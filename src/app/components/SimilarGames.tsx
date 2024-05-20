@@ -3,9 +3,9 @@ import Image from 'next/image';
 
 const games = [
   { src: '/dota2.jpg', alt: 'Dota 2' },
-  { src: '/apex.jpg', alt: 'Apex Legends' },
-  { src: '/lol.jpg', alt: 'League of Legends' },
-  { src: '/valorant.jpg', alt: 'Valorant' },
+  { src: '/dota2.jpg', alt: 'Apex Legends' },
+  { src: '/dota2.jpg', alt: 'League of Legends' },
+  { src: '/dota2.jpg', alt: 'Valorant' },
 ];
 
 export default function SimilarGames() {
