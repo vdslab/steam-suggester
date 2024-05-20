@@ -24,7 +24,6 @@ export default function MainContent() {
           <h3 className="text-lg font-semibold mb-2">一致度</h3>
           <div>
             <div>
-              <MatchIndicator appId={appId} gameTitle={gameTitle} />
             </div>
         </div>
         </div>
@@ -32,47 +31,3 @@ export default function MainContent() {
     </div>
   );
 }
-
-const predefinedGenres = ['Action', 'Adventure', 'Casual']; // 仮
-
-// 一致度表示
-const MatchIndicator = ({ appId, gameTitle }) => {
-  const  [matchPercentage, setMatchPercentage] = useState(0);
-  const [gameGenres, setGameGenres] = useState([]);
-  
-  //test用
-  useEffect(() => {
-    console.log(gameGenres)
-  }, [gameGenres]);
-
-  useEffect(() => {
-    const fetchGameGenres = async () => {
-      try {
-        const response = await fetch(
-          `steam/api/appdetails?appids=${appId}&cc=jp`
-        );
-        const data = await response.json();
-        const genres = data[appId].data.genres.map(genre => genre.description);
-        setGameGenres(genres);
-
-        // 一致度を計算
-        const matchCount = genres.filter(genre => predefinedGenres.includes(genre)).length;
-        setMatchPercentage((matchCount / predefinedGenres.length) * 100);
-      } catch (error) {
-        console.error("Error fetching game genres:", error);
-      }
-    };
-    fetchGameGenres();
-  }, [appId]);
-
-  return (
-    <div>
-      <h3 className="text-lg font-semibold mb-2">一致度</h3>
-      <p>{gameTitle}との一致度：{matchPercentage}%</p>
-      <div className="flex flex-col gap-2">
-        <input type="range" min="0" max="100" value={matchPercentage} className="w-full" readOnly />
-      </div>
-    </div>
-  );
-};
-
