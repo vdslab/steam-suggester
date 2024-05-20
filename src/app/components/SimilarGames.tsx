@@ -14,7 +14,7 @@ export default function SimilarGames() {
       <h2 className="text-lg font-semibold mb-2">類似しているゲーム</h2>
       {games.map((game, index) => (
         <div key={index} className="mb-4">
-          <Image src={game.src} alt={game.alt} width={300} height={150} className="rounded" />
+          {/* <Image src={game.src} alt={game.alt} width={300} height={150} className="rounded" /> */}
           <p className="text-center mt-2">{game.alt}</p>
         </div>
       ))}
