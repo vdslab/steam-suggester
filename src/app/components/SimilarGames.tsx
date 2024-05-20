@@ -6,6 +6,7 @@ const games = [
   { src: '/dota2.jpg', alt: 'Apex Legends' },
   { src: '/dota2.jpg', alt: 'League of Legends' },
   { src: '/dota2.jpg', alt: 'Valorant' },
+  { src: '/dota2.jpg', alt: 'Valorant' },
 ];
 
 export default function SimilarGames() {
