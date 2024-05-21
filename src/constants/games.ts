@@ -1,0 +1,1 @@
+export const GAMES = ['Dota 2', 'Apex Legends', 'League of Legends', 'Valorant', 'Valorant']
