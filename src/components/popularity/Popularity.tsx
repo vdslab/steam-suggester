@@ -1,10 +1,12 @@
 import { PopularityType } from "@/types/PopularityType"
+import Headline from "../common/Headline"
+import StackedAreaChart from "./StackedAreaChart"
 
 const Popularity = (props: PopularityType) => {
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">流行度</h3>
-      ここはこいでの作成ページです  
+      <Headline txt="流行度" />
+      <StackedAreaChart width={400} height={300}  />
     </div>
   )
 }
