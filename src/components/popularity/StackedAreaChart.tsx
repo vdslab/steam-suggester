@@ -5,7 +5,8 @@ import { GradientOrangeRed } from '@visx/gradient';
 import browserUsage, { BrowserUsage } from '@visx/mock-data/lib/mocks/browserUsage';
 import { scaleTime, scaleLinear } from '@visx/scale';
 import { timeParse } from '@visx/vendor/d3-time-format';
-import { CityTemperature } from '@visx/mock-data/lib/mocks/cityTemperature';
+import { CountSteamReviews } from '@/types/Popularity/CountSteamReviews';
+import CalcXDomain from './utils/CalcXDomain';
 
 type BrowserNames = keyof BrowserUsage;
 
@@ -19,6 +20,7 @@ const getY0 = (d: SeriesPoint<BrowserUsage>) => d[0] / 100;
 const getY1 = (d: SeriesPoint<BrowserUsage>) => d[1] / 100;
 
 export type StackedAreasProps = {
+  data1: CountSteamReviews[],
   width: number;
   height: number;
   events?: boolean;
@@ -26,6 +28,7 @@ export type StackedAreasProps = {
 };
 
 const StackedAreaChart =({
+  data1,
   width,
   height,
   margin = { top: 0, right: 0, bottom: 0, left: 0 },
@@ -35,6 +38,11 @@ const StackedAreaChart =({
   const yMax = height - margin.top - margin.bottom;
   const xMax = width - margin.left - margin.right;
 
+
+  // console.log(CalcXDomain(data1))
+
+  
+
   // scales
   const xScale = scaleTime<number>({
     range: [0, xMax],
@@ -43,6 +51,8 @@ const StackedAreaChart =({
   const yScale = scaleLinear<number>({
     range: [yMax, 0],
   });
+
+  console.log(xMax)
 
   return width < 10 ? null : (
     <svg width={width} height={height}>
@@ -59,6 +69,7 @@ const StackedAreaChart =({
       >
         {({ stacks, path }) =>
           stacks.map((stack) => (
+            console.log(stack),
             <path
               key={`stack-${stack.key}`}
               d={path(stack) || ''}
