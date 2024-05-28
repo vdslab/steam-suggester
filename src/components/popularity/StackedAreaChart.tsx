@@ -9,11 +9,11 @@ import { StackedAreasProps } from '@/types/Popularity/StackedAreaProps';
 import { BG_COLOR_STACKED_AREA } from '@/constants/styles/stackedArea';
 
 const getX = (d: CountSteamReviews) => d.date;
-const getY0 = (d: SeriesPoint<any>) => d[0] / 100;
-const getY1 = (d: SeriesPoint<any>) => d[1] / 100;
+const getY0 = (d: SeriesPoint<CountSteamReviews>) => d[0] / 100;
+const getY1 = (d: SeriesPoint<CountSteamReviews>) => d[1] / 100;
 
 const StackedAreaChart =({
-  data1,
+  data,
   width,
   height,
   margin = { top: 0, right: 0, bottom: 0, left: 0 },
@@ -22,17 +22,15 @@ const StackedAreaChart =({
   const yMax = height - margin.top - margin.bottom;
   const xMax = width - margin.left - margin.right;
 
-  const key1 = Object.keys(data1[0]).filter((k) => k !== 'date');
+  const key1 = Object.keys(data[0]).filter((k) => k !== 'date');
 
   const xScale = scaleTime<number>({
     range: [0, xMax],
-    domain: CalcXDomain(data1),
+    domain: CalcXDomain(data),
   });
   const yScale = scaleLinear<number>({
     range: [yMax, 0],
   });
-
-  console.log(key1)
 
   return width < 10 ? null : (
     <svg width={width} height={height}>
@@ -42,7 +40,7 @@ const StackedAreaChart =({
         top={margin.top}
         left={margin.left}
         keys={key1}
-        data={data1}
+        data={data}
         x={(d) => xScale(getX(d.data)) ?? 0}
         y0={(d) => yScale(getY0(d)) ?? 0}
         y1={(d) => yScale(getY1(d)) ?? 0}

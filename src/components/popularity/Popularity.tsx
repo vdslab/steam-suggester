@@ -13,7 +13,10 @@ const Popularity = (props: PopularityType) => {
   return (
     <div>
       <Headline txt="流行度" />
-      <StackedAreaChart data1={data} width={400} height={300}  />
+      {data ? (
+        <StackedAreaChart data={data} width={400} height={300}  />
+      ) : null}
+      
       {/* <button onClick={getData}>steamのレビュー数のデータ取得</button> */}
     </div>
   )

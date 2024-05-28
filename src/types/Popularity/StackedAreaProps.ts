@@ -1,7 +1,7 @@
 import { CountSteamReviews } from "./CountSteamReviews";
 
 export type StackedAreasProps = {
-  data1: CountSteamReviews[],
+  data: CountSteamReviews[],
   width: number;
   height: number;
   events?: boolean;
