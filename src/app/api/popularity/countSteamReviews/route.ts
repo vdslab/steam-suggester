@@ -1,5 +1,4 @@
-import UnixToDate from '@/components/popularity/utils/UnixToDate';
-import { CountSteamReviews, Rollups } from '@/types/Popularity/CountSteamReviews';
+import { Rollups } from '@/types/Popularity/CountSteamReviews';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
@@ -10,9 +9,8 @@ export async function GET(req: Request) {
   
   const reviewsCount = rollups.map((item:Rollups) => ({
     date: item.date,
-    count: item.recommendations_down + item.recommendations_up,
+    count: (item.recommendations_down + item.recommendations_up ) / 1000,
   }))
-  console.log(reviewsCount)
 
   return NextResponse.json(reviewsCount)
 }

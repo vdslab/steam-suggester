@@ -1,0 +1,1 @@
+export const BG_COLOR_STACKED_AREA = '#f38181';
