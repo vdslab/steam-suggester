@@ -17,7 +17,6 @@ const Popularity = (props: PopularityType) => {
         <StackedAreaChart data={data} width={400} height={300}  />
       ) : null}
       
-      {/* <button onClick={getData}>steamのレビュー数のデータ取得</button> */}
     </div>
   )
 }
