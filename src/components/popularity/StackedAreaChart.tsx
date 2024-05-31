@@ -6,6 +6,7 @@ import { CountSteamReviews } from '@/types/Popularity/CountSteamReviews';
 import CalcXDomain from './utils/CalcXDomain';
 import { StackedAreasProps } from '@/types/Popularity/StackedAreaProps';
 import { BG_COLOR_STACKED_AREA } from '@/constants/styles/stackedArea';
+import { AxisBottom, AxisLeft, AxisRight } from '@visx/axis';
 
 const getX = (d: CountSteamReviews) => d.date;
 const getY0 = (d: SeriesPoint<CountSteamReviews>) => d[0] / 100;
@@ -39,9 +40,11 @@ const StackedAreaChart =({
   });
 
   return width < 10 ? null : (
-    <svg width={width} height={height}>
+    <svg width={width+ 100} height={height + 100}>
       {/* <GradientOrangeRed id="stacked-area-orangered" /> */}
       <rect x={0} y={0} width={width} height={height} fill={BG_COLOR_STACKED_AREA} rx={14} />
+      <AxisBottom scale={xScale} label='時間(h)' top={yMax}/>
+      <AxisRight scale={yScale} label='人数' left={xMax}/>
       <AreaStack
         top={margin.top}
         left={margin.left}
