@@ -3,7 +3,6 @@ import { AreaStack } from '@visx/shape';
 import { SeriesPoint } from '@visx/shape/lib/types';
 import { scaleTime, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { CountSteamReviews } from '@/types/Popularity/CountSteamReviews';
-import CalcXDomain from './utils/CalcXDomain';
 import { StackedAreasProps } from '@/types/Popularity/StackedAreaProps';
 import { BG_COLOR_STACKED_AREA } from '@/constants/styles/stackedArea';
 import { AxisBottom, AxisLeft, AxisRight } from '@visx/axis';
@@ -33,7 +32,7 @@ const StackedAreaChart =({
 
   const xScale = scaleTime<number>({
     range: [0, xMax],
-    domain: CalcXDomain(data),
+    domain: data ? [Math.min(...data.map((d) => d.date)), Math.max(...data.map((d) => d.date))] : [0, 0]
   });
   const yScale = scaleLinear<number>({
     range: [yMax, 0],
