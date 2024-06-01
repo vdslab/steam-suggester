@@ -40,10 +40,15 @@ const genreMapping = {
     id: string;
     description: string;
 }
+
+interface Category {
+  id: number;
+  description: string;
+}
   type Data = {
     name:string;
-    genres: string;
-    categories: string;
+    genres: Genre[];
+    categories: Category[];
     priceOverview: number;
   };
 
@@ -58,7 +63,7 @@ const genreMapping = {
     const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
     const [priceDifference, setPriceDifference] = useState<number>(0);
     const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
-    console.log(data);
+    console.log(data.genres);
   
     useEffect(() => {
       // 一致度を計算（ジャンル）
@@ -103,7 +108,6 @@ const genreMapping = {
               {overallMatchPercentage}%
             </div>
           </div>
-          <small className="text-gray-600">aaa</small>
         </div>
   
         <div className="mb-4">
@@ -114,7 +118,13 @@ const genreMapping = {
               {genreMatchPercentage}%
             </div>
           </div>
-          <small className="text-gray-600">aaa</small>
+          <div>
+            {data.genres.map((genre) => (
+                <small key={genre.id} className="text-gray-600">
+                    {genre.description}
+                </small>
+            ))}
+          </div>
         </div>
   
         <div>
