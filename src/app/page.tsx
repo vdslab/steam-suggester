@@ -1,6 +1,6 @@
-import SimilarGames from "@/components/common/SimilarGames"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
+import SimilarGames from "@/components/simlarGames/SimilarGames"
 
 const page = () => {
   return (
@@ -21,12 +21,7 @@ const page = () => {
           </div>
         </div>
         <div className="basis-3/10 flex flex-col">
-          <h3 className="text-lg font-semibold mb-2">関連配信者リスト</h3>
-          <div className="flex flex-row space-x-5">
-            <div className="bg-gray-200 h-24 basis-1/4">動画名</div>
-            <div className="bg-gray-200 h-24 basis-1/4">動画名</div>
-            <div className="bg-gray-200 h-24 basis-1/4">動画名</div>
-          </div>
+
         </div>
       </div>
     </div>
