@@ -1,13 +1,11 @@
 'use client';
-import { PopularityType } from "@/types/PopularityType"
 import Headline from "../common/Headline"
 import StackedAreaChart from "./StackedAreaChart"
 import useCountSteamReview from "@/hooks/popularity/useCountSteamReviews";
-import { GAME_ID } from "@/constants/gameID";
 
-const Popularity = (props: PopularityType) => {
+const Popularity = () => {
 
-  const { data, error, isLoading} = useCountSteamReview(GAME_ID.id)
+  const { data, error, isLoading} = useCountSteamReview(271590)
 
 
   return (
