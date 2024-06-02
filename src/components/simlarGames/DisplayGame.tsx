@@ -6,10 +6,10 @@ const DisplayGame = (props:GameDetails) => {
   const { name, image, url } = props;
 
   return (
-    <div className="flex flex-col box-border">
+    <a className="flex flex-col box-border" href={url} target="_blank" rel="noopener noreferrer">
       <Image src={image} alt={name} width={200} height={200} className="mx-auto"/>
       <p className="text-center my-2 text-white">{name}</p>
-    </div>
+    </a>
   )
 }
 
