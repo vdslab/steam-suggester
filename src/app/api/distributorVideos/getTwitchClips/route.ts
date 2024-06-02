@@ -15,7 +15,7 @@ export async function GET(req: Request) {
   }
 
   const res = await fetch(
-    `https://api.twitch.tv/helix/clips?game_id=${GAME_ID}&first=5`,
+    `https://api.twitch.tv/helix/clips?game_id=${GAME_ID}&first=3`,
     {
       headers: headers,
     }
@@ -25,9 +25,9 @@ export async function GET(req: Request) {
     return ({
       id: clip.id,
       url: clip.url,
+      embedUrl: clip.embed_url,
       image: clip.thumbnail_url,
       title: clip.title,
-      viewCount: clip.view_count,
     })
   })
 
