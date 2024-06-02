@@ -10,7 +10,7 @@ const SimilarGames = () => {
   if (!data) return <div>loading...</div>
 
   return (
-    <div className=" ">
+    <div>
       <Headline txt="類似してるゲーム" />
       {data.map((game:GameDetails) => (
         <DisplayGame key={game.url} name={game.name} image={game.image} url={game.url}/>

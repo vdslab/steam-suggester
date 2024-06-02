@@ -3,10 +3,13 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <div className="h-[8dvh] rounded-none bg-[#171a21] flex text-4xl p-4 text-white">
+    <div className="h-[8dvh] leading-[8dvh] bg-[#171a21] flex text-3xl text-white space-x-5 pl-8">
       <div>{TITLE}</div>
-      <Link href="/network" className="p">
-        Home
+      <Link href="/network">
+        network
+      </Link>
+      <Link href="/details/apex">
+        details
       </Link>
     </div>
   );
