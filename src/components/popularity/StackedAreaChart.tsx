@@ -39,7 +39,7 @@ const StackedAreaChart =({
   });
 
   return width < 10 ? null : (
-    <svg width={width+ 100} height={height + 100}>
+    <svg width={width+ 100} height={height +50}>
       {/* <GradientOrangeRed id="stacked-area-orangered" /> */}
       <rect x={0} y={0} width={width} height={height} fill={BG_COLOR_STACKED_AREA} rx={14} />
       <AxisBottom scale={xScale} label='時間(h)' top={yMax}/>

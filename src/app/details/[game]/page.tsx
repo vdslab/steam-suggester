@@ -1,3 +1,4 @@
+import { DistributorVideos } from "@/components/distributorVideos/DistributorVideos"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
 import SimilarGames from "@/components/simlarGames/SimilarGames"
@@ -26,11 +27,11 @@ export default function Page({
             <Popularity />
           </div>
           <div className="basis-1/2">
-            {/* <Match /> */}
+            <Match />
           </div>
         </div>
         <div className="basis-3/10 flex flex-col">
-          <VideoList />
+          <DistributorVideos />
         </div>
       </div>
     </div>
