@@ -2,9 +2,8 @@ import { TwitchClips } from "@/types/distributorVideos/TwitchClips";
 import Image from "next/image";
 
 export const DisplayClip = (props: TwitchClips) => {
-  const { url, image, title, viewCount } = props;
 
-  console.log(image)
+  const { url, image, title, viewCount } = props;
 
   return (
     <div className="flex flex-col">

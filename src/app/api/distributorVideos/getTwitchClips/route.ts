@@ -31,7 +31,5 @@ export async function GET(req: Request) {
     })
   })
 
-  console.log(clips)
-
   return NextResponse.json(clips)
 }
