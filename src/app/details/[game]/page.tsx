@@ -20,7 +20,7 @@ export default function Page({
       </div>
       <div className="w-3/4 bg-[#2a475e] flex flex-col p-4">
         <div className="basis-1/10">
-          <h2 className="text-xl font-semibold mb-4">ゲームタイトル</h2>
+          <h2 className="text-xl font-semibold mb-4 text-white text-center">{game}</h2>
         </div>
         <div className="basis-6/10 flex flex-row space-x-5">
           <div className="basis-1/2">
