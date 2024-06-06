@@ -63,7 +63,7 @@ interface Category {
     const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
     const [priceDifference, setPriceDifference] = useState<number>(0);
     const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
-    console.log(data.genres);
+    console.log(data);
   
     useEffect(() => {
       // 一致度を計算（ジャンル）
