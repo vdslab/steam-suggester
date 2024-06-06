@@ -31,12 +31,12 @@ const genreMapping = {
     50: "Accounting",
     81: "Documentary",
     84: "Tutorial"
-  };  
-  // ユーザー選択(仮)
-  const userSelectedGenres : number[] = [1, 25, 4];// 仮
-  const userSelectedPrice = 2000;
-  
-  interface Genre {
+};  
+// ユーザー選択(仮)
+const userSelectedGenres : number[] = [1, 25, 4];// 仮
+const userSelectedPrice = 2000;
+
+interface Genre {
     id: string;
     description: string;
 }
@@ -55,11 +55,10 @@ interface Category {
   type MatchIndicatorProps = {
     data: Data;
     appId: number;
-    gameTitle: string;
   }
   
   // 一致度表示
-  const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId, gameTitle }) => {
+  const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
     const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
     const [priceDifference, setPriceDifference] = useState<number>(0);
     const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
@@ -76,7 +75,7 @@ interface Category {
       setPriceDifference(priceDiff);
 
       // 一致度を計算(全体)
-      const overallMatch = Math.round((genreMatch) / 1);// 仮
+      const overallMatch = Math.min(Math.round((genreMatch) / 1), 100);// 仮
       setOverallMatchPercentage(overallMatch);
     }, [appId]);
   
@@ -99,7 +98,7 @@ interface Category {
   
     return (
       <div>
-        <h3 className="text-lg font-semibold mb-2">{gameTitle}との一致度</h3>
+        <h3 className="text-lg font-semibold mb-2">{data.name}との一致度</h3>
         <div className="mb-4">
           <p>全体の一致度：</p>
           <div className="w-full bg-gray-200 rounded-full h-4 mb-1 relative">
@@ -121,7 +120,7 @@ interface Category {
           <div>
             {data.genres.map((genre) => (
                 <small key={genre.id} className="text-gray-600">
-                    {genre.description}
+                    {genre.description},
                 </small>
             ))}
           </div>
