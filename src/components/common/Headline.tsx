@@ -6,7 +6,7 @@ const Headline = (props: Props) => {
 
   const { txt } = props;
 
-  return <h3 className="text-lg font-semibold mb-2">{txt}</h3>;
+  return <div className="p-3 text-lg mb-2 text-white">{txt}</div>;
 };
 
 export default Headline;
