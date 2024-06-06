@@ -1,8 +1,8 @@
-const Network = () => {
+import NodeLink from "./NodeLink";
+
+const Network = (props:any) => {
   return (
-    <div>
-      ここはいのうえの作成ページです
-    </div>
+    <NodeLink filter={props.filter} />
   )
 }
 
