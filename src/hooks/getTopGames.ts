@@ -1,4 +1,4 @@
-export async function getNextAPIData(url: string) {
+export async function getTopGames() {
 
     const res = await fetch(`http://localhost:3000/api/getTopGames`)
   
