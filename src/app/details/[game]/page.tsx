@@ -1,8 +1,7 @@
-import { DistributorVideos } from "@/components/distributorVideos/DistributorVideos"
+import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
 import SimilarGames from "@/components/simlarGames/SimilarGames"
-import VideoList from "@/components/videoList/VideoList"
 
 export default function Page({
   params
