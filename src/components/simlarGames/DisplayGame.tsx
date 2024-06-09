@@ -7,7 +7,7 @@ const DisplayGame = (props:GameDetails) => {
 
   return (
     <a className="flex flex-col box-border" href={url} target="_blank" rel="noopener noreferrer">
-      <Image src={image} alt={name} width={200} height={200} className="mx-auto"/>
+      <Image src={image} alt={name} width={0} height={0} priority className="mx-auto" style={{ width:100, height:200 }}/>
       <p className="text-center my-2 text-white">{name}</p>
     </a>
   )
