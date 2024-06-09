@@ -1,15 +1,16 @@
 import { GameDetails } from "@/types/similarGames/GameDetails";
 import Image from "next/image";
+import Link from "next/link";
 
 const DisplayGame = (props:GameDetails) => {
 
   const { name, image, url } = props;
 
   return (
-    <a className="flex flex-col box-border" href={url} target="_blank" rel="noopener noreferrer">
-      <Image src={image} alt={name} width={0} height={0} priority className="mx-auto" style={{ width:100, height:200 }}/>
+    <Link className="flex flex-col box-border" href={`/details/${name}`}>
+      <Image width={1000} height={0} src={image} alt={name} priority className="mx-auto h-auto w-4/6" />
       <p className="text-center my-2 text-white">{name}</p>
-    </a>
+    </Link>
   )
 }
 
