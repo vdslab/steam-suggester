@@ -1,12 +1,10 @@
-'use client';
 import Headline from "../common/Headline"
 import StackedAreaChart from "./StackedAreaChart"
-import useCountSteamReview from "@/hooks/popularity/useCountSteamReviews";
 
-const Popularity = () => {
+const Popularity = async() => {
 
-  const { data, error, isLoading} = useCountSteamReview(271590)
-
+  const response = await fetch(`http://localhost:3000/api/popularity/countSteamReviews/1172470`);
+  const data = await response.json();
 
   return (
     <div>
