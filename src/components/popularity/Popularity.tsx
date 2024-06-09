@@ -10,7 +10,7 @@ const Popularity = async() => {
     <div>
       <Headline txt="流行度" />
       {data ? (
-        <StackedAreaChart data={data} width={350} height={200}  />
+        <StackedAreaChart data={data} width={400} height={270}  />
       ) : null}
       
     </div>
