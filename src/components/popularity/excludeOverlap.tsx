@@ -6,7 +6,7 @@ import getTopGames from "@/hooks/getTopGames";
 const excludeOverlap = () => {
 
   const { data, error, isLoading} = getTopGames()
-  console.log(data);
+  // console.log(data);
 
   return (
     <div>
