@@ -1,24 +1,35 @@
 'use client';
-import getSteamGameDetail from "@/hooks/popularity/useGetSteamGameDetail";
-import MatchIndicator from "./MatchIndicator";
-import Headline from "../common/Headline";
+
+import React, { useEffect, useState } from 'react';
+import useGetSteamGameDetail from '@/hooks/popularity/useGetSteamGameDetail';
+import useConvertSteamGameIdListFromGameName from '@/hooks/useConvertSteamGameIdListFromGameName';
+import MatchIndicator from './MatchIndicator';
+import Headline from '../common/Headline';
 
 const Match = () => {
-  // 仮 (検討中)
-  const gameTitle="Fall guys";
-  const GAME_ID = 438640;
+  const [gameTitle, setGameTitle] = useState<string>('');
+  const [gameId, setGameId] = useState<number>(0);
+  const { data: nameData, error: nameError, isLoading: nameLoading } = useConvertSteamGameIdListFromGameName();
+  const { data: gameData, error: gameError, isLoading: gameLoading } = useGetSteamGameDetail(gameId || 0);
+  
+  useEffect(() => {
+    if (nameData && nameData.length > 0) {
+      setGameId(nameData[0].id);
+      setGameTitle(nameData[0].name);
+    }
+  }, [nameData]);
 
-  const { data, error, isLoading} = getSteamGameDetail(GAME_ID)
+  if (nameLoading || gameLoading) return <div>Loading...</div>;
+  if (nameError || gameError) return <div>Error occurred</div>;
 
   return (
     <div>
-      <Headline txt='一致度'/>
-      {data ? (
-        <MatchIndicator data={data} appId={GAME_ID} gameTitle={gameTitle} />
+      <Headline txt="一致度" />
+      {gameData ? (
+        <MatchIndicator data={gameData} appId={gameId} gameTitle={gameTitle} />
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-
-export default Match
+export default Match;

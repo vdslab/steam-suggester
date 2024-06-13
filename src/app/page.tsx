@@ -1,6 +1,7 @@
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
 import SimilarGames from "@/components/simlarGames/SimilarGames"
+import ExcludeOverlap from "@/components/network/excludeOverlap" //仮
 
 const page = () => {
   return (
@@ -18,6 +19,7 @@ const page = () => {
           </div>
           <div className="basis-1/2">
             <Match />
+            <ExcludeOverlap/>
           </div>
         </div>
         <div className="basis-3/10 flex flex-col">
