@@ -1,13 +1,11 @@
-'use client'
-import useTwitchClips from "@/hooks/distributorVideos/useTwitchClips"
 import Headline from "../common/Headline"
-import { DisplayClip } from "./DisplayClip"
+import DisplayClip from "./DisplayClip"
 
-export const DistributorVideos = () => {
+const DistributorVideos = async() => {
 
-  const { data, error, isLoading} = useTwitchClips()
 
-  if (isLoading) return <div>loading...</div>
+  const res = await fetch('http://localhost:3000/api/distributorVideos/getTwitchClips')
+  const data = await res.json()
 
 
   return (
@@ -27,3 +25,5 @@ export const DistributorVideos = () => {
     </div>
   )
 }
+
+export default DistributorVideos

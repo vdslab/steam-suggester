@@ -1,6 +1,6 @@
 import { TwitchClips } from "@/types/distributorVideos/TwitchClips";
 
-export const DisplayClip = (props: TwitchClips) => {
+const DisplayClip = (props: TwitchClips) => {
 
   const { url, embedUrl, image, title } = props;
 
@@ -25,3 +25,5 @@ export const DisplayClip = (props: TwitchClips) => {
     </div>
   );
 };
+
+export default DisplayClip;
