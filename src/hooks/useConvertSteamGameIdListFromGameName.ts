@@ -3,7 +3,7 @@ import useSWR from 'swr';
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const useConvertSteamGameIdListFromGameName = () => {
-  const { data, error } = useSWR(`/api/useConvertSteamGameIdListFromGameName`, fetcher);
+  const { data, error } = useSWR(`/api/convertSteamGameIdList`, fetcher);
   return {
     data,
     error,
