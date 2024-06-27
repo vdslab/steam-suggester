@@ -4,17 +4,17 @@ export async function GET(req: Request) {
   const gameNames2 = {
     "data": [
       {
-        "id": "509658",
-        "name": "Just Chatting"
+        "id": "000000",
+        "name": "fall guys"
       },
       {
-        "id": "110758",
-        "name": "The Legend of Zelda: Breath of the Wild"
+        "id": "000000",
+        "name": "Apex"
       }
     ]
   };
 
-  const resultArray: any[] = [];
+  const resultArray: string[] = [];
 
   for (const game of gameNames2.data) {
     const res = await fetch(`https://store.steampowered.com/api/storesearch/?term=${game.name}&cc=JP`);

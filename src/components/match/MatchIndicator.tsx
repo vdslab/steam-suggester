@@ -63,7 +63,7 @@ interface Category {
     const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
     const [priceDifference, setPriceDifference] = useState<number>(0);
     const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
-    // console.log(data);
+    console.log(data);
   
     useEffect(() => {
       // 一致度を計算（ジャンル）
@@ -149,7 +149,7 @@ interface Category {
             <span>0円</span>
             <span>{(userSelectedPrice * 2).toLocaleString()}円</span>
           </div>
-          <small className="text-gray-600">価格:{data.priceOverview.toLocaleString()}</small>
+          {data.priceOverview ? <small className="text-gray-600">価格:{data.priceOverview.toLocaleString()}</small> : null}
         </div>
       </div>
     );
