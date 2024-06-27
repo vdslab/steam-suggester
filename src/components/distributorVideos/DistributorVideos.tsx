@@ -12,7 +12,7 @@ export const DistributorVideos = () => {
 
   return (
     <div>
-      {/* <Headline txt='関連配信者リスト' />
+      <Headline txt='関連配信者リスト' />
       <div className="flex flex-row space-x-5">
         {data.map((clip: any) => (
           <DisplayClip
@@ -23,7 +23,7 @@ export const DistributorVideos = () => {
             image={clip.image}
             title={clip.title}/>
         ))}
-      </div> */}
+      </div>
     </div>
   )
 }

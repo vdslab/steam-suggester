@@ -99,7 +99,7 @@ interface Category {
   
     return (
       <div>
-        <h3 className="text-lg font-semibold mb-2">{gameTitle}との一致度</h3>
+        <h3 className="text-lg font-semibold mb-2">{data.name}との一致度</h3>
         <div className="mb-4">
           <p>全体の一致度：</p>
           <div className="w-full bg-gray-200 rounded-full h-4 mb-1 relative">
