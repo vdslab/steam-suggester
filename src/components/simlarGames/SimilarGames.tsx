@@ -1,13 +1,11 @@
-'use client';
 import Headline from "../common/Headline";
 import DisplayGame from "./DisplayGame";
-import useGameDetails from "@/hooks/similarGames/useGameDetails";
 import { GameDetails } from "@/types/similarGames/GameDetails";
 
-const SimilarGames = () => {
+const SimilarGames = async() => {
 
-  const { data, error, isLoading } = useGameDetails();
-  if (!data) return <div>loading...</div>
+  const res = await fetch('http://localhost:3000/api/similarGames/gameDetails')
+  const data = await res.json()
 
   return (
     <div>
