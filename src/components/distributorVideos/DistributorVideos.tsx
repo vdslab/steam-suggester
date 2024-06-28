@@ -10,7 +10,7 @@ const DistributorVideos = async() => {
 
   return (
     <div>
-      {/* <Headline txt='関連配信者リスト' />
+      <Headline txt='関連配信者リスト' />
       <div className="flex flex-row space-x-5">
         {data.map((clip: any) => (
           <DisplayClip
@@ -21,7 +21,7 @@ const DistributorVideos = async() => {
             image={clip.image}
             title={clip.title}/>
         ))}
-      </div> */}
+      </div>
     </div>
   )
 }
