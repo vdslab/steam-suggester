@@ -14,7 +14,7 @@ const Match = () => {
     <div>
       <Headline txt='一致度'/>
       {data ? (
-        <MatchIndicator data={data} appId={GAME_ID} gameTitle={gameTitle} />
+        <MatchIndicator data={data[0]} appId={GAME_ID} gameTitle={gameTitle} />
       ) : null}
     </div>
   )
