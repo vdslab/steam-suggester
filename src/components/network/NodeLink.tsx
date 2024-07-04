@@ -157,12 +157,12 @@ const NodeLink = (props:any) => {
         d3
           .forceLink(links)
           .id((d:any) => d.id)
-          .distance(() => {
-            return 50;
-          })
-          .strength((item: any) => {
+          .distance((item: any) => {
             return calcCommonGenres(item.source, item.target);
           })
+          /* .strength((item: any) => {
+            return calcCommonGenres(item.source, item.target);
+          }) */
       )
       .force("charge", d3.forceManyBody().strength(-1000))
       .force("center", d3.forceCenter(width / 3, height / 2));
@@ -171,7 +171,7 @@ const NodeLink = (props:any) => {
 
     simulation.on("tick", () => {
       tickCount++;
-      if (tickCount >= 40) {
+      if (tickCount >= 300) {
         simulation.stop();
         const newnode:any = nodes.map((node:any) => {
           return {

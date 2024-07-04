@@ -50,7 +50,7 @@ interface GameData {
   isMultiPlayer: boolean;
   priceOverview: number;
   salePriceOverview: number;
-  platforms: Platforms[];
+  platforms: Platforms;
 };
 
 interface Data {
