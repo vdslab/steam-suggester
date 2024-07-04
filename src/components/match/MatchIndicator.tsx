@@ -42,6 +42,7 @@ interface Category {
   description: string;
 }
 type Data = {
+  gameData: any;
   isSinglePlayer: React.JSX.Element;
   isMultiPlayer: React.JSX.Element;
   name:string;
@@ -68,7 +69,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
     setGenreMatchPercentage(genreMatch);
 
     // 価格の差分を計算
-    const priceDiff = data.priceOverview - userSelected.price;
+    const priceDiff = data.gameData.priceOverview - userSelected.price;
     setPriceDifference(priceDiff);
 
     // 一致度を計算(全体)
@@ -85,7 +86,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
     const countMatchingGenres = () => {
         let matchingCount = 0;
         const userGenreIDs = userSelected.genres.map(genre => genre.id);
-        data.genres.forEach(gameGenre => {
+        data.gameData.genres.forEach((gameGenre: { id: string; }) => {
             if (userGenreIDs.includes(gameGenre.id)) {
                 matchingCount++;
             }
@@ -114,7 +115,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
             </div>
           </div>
           <div>
-            {data.genres.map((genre) => (
+            {data.gameData.genres.map((genre) => (
                 <small key={genre.id} className="text-gray-400">
                     {genre.description}&nbsp;
                 </small>
@@ -128,7 +129,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
             <div
               className={`h-4 rounded-full ${priceDifference < 0 ? 'bg-green-600' : 'bg-red-600'}`}
               style={{
-                width: `${priceBarPosition(data.priceOverview)}%`,
+                width: `${priceBarPosition(data.gameData.priceOverview)}%`,
               }}
             ></div>
             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
@@ -144,17 +145,17 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
             <span>0円</span>
             <span>{(userSelected.price * 2).toLocaleString()}円</span>
           </div>
-          {data.priceOverview ? <small className="text-gray-400">価格:{data.priceOverview.toLocaleString()}円</small> : null}
+          {data.gameData.priceOverview ? <small className="text-gray-400">価格:{data.gameData.priceOverview.toLocaleString()}円</small> : null}
         </div>
 
         <div className="mb-4">
           <p>ゲームモード一致度</p>
           <div className="flex mb-4">
-            <div className={`w-1/2 p-2 ${data.isMultiPlayer ? 'bg-green-600' : 'bg-gray-200'} rounded`}>
+            <div className={`w-1/2 p-2 ${data.gameData.isMultiPlayer ? 'bg-green-600' : 'bg-gray-200'} rounded`}>
               <span className="text-white">マルチプレイヤー</span>
               {userSelected.isMultiPlayer && <div className="mt-1 h-1 bg-blue-600 rounded-full"></div>}
             </div>
-            <div className={`w-1/2 p-2 ${data.isSinglePlayer ? 'bg-green-600' : 'bg-gray-200'} rounded`}>
+            <div className={`w-1/2 p-2 ${data.gameData.isSinglePlayer ? 'bg-green-600' : 'bg-gray-200'} rounded`}>
               <span className="text-white">シングルプレイヤー</span>
               {userSelected.isSinglePlayer && <div className="mt-1 h-1 bg-blue-600 rounded-full"></div>}
             </div>
