@@ -1,9 +1,9 @@
-
-const getLocalstrage = () => {
+'use client'
+const getLocalStorage = () => {
 
   const localData = localStorage.getItem("userPreference")
 
   return localData
 }
 
-export default getLocalstrage
+export default getLocalStorage
