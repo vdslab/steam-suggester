@@ -37,23 +37,30 @@ interface Genre {
   id: string;
   description: string;
 }
+
 interface Category {
   id: number;
   description: string;
 }
-type Data = {
-  gameData: any;
-  isSinglePlayer: React.JSX.Element;
-  isMultiPlayer: React.JSX.Element;
-  name:string;
+
+type GameData = {
   genres: Genre[];
   categories: Category[];
+  isSinglePlayer: boolean;
+  isMultiPlayer: boolean;
   priceOverview: number;
 };
+
+type Data = {
+  gameData: GameData;
+  name: string;
+  imgURL: string;
+};
+
 type MatchIndicatorProps = {
   data: Data;
   appId: number;
-}
+};
 
   // 一致度表示
 const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
