@@ -50,7 +50,11 @@ export async function GET(req: Request) {
             categories: data2[`${gameId}`].data.categories,
             isSinglePlayer: setIsSinglePlayer,
             isMultiPlayer: setIsMultiPlayer,
-            priceOverview: data.items[0].price?.initial / 100 ?? -1
+            priceOverview: data.items[0].price?.initial / 100 ?? -1,
+            salePriceOverview: data.items[0].price?.final / 100 ?? -1,
+            platforms: {
+              windows: data.items[0].platforms?.windows ?? false
+            }
           }
         };
         resultArray.push(result);

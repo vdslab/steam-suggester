@@ -49,12 +49,20 @@ type GameData = {
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
   priceOverview: number;
+  salePriceOverview: number;
+  platforms: Platforms[];
 };
 
 type Data = {
   gameData: GameData;
   name: string;
   imgURL: string;
+};
+
+type Platforms = {
+  windows: boolean
+  max: boolean
+  linux: boolean
 };
 
 type MatchIndicatorProps = {
