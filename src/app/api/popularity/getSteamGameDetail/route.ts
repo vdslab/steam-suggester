@@ -53,7 +53,9 @@ export async function GET(req: Request) {
             priceOverview: data.items[0].price?.initial / 100 ?? -1,
             salePriceOverview: data.items[0].price?.final / 100 ?? -1,
             platforms: {
-              windows: data.items[0].platforms?.windows ?? false
+              windows: data.items[0].platforms?.windows ?? false,
+              mac: data.items[0].platforms?.mac ?? false,
+              linux: data.items[0].platforms?.linux ?? false
             }
           }
         };
