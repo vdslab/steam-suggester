@@ -1,4 +1,5 @@
-import { gameDetailType, steamGamePlatformType, steamGameGenreType, steamGameCategoryType } from '@/types/api/getGameDetailsType';
+import { gameDetailType } from '@/types/api/gameDetailsType';
+import { steamGamePlatformType, steamGameGenreType, steamGameCategoryType } from '@/types/api/steamDataType';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
