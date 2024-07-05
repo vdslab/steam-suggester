@@ -1,7 +1,9 @@
 'use client'
 const setLocalStorage = (data:any) => {
 
-  localStorage.setItem('userPreference', JSON.stringify(data))
+  if (typeof window !== "undefined") {
+    localStorage.setItem('userPreference', JSON.stringify(data))
+  }
 
 }
 

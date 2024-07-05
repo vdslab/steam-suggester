@@ -1,9 +1,12 @@
 'use client'
 const getLocalStorage = () => {
 
-  const localData = localStorage.getItem("userPreference")
+  if (typeof window !== "undefined") {
+    const localData = localStorage.getItem("userPreference")
+    return localData ? JSON.parse(localData) : {}
+  }
 
-  return localData
+  return null
 }
 
 export default getLocalStorage
