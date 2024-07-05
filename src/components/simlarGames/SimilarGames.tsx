@@ -4,7 +4,7 @@ import { GameDetails } from "@/types/similarGames/GameDetails";
 
 const SimilarGames = async() => {
 
-  const res = await fetch('http://localhost:3000/api/similarGames/gameDetails')
+  const res = await fetch(`${process.env.CURRENT_URL}/api/similarGames/gameDetails`)
   const data = await res.json()
 
   return (
