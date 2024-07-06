@@ -1,3 +1,4 @@
+import Gametitle from "@/components/common/Gametitle"
 import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
@@ -6,11 +7,10 @@ import SimilarGames from "@/components/simlarGames/SimilarGames"
 export default function Page({
   params
 }: {
-  params: { game :string }
+  params: { steamGameId :string }
 }){
 
-  const game = params.game
-
+  const steamGameId = params.steamGameId;
 
   return (
     <div className="flex h-[92dvh]">
@@ -19,7 +19,7 @@ export default function Page({
       </div>
       <div className="w-3/4 bg-[#2a475e] flex flex-col p-4">
         <div className="basis-1/10">
-          <h2 className="text-xl font-semibold mb-4 text-white text-center">{game}</h2>
+          <Gametitle steamGameId={steamGameId} />
         </div>
         <div className="basis-6/10 flex flex-row space-x-5">
           <div className="basis-1/2">

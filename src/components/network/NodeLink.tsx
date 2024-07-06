@@ -198,7 +198,6 @@ const NodeLink = (props:any) => {
         ))}
       {newNode.length !== 0 &&
         newNode.map((node:any, i) => {
-          console.log(node);
           return (
             <g transform={`translate(${node.x},${node.y})`} key={i}>
               <Icon
