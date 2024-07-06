@@ -3,12 +3,12 @@ import { useState } from "react";
 import { useRouter } from 'next/navigation';
 
 const Icon = (props:any) => {
-  const { title, imgURL, index } = props;
+  const { title, imgURL, index, steamGameId } = props;
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   const handleClick = (e:any) => {
     e.preventDefault();
-    router.push("/details/apex");
+    router.push(`/details/${steamGameId}`);
   };
 
   return (

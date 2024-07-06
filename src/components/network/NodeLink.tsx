@@ -84,8 +84,10 @@ const NodeLink = (props:any) => {
       title: node.title,
       imgURL: node.imgURL,
       gameData: node.gameData,
+      steamGameId: node.steamGameId
       /* playtime: node.playtime, */
     }));
+
 
     for (let i = 0; i < nodes.length; i++) {
       const array = nodes
@@ -155,9 +157,11 @@ const NodeLink = (props:any) => {
           return {
             x: node.x,
             y: node.y,
+            index: node.index,
             title: node.title,
             imgURL: node.imgURL,
-            index: node.index,
+            gameData: node.gameData,
+            steamGameId: node.steamGameId
           };
         })
         setNewNode(newnode);
@@ -194,12 +198,14 @@ const NodeLink = (props:any) => {
         ))}
       {newNode.length !== 0 &&
         newNode.map((node:any, i) => {
+          console.log(node);
           return (
             <g transform={`translate(${node.x},${node.y})`} key={i}>
               <Icon
                 title={node.title}
                 imgURL={node.imgURL}
                 index={node.index}
+                steamGameId={node.steamGameId}
               ></Icon>
             </g>
           );
