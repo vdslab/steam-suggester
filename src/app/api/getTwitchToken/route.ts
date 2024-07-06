@@ -3,21 +3,21 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const client = await PG_POOL.connect();
-    const result = await client.query(
-      'SELECT token FROM access_token WHERE client_id = $1 ORDER BY get_date DESC LIMIT 1',
-      [process.env.TWITCH_CLIENT_ID]
-    );
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD形式の今日の日付を取得
+    
+    // 今日の日付のデータを取得するクエリ
+    const query = `
+      SELECT get_date, game_title, twitch_id, steam_id, total_views
+      FROM game_views
+      WHERE get_date::date = $1;
+    `;
 
-    await client.release(true);
+    const { rows } = await PG_POOL.query(query, [today]);
 
-    if (result.rows.length > 0) {
-      return NextResponse.json(result.rows[0].token);
-    } else {
-      return NextResponse.json({ error: 'No access token found' }, { status: 404 });
-    }
+    // データが取得できたら JSON 形式で返す
+    return NextResponse.json(rows);
   } catch (error) {
-    console.error('Error fetching access token:', error);
-    return NextResponse.json({ error: 'Failed to fetch access token' }, { status: 500 });
+    console.error('Error fetching data:', error);
+    return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
   }
 }
