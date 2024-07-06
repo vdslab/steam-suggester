@@ -2,7 +2,6 @@ import Headline from "../common/Headline"
 import StackedAreaChart from "./StackedAreaChart"
 
 const Popularity = async() => {
-
   const response = await fetch(`${process.env.CURRENT_URL}/api/popularity/countSteamReviews/1172470`);
   const data = await response.json();
 

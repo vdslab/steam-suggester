@@ -33,12 +33,9 @@ const Network = (props: any) => {
     fetchData();
   }, [data]);
 
-  console.log(newData);
-
   return (
     <>
-
-      {data ? <NodeLink filter={props.filter} data={newData} /> : <div>Loading...</div>}
+      {newData.length !== 0 ? <NodeLink filter={props.filter} data={newData} /> : <div>Loading...</div>}
     </>
   );
 };

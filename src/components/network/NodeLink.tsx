@@ -32,10 +32,9 @@ const ZoomableSVG = (props:any) => {
 };
 
 const NodeLink = (props:any) => {
-  const { filter } = props;
+  const { filter, data } = props;
   const k = 3;
 
-  const data:any = testData;
   const [selectGameIdx, setSelectGameIdx] = useState(0);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -45,10 +44,9 @@ const NodeLink = (props:any) => {
 
   const calcCommonGenres = (game1:any, game2:any) => {
     let genresWeight = 0;
-
-    if(game1.title === game2.title) {
+    /* if(game1.title === game2.title) {
       return 1;
-    }
+    } */
 
     game1.genres.forEach((item:any) =>
       game2.genres.forEach((i:any) => {
@@ -59,29 +57,11 @@ const NodeLink = (props:any) => {
     );
 
     const priceWeight = Math.abs(game1.price - game2.price);
-    const platformsWeight = game1.platforms === game2.platforms ? 1 : 0;
-    const playtimeWeight = Math.abs(game1.playtime - game2.playtime);
-    const totalWeight = genresWeight * 10 + (1 / priceWeight) * 100 + platformsWeight * 5 + (1 / playtimeWeight) * 100;
-    return genresWeight;
+    // const platformsWeight = game1.platforms === game2.platforms ? 1 : 0;
+    // const playtimeWeight = Math.abs(game1.playtime - game2.playtime);
+    const totalWeight = genresWeight * 10 + (1 / priceWeight) * 100;
+    return 10;
   };
-
-  /* テストデータ作成用
-  const newData = data.map((item:any,index:number) => {
-    const newPrice = Math.round(Math.random() * 9999);
-    const newPlatforms = Math.round(Math.random() * 1);
-    const newPlaytime = Math.round(Math.random() * 999);
-
-    return {
-      title: item.title,
-      genres: item.genres,
-      header_image: item.header_image,
-      price: newPrice,
-      platforms: newPlatforms == 0 ? "1人用" : "マルチ用",
-      playtime: newPlaytime
-    };
-  });
-  console.log(newData);
-  */ 
 
   useEffect(() => {
     const width = window.innerWidth;
@@ -90,23 +70,21 @@ const NodeLink = (props:any) => {
     const ngIndex = [];
 
     const nodes = Object.values(data).filter((item: any) => {
-      if(!item.genres.find((value:any) => filter["Categories"][value.id])) return false;
-      const priceId = item.price < 1000 ? 1 : Math.floor(item.price / 1000) + 1;
+      /* if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
+      const priceId = item.gameData.price < 1000 ? 1 : Math.floor(item.gameData.price / 1000) + 1;
       if(!filter["Price"][priceId]) return false;
-      const platformsId = item.platforms === "1人用" ? 1 : 2;
-      if(!filter["Platforms"][platformsId]) return false;
-      const playtimeId = item.playtime < 100 ? 1 : Math.floor(item.playtime / 100) + 1;
-      if(!filter["Playtime"][playtimeId]) return false;
+      const platformsId = item.gameData.isSinglePlayer ? 1 : 2;
+      if(!filter["Platforms"][platformsId]) return false; */
+      /* const playtimeId = item.playtime < 100 ? 1 : Math.floor(item.playtime / 100) + 1;
+      if(!filter["Playtime"][playtimeId]) return false; */
       
       return true;
     }).map((node:any, index) => ({
       id: index,
       title: node.title,
-      header_image: node.header_image,
-      genres: node.genres,
-      price: node.price,
-      platforms: node.platforms,
-      playtime: node.playtime,
+      imgURL: node.imgURL,
+      gameData: node.gameData,
+      /* playtime: node.playtime, */
     }));
 
     for (let i = 0; i < nodes.length; i++) {
@@ -158,7 +136,7 @@ const NodeLink = (props:any) => {
           .forceLink(links)
           .id((d:any) => d.id)
           .distance((item: any) => {
-            return calcCommonGenres(item.source, item.target);
+            return calcCommonGenres(item.source.gameData, item.target.gameData);
           })
           /* .strength((item: any) => {
             return calcCommonGenres(item.source, item.target);
@@ -178,7 +156,7 @@ const NodeLink = (props:any) => {
             x: node.x,
             y: node.y,
             title: node.title,
-            header_image: node.header_image,
+            imgURL: node.imgURL,
             index: node.index,
           };
         })
@@ -220,13 +198,13 @@ const NodeLink = (props:any) => {
             <g transform={`translate(${node.x},${node.y})`} key={i}>
               <Icon
                 title={node.title}
-                header_image={node.header_image}
+                imgURL={node.imgURL}
                 index={node.index}
               ></Icon>
             </g>
           );
         })}
-    </ZoomableSVG> : <div>loading...</div>
+    </ZoomableSVG> : <div>Loading...</div>
     }
     </div>
     

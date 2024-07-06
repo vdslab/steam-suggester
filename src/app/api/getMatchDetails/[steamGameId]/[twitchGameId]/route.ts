@@ -27,7 +27,7 @@ export async function GET(req: Request, { params }: Params) {
       title: gameDetailData.name,
       imgURL: gameDetailData.header_image,
       gameData: {
-        genres: gameDetailData.genres.map((genre: steamGameGenreType) => genre.description),
+        genres: gameDetailData.genres,
         price: gameDetailData.price_overview ? gameDetailData.price_overview.final : 0,
         isSinglePlayer: gameDetailData.categories.some((category: steamGameCategoryType) => category.id === 2),
         isMultiPlayer: gameDetailData.categories.some((category: steamGameCategoryType) => category.id === 1),

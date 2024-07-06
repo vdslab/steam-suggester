@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from 'next/navigation';
 
 const Icon = (props:any) => {
-  const { title, header_image, index } = props;
+  const { title, imgURL, index } = props;
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   const handleClick = (e:any) => {
@@ -25,7 +25,7 @@ const Icon = (props:any) => {
         </clipPath>
       </defs>
       <image
-        href={header_image}
+        href={imgURL}
         width={75}
         height={60}
         x={-37.5}
