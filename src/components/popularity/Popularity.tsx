@@ -3,7 +3,7 @@ import StackedAreaChart from "./StackedAreaChart"
 
 const Popularity = async() => {
 
-  const response = await fetch(`http://localhost:3000/api/popularity/countSteamReviews/1172470`);
+  const response = await fetch(`${process.env.CURRENT_URL}/api/popularity/countSteamReviews/1172470`);
   const data = await response.json();
 
   return (

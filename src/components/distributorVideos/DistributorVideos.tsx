@@ -4,7 +4,7 @@ import DisplayClip from "./DisplayClip"
 const DistributorVideos = async() => {
 
 
-  const res = await fetch('http://localhost:3000/api/distributorVideos/getTwitchClips')
+  const res = await fetch(`${process.env.CURRENT_URL}/api/distributorVideos/getTwitchClips`)
   const data = await res.json()
 
 
