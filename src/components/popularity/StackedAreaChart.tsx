@@ -24,7 +24,6 @@ const StackedAreaChart =({
 
   const keys = Object.keys(data[0]).filter((k) => k !== 'date');
 
-  // console.log(data);
 
   const colorScale = scaleOrdinal<string, string>({
     domain: keys,
@@ -40,7 +39,6 @@ const StackedAreaChart =({
     domain: [0, Math.max(...data.map((d) => d.count))],
   }).nice();
 
-  console.log(xScale.domain());
 
   return width < 10 ? null : (
     <svg width={width+ 100} height={height +50}>
