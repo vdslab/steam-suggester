@@ -1,9 +1,15 @@
 'use client';
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
 
 const Icon = (props:any) => {
-  const { title, header_image, index } = props;
+  const { title, imgURL, index, steamGameId, twitchGameId } = props;
   const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+  const handleClick = (e:any) => {
+    e.preventDefault();
+    router.push(`/details/${steamGameId}/${twitchGameId}`);
+  };
 
   return (
     <g
@@ -11,6 +17,7 @@ const Icon = (props:any) => {
       onMouseLeave={() => setIsHovered(false)}
       transform="scale(1.5)"
       style={{ cursor: "pointer" }}
+      onClick={handleClick}
     >
       <defs>
         <clipPath id={`clip-${index}`}>
@@ -18,7 +25,7 @@ const Icon = (props:any) => {
         </clipPath>
       </defs>
       <image
-        href={header_image}
+        href={imgURL}
         width={75}
         height={60}
         x={-37.5}
@@ -27,14 +34,6 @@ const Icon = (props:any) => {
       />
       {isHovered && (
         <g>
-          {/* <rect
-            x={-getTextWidth(title, "14px") / 2 - 25}
-            y={20}
-            width={getTextWidth(title, "14px") + 50}
-            height={30}
-            fill="white"
-          ></rect> */}
-
           <text
             x={0}
             y={40}
