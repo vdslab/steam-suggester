@@ -7,10 +7,10 @@ import SimilarGames from "@/components/simlarGames/SimilarGames"
 export default function Page({
   params
 }: {
-  params: { steamGameId :string }
+  params: { steamGameId: string, twitchGameId: string }
 }){
 
-  const steamGameId = params.steamGameId;
+  const { steamGameId, twitchGameId } = params;
 
   return (
     <div className="flex h-[92dvh]">

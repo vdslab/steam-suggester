@@ -34,8 +34,6 @@ const NodeLink = (props:any) => {
   const { filter, data } = props;
   const k = 3;
 
-  const [selectGameIdx, setSelectGameIdx] = useState(0);
-
   const [isLoading, setIsLoading] = useState(true);
 
   const [newLinks, setNewLinks] = useState([]);
@@ -80,7 +78,8 @@ const NodeLink = (props:any) => {
       title: node.title,
       imgURL: node.imgURL,
       gameData: node.gameData,
-      steamGameId: node.steamGameId
+      steamGameId: node.steamGameId,
+      twitchGameId: node.twitchGameId,
       /* playtime: node.playtime, */
     }));
 
@@ -157,7 +156,8 @@ const NodeLink = (props:any) => {
             title: node.title,
             imgURL: node.imgURL,
             gameData: node.gameData,
-            steamGameId: node.steamGameId
+            steamGameId: node.steamGameId,
+            twitchGameId: node.twitchGameId,
           };
         })
         setNewNode(newnode);
@@ -201,6 +201,7 @@ const NodeLink = (props:any) => {
                 imgURL={node.imgURL}
                 index={node.index}
                 steamGameId={node.steamGameId}
+                twitchGameId={node.twitchGameId}
               ></Icon>
             </g>
           );

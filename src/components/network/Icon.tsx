@@ -3,12 +3,12 @@ import { useState } from "react";
 import { useRouter } from 'next/navigation';
 
 const Icon = (props:any) => {
-  const { title, imgURL, index, steamGameId } = props;
+  const { title, imgURL, index, steamGameId, twitchGameId } = props;
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   const handleClick = (e:any) => {
     e.preventDefault();
-    router.push(`/details/${steamGameId}`);
+    router.push(`/details/${steamGameId}/${twitchGameId}`);
   };
 
   return (
