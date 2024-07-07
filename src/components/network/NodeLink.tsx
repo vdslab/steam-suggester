@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import * as d3 from 'd3';
-import testData from './testData.json';
 import Icon from "./Icon";
 
 const ZoomableSVG = (props:any) => {
@@ -44,9 +43,6 @@ const NodeLink = (props:any) => {
 
   const calcCommonGenres = (game1:any, game2:any) => {
     let genresWeight = 0;
-    /* if(game1.title === game2.title) {
-      return 1;
-    } */
 
     game1.genres.forEach((item:any) =>
       game2.genres.forEach((i:any) => {
