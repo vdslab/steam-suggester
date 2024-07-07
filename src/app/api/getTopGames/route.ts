@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   try {
 
     // TwitchのAPIにアクセスするためのトークンを取得
-    const tokenResponse = await fetch(`${process.env.CURRENT_URL}/api/getTwitchToken`);
+    const tokenResponse = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getTwitchToken`);
     if (!tokenResponse.ok) {
       return NextResponse.error()
     }

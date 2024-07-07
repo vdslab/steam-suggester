@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
 
-  const response = await fetch(`${process.env.CURRENT_URL}/api/getTopGames`)
+  const response = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getTopGames`)
   const twitchGameNames = await response.json()
 
   const resultArray: gameDetailType[] = [];
