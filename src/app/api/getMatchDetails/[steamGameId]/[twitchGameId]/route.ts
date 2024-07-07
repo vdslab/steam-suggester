@@ -1,5 +1,5 @@
 import { gameDetailType } from "@/types/api/gameDetailsType";
-import { steamGameGenreType, steamGameCategoryType } from "@/types/api/steamDataType";
+import { steamGameCategoryType } from "@/types/api/steamDataType";
 import { NextResponse } from "next/server";
 
 type Params = {
