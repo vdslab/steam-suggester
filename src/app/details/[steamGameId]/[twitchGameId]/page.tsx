@@ -3,6 +3,7 @@ import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
 import SimilarGames from "@/components/simlarGames/SimilarGames"
+import Link from "next/link";
 
 export default function Page({
   params
@@ -18,6 +19,7 @@ export default function Page({
         <SimilarGames />
       </div>
       <div className="w-3/4 bg-[#2a475e] flex flex-col p-4">
+        <Breadcrumb steamGameId={steamGameId} />
         <div className="basis-1/10">
           <Gametitle steamGameId={steamGameId} />
         </div>
@@ -37,3 +39,20 @@ export default function Page({
   )
 }
 
+type BreadcrumbProps = {
+  steamGameId: string;
+};
+
+const Breadcrumb: React.FC<BreadcrumbProps> = ({ steamGameId }) => {
+  return (
+    <div className="text-gray-300">
+      <Link href="/network" legacyBehavior>
+        <a className="text-white text-gray-300 hover:text-gray-400">
+          ネットワーク
+        </a>
+      </Link>
+      ＞
+      {steamGameId}
+    </div>
+  );
+};
