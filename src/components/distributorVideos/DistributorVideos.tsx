@@ -1,10 +1,10 @@
 import Headline from "../common/Headline"
 import DisplayClip from "./DisplayClip"
 
-const DistributorVideos = async() => {
+const DistributorVideos = async({twitchGameId}:{twitchGameId:string}) => {
 
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/distributorVideos/getTwitchClips`)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchClips/${twitchGameId}`)
   const data = await res.json()
 
 
