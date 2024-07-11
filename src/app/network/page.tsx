@@ -54,6 +54,10 @@ const page = () => {
       1: true,
       2: true,
     },
+    device: {
+      1: true,
+      2: true,
+    },
     Playtime: {
       1: true,
       2: true,

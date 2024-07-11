@@ -54,6 +54,11 @@ const platformsMapping: any = {
   2: "マルチ用",
 };
 
+const deviceMapping: any = {
+  1: "windows",
+  2: "mac",
+};
+
 const playtimeMapping: any = {
   1: "～100時間",
   2: "～200時間",
@@ -316,7 +321,17 @@ const SelectParameter = (props: any) => {
         localFilter={localFilter}
         setLocalFilter={setLocalFilter}
       />
-      <div className="relative mb-4">
+
+      <Dropdown
+        displayTag = "対応デバイス"
+        title="device"
+        mapping={deviceMapping}
+        isVisible={visibleDropdown === "device"}
+        toggleVisibility={() => toggleDropdown("device")}
+        localFilter={localFilter}
+        setLocalFilter={setLocalFilter}
+      />
+      {/* <div className="relative mb-4">
         <button
           className="bg-gray-900 hover:bg-gray-800 text-white rounded px-4 py-2 mb-2 flex items-center justify-between w-full"
           onClick={() => toggleDropdown("Playtime")}
@@ -338,7 +353,7 @@ const SelectParameter = (props: any) => {
             </div>
           </div>
         )}
-      </div>
+      </div> */}
       {/* <Dropdown
         displayTag = "プレイ時間"
         title="Playtime"
