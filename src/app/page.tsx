@@ -14,7 +14,7 @@ const page = () => {
         </div>
         <div className="basis-6/10 flex flex-row space-x-5">
           <div className="basis-1/2">
-            <Popularity />
+            {/* <Popularity /> */}
           </div>
           <div className="basis-1/2">
             <Match />

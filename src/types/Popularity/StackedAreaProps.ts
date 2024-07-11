@@ -6,4 +6,5 @@ export type StackedAreasProps = {
   height: number;
   events?: boolean;
   margin?: { top: number; right: number; bottom: number; left: number };
+  colorRange: string[];
 };

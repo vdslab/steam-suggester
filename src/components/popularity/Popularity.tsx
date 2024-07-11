@@ -1,15 +1,36 @@
+import { STEAM_COLOR_RANGE, TWITCH_COLOR_RANGE } from "@/constants/styles/stackedArea";
 import Headline from "../common/Headline"
 import StackedAreaChart from "./StackedAreaChart"
 
-const Popularity = async() => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/popularity/countSteamReviews/1172470`);
-  const data = await response.json();
+type Props = {
+  twitchGameId: string;
+  steamGameId: string;
+}
+
+const Popularity = async(props:Props) => {
+
+  const { twitchGameId, steamGameId } = props;
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countRecentSteamReviews/${steamGameId}`);
+  const steamData = await response.json();
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchViews/${twitchGameId}`);
+  const twitchData = await res.json();
 
   return (
     <div>
       <Headline txt="流行度" />
-      {data ? (
-        <StackedAreaChart data={data} width={400} height={270}  />
+      {steamData && twitchData ? (
+        <div className="flex">
+          <div className="border border-gray-500 p-3">
+            <div className="text-white">Steamレビュー数</div>
+            <StackedAreaChart data={steamData} width={300} height={200} colorRange={STEAM_COLOR_RANGE}/>
+          </div>
+          <div className="border border-gray-500 ml-2 p-3">
+            <div className="text-white">Twitch視聴数</div>
+            <StackedAreaChart data={twitchData} width={300} height={200} colorRange={TWITCH_COLOR_RANGE} />
+          </div>
+        </div>
       ) : null}
       
     </div>

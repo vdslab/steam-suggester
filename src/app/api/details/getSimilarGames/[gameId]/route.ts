@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(req: Request) {
+type Params = {
+  params: {
+    gameId: string;
+  };
+}
+
+export async function GET(req: Request, { params }:Params) {
+
+  const gameId = params.gameId
   const GAME_IDS = [1172470, 1938090, 730, 359550];
+
   const gameDetails = [];
 
   for( let i = 0; i < GAME_IDS.length; i++ ) {
