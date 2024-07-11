@@ -44,8 +44,8 @@ const StackedAreaChart =({
   return width < 10 ? null : (
     <svg width={width+ 100} height={height +50}>
       <rect x={70} y={margin.top} width={width} height={height -margin.top} fill={BG_COLOR_STACKED_AREA} />
-      <AxisBottom scale={xScale} label='時間(年)' top={yMax+margin.top} left={70} hideZero numTicks={5} />
-      <AxisLeft scale={yScale} label='数' left={70} top={margin.top} labelOffset={50}/>
+      <AxisBottom scale={xScale} label='時間(年)' top={yMax+margin.top} left={70} hideZero numTicks={5} labelProps={{fill:'#e5e4e6'}} tickLabelProps={{fill: '#e5e4e6'}}/>
+      <AxisLeft scale={yScale} label='数' left={70} top={margin.top} labelOffset={50} labelProps={{fill:'#e5e4e6'}} tickLabelProps={{fill: '#e5e4e6'}} tickLineProps={{fill: '#e5e4e6'}}/>
       <AreaStack
         top={margin.top}
         left={margin.left}
