@@ -7,6 +7,10 @@ type Params = {
   };
 };
 
+type TwitchViews = {
+  get_date: string;
+  total_views: number;
+}
 
 export async function GET(req: Request, params: Params) {
 
@@ -15,16 +19,24 @@ export async function GET(req: Request, params: Params) {
   try {
     const client = await PG_POOL.connect();
     const result = await client.query(
-    'SELECT total_views FROM game_views WHERE twitch_id = $1 ORDER BY get_date DESC ',
+    'SELECT get_date,total_views FROM game_views WHERE twitch_id = $1 ORDER BY get_date DESC ',
       [twitch_id]
     );
 
     await client.release(true);
 
-    Object.values(result.rows)
-  
+    const data = result.rows
 
-    return NextResponse.json(Object.values(result.rows))
+    const formatData = data.map((d: TwitchViews) => {
+      const date = new Date(d.get_date)
+      const unixTime = Math.floor(date.getTime() / 1000)
+      return {
+        date: unixTime,
+        count: d.total_views
+      }
+    })
+
+    return NextResponse.json(formatData)
 
   } catch (error) {
     console.error('Error fetching clips:', error)

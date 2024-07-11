@@ -25,7 +25,7 @@ export default function Page({
         </div>
         <div className="basis-6/10 flex flex-row space-x-5">
           <div className="basis-1/2">
-            <Popularity />
+            <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
           </div>
           <div className="basis-1/2">
             <Match />

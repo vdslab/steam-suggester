@@ -17,6 +17,7 @@ const StackedAreaChart =({
   height,
   margin = { top: 10, right: 0, bottom: 0, left: 0 },
   events = false,
+  colorRange,
 }: StackedAreasProps) => {
   const yMax = height - margin.top - margin.bottom;
   const xMax = width - margin.left - margin.right;
@@ -27,7 +28,7 @@ const StackedAreaChart =({
 
   const colorScale = scaleOrdinal<string, string>({
     domain: keys,
-    range: ['#ffc409', '#f14702', '#262d97', 'white', '#036ecd', '#9ecadd', '#51666e'],
+    range: colorRange,
   });
 
   const xScale = scaleTime<number>({
@@ -42,10 +43,9 @@ const StackedAreaChart =({
 
   return width < 10 ? null : (
     <svg width={width+ 100} height={height +50}>
-      {/* <GradientOrangeRed id="stacked-area-orangered" /> */}
       <rect x={70} y={margin.top} width={width} height={height -margin.top} fill={BG_COLOR_STACKED_AREA} />
       <AxisBottom scale={xScale} label='時間(年)' top={yMax+margin.top} left={70} hideZero numTicks={5} />
-      <AxisLeft scale={yScale} label='レビュー数' left={70} top={margin.top} labelOffset={50}/>
+      <AxisLeft scale={yScale} label='数' left={70} top={margin.top} labelOffset={50}/>
       <AreaStack
         top={margin.top}
         left={margin.left}
