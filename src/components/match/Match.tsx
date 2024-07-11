@@ -12,9 +12,9 @@ const Match = () => {
 
   return (
     <div>
-      <Headline txt='ユーザーとの一致度'/>
+      <Headline txt='フィルター項目との一致度'/>
       {data ? (
-        <MatchIndicator data={data[0]} appId={GAME_ID} gameTitle={gameTitle} />
+        <MatchIndicator data={data[0]} />
       ) : null}
     </div>
   )

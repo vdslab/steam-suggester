@@ -1,38 +1,6 @@
 "use client"; 
 import React, { useState, useEffect } from 'react';
 
-// const genreMapping = {
-//   1: "Action",
-//   37: "Free to Play",
-//   2: "Strategy",
-//   25: "Adventure",
-//   23: "Indie",
-//   3: "RPG",
-//   51: "Animation & Modeling",
-//   58: "Video Production",
-//   4: "Casual",
-//   28: "Simulation",
-//   9: "Racing",
-//   73: "Violent",
-//   29: "Massively Multiplayer",
-//   72: "Nudity",
-//   18: "Sports",
-//   70: "Early Access",
-//   74: "Gore",
-//   57: "Utilities",
-//   52: "Audio Production",
-//   53: "Design & Illustration",
-//   59: "Web Publishing",
-//   55: "Photo Editing",
-//   54: "Education",
-//   56: "Software Training",
-//   71: "Sexual Content",
-//   60: "Game Development",
-//   50: "Accounting",
-//   81: "Documentary",
-//   84: "Tutorial"
-// };
-
 interface Genre {
   id: string;
   description: string;
@@ -67,11 +35,72 @@ interface Platforms {
 
 interface MatchIndicatorProps {
   data: Data;
-  appId: number;
 };
 
-  // 一致度表示
-const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
+const userSelected = {
+  Categories: {
+    1: true,
+    2: false,
+    3: false,
+    4: false,
+    9: false,
+    18: false,
+    23: false,
+    25: false,
+    28: false,
+    29: false,
+    37: true,
+    50: false,
+    51: false,
+    52: false,
+    53: false,
+    54: false,
+    55: false,
+    56: false,
+    57: false,
+    58: false,
+    59: false,
+    60: false,
+    70: false,
+    71: false,
+    72: false,
+    73: false,
+    74: false,
+    81: false,
+    84: false,
+  },
+  Price: {
+    1: true,
+    2: true,
+    3: true,
+    4: true,
+    5: true,
+    6: false,
+    7: false,
+    8: false,
+    9: false,
+    10: false,
+    11: false,
+  },
+  Platforms: {
+    1: true,
+    2: false,
+  },
+  Playtime: {
+    1: true,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+    6: false,
+    7: false,
+    8: false,
+    9: false,
+    10: false,
+  },
+};
+
+const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
   const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
   const [priceMatchPercentage, setPriceMatchPercentage] = useState<number>(0);
   const [modeMatchPercentage, setModeMatchPercentage] = useState<number>(0);
@@ -82,51 +111,53 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
   useEffect(() => {
     // 一致度を計算（ジャンル）
     const genreMatchCount = countMatchingGenres();
-    const genreMatch = calculateMatchPercentage(genreMatchCount, userSelected.genres.length);
+    const genreMatch = calculateMatchPercentage(genreMatchCount, userSelected.Categories[37] ? 1 : 0);
     setGenreMatchPercentage(genreMatch);
 
     // 価格の差分を計算
-    const priceDiff = data.gameData.priceOverview - userSelected.price;
+    const priceDiff = data.gameData.priceOverview - calculateUserSelectedPrice();
     setPriceDifference(priceDiff);
 
     // 一致度を計算(価格)
-    const priceMatch = calculateMatchPercentage(data.gameData.priceOverview, userSelected.price);
+    const priceMatch = calculateMatchPercentage(data.gameData.priceOverview, calculateUserSelectedPrice());
     setPriceMatchPercentage(priceMatch);
 
     // 一致度を計算(ゲームモード)
     const modeMatchCount = countMatchMode();
     const modeMatch = calculateMatchPercentage(2, modeMatchCount);
-    console.log(modeMatch)
+
     setModeMatchPercentage(modeMatch);
-    
-    // 一致度を計算(全体)
-    const overallMatch = Math.round((genreMatch + priceMatchPercentage + modeMatchPercentage) / 3);// 仮
-    setOverallMatchPercentage(overallMatch);
-  }, [appId]);
+  }, [data, userSelected]);
+
+  useEffect(() => {
+     // 一致度を計算(全体)
+     const overallMatch = Math.round((genreMatchPercentage + priceMatchPercentage + modeMatchPercentage) / 3); // 仮
+     setOverallMatchPercentage(overallMatch);
+  }, [genreMatchPercentage, priceMatchPercentage, ]);
 
   const priceBarPosition = (price: number) => {
-    const maxPrice = userSelected.price * 2;
+    const maxPrice = calculateUserSelectedPrice() === 0 ? 1000 : calculateUserSelectedPrice() * 2;
     const adjustedPrice = Math.min(price, maxPrice);
     return (adjustedPrice / maxPrice) * 100;
   };
 
   const countMatchingGenres = () => {
-      let matchingCount = 0;
-      const userGenreIDs = userSelected.genres.map(genre => genre.id);
-      data.gameData.genres.forEach((gameGenre: { id: string; }) => {
-          if (userGenreIDs.includes(gameGenre.id)) {
-              matchingCount++;
-          }
-      });
-      return matchingCount;
+    let matchingCount = 0;
+    const userGenreIDs = Object.keys(userSelected.Categories).filter(id => userSelected.Categories[Number(id)]);
+    data.gameData.genres.forEach((gameGenre: { id: string; }) => {
+      if (userGenreIDs.includes(gameGenre.id)) {
+        matchingCount++;
+      }
+    });
+    return matchingCount;
   };
 
   const countMatchMode = () => {
     let matchCount = 0;
-  
-    if (userSelected.isSinglePlayer === data.gameData.isSinglePlayer) 
+
+    if (userSelected.Categories[1] === data.gameData.isMultiPlayer) 
       matchCount++;
-    if (userSelected.isMultiPlayer === data.gameData.isMultiPlayer)
+    if (!userSelected.Categories[1] === data.gameData.isSinglePlayer)
       matchCount++;
 
     return matchCount;
@@ -137,7 +168,17 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
     const matchPercentage = Math.round(Math.max(0, 100 - (diff / userSelected) * 100));
     return matchPercentage;
   };
-  
+
+  const calculateUserSelectedPrice = () => {
+    let price = 0;
+    Object.keys(userSelected.Price).forEach((key, index) => {
+      if (userSelected.Price[Number(key)]) {
+        price = index === 0 ? 0 : (index + 1) * 1000; // Handle 0 yen and subsequent prices
+      }
+    });
+    return price;
+  };
+
   const getTextColor = (percentage: number, barColor: string) => {
     return percentage > 50 ? 'text-white' : barColor;
   };
@@ -164,9 +205,9 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
         </div>
         <div>
           {data.gameData.genres.map((genre) => (
-              <small key={genre.id} className="text-gray-400">
-                  {genre.description}&nbsp;
-              </small>
+            <small key={genre.id} className="text-gray-400">
+              {genre.description}&nbsp;
+            </small>
           ))}
         </div>
       </div>
@@ -184,14 +225,14 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
           <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
           <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
-            <span className="absolute top-full mt-1 text-xs">
-              {userSelected.price.toLocaleString()}円
+            <span className="absolute top-full -translate-x-1/2 mt-1 text-xs"  style={{ whiteSpace: 'nowrap' }}>
+              {calculateUserSelectedPrice() != 0 ? calculateUserSelectedPrice().toLocaleString() + "円" : "1000円"}
             </span>
           </div>
         </div>
         <div className="flex justify-between text-xs">
           <span>0円</span>
-          <span>{(userSelected.price * 2).toLocaleString()}円</span>
+          <span>{(calculateUserSelectedPrice() * 2).toLocaleString()}円</span>
         </div>
         {data.gameData.priceOverview ? <small className="text-gray-400">価格:{data.gameData.priceOverview.toLocaleString()}円</small> : null}
       </div>
@@ -201,91 +242,32 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data, appId }) => {
         <div className="flex mb-4">
           <div className={`w-1/2 p-2 ${data.gameData.isMultiPlayer ? 'bg-green-600' : 'bg-gray-200'} rounded relative`}>
             <span className="text-white">マルチプレイヤー</span>
-            {userSelected.isMultiPlayer && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-blue-600 rounded-b-full"></div>}
+            {userSelected.Categories[1] && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-blue-600 rounded-b-full"></div>}
           </div>
           <div className={`w-1/2 p-2 ${data.gameData.isSinglePlayer ? 'bg-green-600' : 'bg-gray-200'} rounded relative`}>
             <span className="text-white">シングルプレイヤー</span>
-            {userSelected.isSinglePlayer && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-blue-600 rounded-b-full"></div>}
+            {!userSelected.Categories[1] && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-blue-600 rounded-b-full"></div>}
           </div>
         </div>
 
-        
         {data.gameData.platforms.windows ? (
           <span className="px-2 py-1 bg-green-200 text-green-800 rounded">Windows:〇</span>
-        ):
+        ) : (
           <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">Windows:×</span>
-        }
+        )}
         {data.gameData.platforms.mac ? (
           <span className="px-2 py-1 bg-green-200 text-green-800 rounded">mac:〇</span>
-        ):
+        ) : (
           <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">mac:×</span>
-        }
+        )}
         {data.gameData.platforms.linux ? (
           <span className="px-2 py-1 bg-green-200 text-green-800 rounded">linux:〇</span>
-        ):
+        ) : (
           <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">linux:×</span>
-        }
+        )}
       </div>
     </div>
   );
 };
-
-const userSelected={
-  "genres": [
-      {
-          "id": "1",
-          "description": "Action"
-      },
-      {
-          "id": "25",
-          "description": "Adventure"
-      },
-      {
-          "id": "37",
-          "description": "Free to Play"
-      }
-  ],
-  "categories": [
-      {
-          "id": 1,
-          "description": "Multi-player"
-      },
-      {
-          "id": 49,
-          "description": "PvP"
-      },
-      {
-          "id": 36,
-          "description": "Online PvP"
-      },
-      {
-          "id": 9,
-          "description": "Co-op"
-      },
-      {
-          "id": 38,
-          "description": "Online Co-op"
-      },
-      {
-          "id": 22,
-          "description": "Steam Achievements"
-      },
-      {
-          "id": 28,
-          "description": "Full controller support"
-      },
-      {
-          "id": 29,
-          "description": "Steam Trading Cards"
-      },
-      {
-          "id": 35,
-          "description": "In-App Purchases"
-      }
-  ],
-  "isSinglePlayer": false,
-  "isMultiPlayer": true,
-  "price": 3500
-}
 
 export default MatchIndicator;
