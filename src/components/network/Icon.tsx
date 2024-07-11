@@ -21,7 +21,7 @@ const Icon = (props:any) => {
     >
       <defs>
         <clipPath id={`clip-${index}`}>
-          <circle r={30} />
+          <circle r={17} />
         </clipPath>
       </defs>
       <image

@@ -32,7 +32,7 @@ const ZoomableSVG = (props:any) => {
 
 const NodeLink = (props:any) => {
   const { filter, data } = props;
-  const k = 3;
+  const k = 5;
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,7 +40,7 @@ const NodeLink = (props:any) => {
   const [newNode, setNewNode] = useState([]);
 
   const calcCommonGenres = (game1:any, game2:any) => {
-    let genresWeight = 0;
+    let genresWeight = 1;
 
     game1.genres.forEach((item:any) =>
       game2.genres.forEach((i:any) => {
@@ -49,12 +49,13 @@ const NodeLink = (props:any) => {
         }
       })
     );
+    genresWeight *= 10;
 
     const priceWeight = Math.abs(game1.price - game2.price);
     // const platformsWeight = game1.platforms === game2.platforms ? 1 : 0;
     // const playtimeWeight = Math.abs(game1.playtime - game2.playtime);
     const totalWeight = genresWeight * 10 + (1 / priceWeight) * 100;
-    return 10;
+    return 1 / genresWeight;
   };
 
   useEffect(() => {
@@ -80,20 +81,22 @@ const NodeLink = (props:any) => {
       gameData: node.gameData,
       steamGameId: node.steamGameId,
       twitchGameId: node.twitchGameId,
+      total_views: node.total_views,
       /* playtime: node.playtime, */
     }));
 
 
     for (let i = 0; i < nodes.length; i++) {
       const array = nodes
+        .filter((_,index) => i !== index)
         .map((node, index) => {
           return {
             index,
-            weight: Math.random() * 10
+            weight: calcCommonGenres(nodes[i].gameData, node.gameData)
           };
         })
         .filter((e) => e);
-      array.sort((a, b) => b.weight - a.weight);
+      array.sort((a, b) => a.weight - b.weight);
 
       const newArray = array.map((item) => item.index);
 
@@ -176,6 +179,9 @@ const NodeLink = (props:any) => {
       }
     });
   }, [filter]);
+
+  console.log(newNode);
+  console.log(newLinks);
 
   return (
     <div>
