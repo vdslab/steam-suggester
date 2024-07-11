@@ -145,6 +145,33 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
     }
   }, [isVisible]);
 
+  const handleSelectAll = () => {
+      setLocalFilter((prev: any) => {
+        const newFilter = { ...prev[title] };
+        Object.keys(mapping).forEach((key) => {
+          newFilter[key] = true;
+        });
+        return {
+          ...prev,
+          [title]: newFilter,
+        };
+      });
+    };
+
+    const handleDeselectAll = () => {
+      setLocalFilter((prev: any) => {
+        const newFilter = { ...prev[title] };
+        Object.keys(mapping).forEach((key) => {
+          newFilter[key] = false;
+        });
+        return {
+          ...prev,
+          [title]: newFilter,
+        };
+      });
+    };
+
+
   return (
     <div className="relative mb-4">
       <button
@@ -165,6 +192,21 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
           border: 'none'
         }}
       >
+
+      <div className="p-2">
+          <button
+            onClick={handleSelectAll}
+            className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 mr-2"
+          >
+            全選択
+          </button>
+          <button
+            onClick={handleDeselectAll}
+            className="bg-red-600 hover:bg-red-500 text-white rounded px-4 py-2"
+          >
+            全解除
+          </button>
+        </div>
 
       <div className="flex flex-wrap -mx-2 p-2">
         {Object.keys(mapping).map((key: any) => {
