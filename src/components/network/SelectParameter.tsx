@@ -1,4 +1,5 @@
 "use client";
+import { addFilterData, getFilterData, updateFilterData } from "@/hooks/indexedDB";
 import { useState, useRef, useEffect } from "react";
 import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
 
@@ -243,7 +244,6 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
 const SelectParameter = (props: any) => {
   const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
   const { filter, setFilter } = props;
-  console.log(filter);
 
   const [localFilter, setLocalFilter] = useState(filter);
   const [isFreeChecked, setIsFreeChecked] = useState(false);
@@ -292,13 +292,41 @@ const SelectParameter = (props: any) => {
     setLocalFilter(newFilter);
   };
 
+  useEffect(() => {
+    (async() => {
+      const d = await getFilterData('unique_id');
+      if(d) {
+        setFilter(d);
+        setLocalFilter(d);
+      }
+    })();
+  }, [])
+
+  const handleClickFilter = () => {
+    (async() => {
+      const d = await getFilterData('unique_id');
+      if(d) {
+        updateFilterData({
+          id: 'unique_id',
+          ...localFilter
+        });
+
+      } else {
+        addFilterData({
+          id: 'unique_id',
+          ...localFilter
+        });
+      }
+    })();
+    setFilter(localFilter)
+  }
 
   return (
     <div className="p-4" style={{ maxHeight: '90vh', overflowY: 'auto'}}>
       <div className="flex justify-end mb-4">
         <button
           className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2"
-          onClick={() => setFilter(localFilter)}
+          onClick={() => handleClickFilter()}
         >
           フィルターを適用
         </button>

@@ -16,7 +16,12 @@ export async function GET(req: Request) {
 
     const filteredRows = rows
                         .sort((a, b) => b.total_views - a.total_views)
-                        .slice(0, 120);
+                        .slice(0, 120)
+                        .filter((item, index, self) => (
+                          index === self.findIndex((t) => (
+                            t.steam_id === item.steam_id
+                          ))
+                        ));
 
     console.log('Fetched rows:', filteredRows);
 
