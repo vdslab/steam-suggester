@@ -161,20 +161,21 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
         }}
       >
 
-        <div className="flex flex-wrap -mx-2 p-2">
-          {Object.keys(mapping).map((key: any) => {
-            return (
-              <div key={key} className="w-1/2 px-2 mb-2">
-                <button
-                  onClick={() => handleChangeFilter(key)}
-                  className="bg-blue-900 hover:bg-blue-800 text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-lg sm:text-base md:text-sm"
-                >
-                  <span className="block truncate">{mapping[key]}</span>
-                </button>
-              </div>
-            );
-          })}
-        </div>
+      <div className="flex flex-wrap -mx-2 p-2">
+        {Object.keys(mapping).map((key: any) => {
+          const flag = localFilter[title][key];
+          return (
+            <div key={key} className="w-1/2 p-2">
+              <button 
+                onClick={() => handleChangeFilter(key)} 
+                className={`${flag ? 'bg-blue-900 hover:bg-blue-800' : 'bg-gray-800 hover:bg-gray-700'} text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-sm`}
+              >
+                <span className="block truncate">{mapping[key]}</span>
+              </button>
+            </div>
+          );
+        })}
+      </div>
         {/* <div className="flex flex-wrap -mx-2 p-2">
           {Object.keys(mapping).map((key: any) => {
             const flag = localFilter[title][key];
