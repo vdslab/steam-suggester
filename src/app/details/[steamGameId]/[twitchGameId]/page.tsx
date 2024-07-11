@@ -30,7 +30,7 @@ export default function Page({
           </div>
         </div>
         <div className="basis-3/10 flex flex-col">
-          <DistributorVideos />
+          <DistributorVideos twitchGameId={twitchGameId} />
         </div>
       </div>
     </div>
