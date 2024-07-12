@@ -1,4 +1,5 @@
 "use client"; 
+import { getFilterData } from '@/hooks/indexedDB';
 import React, { useState, useEffect } from 'react';
 
 interface Genre {
@@ -37,71 +38,86 @@ interface MatchIndicatorProps {
   data: Data;
 };
 
-const userSelected = {
-  Categories: {
-    1: true,
-    2: true,
-    3: false,
-    4: false,
-    9: false,
-    18: false,
-    23: false,
-    25: false,
-    28: false,
-    29: false,
-    37: true,
-    50: false,
-    51: false,
-    52: false,
-    53: false,
-    54: false,
-    55: false,
-    56: false,
-    57: false,
-    58: false,
-    59: false,
-    60: false,
-    70: false,
-    71: false,
-    72: false,
-    73: false,
-    74: false,
-    81: false,
-    84: false,
-  },
-  Price: {
-    1: true,
-    2: true,
-    3: true,
-    4: true,
-    5: true,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false,
-    11: false,
-  },
-  Platforms: {
-    1: true,
-    2: false,
-  },
-  Playtime: {
-    1: true,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false,
-  },
-};
+// const userSelected = {
+//   Categories: {
+//     1: true,
+//     2: true,
+//     3: false,
+//     4: false,
+//     9: false,
+//     18: false,
+//     23: false,
+//     25: false,
+//     28: false,
+//     29: false,
+//     37: true,
+//     50: false,
+//     51: false,
+//     52: false,
+//     53: false,
+//     54: false,
+//     55: false,
+//     56: false,
+//     57: false,
+//     58: false,
+//     59: false,
+//     60: false,
+//     70: false,
+//     71: false,
+//     72: false,
+//     73: false,
+//     74: false,
+//     81: false,
+//     84: false,
+//   },
+//   Price: {
+//     1: true,
+//     2: true,
+//     3: true,
+//     4: true,
+//     5: true,
+//     6: false,
+//     7: false,
+//     8: false,
+//     9: false,
+//     10: false,
+//     11: false,
+//   },
+//   Platforms: {
+//     1: true,
+//     2: false,
+//   },
+//   Playtime: {
+//     1: true,
+//     2: false,
+//     3: false,
+//     4: false,
+//     5: false,
+//     6: false,
+//     7: false,
+//     8: false,
+//     9: false,
+//     10: false,
+//   },
+// };
 
 const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
-  console.log(data)
+  const [userSelected, setLocalFilter] = useState({
+      Categories: {},
+      Price: {},
+      Platforms: {},
+      Playtime: {},
+    });//仮(一応OK)
+
+  useEffect(() => {
+    (async() => {
+      const d = await getFilterData('unique_id');
+      if(d) {
+        setLocalFilter(d);
+      }
+    })();
+  }, [])
+
   const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
   const [priceMatchPercentage, setPriceMatchPercentage] = useState<number>(0);
   const [modeMatchPercentage, setModeMatchPercentage] = useState<number>(0);
@@ -109,7 +125,6 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
   const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
   // console.log(data);
 
-  
   useEffect(() => {
     // 一致度を計算（ジャンル）
     const genreMatchCount = countMatchingGenres();
