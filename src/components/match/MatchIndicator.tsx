@@ -16,8 +16,8 @@ interface GameData {
   categories: Category[];
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
-  priceOverview: number;
-  salePriceOverview: number;
+  price: number;
+  // salePriceOverview: number;
   platforms: Platforms;
 };
 
@@ -40,7 +40,7 @@ interface MatchIndicatorProps {
 const userSelected = {
   Categories: {
     1: true,
-    2: false,
+    2: true,
     3: false,
     4: false,
     9: false,
@@ -101,25 +101,27 @@ const userSelected = {
 };
 
 const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
+  console.log(data)
   const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
   const [priceMatchPercentage, setPriceMatchPercentage] = useState<number>(0);
   const [modeMatchPercentage, setModeMatchPercentage] = useState<number>(0);
   const [priceDifference, setPriceDifference] = useState<number>(0);
   const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
-  console.log(data);
+  // console.log(data);
 
+  
   useEffect(() => {
     // 一致度を計算（ジャンル）
     const genreMatchCount = countMatchingGenres();
-    const genreMatch = calculateMatchPercentage(genreMatchCount, userSelected.Categories[37] ? 1 : 0);
+    const genreMatch = calculateMatchPercentage(genreMatchCount, data.gameData.genres.length);
     setGenreMatchPercentage(genreMatch);
 
     // 価格の差分を計算
-    const priceDiff = data.gameData.priceOverview - calculateUserSelectedPrice();
+    const priceDiff = data.gameData.price - calculateUserSelectedPrice();
     setPriceDifference(priceDiff);
 
     // 一致度を計算(価格)
-    const priceMatch = calculateMatchPercentage(data.gameData.priceOverview, calculateUserSelectedPrice());
+    const priceMatch = calculateMatchPercentage(data.gameData.price, calculateUserSelectedPrice());
     setPriceMatchPercentage(priceMatch);
 
     // 一致度を計算(ゲームモード)
@@ -218,7 +220,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
           <div
             className={`h-4 rounded-full ${priceDifference < 0 ? 'bg-green-600' : 'bg-red-600'}`}
             style={{
-              width: `${priceBarPosition(data.gameData.priceOverview)}%`,
+              width: `${priceBarPosition(data.gameData.price)}%`,
             }}
           ></div>
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
@@ -234,7 +236,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
           <span>0円</span>
           <span>{(calculateUserSelectedPrice() * 2).toLocaleString()}円</span>
         </div>
-        {data.gameData.priceOverview ? <small className="text-gray-400">価格:{data.gameData.priceOverview.toLocaleString()}円</small> : null}
+        {data.gameData.price ? <small className="text-gray-400">価格:{data.gameData.price.toLocaleString()}円</small> : null}
       </div>
 
       <div className="mb-4">
