@@ -8,9 +8,6 @@ const Header = () => {
       <Link href="/network">
         network
       </Link>
-      <Link href="/details/apex">
-        details
-      </Link>
     </div>
   );
 }

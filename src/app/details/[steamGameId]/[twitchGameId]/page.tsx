@@ -47,7 +47,7 @@ type BreadcrumbProps = {
 const Breadcrumb: React.FC<BreadcrumbProps> = ({ steamGameId, twitchGameId }) => {
   return (
     <div className="text-gray-300">
-      <Link href="/network" legacyBehavior>
+      {/* <Link href="/network" legacyBehavior>
         <a className="text-white text-gray-300 hover:text-gray-400">
           ネットワーク
         </a>
@@ -55,7 +55,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ steamGameId, twitchGameId }) =>
       ＞
       <a className="text-white text-gray-300 hover:text-gray-400">
         {steamGameId}/{twitchGameId}
-      </a>
+      </a> */}
     </div>
   );
 };
