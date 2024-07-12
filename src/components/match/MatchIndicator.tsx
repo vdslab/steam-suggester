@@ -238,32 +238,24 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
       </div>
 
       <div className="mb-4">
-        <p>ゲームモード</p>
-        <div className="flex mb-4">
-          <div className={`w-1/2 p-2 ${data.gameData.isMultiPlayer ? 'bg-green-600' : 'bg-gray-200'} rounded relative`}>
-            <span className="text-white">マルチプレイヤー</span>
-            {userSelected.Categories[1] && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-blue-600 rounded-b-full"></div>}
-          </div>
-          <div className={`w-1/2 p-2 ${data.gameData.isSinglePlayer ? 'bg-green-600' : 'bg-gray-200'} rounded relative`}>
-            <span className="text-white">シングルプレイヤー</span>
-            {!userSelected.Categories[1] && <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-blue-600 rounded-b-full"></div>}
-          </div>
-        </div>
+        <p>プレイモード</p>
+        {data.gameData.isMultiPlayer ?
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">マルチプレイヤー</span>
+          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">マルチプレイヤー</span>}
+        {data.gameData.isSinglePlayer ?
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded mr-1">シングルプレイヤー</span>
+          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded mr-1">シングルプレイヤー</span>}
 
+        <p className='mt-3'>対応デバイス</p>
         {data.gameData.platforms.windows ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">Windows:〇</span>
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">Windows</span>
         ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">Windows:×</span>
+          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">Windows</span>
         )}
         {data.gameData.platforms.mac ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">mac:〇</span>
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">mac</span>
         ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">mac:×</span>
-        )}
-        {data.gameData.platforms.linux ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">linux:〇</span>
-        ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">linux:×</span>
+          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">mac</span>
         )}
       </div>
     </div>
