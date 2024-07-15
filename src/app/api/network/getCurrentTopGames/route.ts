@@ -4,7 +4,7 @@ import { PG_POOL } from "@/constants/PG_POOL";
 export async function GET(req: Request) {
   try {
     const today = new Date();
-    today.setDate(today.getDate()-1);
+    today.setDate(today.getDate());
     const dateString = today.toISOString().split('T')[0];
 
     const query = `

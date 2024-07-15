@@ -1,4 +1,4 @@
-import GameTitle from "@/components/common/Gametitle";
+import GameTitle from "@/components/common/GameTitle";
 import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
@@ -26,7 +26,7 @@ export default function Page({
             <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
           </div>
           <div className="basis-1/2">
-            <Match />
+            <Match steamGameId={steamGameId} />
           </div>
         </div>
         <div className="basis-3/10 flex flex-col">
