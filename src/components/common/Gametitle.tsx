@@ -1,14 +1,12 @@
 const GameTitle = async (props: {steamGameId:string}) => {
   const { steamGameId } = props;
 
-  // TODO APIを実装する
-  // const response = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetails/${steamGameId}`);
-  // const data = await response.json();
+  const response = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
+  const data = await response.json();
 
 
   return (
-    <></>
-    // <h2 className="text-xl font-semibold mb-4 text-white text-center">{data.title}</h2>
+    <h2 className="text-xl font-semibold mb-4 text-white text-center">{data.title}</h2>
   );
 }
 
