@@ -1,8 +1,14 @@
-export default function Page() {
+import Network from "@/components/network/Network";
+import { gameDetailType } from "@/types/api/gameDetailsType";
+
+export default async function Page() {
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
+  const data:gameDetailType[] = await res.json();
+
   return (
     <div>
-      <h1>Desktop Page</h1>
-      <p>This is a desktop-only page.</p>
+      <Network data={data} />
     </div>
   );
 }
