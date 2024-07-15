@@ -5,7 +5,7 @@ export async function GET() {
 
   try {
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getCurrentTopGames`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getCurrentTopGames`);
     const data = await res.json();  
 
     const result = [];
