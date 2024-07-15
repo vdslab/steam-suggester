@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import NodeLink from "./NodeLink";
 import SelectParameter from './SelectParameter';
 import { gameDetailType } from '@/types/api/gameDetailsType';

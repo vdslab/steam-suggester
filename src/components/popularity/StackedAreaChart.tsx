@@ -4,8 +4,8 @@ import { SeriesPoint } from '@visx/shape/lib/types';
 import { scaleTime, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { CountSteamReviews } from '@/types/Popularity/CountSteamReviews';
 import { StackedAreasProps } from '@/types/Popularity/StackedAreaProps';
-import { BG_COLOR_STACKED_AREA } from '@/constants/styles/stackedArea';
 import { AxisBottom, AxisLeft } from '@visx/axis';
+import { BG_COLOR_STACKED_AREA } from '@/constants/STYLES';
 
 const getX = (d: CountSteamReviews) => d.date * 1000;
 const getY0 = (d: SeriesPoint<CountSteamReviews>) => d[0];
