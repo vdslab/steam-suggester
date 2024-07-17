@@ -1,43 +1,94 @@
-import { useEffect, useState } from 'react';
+"use client";
+import { useState } from 'react';
 import NodeLink from "./NodeLink";
+import SelectParameter from './SelectParameter';
+import { gameDetailType } from '@/types/api/gameDetailsType';
 
-const Network = (props: any) => {
-  const [data, setData] = useState<any>([]);
-  const [newData, setNewData] = useState<any>([]);
+type Props = {
+  data : gameDetailType[]
+}
 
-  useEffect(() => {
 
-    const fetchData = async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getCurrentTopGames`);
-      const data = await res.json();
+const Network = (props: Props) => {
 
-      setData(data);
-      
-    }
-    fetchData();
-  }, []);
+  const { data } = props;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const newD: any = [];
-      for(let i = 0; i < data.length; i += 1) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getMatchDetails/${data[i].steam_id}/${data[i].twitch_id}`);
-        const d = await res.json();
-        if(d !== null) {
-          newD.push({...d, total_views: data[i].total_views});
-        }
-      }
-      const slicedData = newD.slice(0,100);
-      setNewData(slicedData);
-    }
-    fetchData();
-  }, [data]);
-
+  const [filter, setFilter] = useState({
+    Categories: {
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      9: true,
+      18: true,
+      23: true,
+      25: true,
+      28: true,
+      29: true,
+      37: true,
+      50: true,
+      51: true,
+      52: true,
+      53: true,
+      54: true,
+      55: true,
+      56: true,
+      57: true,
+      58: true,
+      59: true,
+      60: true,
+      70: true,
+      71: true,
+      72: true,
+      73: true,
+      74: true,
+      81: true,
+      84: true,
+    },
+    Price: {
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: true,
+      7: true,
+      8: true,
+      9: true,
+      10: true,
+      11: true,
+    },
+    Platforms: {
+      1: true,
+      2: true,
+    },
+    device: {
+      1: true,
+      2: true,
+    },
+    Playtime: {
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: true,
+      7: true,
+      8: true,
+      9: true,
+      10: true,
+    },
+  });
   return (
-    <>
-      {newData.length !== 0 ? <NodeLink filter={props.filter} data={newData} /> : <div>Loading...</div>}
-    </>
-  );
-};
+    <div className="flex h-[92dvh]">
+      <div className="w-1/4 bg-[#1b2838]">
+        <SelectParameter filter={filter} setFilter={setFilter} />
+      </div>
+      <div className="w-3/4 bg-[#2a475e] flex flex-col p-4">
+        <NodeLink filter={filter} data={data} />
+      </div>
+    </div>
+  )
+}
 
 export default Network;
