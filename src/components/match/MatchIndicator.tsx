@@ -1,77 +1,125 @@
 "use client"; 
-import { GenreType, MatchDataType } from '@/types/match/MatchDataType';
+import { getFilterData } from '@/hooks/indexedDB';
 import React, { useState, useEffect } from 'react';
 
-const userSelected = {
-  Categories: {
-    1: true,
-    2: false,
-    3: false,
-    4: false,
-    9: false,
-    18: false,
-    23: false,
-    25: false,
-    28: false,
-    29: false,
-    37: true,
-    50: false,
-    51: false,
-    52: false,
-    53: false,
-    54: false,
-    55: false,
-    56: false,
-    57: false,
-    58: false,
-    59: false,
-    60: false,
-    70: false,
-    71: false,
-    72: false,
-    73: false,
-    74: false,
-    81: false,
-    84: false,
-  },
-  Price: {
-    1: true,
-    2: true,
-    3: true,
-    4: true,
-    5: true,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false,
-    11: false,
-  },
-  Platforms: {
-    1: true,
-    2: false,
-  },
-  Playtime: {
-    1: true,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false,
-  },
+interface Genre {
+  id: string;
+  description: string;
+}
+
+interface Category {
+  id: number;
+  description: string;
+}
+
+interface Data {
+  name: string;
+  imgURL: string;
+  genres: Genre[];
+  categories: Category[];
+  isSinglePlayer: boolean;
+  isMultiPlayer: boolean;
+  price: number;
+  // salePriceOverview: number;
+  platforms: Platforms;
 };
 
-type Props = {
-  data: MatchDataType;
+interface Platforms {
+  windows: boolean;
+  mac: boolean;
+  linux: boolean;
 };
 
-const MatchIndicator = (props:Props) => {
+interface MatchIndicatorProps {
+  data: Data;
+};
 
-  const { data } = props;
+interface UserSelected {
+  Categories: { [key: number]: boolean };
+  Price: { [key: number]: boolean };
+  Platforms: { [key: number]: boolean };
+  Playtime: { [key: number]: boolean };
+}
+
+// const userSelected = {
+//   Categories: {
+//     1: true,
+//     2: true,
+//     3: false,
+//     4: false,
+//     9: false,
+//     18: false,
+//     23: false,
+//     25: false,
+//     28: false,
+//     29: false,
+//     37: true,
+//     50: false,
+//     51: false,
+//     52: false,
+//     53: false,
+//     54: false,
+//     55: false,
+//     56: false,
+//     57: false,
+//     58: false,
+//     59: false,
+//     60: false,
+//     70: false,
+//     71: false,
+//     72: false,
+//     73: false,
+//     74: false,
+//     81: false,
+//     84: false,
+//   },
+//   Price: {
+//     1: true,
+//     2: true,
+//     3: true,
+//     4: true,
+//     5: true,
+//     6: false,
+//     7: false,
+//     8: false,
+//     9: false,
+//     10: false,
+//     11: false,
+//   },
+//   Platforms: {
+//     1: true,
+//     2: false,
+//   },
+//   Playtime: {
+//     1: true,
+//     2: false,
+//     3: false,
+//     4: false,
+//     5: false,
+//     6: false,
+//     7: false,
+//     8: false,
+//     9: false,
+//     10: false,
+//   },
+// };
+
+const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
+  const [userSelected, setLocalFilter] = useState<UserSelected>({
+    Categories: {},
+    Price: {},
+    Platforms: {},
+    Playtime: {},
+  });
+
+  useEffect(() => {
+    (async() => {
+      const d = await getFilterData('unique_id');
+      if(d) {
+        setLocalFilter(d);
+      }
+    })();
+  }, [])
 
   const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
   const [priceMatchPercentage, setPriceMatchPercentage] = useState<number>(0);
@@ -82,7 +130,7 @@ const MatchIndicator = (props:Props) => {
   useEffect(() => {
     // 一致度を計算（ジャンル）
     const genreMatchCount = countMatchingGenres();
-    const genreMatch = calculateMatchPercentage(genreMatchCount, userSelected.Categories[37] ? 1 : 0);
+    const genreMatch = calculateMatchPercentage(genreMatchCount, data.genres.length);
     setGenreMatchPercentage(genreMatch);
 
     // 価格の差分を計算
@@ -115,8 +163,8 @@ const MatchIndicator = (props:Props) => {
   const countMatchingGenres = () => {
     let matchingCount = 0;
     const userGenreIDs = Object.keys(userSelected.Categories).filter(id => userSelected.Categories[Number(id)]);
-    data.genres.forEach((gameGenre:GenreType) => {
-      if (userGenreIDs.includes(String((gameGenre.id)))) {
+    data.genres.forEach((gameGenre: { id: string; }) => {
+      if (userGenreIDs.includes(gameGenre.id)) {
         matchingCount++;
       }
     });
@@ -175,7 +223,7 @@ const MatchIndicator = (props:Props) => {
           </div>
         </div>
         <div>
-          {data.genres.map((genre:GenreType) => (
+          {data.genres.map((genre) => (
             <small key={genre.id} className="text-gray-400">
               {genre.description}&nbsp;
             </small>

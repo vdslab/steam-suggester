@@ -16,10 +16,11 @@ const Match = async(props:Props) => {
   return (
     <div>
       <Headline txt='フィルター項目との一致度'/>
-      <MatchIndicator data={data} />
+      {data ? (
+        <MatchIndicator data={data}/>
+      ) : null}
     </div>
   )
 }
-
 
 export default Match
