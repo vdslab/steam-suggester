@@ -138,9 +138,6 @@ const NodeLink = (props:any) => {
           .distance((item: any) => {
             return calcCommonGenres(item.source.gameData, item.target.gameData);
           })
-          /* .strength((item: any) => {
-            return calcCommonGenres(item.source, item.target);
-          }) */
       )
       .force("charge", d3.forceManyBody().strength(-1000))
       .force("center", d3.forceCenter(width / 3, height / 2));
@@ -174,9 +171,6 @@ const NodeLink = (props:any) => {
     setIsLoading(false);
     
   }, [filter]);
-
-  console.log(newNode);
-  console.log(newLinks);
 
   return (
     <div>
