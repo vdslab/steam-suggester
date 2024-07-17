@@ -138,50 +138,39 @@ const NodeLink = (props:any) => {
           .distance((item: any) => {
             return calcCommonGenres(item.source.gameData, item.target.gameData);
           })
-          /* .strength((item: any) => {
-            return calcCommonGenres(item.source, item.target);
-          }) */
       )
       .force("charge", d3.forceManyBody().strength(-1000))
       .force("center", d3.forceCenter(width / 3, height / 2));
 
-    let tickCount = 0;
+    simulation.tick(300).stop()
 
-    simulation.on("tick", () => {
-      tickCount++;
-      if (tickCount >= 300) {
-        simulation.stop();
-        const newnode:any = nodes.map((node:any) => {
-          return {
-            x: node.x,
-            y: node.y,
-            index: node.index,
-            title: node.title,
-            imgURL: node.imgURL,
-            gameData: node.gameData,
-            steamGameId: node.steamGameId,
-            twitchGameId: node.twitchGameId,
-          };
-        })
-        setNewNode(newnode);
+    const newnode:any = nodes.map((node:any) => {
+      return {
+        x: node.x,
+        y: node.y,
+        index: node.index,
+        title: node.title,
+        imgURL: node.imgURL,
+        gameData: node.gameData,
+        steamGameId: node.steamGameId,
+        twitchGameId: node.twitchGameId,
+      };
+    })
+    setNewNode(newnode);
 
-        setNewLinks(
-          links.map((link:any) => {
-            return {
-              ...link,
-              color: "white",
-              width: 1,
-            }
-          })
-        );
+    setNewLinks(
+      links.map((link:any) => {
+        return {
+          ...link,
+          color: "white",
+          width: 1,
+        }
+      })
+    );
 
-        setIsLoading(false);
-      }
-    });
+    setIsLoading(false);
+    
   }, [filter]);
-
-  console.log(newNode);
-  console.log(newLinks);
 
   return (
     <div>
