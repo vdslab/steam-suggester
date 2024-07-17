@@ -1,7 +1,7 @@
-const Gametitle = async (props: {steamGameId:string}) => {
+const GameTitle = async (props: {steamGameId:string}) => {
   const { steamGameId } = props;
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getMatchDetails/${steamGameId}/0`);
+  const response = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
   const data = await response.json();
 
 
@@ -10,4 +10,4 @@ const Gametitle = async (props: {steamGameId:string}) => {
   );
 }
 
-export default Gametitle;
+export default GameTitle;

@@ -1,4 +1,4 @@
-import GameTitle from "@/components/common/Gametitle";
+import GameTitle from "@/components/common/GameTitle";
 import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
@@ -18,7 +18,6 @@ export default function Page({
         <SimilarGames />
       </div>
       <div className="w-3/4 bg-[#2a475e] flex flex-col p-4">
-        <Breadcrumb steamGameId={steamGameId} twitchGameId={twitchGameId}/>
         <div className="basis-1/10">
           <GameTitle steamGameId={steamGameId} />
         </div>
@@ -27,7 +26,7 @@ export default function Page({
             <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
           </div>
           <div className="basis-1/2">
-            <Match steamGameId={steamGameId}/>
+            <Match steamGameId={steamGameId} />
           </div>
         </div>
         <div className="basis-3/10 flex flex-col">
@@ -37,24 +36,3 @@ export default function Page({
     </div>
   )
 }
-
-type BreadcrumbProps = {
-  steamGameId: string;
-  twitchGameId: string;
-};
-
-const Breadcrumb: React.FC<BreadcrumbProps> = ({ steamGameId, twitchGameId }) => {
-  return (
-    <div className="text-gray-300">
-      {/* <Link href="/network" legacyBehavior>
-        <a className="text-white text-gray-300 hover:text-gray-400">
-          ネットワーク
-        </a>
-      </Link>
-      ＞
-      <a className="text-white text-gray-300 hover:text-gray-400">
-        {steamGameId}/{twitchGameId}
-      </a> */}
-    </div>
-  );
-};

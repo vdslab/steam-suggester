@@ -1,6 +1,6 @@
-import { STEAM_COLOR_RANGE, TWITCH_COLOR_RANGE } from "@/constants/styles/stackedArea";
-import Headline from "../common/Headline"
+import { STEAM_COLOR_RANGE, TWITCH_COLOR_RANGE } from "@/constants/STYLES";
 import StackedAreaChart from "./StackedAreaChart"
+import Headline from "../common/Headline";
 
 type Props = {
   twitchGameId: string;
