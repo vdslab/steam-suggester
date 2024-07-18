@@ -229,24 +229,35 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
       <div className="mb-4">
         <p>価格</p>
         <div className="relative w-full h-4 bg-gray-200 rounded-lg mb-1">
-          {data.price ?
-            <div>
-                <div
-                className={`h-4 rounded-lg bg-orange-400`}
-                style={{
-                  width: `${priceBarPosition(data.price)}%`,
-                }}
-              ></div>
-              {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
-              <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
-              <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
-                <span className="absolute top-full -translate-x-1/2 mt-1 text-xs"  style={{ whiteSpace: 'nowrap' }}>
-                  {calculateUserSelectedPrice() != 0 ? calculateUserSelectedPrice().toLocaleString() + "円" : "1000円"}
-                </span>
+          {data.price ? (
+            data.price != 0 ? (
+              <div>
+                  <div
+                  className={`h-4 rounded-lg bg-orange-400`}
+                  style={{
+                    width: `${priceBarPosition(data.price)}%`,
+                  }}
+                ></div>
+                {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
+                <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
+                <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
+                  <span className="absolute top-full -translate-x-1/2 mt-1 text-xs"  style={{ whiteSpace: 'nowrap' }}>
+                    {calculateUserSelectedPrice() != 0 ? calculateUserSelectedPrice().toLocaleString() + "円" : "1000円"}
+                  </span>
+                </div>
               </div>
-            </div>
-          :
+            ) : (
+              <div
+                className="h-4 rounded-lg bg-gray-400 flex items-center justify-center text-white text-xs"
+                style={{
+                  width: '100%',
+                }}
+              >
+                無料
+              </div>
+            )
+          ):
             <div
               className="h-4 rounded-lg bg-gray-400 flex items-center justify-center text-white text-xs"
               style={{
