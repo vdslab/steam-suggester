@@ -238,7 +238,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
                   }}
                 ></div>
                  {Object.keys(userSelected.Price).map((key) => {
-                  if (userSelected.Price[key]) {
+                  if (userSelected.Price[key as any]) {
                     const minPrice = Math.max((Number(key) - 2), 0) * 1000;
                     const maxPrice = Math.min((Number(key) - 1), 10) * 1000;
 
