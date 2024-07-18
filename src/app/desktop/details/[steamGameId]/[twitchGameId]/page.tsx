@@ -1,4 +1,4 @@
-import GameTitle from "@/components/common/GameTitle";
+import GameTitle from "@/components/common/GameTitle"
 import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
