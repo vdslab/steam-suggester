@@ -2,16 +2,8 @@
 import { useState } from 'react';
 import NodeLink from "./NodeLink";
 import SelectParameter from './SelectParameter';
-import { gameDetailType } from '@/types/api/gameDetailsType';
 
-type Props = {
-  data : gameDetailType[]
-}
-
-
-const Network = (props: Props) => {
-
-  const { data } = props;
+const Network = () => {
 
   const [filter, setFilter] = useState({
     Categories: {
@@ -85,7 +77,7 @@ const Network = (props: Props) => {
         <SelectParameter filter={filter} setFilter={setFilter} />
       </div>
       <div className="w-3/4 bg-[#2a475e] flex flex-col p-4">
-        <NodeLink filter={filter} data={data} />
+        <NodeLink filter={filter}/>
       </div>
     </div>
   )
