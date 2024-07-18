@@ -6,7 +6,7 @@ const GameTitle = async (props: {steamGameId:string}) => {
 
 
   return (
-    <h2 className="text-xl font-semibold mb-4 text-white text-center">{data.title}</h2>
+    <h2 className="text-5xl font-semibold mb-4 text-white text-center">{data.title}</h2>
   );
 }
 
