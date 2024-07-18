@@ -239,13 +239,14 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
                 ></div>
                  {Object.keys(userSelected.Price).map((key) => {
                   if (userSelected.Price[key]) {
-                    const minPrice = (Number(key) - 2) * 1000;
-                    const maxPrice = (Number(key) - 1) * 1000;
+                    const minPrice = Math.max((Number(key) - 2), 0) * 1000;
+                    const maxPrice = Math.min((Number(key) - 1), 10) * 1000;
 
                     // バーの位置と幅を計算
                     const barWidth = (maxPrice - minPrice) / (calculateUserSelectedPrice() * 2) * 100;
                     const barLeft = (minPrice / (calculateUserSelectedPrice() * 2)) * 100;
 
+                    console.log(barLeft,barLeft)
                     return (
                       <div
                         key={key}
