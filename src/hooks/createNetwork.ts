@@ -1,5 +1,75 @@
 import * as d3 from 'd3';
 import { gameDetailType } from "@/types/api/gameDetailsType";
+import { getFilterData } from './indexedDB';
+
+const DEFAULT_FILTER = {
+  "id": "unique_id",
+  "Categories": {
+      "1": true,
+      "2": true,
+      "3": true,
+      "4": true,
+      "9": true,
+      "18": true,
+      "23": true,
+      "25": true,
+      "28": true,
+      "29": true,
+      "37": true,
+      "50": true,
+      "51": true,
+      "52": true,
+      "53": true,
+      "54": true,
+      "55": true,
+      "56": true,
+      "57": true,
+      "58": true,
+      "59": true,
+      "60": true,
+      "70": true,
+      "71": true,
+      "72": true,
+      "73": true,
+      "74": true,
+      "81": true,
+      "84": true
+  },
+  "Price": {
+      "0": true,
+      "1": true,
+      "2": true,
+      "3": true,
+      "4": true,
+      "5": true,
+      "6": true,
+      "7": true,
+      "8": true,
+      "9": true,
+      "10": true,
+      "11": true
+  },
+  "Platforms": {
+      "1": true,
+      "2": true
+  },
+  "device": {
+      "1": true,
+      "2": true
+  },
+  "Playtime": {
+      "1": true,
+      "2": true,
+      "3": true,
+      "4": true,
+      "5": true,
+      "6": true,
+      "7": true,
+      "8": true,
+      "9": true,
+      "10": true
+  }
+}
 
 const calcCommonGenres = (game1:any, game2:any) => {
   let genresWeight = 1;
@@ -26,16 +96,21 @@ const createNetwork = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
   const data:gameDetailType[] = await res.json();
 
+  const d = await getFilterData('unique_id');
+  const filter: any = d ? d : DEFAULT_FILTER;
+
+  console.log(filter);
+
   const links: any = [];
   const similarGames: any = {};
   const ngIndex = [];
 
   const nodes = Object.values(data).filter((item: any) => {
-    /* if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
-    const priceId = item.gameData.price < 1000 ? 1 : Math.floor(item.gameData.price / 1000) + 1;
-    if(!filter["Price"][priceId]) return false;
-    const platformsId = item.gameData.isSinglePlayer ? 1 : 2;
-    if(!filter["Platforms"][platformsId]) return false; */
+    if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
+    /* const priceId = item.gameData.price < 1000 ? 1 : Math.floor(item.gameData.price / 1000) + 1; */
+    /* if(!filter["Price"][priceId]) return false; */
+    if(!((item.gameData.isSinglePlayer && filter["Platforms"]["1"]) || (item.gameData.isMultiPlayer && filter["Platforms"]["2"]))) return false;
+    if(!((item.gameData.platforms["windows"] && filter["device"]["1"]) || (item.gameData.platforms["mac"] && filter["device"]["2"]))) return false;
     /* const playtimeId = item.playtime < 100 ? 1 : Math.floor(item.playtime / 100) + 1;
     if(!filter["Playtime"][playtimeId]) return false; */
     
