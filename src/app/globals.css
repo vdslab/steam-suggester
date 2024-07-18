@@ -39,11 +39,15 @@ body {
 ::-webkit-scrollbar-thumb {background-color: #888;}
 ::-webkit-scrollbar-thumb:hover {background-color: #555;}
 
-.match-genre-color{
+.match-genre-bgcolor{
   background-color: rgb(100 150 250);
+}
+.match-genre-color{
   color: rgb(0 55 184);
 }
-.match-all-color{
+.match-all-bgcolor{
   background-color: rgb(170, 100, 250);
+}
+.match-all-color{
   color: rgb(138, 0, 184);
 }
