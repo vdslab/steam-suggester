@@ -99,8 +99,6 @@ const createNetwork = async () => {
   const d = await getFilterData('unique_id');
   const filter: any = d ? d : DEFAULT_FILTER;
 
-  console.log(filter);
-
   const links: any = [];
   const similarGames: any = {};
   const ngIndex = [];
