@@ -1,8 +1,24 @@
-const Match = () => {
+import MatchIndicator from "./MatchIndicator";
+import Headline from "../common/Headline";
+
+type Props = {
+  steamGameId: string;
+}
+
+const Match = async(props:Props) => {
+
+  const { steamGameId } = props;
+
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
+  const data = await res.json();
+
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">一致度</h3>
-      ここはしょうの作成ページです
+      <Headline txt='フィルター項目との一致度'/>
+      {data ? (
+        <MatchIndicator data={data}/>
+      ) : null}
     </div>
   )
 }
