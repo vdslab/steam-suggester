@@ -185,7 +185,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
     let price = 0;
     Object.keys(userSelected.Price).forEach((key, index) => {
       if (userSelected.Price[Number(key)]) {
-        price = index === 0 ? 0 : (index + 1) * 1000; // Handle 0 yen and subsequent prices
+        price = index === 0 ? 0 : (index + 1) * 1000;
       }
     });
     return price;
@@ -198,20 +198,20 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
   return (
     <div className='text-white'>
       <div className="mb-4">
-      <p className="text-lg font-bold">全体の一致度</p>
-      <div className="w-full bg-gray-200 rounded-lg h-8 mb-1 relative">
-        <div className="bg-purple-600 h-8 rounded-lg" style={{ width: `${overallMatchPercentage}%` }}></div>
-        <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold match-all-color`}>
-          {overallMatchPercentage}%
+        <p className="text-lg font-bold">全体の一致度</p>
+        <div className="w-full bg-gray-200 rounded-lg h-8 mb-1 relative">
+          <div className="bg-purple-600 h-8 rounded-lg match-all-bgcolor" style={{ width: `${overallMatchPercentage}%` }}></div>
+          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold match-all-color`}>
+            {overallMatchPercentage}%
+          </div>
         </div>
       </div>
-    </div>
 
 
       <div className="mb-4">
         <p className="text-lg">ジャンル一致度</p>
         <div className="w-full bg-gray-200 rounded-t-lg h-8 relative">
-          <div className="bg-blue-600 h-8 rounded-t-lg" style={{ width: `${genreMatchPercentage}%` }}></div>
+          <div className="bg-blue-600 h-8 rounded-t-lg match-genre-bgcolor" style={{ width: `${genreMatchPercentage}%` }}></div>
           <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold match-genre-color`}>
             {genreMatchPercentage}%
           </div>
@@ -225,19 +225,42 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
         </div>
       </div>
 
-
       <div className="mb-4">
         <p>価格</p>
         <div className="relative w-full h-4 bg-gray-200 rounded-lg mb-1">
           {data.price ? (
             data.price != 0 ? (
               <div>
-                  <div
-                  className={`h-4 rounded-lg bg-orange-400`}
+                <div
+                  className={`absolute top-0 left-0 h-full rounded-lg bg-orange-400`}
                   style={{
                     width: `${priceBarPosition(data.price)}%`,
                   }}
                 ></div>
+                 {Object.keys(userSelected.Price).map((key) => {
+                  if (userSelected.Price[key]) {
+                    const minPrice = Math.max((Number(key) - 2), 0) * 1000;
+                    const maxPrice = Math.min((Number(key) - 1), 10) * 1000;
+
+                    // バーの位置と幅を計算
+                    const barWidth = (maxPrice - minPrice) / (calculateUserSelectedPrice() * 2) * 100;
+                    const barLeft = (minPrice / (calculateUserSelectedPrice() * 2)) * 100;
+
+                    console.log(barLeft,barLeft)
+                    return (
+                      <div
+                        key={key}
+                        className="absolute top-0 left-0 h-full"
+                        style={{
+                          width: `${barWidth}%`,
+                          left: `${barLeft}%`,
+                          backgroundColor: 'rgba(0, 165, 0, 0.5)',
+                        }}
+                      ></div>
+                    );
+                  }
+                  return null;
+                })}
                 {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
                 <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
                 <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
