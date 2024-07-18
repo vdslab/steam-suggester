@@ -8,7 +8,7 @@ const Icon = (props:any) => {
   const router = useRouter();
   const handleClick = (e:any) => {
     e.preventDefault();
-    router.push(`/details/${steamGameId}/${twitchGameId}`);
+    router.push(`/desktop/details/${steamGameId}/${twitchGameId}`);
   };
 
   return (
