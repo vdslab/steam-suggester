@@ -128,11 +128,6 @@ const createNetwork = async () => {
     } else {
       similarGames[targetGame.steamGameId] = [{steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId}];
     }
-    if(sourceGame.steamGameId === '381210' || targetGame.steamGameId === '381210') {
-      console.log(similarGames['381210']);
-      console.log(link);
-    }
-    
   });
 
   return {nodes, links, similarGames};
