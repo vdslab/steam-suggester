@@ -1,4 +1,5 @@
 "use client"; 
+import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
 import React, { useState, useEffect } from 'react';
 
@@ -42,68 +43,7 @@ interface UserSelected {
 }
 
 const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
-  const [userSelected, setLocalFilter] = useState<UserSelected>({
-    Categories: {
-      1: true,
-      2: true,
-      3: false,
-      4: false,
-      9: false,
-      18: false,
-      23: false,
-      25: false,
-      28: false,
-      29: false,
-      37: true,
-      50: false,
-      51: false,
-      52: false,
-      53: false,
-      54: false,
-      55: false,
-      56: false,
-      57: false,
-      58: false,
-      59: false,
-      60: false,
-      70: false,
-      71: false,
-      72: false,
-      73: false,
-      74: false,
-      81: false,
-      84: false,
-    },
-    Price: {
-      1: true,
-      2: true,
-      3: true,
-      4: true,
-      5: true,
-      6: false,
-      7: false,
-      8: false,
-      9: false,
-      10: false,
-      11: false,
-    },
-    Platforms: {
-      1: true,
-      2: false,
-    },
-    Playtime: {
-      1: true,
-      2: false,
-      3: false,
-      4: false,
-      5: false,
-      6: false,
-      7: false,
-      8: false,
-      9: false,
-      10: false,
-    }
-  });
+  const [userSelected, setLocalFilter] = useState<UserSelected>(DEFAULT_FILTER);
 
   useEffect(() => {
     (async() => {
