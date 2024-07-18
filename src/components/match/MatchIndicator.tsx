@@ -41,75 +41,68 @@ interface UserSelected {
   Playtime: { [key: number]: boolean };
 }
 
-// const userSelected = {
-//   Categories: {
-//     1: true,
-//     2: true,
-//     3: false,
-//     4: false,
-//     9: false,
-//     18: false,
-//     23: false,
-//     25: false,
-//     28: false,
-//     29: false,
-//     37: true,
-//     50: false,
-//     51: false,
-//     52: false,
-//     53: false,
-//     54: false,
-//     55: false,
-//     56: false,
-//     57: false,
-//     58: false,
-//     59: false,
-//     60: false,
-//     70: false,
-//     71: false,
-//     72: false,
-//     73: false,
-//     74: false,
-//     81: false,
-//     84: false,
-//   },
-//   Price: {
-//     1: true,
-//     2: true,
-//     3: true,
-//     4: true,
-//     5: true,
-//     6: false,
-//     7: false,
-//     8: false,
-//     9: false,
-//     10: false,
-//     11: false,
-//   },
-//   Platforms: {
-//     1: true,
-//     2: false,
-//   },
-//   Playtime: {
-//     1: true,
-//     2: false,
-//     3: false,
-//     4: false,
-//     5: false,
-//     6: false,
-//     7: false,
-//     8: false,
-//     9: false,
-//     10: false,
-//   },
-// };
-
 const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
   const [userSelected, setLocalFilter] = useState<UserSelected>({
-    Categories: {},
-    Price: {},
-    Platforms: {},
-    Playtime: {},
+    Categories: {
+      1: true,
+      2: true,
+      3: false,
+      4: false,
+      9: false,
+      18: false,
+      23: false,
+      25: false,
+      28: false,
+      29: false,
+      37: true,
+      50: false,
+      51: false,
+      52: false,
+      53: false,
+      54: false,
+      55: false,
+      56: false,
+      57: false,
+      58: false,
+      59: false,
+      60: false,
+      70: false,
+      71: false,
+      72: false,
+      73: false,
+      74: false,
+      81: false,
+      84: false,
+    },
+    Price: {
+      1: true,
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+      6: false,
+      7: false,
+      8: false,
+      9: false,
+      10: false,
+      11: false,
+    },
+    Platforms: {
+      1: true,
+      2: false,
+    },
+    Playtime: {
+      1: true,
+      2: false,
+      3: false,
+      4: false,
+      5: false,
+      6: false,
+      7: false,
+      8: false,
+      9: false,
+      10: false,
+    }
   });
 
   useEffect(() => {
@@ -208,7 +201,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
       <p className="text-lg font-bold">全体の一致度</p>
       <div className="w-full bg-gray-200 rounded-lg h-8 mb-1 relative">
         <div className="bg-purple-600 h-8 rounded-lg" style={{ width: `${overallMatchPercentage}%` }}></div>
-        <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold ${getTextColor(overallMatchPercentage, "text-purple-600")}`}>
+        <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold match-all-color`}>
           {overallMatchPercentage}%
         </div>
       </div>
@@ -219,7 +212,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
         <p className="text-lg">ジャンル一致度</p>
         <div className="w-full bg-gray-200 rounded-t-lg h-8 relative">
           <div className="bg-blue-600 h-8 rounded-t-lg" style={{ width: `${genreMatchPercentage}%` }}></div>
-          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold ${getTextColor(genreMatchPercentage, "text-blue-600")}`}>
+          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold match-genre-color`}>
             {genreMatchPercentage}%
           </div>
         </div>
@@ -236,20 +229,44 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
       <div className="mb-4">
         <p>価格</p>
         <div className="relative w-full h-4 bg-gray-200 rounded-lg mb-1">
-          <div
-            className={`h-4 rounded-lg ${priceDifference < 0 ? 'bg-green-600' : 'bg-red-600'}`}
-            style={{
-              width: `${priceBarPosition(data.price)}%`,
-            }}
-          ></div>
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
-          <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
-          <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
-            <span className="absolute top-full -translate-x-1/2 mt-1 text-xs"  style={{ whiteSpace: 'nowrap' }}>
-              {calculateUserSelectedPrice() != 0 ? calculateUserSelectedPrice().toLocaleString() + "円" : "1000円"}
-            </span>
-          </div>
+          {data.price ? (
+            data.price != 0 ? (
+              <div>
+                  <div
+                  className={`h-4 rounded-lg bg-orange-400`}
+                  style={{
+                    width: `${priceBarPosition(data.price)}%`,
+                  }}
+                ></div>
+                {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
+                <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
+                <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
+                  <span className="absolute top-full -translate-x-1/2 mt-1 text-xs"  style={{ whiteSpace: 'nowrap' }}>
+                    {calculateUserSelectedPrice() != 0 ? calculateUserSelectedPrice().toLocaleString() + "円" : "1000円"}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="h-4 rounded-lg bg-gray-400 flex items-center justify-center text-white text-xs"
+                style={{
+                  width: '100%',
+                }}
+              >
+                無料
+              </div>
+            )
+          ):
+            <div
+              className="h-4 rounded-lg bg-gray-400 flex items-center justify-center text-white text-xs"
+              style={{
+                width: '100%',
+              }}
+            >
+              データがありません
+            </div>
+          }
         </div>
         <div className="flex justify-between text-xs">
           <span>0円</span>
