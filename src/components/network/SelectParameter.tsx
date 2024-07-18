@@ -76,8 +76,8 @@ const playtimeMapping: any = {
 const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: { min: number, max: number, values: number[], onChange: (values: number[]) => void, valueFormatter: (value: number) => string, disabled: boolean }) => {
   const [domain] = useState([min, max]);
 
-  const handleChange = (newValues: number[]) => {
-    onChange(newValues);
+  const handleChange = (newValues: readonly number[]) => {
+    onChange([...newValues]);
   };
 
   return (
