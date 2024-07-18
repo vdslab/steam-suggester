@@ -194,7 +194,7 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
         }}
       >
 
-      <div className="p-2">
+      {title=="Categories" ? <div className="p-2">
           <button
             onClick={handleSelectAll}
             className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 mr-2"
@@ -207,7 +207,7 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
           >
             全解除
           </button>
-        </div>
+        </div>: null}
 
       <div className="flex flex-wrap -mx-2 p-2">
         {Object.keys(mapping).map((key: any) => {
