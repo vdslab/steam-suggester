@@ -205,37 +205,39 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
   return (
     <div className='text-white'>
       <div className="mb-4">
-        <p>全体の一致度</p>
-        <div className="w-full bg-gray-200 rounded-full h-4 mb-1 relative">
-          <div className="bg-purple-600 h-4 rounded-full" style={{ width: `${overallMatchPercentage}%` }}></div>
-          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-xs ${getTextColor(overallMatchPercentage, "text-purple-600")}`}>
-            {overallMatchPercentage}%
-          </div>
+      <p className="text-lg font-bold">全体の一致度</p>
+      <div className="w-full bg-gray-200 rounded-lg h-8 mb-1 relative">
+        <div className="bg-purple-600 h-8 rounded-lg" style={{ width: `${overallMatchPercentage}%` }}></div>
+        <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold ${getTextColor(overallMatchPercentage, "text-purple-600")}`}>
+          {overallMatchPercentage}%
         </div>
       </div>
+    </div>
+
 
       <div className="mb-4">
-        <p>ジャンル一致度</p>
-        <div className="w-full bg-gray-200 rounded-full h-4 mb-1 relative">
-          <div className="bg-blue-600 h-4 rounded-full" style={{ width: `${genreMatchPercentage}%` }}></div>
-          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-xs ${getTextColor(genreMatchPercentage, "text-blue-600")}`}>
+        <p className="text-lg">ジャンル一致度</p>
+        <div className="w-full bg-gray-200 rounded-t-lg h-8 relative">
+          <div className="bg-blue-600 h-8 rounded-t-lg" style={{ width: `${genreMatchPercentage}%` }}></div>
+          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold ${getTextColor(genreMatchPercentage, "text-blue-600")}`}>
             {genreMatchPercentage}%
           </div>
         </div>
-        <div>
+        <div className="w-full bg-gray-300 rounded-b-lg pt-0 pb-1 pl-2 pr-1 ">
           {data.genres.map((genre) => (
-            <small key={genre.id} className="text-gray-400">
+            <small key={genre.id} className="text-gray-700">
               {genre.description}&nbsp;
             </small>
           ))}
         </div>
       </div>
 
+
       <div className="mb-4">
         <p>価格</p>
-        <div className="relative w-full h-4 bg-gray-200 rounded-full mb-1">
+        <div className="relative w-full h-4 bg-gray-200 rounded-lg mb-1">
           <div
-            className={`h-4 rounded-full ${priceDifference < 0 ? 'bg-green-600' : 'bg-red-600'}`}
+            className={`h-4 rounded-lg ${priceDifference < 0 ? 'bg-green-600' : 'bg-red-600'}`}
             style={{
               width: `${priceBarPosition(data.price)}%`,
             }}
