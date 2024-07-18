@@ -185,7 +185,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
     let price = 0;
     Object.keys(userSelected.Price).forEach((key, index) => {
       if (userSelected.Price[Number(key)]) {
-        price = index === 0 ? 0 : (index + 1) * 1000; // Handle 0 yen and subsequent prices
+        price = index === 0 ? 0 : (index + 1) * 1000;
       }
     });
     return price;
@@ -231,12 +231,35 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
           {data.price ? (
             data.price != 0 ? (
               <div>
-                  <div
-                  className={`h-4 rounded-lg bg-orange-400`}
+                <div
+                  className={`absolute top-0 left-0 h-full rounded-lg bg-orange-400`}
                   style={{
                     width: `${priceBarPosition(data.price)}%`,
                   }}
                 ></div>
+                 {Object.keys(userSelected.Price).map((key) => {
+                  if (userSelected.Price[key]) {
+                    const minPrice = (Number(key) - 2) * 1000;
+                    const maxPrice = (Number(key) - 1) * 1000;
+
+                    // バーの位置と幅を計算
+                    const barWidth = (maxPrice - minPrice) / (calculateUserSelectedPrice() * 2) * 100;
+                    const barLeft = (minPrice / (calculateUserSelectedPrice() * 2)) * 100;
+
+                    return (
+                      <div
+                        key={key}
+                        className="absolute top-0 left-0 h-full"
+                        style={{
+                          width: `${barWidth}%`,
+                          left: `${barLeft}%`,
+                          backgroundColor: 'rgba(0, 165, 0, 0.5)',
+                        }}
+                      ></div>
+                    );
+                  }
+                  return null;
+                })}
                 {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
                 <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
                 <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
