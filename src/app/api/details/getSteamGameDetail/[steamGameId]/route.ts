@@ -19,7 +19,7 @@ export async function GET(req: Request, {params}: Params) {
   const result:MatchDataType = {
     title: gameDetailData.name,
     genres: gameDetailData.genres,
-    price: gameDetailData.price_overview ? gameDetailData.price_overview.final : 0,
+    price: gameDetailData.price_overview ? gameDetailData.price_overview.final / 100 : 0,
     isSinglePlayer: gameDetailData.categories.some((category: steamGameCategoryType) => category.id === 2),
     isMultiPlayer: gameDetailData.categories.some((category: steamGameCategoryType) => category.id === 1),
     platforms: {
