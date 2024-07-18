@@ -22,6 +22,9 @@ const StackedAreaChart =({
   const yMax = height - margin.top - margin.bottom;
   const xMax = width - margin.left - margin.right;
 
+  if (!data || data.length === 0) {
+    return null; // データがない場合は何も表示しない
+  }
 
   const keys = Object.keys(data[0]).filter((k) => k !== 'date');
 

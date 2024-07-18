@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as d3 from 'd3';
 import Icon from "./Icon";
+import createNetwork from "@/hooks/createNetwork";
 
 const ZoomableSVG = (props:any) => {
   const { children } = props;
@@ -31,181 +32,55 @@ const ZoomableSVG = (props:any) => {
 };
 
 const NodeLink = (props:any) => {
-  const { filter, data } = props;
-  const k = 5;
+  const { filter } = props;
+
+  const [nodes, setNodes] = useState<any>([]);
+  const [links, setLinks] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const [newLinks, setNewLinks] = useState([]);
-  const [newNode, setNewNode] = useState([]);
-
-  const calcCommonGenres = (game1:any, game2:any) => {
-    let genresWeight = 1;
-
-    game1.genres.forEach((item:any) =>
-      game2.genres.forEach((i:any) => {
-        if (i.id === item.id) {
-          genresWeight++;
-        }
-      })
-    );
-    genresWeight *= 10;
-
-    const priceWeight = Math.abs(game1.price - game2.price);
-    // const platformsWeight = game1.platforms === game2.platforms ? 1 : 0;
-    // const playtimeWeight = Math.abs(game1.playtime - game2.playtime);
-    const totalWeight = genresWeight * 10 + (1 / priceWeight) * 100;
-    return 1 / genresWeight;
-  };
-
   useEffect(() => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const links:any = [];
-    const ngIndex = [];
-
-    const nodes = Object.values(data).filter((item: any) => {
-      /* if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
-      const priceId = item.gameData.price < 1000 ? 1 : Math.floor(item.gameData.price / 1000) + 1;
-      if(!filter["Price"][priceId]) return false;
-      const platformsId = item.gameData.isSinglePlayer ? 1 : 2;
-      if(!filter["Platforms"][platformsId]) return false; */
-      /* const playtimeId = item.playtime < 100 ? 1 : Math.floor(item.playtime / 100) + 1;
-      if(!filter["Playtime"][playtimeId]) return false; */
-      
-      return true;
-    }).map((node:any, index) => ({
-      id: index,
-      title: node.title,
-      imgURL: node.imgURL,
-      gameData: node.gameData,
-      steamGameId: node.steamGameId,
-      twitchGameId: node.twitchGameId,
-      total_views: node.total_views,
-      /* playtime: node.playtime, */
-    }));
-
-
-    for (let i = 0; i < nodes.length; i++) {
-      const array = nodes
-        .filter((_,index) => i !== index)
-        .map((node, index) => {
-          return {
-            index,
-            weight: calcCommonGenres(nodes[i].gameData, node.gameData)
-          };
-        })
-        .filter((e) => e);
-      array.sort((a, b) => a.weight - b.weight);
-
-      const newArray = array.map((item) => item.index);
-
-      let count = 0;
-      newArray.forEach((index) => {
-        const isSourceOk =
-          links.filter((item:any) => item.target === i || item.source === i)
-            .length < k;
-        const isTargetOk =
-          links.filter((item:any) => item.target === index || item.source === index)
-            .length < k;
-        if (count < k && isSourceOk && isTargetOk) {
-          links.push({ source: i, target: index });
-          count++;
-          if (
-            links.filter((item:any) => item.target === i || item.source === i)
-              .length >= k
-          ) {
-            ngIndex.push(i);
-          } else if (
-            links.filter(
-              (item:any) => item.target === index || item.source === index
-            ).length >= k
-          ) {
-            ngIndex.push(index);
-            count++;
-          }
-        }
-      });
-    }
-
-    const simulation = d3
-      .forceSimulation(nodes)
-      .force(
-        "link",
-        d3
-          .forceLink(links)
-          .id((d:any) => d.id)
-          .distance((item: any) => {
-            return calcCommonGenres(item.source.gameData, item.target.gameData);
-          })
-      )
-      .force("charge", d3.forceManyBody().strength(-1000))
-      .force("center", d3.forceCenter(width / 3, height / 2));
-
-    simulation.tick(300).stop()
-
-    const newnode:any = nodes.map((node:any) => {
-      return {
-        x: node.x,
-        y: node.y,
-        index: node.index,
-        title: node.title,
-        imgURL: node.imgURL,
-        gameData: node.gameData,
-        steamGameId: node.steamGameId,
-        twitchGameId: node.twitchGameId,
-      };
-    })
-    setNewNode(newnode);
-
-    setNewLinks(
-      links.map((link:any) => {
-        return {
-          ...link,
-          color: "white",
-          width: 1,
-        }
-      })
-    );
-
-    setIsLoading(false);
+    (async () => {
+      const {nodes, links} = await createNetwork();
+      setNodes(nodes);
+      setLinks(links);
+      setIsLoading(false);
+    })();
     
   }, [filter]);
 
   return (
     <div>
       {!isLoading ? <ZoomableSVG>
-      {newLinks.length !== 0 &&
-        newLinks.map((link:any, i) => (
-          <line
-            key={i}
-            className="link"
-            x1={link.source.x}
-            y1={link.source.y}
-            x2={link.target.x}
-            y2={link.target.y}
-            style={{ stroke: link.color, strokeWidth: link.width }}
-          />
-        ))}
-      {newNode.length !== 0 &&
-        newNode.map((node:any, i) => {
-          return (
-            <g transform={`translate(${node.x},${node.y})`} key={i}>
-              <Icon
-                title={node.title}
-                imgURL={node.imgURL}
-                index={node.index}
-                steamGameId={node.steamGameId}
-                twitchGameId={node.twitchGameId}
-              ></Icon>
-            </g>
-          );
-        })}
-    </ZoomableSVG> : <div>Loading...</div>
-    }
+        {links.length !== 0 &&
+          links.map((link:any, i) => (
+            <line
+              key={i}
+              className="link"
+              x1={link.source.x}
+              y1={link.source.y}
+              x2={link.target.x}
+              y2={link.target.y}
+              style={{ stroke: "white", strokeWidth: "0.5" }}
+            />
+          ))}
+        {nodes.length !== 0 &&
+          nodes.map((node:any, i:any) => {
+            return (
+              <g transform={`translate(${node.x},${node.y})`} key={i}>
+                <Icon
+                  title={node.title}
+                  imgURL={node.imgURL}
+                  index={node.index}
+                  steamGameId={node.steamGameId}
+                  twitchGameId={node.twitchGameId}
+                ></Icon>
+              </g>
+            );
+          })}
+      </ZoomableSVG> : <div>Loading...</div>
+      }
     </div>
-    
-    
   );
 };
 

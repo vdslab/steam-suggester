@@ -1,17 +1,32 @@
+import createNetwork from "@/hooks/createNetwork";
 import Headline from "../common/Headline";
 import DisplayGame from "./DisplayGame";
 import { GameDetails } from "@/types/similarGames/GameDetails";
 
-const SimilarGames = async() => {
+const SimilarGames = async (props: any) => {
+  const { steamGameId } = props;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSimilarGames/${511224}`)
-  const data = await res.json()
+  const { similarGames } = await createNetwork();
+
+  const data: any = [];
+
+  if(similarGames[steamGameId]) {
+    for(let i = 0; i < similarGames[steamGameId].length; i++) {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSimilarGames/${similarGames[steamGameId][i].steamGameId}`)
+      const d = await res.json();
+      data.push({
+        ...d, 
+        steamGameId: similarGames[steamGameId][i].steamGameId,
+        twitchGameId: similarGames[steamGameId][i].twitchGameId
+      });
+    }
+  }
 
   return (
     <div>
       <Headline txt="類似してるゲーム" />
-      {data.map((game:GameDetails) => (
-        <DisplayGame key={game.url} name={game.name} image={game.image} url={game.url}/>
+      {data.map((game: GameDetails) => (
+        <DisplayGame key={game.url} name={game.name} image={game.image} url={game.url} steamGameId={game.steamGameId} twitchGameId={game.twitchGameId} />
       ))}
     </div>
   )
