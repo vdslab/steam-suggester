@@ -7,22 +7,16 @@ type Params = {
 }
 
 export async function GET(req: Request, { params }:Params) {
-
   const gameId = params.gameId
-  const GAME_IDS = [1172470, 1938090, 730, 359550];
 
-  const gameDetails = [];
+  const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${gameId}&cc=jp`)
+  const data = await res.json()
 
-  for( let i = 0; i < GAME_IDS.length; i++ ) {
-    const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${GAME_IDS[i]}&cc=jp`)
-    const data = await res.json()
-    gameDetails.push({
-      name: data[GAME_IDS[i]].data.name,
-      image: data[GAME_IDS[i]].data.header_image,
-      url: `https://store.steampowered.com/app/${GAME_IDS[i]}`,
-    })
+  const gameDetail = {
+    name: data[gameId].data.name,
+    image: data[gameId].data.header_image,
+    url: `https://store.steampowered.com/app/${gameId}`,
   }
-  
 
-  return NextResponse.json(gameDetails)
+  return NextResponse.json(gameDetail)
 }

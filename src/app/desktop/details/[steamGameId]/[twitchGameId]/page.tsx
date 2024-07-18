@@ -15,7 +15,7 @@ export default function Page({
   return (
     <div className="flex h-[92dvh]">
       <div className="w-1/4 bg-[#1b2838]">
-        <SimilarGames />
+        <SimilarGames steamGameId={steamGameId} />
       </div>
       <div className="w-3/4 bg-[#2a475e] flex flex-col p-4">
         <div className="basis-1/10">

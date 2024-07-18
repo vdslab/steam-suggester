@@ -26,9 +26,8 @@ const createNetwork = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
   const data:gameDetailType[] = await res.json();
 
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  const links:any = [];
+  const links: any = [];
+  const similarGames: any = {};
   const ngIndex = [];
 
   const nodes = Object.values(data).filter((item: any) => {
@@ -41,7 +40,7 @@ const createNetwork = async () => {
     if(!filter["Playtime"][playtimeId]) return false; */
     
     return true;
-  }).map((node:any, index) => ({
+  }).map((node: any, index) => ({
     id: index,
     title: node.title,
     imgURL: node.imgURL,
@@ -50,7 +49,6 @@ const createNetwork = async () => {
     twitchGameId: node.twitchGameId,
     total_views: node.total_views,
   }));
-
 
   for (let i = 0; i < nodes.length; i++) {
     const array = nodes
@@ -106,11 +104,38 @@ const createNetwork = async () => {
         })
     )
     .force("charge", d3.forceManyBody().strength(-1000))
-    .force("center", d3.forceCenter(width / 3, height / 2));
 
   simulation.tick(300).stop()
 
-  return {nodes, links};
+  links.forEach((link: any) => {
+    const sourceGame = link.source;
+    const targetGame = link.target;
+
+    if(sourceGame === targetGame) return ;
+
+    if(similarGames[sourceGame.steamGameId]) {
+      if(!similarGames[sourceGame.steamGameId].includes({steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId})) {
+        similarGames[sourceGame.steamGameId].push({steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId});
+      }
+    } else {
+      similarGames[sourceGame.steamGameId] = [{steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId}];
+    }
+
+    if(similarGames[targetGame.steamGameId]) {
+      if(!similarGames[targetGame.steamGameId].includes({steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId})) {
+        similarGames[targetGame.steamGameId].push({steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId});
+      }
+    } else {
+      similarGames[targetGame.steamGameId] = [{steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId}];
+    }
+    if(sourceGame.steamGameId === '381210' || targetGame.steamGameId === '381210') {
+      console.log(similarGames['381210']);
+      console.log(link);
+    }
+    
+  });
+
+  return {nodes, links, similarGames};
 };
 
 export default createNetwork;
