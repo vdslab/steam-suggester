@@ -186,7 +186,6 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
                     const barWidth = (maxPrice - minPrice) / (calculateUserSelectedPrice() * 2) * 100;
                     const barLeft = (minPrice / (calculateUserSelectedPrice() * 2)) * 100;
 
-                    console.log(barLeft,barLeft)
                     return (
                       <div
                         key={key}

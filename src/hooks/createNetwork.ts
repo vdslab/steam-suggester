@@ -23,7 +23,7 @@ const calcCommonGenres = (game1:any, game2:any) => {
 };
 
 const createNetwork = async () => {
-  const k = 5;
+  const k = 4;
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
   const data:gameDetailType[] = await res.json();
