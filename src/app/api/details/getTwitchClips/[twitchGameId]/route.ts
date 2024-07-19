@@ -1,3 +1,4 @@
+import TwitchToken from "@/app/api/TwitchToken";
 import { NextResponse } from "next/server";
 
 type Params = {
@@ -18,11 +19,7 @@ export async function GET(req: Request, { params }: Params) {
 
   try {
     // TwitchのAPIにアクセスするためのトークンを取得
-    const tokenResponse = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getTwitchToken`);
-    if (!tokenResponse.ok) {
-      return NextResponse.error()
-    }
-    const token = await tokenResponse.json();
+    const token = await TwitchToken();
 
     // TwitchのAPIにアクセスするためのヘッダーを作成
     const headers = new Headers();

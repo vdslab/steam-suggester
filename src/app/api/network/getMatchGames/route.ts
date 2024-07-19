@@ -1,3 +1,4 @@
+import { PG_POOL } from "@/constants/PG_POOL";
 import { steamGameCategoryType } from "@/types/api/steamDataType";
 import { NextResponse } from "next/server";
 
@@ -5,8 +6,25 @@ export async function GET() {
 
   try {
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getCurrentTopGames`);
-    const data = await res.json();  
+    const today = new Date();
+    today.setDate(today.getDate() -1);
+    const dateString = today.toISOString().split('T')[0];
+
+    const query = `
+      SELECT get_date, game_title, twitch_id, steam_id, total_views
+      FROM game_views
+      WHERE get_date::date = $1
+    `;
+    const { rows } = await PG_POOL.query(query, [dateString]);
+
+    const data = rows
+                        .sort((a, b) => b.total_views - a.total_views)
+                        .slice(0, 120)
+                        .filter((item, index, self) => (
+                          index === self.findIndex((t) => (
+                            t.steam_id === item.steam_id
+                          ))
+                        ));
 
     const result = [];
     for(let i = 0; i < data.length; i += 1) {
