@@ -74,6 +74,7 @@ const NodeLink = (props:any) => {
                   index={node.index}
                   steamGameId={node.steamGameId}
                   twitchGameId={node.twitchGameId}
+                  circleScale={node.circleScale}
                 ></Icon>
               </g>
             );

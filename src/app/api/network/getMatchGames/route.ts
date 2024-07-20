@@ -1,11 +1,10 @@
 import { PG_POOL } from "@/constants/PG_POOL";
+import { gameDetailType } from "@/types/api/gameDetailsType";
 import { steamGameCategoryType } from "@/types/api/steamDataType";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-
   try {
-
     const today = new Date();
     today.setDate(today.getDate() -1);
     const dateString = today.toISOString().split('T')[0];
@@ -26,12 +25,12 @@ export async function GET() {
                           ))
                         ));
 
-    const result = [];
+    const result: gameDetailType[] = [];
     for(let i = 0; i < data.length; i += 1) {
 
       const twitchGameId = data[i].twitch_id;
       const steamGameId = data[i].steam_id;
-
+      const total_views = data[i].total_views;
 
       const response = await fetch(`https://store.steampowered.com/api/appdetails?appids=${steamGameId}&cc=jp`);
       const responseJson = await response.json();
@@ -46,6 +45,7 @@ export async function GET() {
         steamGameId: steamGameId,
         title: gameDetailData.name,
         imgURL: gameDetailData.header_image,
+        totalViews: total_views,
         gameData: {
           genres: gameDetailData.genres,
           price: gameDetailData.price_overview ? gameDetailData.price_overview.final : 0,
@@ -59,7 +59,6 @@ export async function GET() {
         }
       })
     }
-    
 
     return NextResponse.json(result);
 

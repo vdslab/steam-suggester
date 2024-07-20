@@ -1,7 +1,79 @@
 import * as d3 from 'd3';
 import { gameDetailType } from "@/types/api/gameDetailsType";
+import { steamGameGenreType, steamGamePlatformType } from '@/types/api/steamDataType';
 import { getFilterData } from './indexedDB';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
+
+type Node = {
+  circleScale?: number,
+  gameData: GameData,
+  id: number,
+  imgURL: string,
+  index?: number,
+  steamGameId: string,
+  title: string,
+  totalViews: number,
+  twitchGameId: string,
+  vx?: number,
+  vy?: number,
+  x?: number,
+  y?: number,
+}
+
+type Filter = {
+  Categories: { [key: number]: boolean },
+  Price: { [key: number]: boolean },
+  Platforms: { [key: number]: boolean },
+  Playtime: { [key: number]: boolean },
+}
+
+type GameData = {
+  genres : steamGameGenreType[],
+  price: number,
+  isSinglePlayer: boolean,
+  isMultiPlayer: boolean,
+  platforms: steamGamePlatformType,
+}
+
+
+
+const countMatchingGenres = (filter: Filter, data: GameData) => {
+  let matchingCount = 0;
+  const userGenreIDs = Object.keys(filter.Categories).filter(id => filter.Categories[Number(id)]);
+  data.genres.forEach((gameGenre: { id: string; }) => {
+    if (userGenreIDs.includes(gameGenre.id)) {
+      matchingCount++;
+    }
+  });
+  return matchingCount;
+};
+
+const countMatchMode = (filter: Filter, data: GameData) => {
+  let matchCount = 0;
+
+  if (filter.Categories[1] === data.isMultiPlayer) 
+    matchCount++;
+  if (!filter.Categories[1] === data.isSinglePlayer)
+    matchCount++;
+
+  return matchCount;
+};
+
+const calculateMatchPercentage = (overview: number, userSelected: number) => {
+  const diff = Math.abs(overview - userSelected);
+  const matchPercentage = Math.round(Math.max(0, 100 - (diff / userSelected) * 100));
+  return matchPercentage;
+};
+
+const calculateUserSelectedPrice = (filter: Filter) => {
+  let price = 0;
+  Object.keys(filter.Price).forEach((key, index) => {
+    if (filter.Price[Number(key)]) {
+      price = index === 0 ? 0 : (index + 1) * 1000;
+    }
+  });
+  return price;
+};
 
 const calcCommonGenres = (game1:any, game2:any) => {
   let genresWeight = 1;
@@ -35,7 +107,11 @@ const createNetwork = async () => {
   const similarGames: any = {};
   const ngIndex = [];
 
-  const nodes = Object.values(data).filter((item: any) => {
+  const matchScale = d3.scaleLinear()
+                      .domain([0, 100])
+                      .range([1, 4])
+
+  const nodes: Node[] = Object.values(data).filter((item: any) => {
     if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
     /* const priceId = item.gameData.price < 1000 ? 1 : Math.floor(item.gameData.price / 1000) + 1; */
     /* if(!filter["Price"][priceId]) return false; */
@@ -52,8 +128,10 @@ const createNetwork = async () => {
     gameData: node.gameData,
     steamGameId: node.steamGameId,
     twitchGameId: node.twitchGameId,
-    total_views: node.total_views,
+    totalViews: node.totalViews,
   }));
+
+  
 
   for (let i = 0; i < nodes.length; i++) {
     const array = nodes
@@ -136,6 +214,24 @@ const createNetwork = async () => {
       similarGames[targetGame.steamGameId].push({steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId});
     }
 
+  });
+
+  nodes.forEach((node: Node) => {
+    // 一致度を計算（ジャンル）
+    const genreMatchCount = countMatchingGenres(filter, node.gameData);
+    const genreMatch = calculateMatchPercentage(genreMatchCount, node.gameData.genres.length);
+
+    // 一致度を計算(価格)
+    const priceMatch = calculateMatchPercentage(node.gameData.price, calculateUserSelectedPrice(filter));
+
+    // 一致度を計算(ゲームモード)
+    const modeMatchCount = countMatchMode(filter, node.gameData);
+    const modeMatch = calculateMatchPercentage(2, modeMatchCount);
+
+    // 一致度を計算(全体)
+    const overallMatch = Math.round((genreMatch + priceMatch + modeMatch) / 3);
+
+    node.circleScale = matchScale(overallMatch);
   });
 
   return {nodes, links, similarGames};
