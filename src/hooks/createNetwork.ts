@@ -114,12 +114,6 @@ const createNetwork = async () => {
 
   simulation.tick(300).stop()
 
-  /* const newLinks = links.map((link:any) => {
-    return {source:link.source.steamGameId, target:link.target.steamGameId}
-  });
-
-  console.log(newLinks); */
-
   nodes.forEach((node: any) => {
     similarGames[node.steamGameId] = [];
   })
@@ -134,8 +128,6 @@ const createNetwork = async () => {
     if(!isSourceGameIncluded) {
       similarGames[sourceGame.steamGameId].push({steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId});
     }
-
-
    
     const isTargetGameIncluded = similarGames[targetGame.steamGameId].some((game:any) => 
       game.steamGameId === sourceGame.steamGameId && game.twitchGameId === sourceGame.twitchGameId
@@ -145,8 +137,6 @@ const createNetwork = async () => {
     }
 
   });
-
-  console.log(similarGames);
 
   return {nodes, links, similarGames};
 };
