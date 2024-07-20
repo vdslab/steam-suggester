@@ -17,7 +17,7 @@ const Match = async(props:Props) => {
     <div>
       <Headline txt='フィルター項目との一致度'/>
       {data ? (
-        <MatchIndicator data={data}/>
+        <MatchIndicator data={data} />
       ) : null}
     </div>
   )

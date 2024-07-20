@@ -1,6 +1,10 @@
 "use client"; 
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
+import { Filter } from '@/types/api/FilterType';
+import { steamGameGenreType } from '@/types/api/steamDataType';
+import { DeviceType } from '@/types/match/MatchDataType';
+import * as d3 from 'd3';
 import React, { useState, useEffect } from 'react';
 
 interface Genre {
@@ -13,37 +17,24 @@ interface Category {
   description: string;
 }
 
-interface Data {
-  name: string;
-  imgURL: string;
-  genres: Genre[];
-  categories: Category[];
-  isSinglePlayer: boolean;
-  isMultiPlayer: boolean;
-  price: number;
-  // salePriceOverview: number;
-  platforms: Platforms;
-};
-
-interface Platforms {
-  windows: boolean;
-  mac: boolean;
-  linux: boolean;
-};
-
 interface MatchIndicatorProps {
-  data: Data;
+  data: {
+    name: string;
+    imgURL: string;
+    genres: Genre[];
+    categories: Category[];
+    isSinglePlayer: boolean;
+    isMultiPlayer: boolean;
+    price: number;
+    device: DeviceType;
+  }
 };
 
-interface UserSelected {
-  Categories: { [key: number]: boolean };
-  Price: { [key: number]: boolean };
-  Platforms: { [key: number]: boolean };
-  Playtime: { [key: number]: boolean };
-}
-
-const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
-  const [userSelected, setLocalFilter] = useState<UserSelected>(DEFAULT_FILTER);
+const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
+  const data = props.data;
+  const [localFilter, setLocalFilter] = useState<Filter>(DEFAULT_FILTER);
+  const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
+  const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
 
   useEffect(() => {
     (async() => {
@@ -54,33 +45,78 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
     })();
   }, [])
 
-  const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
-  const [priceMatchPercentage, setPriceMatchPercentage] = useState<number>(0);
-  const [modeMatchPercentage, setModeMatchPercentage] = useState<number>(0);
-  const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
-
   useEffect(() => {
     // 一致度を計算（ジャンル）
-    const genreMatchCount = countMatchingGenres();
-    const genreMatch = calculateMatchPercentage(genreMatchCount, data.genres.length);
-    setGenreMatchPercentage(genreMatch);
+    const genreMatchPercent = calcGenresPercentage(localFilter, data.genres);
 
     // 一致度を計算(価格)
-    const priceMatch = calculateMatchPercentage(data.price, calculateUserSelectedPrice());
-    setPriceMatchPercentage(priceMatch);
+    const priceMatchPercent = calcPricePercentage(localFilter, data.price);
 
     // 一致度を計算(ゲームモード)
-    const modeMatchCount = countMatchMode();
-    const modeMatch = calculateMatchPercentage(2, modeMatchCount);
+    const modeMatchPercent = calcModePercentage(localFilter, {isSinglePlayer: data.isSinglePlayer, isMultiPlayer: data.isMultiPlayer});
 
-    setModeMatchPercentage(modeMatch);
-  }, [data, userSelected]);
+    // 一致度を計算(対応デバイス)
+    const deviceMatchPercent = calcDevicePercentage(localFilter, data.device);
 
-  useEffect(() => {
-     // 一致度を計算(全体)
-     const overallMatch = Math.round((genreMatchPercentage + priceMatchPercentage + modeMatchPercentage) / 3); // 仮
-     setOverallMatchPercentage(overallMatch);
-  }, [genreMatchPercentage, priceMatchPercentage, ]);
+    // 一致度を計算(全体)
+    const overallMatchPercentage = parseFloat(((genreMatchPercent + priceMatchPercent + modeMatchPercent + deviceMatchPercent) / 4).toFixed(1));
+
+    setGenreMatchPercentage(parseFloat(genreMatchPercent.toFixed(1)));
+    setOverallMatchPercentage(overallMatchPercentage);
+  }, [data, localFilter]);
+
+  const calcGenresPercentage = (filter: Filter, genres: steamGameGenreType[]) => {
+    let genreCount = 0;
+  
+    genres.forEach((genre: steamGameGenreType) => {
+      if(filter.Categories[genre.id]) {
+        genreCount++;
+      }
+    });
+  
+    return (genreCount / genres.length) * 100;
+  }
+  
+  const calcPricePercentage = (filter: Filter, price: number) => {
+    const startPrice = filter.Price.startPrice;
+    const endPrice = filter.Price.endPrice;
+    const diffPrice = endPrice - startPrice;
+    const diffScale = d3.scaleLinear()
+                    .domain([0, diffPrice])
+                    .range([100, 0]);
+  
+    if(startPrice <= price && price <= endPrice) {
+      return 100;
+    } else if(price < startPrice) {
+      const diff = startPrice - price;
+      return diffScale(diff) >= 0 ? diffScale(diff) : 0;
+    } else {
+      const diff = price - endPrice;
+      return diffScale(diff) >= 0 ? diffScale(diff) : 0;
+    }
+  }
+  
+  const calcModePercentage = (filter: Filter, modes: {isSinglePlayer: boolean, isMultiPlayer: boolean}) => {
+    let modeCount = 0;
+    Object.keys(modes).forEach((mode: string) => {
+      if(mode === "isSinglePlayer" && filter.Mode.isSinglePlayer || mode === "isMultiPlayer" && filter.Mode.isMultiPlayer) {
+        modeCount++;
+      }
+    });
+  
+    return (modeCount / 2) * 100;
+  }
+  
+  const calcDevicePercentage = (filter: Filter, devices: DeviceType) => {
+    let deviceCount = 0;
+    Object.keys(devices).forEach((device: string) => {
+      if((device === "windows" && filter.Device.windows) || (device === "mac" && filter.Device.mac)) {
+        deviceCount++;
+      }
+    });
+  
+    return (deviceCount / 2) * 100;
+  }
 
   const priceBarPosition = (price: number) => {
     const maxPrice = calculateUserSelectedPrice() === 0 ? 1000 : calculateUserSelectedPrice() * 2;
@@ -88,40 +124,10 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
     return (adjustedPrice / maxPrice) * 100;
   };
 
-  const countMatchingGenres = () => {
-    let matchingCount = 0;
-    const userGenreIDs = Object.keys(userSelected.Categories).filter(id => userSelected.Categories[Number(id)]);
-    data.genres.forEach((gameGenre: { id: string; }) => {
-      if (userGenreIDs.includes(gameGenre.id)) {
-        matchingCount++;
-      }
-    });
-    return matchingCount;
-  };
-
-  const countMatchMode = () => {
-    let matchCount = 0;
-
-    if (userSelected.Categories[1] === data.isMultiPlayer) 
-      matchCount++;
-    if (!userSelected.Categories[1] === data.isSinglePlayer)
-      matchCount++;
-
-    return matchCount;
-  };
-
-  const calculateMatchPercentage = (overview: number, userSelected: number) => {
-    const diff = Math.abs(overview - userSelected);
-    const matchPercentage = Math.round(Math.max(0, 100 - (diff / userSelected) * 100));
-    return matchPercentage;
-  };
-
   const calculateUserSelectedPrice = () => {
     let price = 0;
-    Object.keys(userSelected.Price).forEach((key, index) => {
-      if (userSelected.Price[Number(key)]) {
-        price = index === 0 ? 0 : (index + 1) * 1000;
-      }
+    Object.keys(localFilter.Price).forEach((key, index) => {
+      price = index === 0 ? 0 : (index + 1) * 1000;
     });
     return price;
   };
@@ -167,8 +173,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
                     width: `${priceBarPosition(data.price)}%`,
                   }}
                 ></div>
-                 {Object.keys(userSelected.Price).map((key) => {
-                  if (userSelected.Price[key as any]) {
+                 {Object.keys(localFilter.Price).map((key) => {
                     const minPrice = Math.max((Number(key) - 2), 0) * 1000;
                     const maxPrice = Math.min((Number(key) - 1), 10) * 1000;
 
@@ -187,8 +192,6 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
                         }}
                       ></div>
                     );
-                  }
-                  return null;
                 })}
                 {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
                 <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
@@ -237,12 +240,12 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
           : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded mr-1">シングルプレイヤー</span>}
 
         <p className='mt-3'>対応デバイス</p>
-        {data.platforms.windows ? (
+        {data.device.windows ? (
           <span className="px-2 py-1 bg-green-200 text-green-800 rounded">Windows</span>
         ) : (
           <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">Windows</span>
         )}
-        {data.platforms.mac ? (
+        {data.device.mac ? (
           <span className="px-2 py-1 bg-green-200 text-green-800 rounded">mac</span>
         ) : (
           <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">mac</span>

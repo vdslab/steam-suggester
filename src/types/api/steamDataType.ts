@@ -8,8 +8,7 @@ export type steamGameGenreType = {
   description: string
 }
 
-export type steamGamePlatformType = {
+export type steamGameDeviceType = {
   windows: boolean,
   mac: boolean,
-  linux: boolean
 }

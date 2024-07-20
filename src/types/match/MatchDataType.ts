@@ -4,7 +4,7 @@ export type MatchDataType = {
   price: number;
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
-  platforms: PlatformsType
+  device: DeviceType;
 };
 
 export type GenreType = {
@@ -12,8 +12,7 @@ export type GenreType = {
   description: string;
 };
 
-export type PlatformsType = {
+export type DeviceType = {
   windows: boolean;
   mac: boolean;
-  linux: boolean;
 };

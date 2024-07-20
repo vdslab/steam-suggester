@@ -1,3 +1,5 @@
+import { Filter } from "@/types/api/FilterType";
+
 let db: IDBDatabase;
 let dbInitialized: Promise<IDBDatabase>;
 
@@ -12,7 +14,7 @@ if (typeof window !== 'undefined') {
       networkFilterStore.createIndex('Categories', 'Categories', { unique: false });
       networkFilterStore.createIndex('Price', 'Price', { unique: false });
       networkFilterStore.createIndex('Platforms', 'Platforms', { unique: false });
-      networkFilterStore.createIndex('device', 'device', { unique: false });
+      networkFilterStore.createIndex('Device', 'Device', { unique: false });
       networkFilterStore.createIndex('Playtime', 'Playtime', { unique: false });
     }
   };
@@ -41,14 +43,7 @@ if (typeof window !== 'undefined') {
   });
 }
 
-export async function addFilterData(data: {
-  id: string;
-  Categories: { [key: string]: boolean };
-  Price: { [key: string]: boolean };
-  Platforms: { [key: string]: boolean };
-  device: { [key: string]: boolean };
-  Playtime: { [key: string]: boolean };
-}) {
+export async function addFilterData(data: Filter) {
   if (typeof window === 'undefined') return;
 
   const db = await dbInitialized;
@@ -65,14 +60,7 @@ export async function addFilterData(data: {
   };
 }
 
-export async function getFilterData(key: string): Promise<{
-  id: string;
-  Categories: { [key: string]: boolean };
-  Price: { [key: string]: boolean };
-  Platforms: { [key: string]: boolean };
-  device: { [key: string]: boolean };
-  Playtime: { [key: string]: boolean };
-} | null> {
+export async function getFilterData(key: string): Promise<Filter | null> {
   if (typeof window === 'undefined') return null;
 
   const db = await dbInitialized;
@@ -99,14 +87,7 @@ export async function getFilterData(key: string): Promise<{
   });
 }
 
-export async function updateFilterData(data: {
-  id: string;
-  Categories: { [key: string]: boolean };
-  Price: { [key: string]: boolean };
-  Platforms: { [key: string]: boolean };
-  device: { [key: string]: boolean };
-  Playtime: { [key: string]: boolean };
-}) {
+export async function updateFilterData(data: Filter) {
   if (typeof window === 'undefined') return;
 
   const db = await dbInitialized;
