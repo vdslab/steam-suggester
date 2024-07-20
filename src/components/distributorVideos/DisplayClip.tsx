@@ -26,13 +26,6 @@ const DisplayClip = (props: TwitchClipType) => {
         <div className="absolute inset-0 flex items-center justify-center">
           <PlayArrowIcon className="text-white" style={{ fontSize: 64 }} />
         </div>
-        <a
-          className="text-white w-64 mx-auto block text-center mt-2"
-          href={url} target="_blank"
-          rel="noopener noreferrer"
-        >
-          {title}
-        </a>
       </div>
       {showModal && // 写真をクリックしたらモーダルが表示される
         <div

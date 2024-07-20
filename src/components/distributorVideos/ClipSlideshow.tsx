@@ -11,7 +11,6 @@ type Props = {
 };
 
 const ClipSlideshow = (props: Props) => {
-
   const { data } = props;
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -26,24 +25,40 @@ const ClipSlideshow = (props: Props) => {
     );
   };
 
-  // Optional: Automatically go to the next slide every 5 seconds
   useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
+    const timer = setInterval(nextSlide, 10000);
     return () => clearInterval(timer);
   }, [data.length, nextSlide]);
 
-
   return (
-    <div className="relative flex items-center justify-center">
-      <button onClick={prevSlide} className="absolute left-0 z-10 fill-white">
-        <ArrowBackIosNewIcon sx={{ fill:"white" }}/>
-      </button>
-      <DisplayClip {...data[currentSlide]} />
-      <button onClick={nextSlide} className="absolute right-0 z-10 fill-white">
-        <ArrowForwardIosIcon sx={{ fill:"white" }}/>
-      </button>
-    </div>
-  )
-}
+    <div>
+      <div className="relative flex items-center justify-center">
+        <button
+          onClick={prevSlide}
+          className={`absolute left-0 z-10 ${currentSlide === 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
+          disabled={currentSlide === 0}
+        >
+          <ArrowBackIosNewIcon sx={{ fill: "white" }} />
+        </button>
+        <DisplayClip {...data[currentSlide]} />
+        <button
+          onClick={nextSlide}
+          className={`absolute right-0 z-10 ${currentSlide === data.length - 1 ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
+          disabled={currentSlide === data.length - 1}
+        >
+          <ArrowForwardIosIcon sx={{ fill: "white" }} />
+        </button>
+      </div>
 
-export default ClipSlideshow
+      <a
+        className="text-white w-64 mx-auto block text-center mt-2"
+        href={data[currentSlide].url} target="_blank"
+        rel="noopener noreferrer"
+      >
+        {data[currentSlide].title}
+      </a>
+    </div>
+  );
+};
+
+export default ClipSlideshow;
