@@ -29,8 +29,13 @@ export default function Page({
             <Match steamGameId={steamGameId} />
           </div>
         </div>
-        <div className="basis-3/10 flex flex-col">
-          <DistributorVideos twitchGameId={twitchGameId} />
+        <div className="basis-3/10 flex flex-row space-x-5">
+          <div className="basis-2/3">
+            <div className="text-white">開発中</div>
+          </div>
+          <div className="basis-1/3">
+            <DistributorVideos twitchGameId={twitchGameId} />
+          </div>
         </div>
       </div>
     </div>

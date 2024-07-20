@@ -1,11 +1,11 @@
 'use client'
-import { TwitchClips } from "@/types/distributorVideos/TwitchClips";
 import { useState } from "react";
 import Image from "next/image";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CloseIcon from '@mui/icons-material/Close';
+import { TwitchClipType } from "@/types/api/DetailsTypes";
 
-const DisplayClip = (props: TwitchClips) => {
+const DisplayClip = (props: TwitchClipType) => {
 
   const { url, embedUrl, image, title } = props;
 
@@ -26,13 +26,6 @@ const DisplayClip = (props: TwitchClips) => {
         <div className="absolute inset-0 flex items-center justify-center">
           <PlayArrowIcon className="text-white" style={{ fontSize: 64 }} />
         </div>
-        <a
-          className="text-white"
-          href={url} target="_blank"
-          rel="noopener noreferrer"
-        >
-          {title}
-        </a>
       </div>
       {showModal && // 写真をクリックしたらモーダルが表示される
         <div
