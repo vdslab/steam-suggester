@@ -57,7 +57,6 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
   const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
   const [priceMatchPercentage, setPriceMatchPercentage] = useState<number>(0);
   const [modeMatchPercentage, setModeMatchPercentage] = useState<number>(0);
-  const [priceDifference, setPriceDifference] = useState<number>(0);
   const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
 
   useEffect(() => {
@@ -65,10 +64,6 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
     const genreMatchCount = countMatchingGenres();
     const genreMatch = calculateMatchPercentage(genreMatchCount, data.genres.length);
     setGenreMatchPercentage(genreMatch);
-
-    // 価格の差分を計算
-    const priceDiff = data.price - calculateUserSelectedPrice();
-    setPriceDifference(priceDiff);
 
     // 一致度を計算(価格)
     const priceMatch = calculateMatchPercentage(data.price, calculateUserSelectedPrice());
@@ -131,10 +126,6 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
     return price;
   };
 
-  const getTextColor = (percentage: number, barColor: string) => {
-    return percentage > 50 ? 'text-white' : barColor;
-  };
-
   return (
     <div className='text-white'>
       <div className="mb-4">
@@ -146,7 +137,6 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ({ data }) => {
           </div>
         </div>
       </div>
-
 
       <div className="mb-4">
         <p className="text-lg">ジャンル一致度</p>
