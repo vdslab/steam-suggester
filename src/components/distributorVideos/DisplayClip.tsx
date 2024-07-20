@@ -27,7 +27,7 @@ const DisplayClip = (props: TwitchClipType) => {
           <PlayArrowIcon className="text-white" style={{ fontSize: 64 }} />
         </div>
         <a
-          className="text-white"
+          className="text-white w-64 mx-auto block text-center mt-2"
           href={url} target="_blank"
           rel="noopener noreferrer"
         >

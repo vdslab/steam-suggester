@@ -20,9 +20,10 @@ const DistributorVideos = async (props: Props) => {
   return (
     <div>
       <Headline txt='関連配信者リスト' />
-      <div className="relative flex items-center justify-center">
-        <ClipSlideshow data={data} />
-      </div>
+      {data.length === 0 ? (<div className="text-white">直近の配信者のクリップがありません</div>) :
+        <div className="relative flex items-center justify-center">
+          <ClipSlideshow data={data} />
+        </div>}
     </div>
   );
 };
