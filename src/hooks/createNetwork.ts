@@ -78,8 +78,10 @@ const createNetwork = async () => {
         links.filter((item:any) => item.target === index || item.source === index)
           .length < k;
       if (count < k && isSourceOk && isTargetOk) {
-        links.push({ source: i, target: index });
-        count++;
+        if (i !== index) {
+          links.push({ source: i, target: index });
+          count++;
+        }
         if (
           links.filter((item:any) => item.target === i || item.source === i)
             .length >= k
@@ -112,28 +114,39 @@ const createNetwork = async () => {
 
   simulation.tick(300).stop()
 
+  /* const newLinks = links.map((link:any) => {
+    return {source:link.source.steamGameId, target:link.target.steamGameId}
+  });
+
+  console.log(newLinks); */
+
+  nodes.forEach((node: any) => {
+    similarGames[node.steamGameId] = [];
+  })
+
   links.forEach((link: any) => {
     const sourceGame = link.source;
     const targetGame = link.target;
 
-    if(sourceGame === targetGame) return ;
-
-    if(similarGames[sourceGame.steamGameId]) {
-      if(!similarGames[sourceGame.steamGameId].includes({steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId})) {
-        similarGames[sourceGame.steamGameId].push({steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId});
-      }
-    } else {
-      similarGames[sourceGame.steamGameId] = [{steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId}];
+    const isSourceGameIncluded = similarGames[sourceGame.steamGameId].some((game:any) => 
+      game.steamGameId === targetGame.steamGameId && targetGame.twitchGameId === targetGame.twitchGameId
+    );
+    if(!isSourceGameIncluded) {
+      similarGames[sourceGame.steamGameId].push({steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId});
     }
 
-    if(similarGames[targetGame.steamGameId]) {
-      if(!similarGames[targetGame.steamGameId].includes({steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId})) {
-        similarGames[targetGame.steamGameId].push({steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId});
-      }
-    } else {
-      similarGames[targetGame.steamGameId] = [{steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId}];
+
+   
+    const isTargetGameIncluded = similarGames[targetGame.steamGameId].some((game:any) => 
+      game.steamGameId === sourceGame.steamGameId && game.twitchGameId === sourceGame.twitchGameId
+    );
+    if(!isTargetGameIncluded) {
+      similarGames[targetGame.steamGameId].push({steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId});
     }
+
   });
+
+  console.log(similarGames);
 
   return {nodes, links, similarGames};
 };
