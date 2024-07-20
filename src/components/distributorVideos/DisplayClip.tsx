@@ -1,11 +1,11 @@
 'use client'
-import { TwitchClips } from "@/types/distributorVideos/TwitchClips";
 import { useState } from "react";
 import Image from "next/image";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CloseIcon from '@mui/icons-material/Close';
+import { TwitchClipType } from "@/types/api/DetailsTypes";
 
-const DisplayClip = (props: TwitchClips) => {
+const DisplayClip = (props: TwitchClipType) => {
 
   const { url, embedUrl, image, title } = props;
 
