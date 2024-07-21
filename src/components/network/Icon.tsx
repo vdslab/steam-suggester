@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from 'next/navigation';
 
 const Icon = (props:any) => {
-  const { title, imgURL, index, steamGameId, twitchGameId } = props;
+  const { title, imgURL, index, steamGameId, twitchGameId, circleScale } = props;
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   const handleClick = (e:any) => {
@@ -15,8 +15,7 @@ const Icon = (props:any) => {
     <g
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      transform={`scale(1.5)`}
-      /* transform={`scale(${circleSize})`} */
+      transform={`scale(${circleScale})`}
       style={{ cursor: "pointer" }}
       onClick={handleClick}
     >

@@ -32,26 +32,16 @@ export const DEFAULT_FILTER = {
       "84": true
   },
   "Price": {
-      "0": true,
-      "1": true,
-      "2": true,
-      "3": true,
-      "4": true,
-      "5": true,
-      "6": true,
-      "7": true,
-      "8": true,
-      "9": true,
-      "10": true,
-      "11": true
+    "startPrice": 0,
+    "endPrice": 10000
   },
-  "Platforms": {
-      "1": true,
-      "2": true
+  "Mode": {
+      "isSinglePlayer": true,
+      "isMultiPlayer": true
   },
-  "device": {
-      "1": true,
-      "2": true
+  "Device": {
+      "windows": true,
+      "mac": true
   },
   "Playtime": {
       "1": true,
