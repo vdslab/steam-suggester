@@ -232,12 +232,13 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
 
       <div className="mb-4">
         <p>プレイモード</p>
-        {data.isMultiPlayer ?
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">マルチプレイヤー</span>
-          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">マルチプレイヤー</span>}
         {data.isSinglePlayer ?
           <span className="px-2 py-1 bg-green-200 text-green-800 rounded mr-1">シングルプレイヤー</span>
           : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded mr-1">シングルプレイヤー</span>}
+        {data.isMultiPlayer ?
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">マルチプレイヤー</span>
+          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">マルチプレイヤー</span>}
+        
 
         <p className='mt-3'>対応デバイス</p>
         {data.device.windows ? (
