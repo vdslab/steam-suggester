@@ -13,7 +13,7 @@ if (typeof window !== 'undefined') {
       const networkFilterStore: IDBObjectStore = db.createObjectStore('networkFilter', { keyPath: 'id' });
       networkFilterStore.createIndex('Categories', 'Categories', { unique: false });
       networkFilterStore.createIndex('Price', 'Price', { unique: false });
-      networkFilterStore.createIndex('Platforms', 'Platforms', { unique: false });
+      networkFilterStore.createIndex('Mode', 'Mode', { unique: false });
       networkFilterStore.createIndex('Device', 'Device', { unique: false });
       networkFilterStore.createIndex('Playtime', 'Playtime', { unique: false });
     }
