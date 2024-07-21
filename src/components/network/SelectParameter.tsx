@@ -1,4 +1,5 @@
 "use client";
+import { DEFAULT_FILTER } from "@/constants/DEFAULT_FILTER";
 import { addFilterData, getFilterData, updateFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
 import { useState, useEffect } from "react";
@@ -226,23 +227,28 @@ const SelectParameter = (props: any) => {
     })();
   }, [])
 
-  const handleClickFilter = () => {
+  const handleClickFilter = (filter: Filter) => {
     (async() => {
       const d = await getFilterData('unique_id');
       if(d) {
         updateFilterData({
-          ...localFilter,
+          ...filter,
           id: 'unique_id',
         });
 
       } else {
         addFilterData({
-          ...localFilter,
+          ...filter,
           id: 'unique_id',
         });
       }
     })();
-    setFilter(localFilter)
+    setFilter(filter)
+    setLocalFilter(filter)
+    if(filter === DEFAULT_FILTER) {
+      setPriceRange([0, 10000]);
+      setIsFreeChecked(false);
+    }
   }
 
   return (
@@ -303,10 +309,16 @@ const SelectParameter = (props: any) => {
         
       <div className="absolute bottom-0 left-0 p-4 w-[calc(25%-12px)]" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
         <button
-          className="text-white rounded px-4 py-2 bg-blue-600 w-full"
-          onClick={() => handleClickFilter()}
+          className="text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500 w-full mb-2"
+          onClick={() => handleClickFilter(localFilter)}
         >
           フィルターを適用
+        </button>
+        <button
+          onClick={() => handleClickFilter(DEFAULT_FILTER)}
+          className="text-white rounded px-4 py-2 w-full"
+        >
+          フィルターを解除
         </button>
       </div>
     </div>
