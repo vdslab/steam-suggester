@@ -5,7 +5,7 @@ import * as d3 from 'd3';
 import Icon from "./Icon";
 import createNetwork from "@/hooks/createNetwork";
 
-const ZoomableSVG = (props:any) => {
+const ZoomableSVG = (props: any) => {
   const { children } = props;
 
   const svgRef = useRef<SVGSVGElement>(null);
@@ -14,14 +14,17 @@ const ZoomableSVG = (props:any) => {
   const [y, setY] = useState(0);
 
   useEffect(() => {
-    const zoom = d3.zoom().on("zoom", (event:any) => {
+    const zoom = d3.zoom<SVGSVGElement, unknown>().on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
       const { x, y, k } = event.transform;
       setX(x);
       setY(y);
       setK(k);
     });
-    d3.select(svgRef.current).call(zoom);
+    if (svgRef.current) {
+      d3.select<SVGSVGElement, unknown>(svgRef.current).call(zoom);
+    }
   }, []);
+
   return (
     <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight}>
       <g transform={`translate(${x + 300},${y + 200})scale(${k - 0.5})`}>
@@ -31,7 +34,7 @@ const ZoomableSVG = (props:any) => {
   );
 };
 
-const NodeLink = (props:any) => {
+const NodeLink = (props: any) => {
   const { filter } = props;
 
   const [nodes, setNodes] = useState<any>([]);
@@ -41,19 +44,19 @@ const NodeLink = (props:any) => {
 
   useEffect(() => {
     (async () => {
-      const {nodes, links} = await createNetwork();
+      const { nodes, links } = await createNetwork();
       setNodes(nodes);
       setLinks(links);
       setIsLoading(false);
     })();
-    
+
   }, [filter]);
 
   return (
     <div>
       {!isLoading ? <ZoomableSVG>
         {links.length !== 0 &&
-          links.map((link:any, i) => (
+          links.map((link: any, i) => (
             <line
               key={i}
               className="link"
@@ -65,7 +68,7 @@ const NodeLink = (props:any) => {
             />
           ))}
         {nodes.length !== 0 &&
-          nodes.map((node:any, i:any) => {
+          nodes.map((node: any, i: any) => {
             return (
               <g transform={`translate(${node.x},${node.y})`} key={i}>
                 <Icon
