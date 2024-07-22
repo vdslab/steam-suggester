@@ -106,6 +106,9 @@ const createNetwork = async () => {
   const k = 4;
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
+  if(!res) {
+    return {};
+  }
   const data:gameDetailType[] = await res.json();
 
   const d = await getFilterData('unique_id');
