@@ -98,7 +98,7 @@ const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: 
 };
 
 const Dropdown = ({ displayTag, title, mapping, localFilter, setLocalFilter }: { displayTag: string, title: string, mapping: any, localFilter: any, setLocalFilter:  React.Dispatch<React.SetStateAction<Filter>> }) => {
-  const handleChangeFilter = (key: number) => {
+    const handleChangeFilter = (key: number) => {
     setLocalFilter((prev:any) => {
       return {
         ...prev,
@@ -111,17 +111,17 @@ const Dropdown = ({ displayTag, title, mapping, localFilter, setLocalFilter }: {
   };
 
   const handleSelectAll = () => {
-      setLocalFilter((prev: any) => {
-        const newFilter = { ...prev[title] };
-        Object.keys(mapping).forEach((key) => {
-          newFilter[key] = true;
-        });
-        return {
-          ...prev,
-          [title]: newFilter,
-        };
+    setLocalFilter((prev: any) => {
+      const newFilter = { ...prev[title] };
+      Object.keys(mapping).forEach((key) => {
+        newFilter[key] = true;
       });
-    };
+      return {
+        ...prev,
+        [title]: newFilter,
+      };
+    });
+  };
 
   const handleDeselectAll = () => {
     setLocalFilter((prev: any) => {
@@ -138,9 +138,7 @@ const Dropdown = ({ displayTag, title, mapping, localFilter, setLocalFilter }: {
 
   return (
     <div className="relative mb-4">
-      <div
-        className="bg-gray-900 text-white rounded px-4 py-2 mb-2 flex items-center justify-between w-full"
-      >
+      <div className="bg-gray-900 text-white rounded px-4 py-2 mb-2 flex items-center justify-between w-full">
         {displayTag}
       </div>
       <div
@@ -152,8 +150,8 @@ const Dropdown = ({ displayTag, title, mapping, localFilter, setLocalFilter }: {
           border: 'none'
         }}
       >
-
-        {title=="Categories" ? <div className="p-2">
+        {title === "Categories" ? (
+          <div className="p-2">
             <button
               onClick={handleSelectAll}
               className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 mr-2"
@@ -166,16 +164,34 @@ const Dropdown = ({ displayTag, title, mapping, localFilter, setLocalFilter }: {
             >
               全解除
             </button>
-          </div>: null}
-
-        <div className="flex flex-wrap -mx-2 p-2">
+          </div>
+        ) : null}
+        {title === "Categories" ? <div className="flex flex-wrap -mx-2 p-2">
           {Object.keys(mapping).map((key: any) => {
             const flag = localFilter[title][key];
             return (
-              <div key={key} className={`w-1/${title==="Categories" ? 3 : 2} p-2`}>
-                <button 
-                  onClick={() => handleChangeFilter(key)} 
-                  className={`${flag ? 'bg-blue-900 hover:bg-blue-800' : 'bg-gray-800 hover:bg-gray-700'} text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-sm`}
+              <div key={key} className={`w-1/3 p-2`}>
+                <button
+                  onClick={() => handleChangeFilter(key)}
+                  className={`${
+                    flag ? 'bg-blue-900 hover:bg-blue-800' : 'bg-gray-800 hover:bg-gray-700'
+                  } text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-sm`}
+                >
+                  <span className="block truncate">{mapping[key]}</span>
+                </button>
+              </div>
+            );
+          })}
+        </div> : <div className="flex flex-wrap -mx-2 p-2">
+          {Object.keys(mapping).map((key: any) => {
+            const flag = localFilter[title][key];
+            return (
+              <div key={key} className={`w-1/2 p-2`}>
+                <button
+                  onClick={() => handleChangeFilter(key)}
+                  className={`${
+                    flag ? 'bg-blue-900 hover:bg-blue-800' : 'bg-gray-800 hover:bg-gray-700'
+                  } text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-sm`}
                 >
                   <span className="block truncate">{mapping[key]}</span>
                 </button>
@@ -183,7 +199,8 @@ const Dropdown = ({ displayTag, title, mapping, localFilter, setLocalFilter }: {
             );
           })}
         </div>
-
+        }
+        
       </div>
     </div>
   );
@@ -252,7 +269,7 @@ const SelectParameter = (props: any) => {
   }
 
   return (
-    <div className="p-4" style={{ maxHeight: '90vh', overflowY: 'auto', paddingBottom: '60px'}}>
+    <div className="p-4" style={{ maxHeight: '90vh', overflowY: 'auto', paddingBottom: '120px'}}>
       <Dropdown
         displayTag = "カテゴリー"
         title="Categories"
