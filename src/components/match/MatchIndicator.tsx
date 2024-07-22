@@ -3,8 +3,8 @@ import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
 import { Filter } from '@/types/api/FilterType';
 import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
-import * as d3 from 'd3';
 import React, { useState, useEffect } from 'react';
+import { calcAllMatchPercentage, calcGenresPercentage } from '../common/CalcMatch';
 
 type Props = {
   data: SteamDetailsDataType;
@@ -17,6 +17,12 @@ const MatchIndicator = ( props:Props ) => {
   const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
 
   useEffect(() => {
+    const genreMatchPercentage = calcGenresPercentage(localFilter, data.genres);
+    const overallMatchPercentage = calcAllMatchPercentage(localFilter, data);
+
+    setGenreMatchPercentage(genreMatchPercentage);
+    setOverallMatchPercentage(overallMatchPercentage);
+
     (async() => {
       const d = await getFilterData('unique_id');
       if(d) {
@@ -25,78 +31,6 @@ const MatchIndicator = ( props:Props ) => {
     })();
   }, [])
 
-  useEffect(() => {
-    // 一致度を計算（ジャンル）
-    const genreMatchPercent = calcGenresPercentage(localFilter, data.genres);
-
-    // 一致度を計算(価格)
-    const priceMatchPercent = calcPricePercentage(localFilter, data.price);
-
-    // 一致度を計算(ゲームモード)
-    const modeMatchPercent = calcModePercentage(localFilter, {isSinglePlayer: data.isSinglePlayer, isMultiPlayer: data.isMultiPlayer});
-
-    // 一致度を計算(対応デバイス)
-    const deviceMatchPercent = calcDevicePercentage(localFilter, data.device);
-
-    // 一致度を計算(全体)
-    const overallMatchPercentage = parseFloat(((genreMatchPercent + priceMatchPercent + modeMatchPercent + deviceMatchPercent) / 4).toFixed(1));
-
-    setGenreMatchPercentage(parseFloat(genreMatchPercent.toFixed(1)));
-    setOverallMatchPercentage(overallMatchPercentage);
-  }, [data, localFilter]);
-
-  const calcGenresPercentage = (filter: Filter, genres: SteamGenreType[]) => {
-    let genreCount = 0;
-  
-    genres.forEach((genre: SteamGenreType) => {
-      if(filter.Categories[genre.id]) {
-        genreCount++;
-      }
-    });
-  
-    return (genreCount / genres.length) * 100;
-  }
-  
-  const calcPricePercentage = (filter: Filter, price: number) => {
-    const startPrice = filter.Price.startPrice;
-    const endPrice = filter.Price.endPrice;
-    const diffPrice = endPrice - startPrice;
-    const diffScale = d3.scaleLinear()
-                    .domain([0, diffPrice])
-                    .range([100, 0]);
-  
-    if(startPrice <= price && price <= endPrice) {
-      return 100;
-    } else if(price < startPrice) {
-      const diff = startPrice - price;
-      return diffScale(diff) >= 0 ? diffScale(diff) : 0;
-    } else {
-      const diff = price - endPrice;
-      return diffScale(diff) >= 0 ? diffScale(diff) : 0;
-    }
-  }
-  
-  const calcModePercentage = (filter: Filter, modes: {isSinglePlayer: boolean, isMultiPlayer: boolean}) => {
-    let modeCount = 0;
-    Object.keys(modes).forEach((mode: string) => {
-      if(mode === "isSinglePlayer" && filter.Mode.isSinglePlayer || mode === "isMultiPlayer" && filter.Mode.isMultiPlayer) {
-        modeCount++;
-      }
-    });
-  
-    return (modeCount / 2) * 100;
-  }
-  
-  const calcDevicePercentage = (filter: Filter, devices: SteamDeviceType) => {
-    let deviceCount = 0;
-    Object.keys(devices).forEach((device: string) => {
-      if((device === "windows" && filter.Device.windows) || (device === "mac" && filter.Device.mac)) {
-        deviceCount++;
-      }
-    });
-  
-    return (deviceCount / 2) * 100;
-  }
 
   const priceBarPosition = (price: number) => {
     const maxPrice = 10000;
