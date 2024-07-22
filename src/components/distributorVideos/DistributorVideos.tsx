@@ -2,6 +2,7 @@ import { TwitchClipType } from "@/types/api/getTwitchClipType";
 import Headline from "../common/Headline";
 import ClipSlideshow from "./ClipSlideshow";
 import { DetailsPropsType } from "@/types/DetailsType";
+import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 
 const DistributorVideos = async (props: DetailsPropsType) => {
 
@@ -9,7 +10,7 @@ const DistributorVideos = async (props: DetailsPropsType) => {
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchClips/${twitchGameId}`,
-    { next: { revalidate: 86400 } }
+    { next: { revalidate: ISR_FETCH_INTERVAL } }
   );
   const data: TwitchClipType[] = await res.json();
 

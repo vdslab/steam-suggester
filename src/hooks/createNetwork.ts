@@ -3,6 +3,7 @@ import { getFilterData } from './indexedDB';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
+import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 
 type Node = {
   circleScale?: number,
@@ -99,7 +100,10 @@ const calcCommonGenres = (game1:any, game2:any) => {
 const createNetwork = async () => {
   const k = 4;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
+    {next: { revalidate: ISR_FETCH_INTERVAL }}
+  );
   if(!res) {
     return {};
   }
