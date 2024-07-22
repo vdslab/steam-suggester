@@ -1,42 +1,10 @@
 "use client";
-import { DEFAULT_FILTER } from "@/constants/DEFAULT_FILTER";
+import { DEFAULT_FILTER, GENRE_MAPPING } from "@/constants/DEFAULT_FILTER";
 import { addFilterData, getFilterData, updateFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
 import { useState, useEffect } from "react";
 import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
 
-// マッピングデータ
-const genreMapping: any = {
-  1: "アクション",
-  37: "無料プレイ",
-  2: "ストラテジー",
-  25: "アドベンチャー",
-  23: "インディー",
-  3: "RPG",
-  51: "アニメーション & モデリング",
-  58: "Video Production",
-  4: "カジュアル",
-  28: "シミュレーション",
-  9: "レース",
-  73: "Violent",
-  29: "MM（Massively Multiplayer）",
-  72: "Nudity",
-  18: "スポーツ",
-  70: "早期アクセス",
-  74: "Gore",
-  57: "ユーティリティ",
-  52: "Audio Production",
-  53: "デザイン & イラストレーション",
-  59: "Web Publishing",
-  55: "写真編集",
-  54: "Education",
-  56: "Software Training",
-  71: "Sexual Content",
-  60: "Game Development",
-  50: "Accounting",
-  81: "Documentary",
-  84: "Tutorial"
-};
 
 const modeMapping: any = {
   isSinglePlayer: "シングルプレイヤー",
@@ -78,7 +46,7 @@ const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: 
           {({ handles, getHandleProps }) => (
             <div className="slider-handles">
               {handles.map(handle => (
-                <div key={handle.id} style={{ left: `${handle.percent}%`, position: 'absolute', marginLeft: -11, marginTop: -5, width: 20, height: 20, cursor: 'pointer', backgroundColor: '#fff', borderRadius: '50%' }} {...getHandleProps(handle.id)} />
+                <div key={handle.id} style={{ left: `${handle.percent}%`, position: 'absolute', marginLeft: -11, marginTop: -5, width: 20, height: 20, zIndex: 1, cursor: 'pointer', backgroundColor: '#fff', borderRadius: '50%' }} {...getHandleProps(handle.id)} />
               ))}
             </div>
           )}
@@ -273,7 +241,7 @@ const SelectParameter = (props: any) => {
       <Dropdown
         displayTag = "カテゴリー"
         title="Categories"
-        mapping={genreMapping}
+        mapping={GENRE_MAPPING}
         localFilter={localFilter}
         setLocalFilter={setLocalFilter}
       />
@@ -324,7 +292,7 @@ const SelectParameter = (props: any) => {
         setLocalFilter={setLocalFilter}
       />
         
-      <div className="absolute bottom-0 left-0 p-4 w-[calc(25%-12px)]" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
+      <div className="absolute bottom-0 left-0 p-4 w-[calc(25%-12px)] z-10" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
         <button
           className="text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500 w-full mb-2"
           onClick={() => handleClickFilter(localFilter)}
