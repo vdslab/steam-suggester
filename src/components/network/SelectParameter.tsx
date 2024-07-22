@@ -78,7 +78,7 @@ const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: 
           {({ handles, getHandleProps }) => (
             <div className="slider-handles">
               {handles.map(handle => (
-                <div key={handle.id} style={{ left: `${handle.percent}%`, position: 'absolute', marginLeft: -11, marginTop: -5, zIndex: 2, width: 20, height: 20, cursor: 'pointer', backgroundColor: '#fff', borderRadius: '50%' }} {...getHandleProps(handle.id)} />
+                <div key={handle.id} style={{ left: `${handle.percent}%`, position: 'absolute', marginLeft: -11, marginTop: -5, width: 20, height: 20, cursor: 'pointer', backgroundColor: '#fff', borderRadius: '50%' }} {...getHandleProps(handle.id)} />
               ))}
             </div>
           )}
@@ -87,7 +87,7 @@ const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: 
           {({ tracks, getTrackProps }) => (
             <div className="slider-tracks">
               {tracks.map(({ id, source, target }) => (
-                <div key={id} style={{ position: 'absolute', height: 8, zIndex: 1, backgroundColor: '#548BF4', borderRadius: 4, left: `${source.percent}%`, width: `${target.percent - source.percent}%` }} {...getTrackProps()} />
+                <div key={id} style={{ position: 'absolute', height: 8, backgroundColor: '#548BF4', borderRadius: 4, left: `${source.percent}%`, width: `${target.percent - source.percent}%` }} {...getTrackProps()} />
               ))}
             </div>
           )}
