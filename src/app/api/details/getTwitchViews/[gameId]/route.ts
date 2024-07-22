@@ -36,8 +36,6 @@ export async function GET(req: Request, params: Params) {
       }
     }).sort((d1, d2) => d1.date - d2.date);
 
-    console.log(formatData);
-
     return NextResponse.json(formatData)
 
   } catch (error) {
