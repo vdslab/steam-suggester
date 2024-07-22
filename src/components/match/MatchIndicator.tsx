@@ -235,24 +235,24 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
 
       <div className="mb-4">
         <p>プレイモード</p>
-        {data.isMultiPlayer ?
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded cursor-pointer">マルチプレイヤー</span>
-          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded cursor-pointer">マルチプレイヤー</span>}
-        {data.isSinglePlayer ?
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded mr-1 cursor-pointer">シングルプレイヤー</span>
-          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded mr-1 cursor-pointer">シングルプレイヤー</span>}
+        <div className="flex">
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isMultiPlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            マルチプレイヤー
+          </span>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isSinglePlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            シングルプレイヤー
+          </span>
+        </div>
 
         <p className='mt-3'>対応デバイス</p>
-        {data.device.windows ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded cursor-pointer">Windows</span>
-        ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded cursor-pointer">Windows</span>
-        )}
-        {data.device.mac ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded cursor-pointer">mac</span>
-        ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded cursor-pointer">mac</span>
-        )}
+        <div className="flex">
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.windows ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            Windows
+          </span>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.mac ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            mac
+          </span>
+        </div>
       </div>
     </div>
   );
