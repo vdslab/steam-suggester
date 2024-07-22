@@ -22,7 +22,7 @@ const DisplayClip = (props: TwitchClipType) => {
   return (
     <div>
       <div className="relative flex flex-col px-5 cursor-pointer" onClick={onHandleOpen}>
-        <Image width={1000} height={0} src={image} alt={title} priority className="mx-auto h-auto w-64" />
+        <Image width={1000} height={0} src={image} alt={title} priority className="mx-auto h-auto w-82 mt-5" />
         <div className="absolute inset-0 flex items-center justify-center">
           <PlayArrowIcon className="text-white" style={{ fontSize: 64 }} />
         </div>
