@@ -1,45 +1,10 @@
 "use client";
+import { DEFAULT_FILTER, GENRE_MAPPING } from "@/constants/DEFAULT_FILTER";
 import { addFilterData, getFilterData, updateFilterData } from "@/hooks/indexedDB";
-import { useState, useRef, useEffect } from "react";
+import { Filter } from "@/types/api/FilterType";
+import { useState, useEffect } from "react";
 import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
 
-// マッピングデータ
-const genreMapping: any = {
-  1: "アクション",
-  37: "無料プレイ",
-  2: "ストラテジー",
-  25: "アドベンチャー",
-  23: "インディー",
-  3: "RPG",
-  51: "アニメーション & モデリング",
-  58: "Video Production",
-  4: "カジュアル",
-  28: "シミュレーション",
-  9: "レース",
-  73: "Violent",
-  29: "MM（Massively Multiplayer）",
-  72: "Nudity",
-  18: "スポーツ",
-  70: "早期アクセス",
-  74: "Gore",
-  57: "ユーティリティ",
-  52: "Audio Production",
-  53: "デザイン & イラストレーション",
-  59: "Web Publishing",
-  55: "写真編集",
-  54: "Education",
-  56: "Software Training",
-  71: "Sexual Content",
-  60: "Game Development",
-  50: "Accounting",
-  81: "Documentary",
-  84: "Tutorial"
-};
-
-const priceMapping: any = {
-  startPrice: 0,
-  endPrice: 10000
-};
 
 const modeMapping: any = {
   isSinglePlayer: "シングルプレイヤー",
@@ -49,19 +14,6 @@ const modeMapping: any = {
 const deviceMapping: any = {
   windows: "windows",
   mac: "mac"
-};
-
-const playtimeMapping: any = {
-  1: "～100時間",
-  2: "～200時間",
-  3: "～300時間",
-  4: "～400時間",
-  5: "～500時間",
-  6: "～600時間",
-  7: "～700時間",
-  8: "～800時間",
-  9: "～900時間",
-  10: "～1000時間",
 };
 
 const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: { min: number, max: number, values: number[], onChange: (values: number[]) => void, valueFormatter: (value: number) => string, disabled: boolean }) => {
@@ -94,7 +46,7 @@ const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: 
           {({ handles, getHandleProps }) => (
             <div className="slider-handles">
               {handles.map(handle => (
-                <div key={handle.id} style={{ left: `${handle.percent}%`, position: 'absolute', marginLeft: -11, marginTop: -5, zIndex: 2, width: 20, height: 20, cursor: 'pointer', backgroundColor: '#fff', borderRadius: '50%' }} {...getHandleProps(handle.id)} />
+                <div key={handle.id} style={{ left: `${handle.percent}%`, position: 'absolute', marginLeft: -11, marginTop: -5, width: 20, height: 20, zIndex: 1, cursor: 'pointer', backgroundColor: '#fff', borderRadius: '50%' }} {...getHandleProps(handle.id)} />
               ))}
             </div>
           )}
@@ -103,7 +55,7 @@ const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: 
           {({ tracks, getTrackProps }) => (
             <div className="slider-tracks">
               {tracks.map(({ id, source, target }) => (
-                <div key={id} style={{ position: 'absolute', height: 8, zIndex: 1, backgroundColor: '#548BF4', borderRadius: 4, left: `${source.percent}%`, width: `${target.percent - source.percent}%` }} {...getTrackProps()} />
+                <div key={id} style={{ position: 'absolute', height: 8, backgroundColor: '#548BF4', borderRadius: 4, left: `${source.percent}%`, width: `${target.percent - source.percent}%` }} {...getTrackProps()} />
               ))}
             </div>
           )}
@@ -113,10 +65,8 @@ const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: 
   );
 };
 
-const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, localFilter, setLocalFilter }: { displayTag:string, title: string, mapping: any, isVisible: boolean, toggleVisibility: () => void, localFilter: any, setLocalFilter: any }) => {
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  const handleChangeFilter = (key: number) => {
+const Dropdown = ({ displayTag, title, mapping, localFilter, setLocalFilter }: { displayTag: string, title: string, mapping: any, localFilter: any, setLocalFilter:  React.Dispatch<React.SetStateAction<Filter>> }) => {
+    const handleChangeFilter = (key: number) => {
     setLocalFilter((prev:any) => {
       return {
         ...prev,
@@ -128,26 +78,18 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
     });
   };
 
-  useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.style.maxHeight = isVisible
-        ? `${contentRef.current.scrollHeight}px`
-        : '0px';
-    }
-  }, [isVisible]);
-
   const handleSelectAll = () => {
-      setLocalFilter((prev: any) => {
-        const newFilter = { ...prev[title] };
-        Object.keys(mapping).forEach((key) => {
-          newFilter[key] = true;
-        });
-        return {
-          ...prev,
-          [title]: newFilter,
-        };
+    setLocalFilter((prev: any) => {
+      const newFilter = { ...prev[title] };
+      Object.keys(mapping).forEach((key) => {
+        newFilter[key] = true;
       });
-    };
+      return {
+        ...prev,
+        [title]: newFilter,
+      };
+    });
+  };
 
   const handleDeselectAll = () => {
     setLocalFilter((prev: any) => {
@@ -162,29 +104,22 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
     });
   };
 
-
   return (
     <div className="relative mb-4">
-      <button
-        className="bg-gray-900 hover:bg-gray-800 text-white rounded px-4 py-2 mb-2 flex items-center justify-between w-full"
-        onClick={toggleVisibility}
-      >
+      <div className="bg-gray-900 text-white rounded px-4 py-2 mb-2 flex items-center justify-between w-full">
         {displayTag}
-        <span className="ml-2">{isVisible ? '▲' : '▼'}</span>
-      </button>
+      </div>
       <div
-        ref={contentRef}
         className={`bg-white rounded mt-1 w-full z-10 overflow-hidden transition-all duration-300 ease-in-out`}
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          maxHeight: isVisible ? `${contentRef.current?.scrollHeight}px` : '0px',
-          opacity: isVisible ? 1 : 0,
-          transform: isVisible ? 'translateY(0)' : 'translateY(-20px)',
+          opacity: 1,
+          transform: 'translateY(0)',
           border: 'none'
         }}
       >
-
-        {title=="Categories" ? <div className="p-2">
+        {title === "Categories" ? (
+          <div className="p-2">
             <button
               onClick={handleSelectAll}
               className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 mr-2"
@@ -197,16 +132,34 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
             >
               全解除
             </button>
-          </div>: null}
-
-        <div className="flex flex-wrap -mx-2 p-2">
+          </div>
+        ) : null}
+        {title === "Categories" ? <div className="flex flex-wrap -mx-2 p-2">
           {Object.keys(mapping).map((key: any) => {
             const flag = localFilter[title][key];
             return (
-              <div key={key} className="w-1/2 p-2">
-                <button 
-                  onClick={() => handleChangeFilter(key)} 
-                  className={`${flag ? 'bg-blue-900 hover:bg-blue-800' : 'bg-gray-800 hover:bg-gray-700'} text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-sm`}
+              <div key={key} className={`w-1/3 p-2`}>
+                <button
+                  onClick={() => handleChangeFilter(key)}
+                  className={`${
+                    flag ? 'bg-blue-900 hover:bg-blue-800' : 'bg-gray-800 hover:bg-gray-700'
+                  } text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-sm`}
+                >
+                  <span className="block truncate">{mapping[key]}</span>
+                </button>
+              </div>
+            );
+          })}
+        </div> : <div className="flex flex-wrap -mx-2 p-2">
+          {Object.keys(mapping).map((key: any) => {
+            const flag = localFilter[title][key];
+            return (
+              <div key={key} className={`w-1/2 p-2`}>
+                <button
+                  onClick={() => handleChangeFilter(key)}
+                  className={`${
+                    flag ? 'bg-blue-900 hover:bg-blue-800' : 'bg-gray-800 hover:bg-gray-700'
+                  } text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-sm`}
                 >
                   <span className="block truncate">{mapping[key]}</span>
                 </button>
@@ -214,24 +167,19 @@ const Dropdown = ({ displayTag, title, mapping, isVisible, toggleVisibility, loc
             );
           })}
         </div>
-
+        }
+        
       </div>
     </div>
   );
 };
 
 const SelectParameter = (props: any) => {
-  const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
   const { filter, setFilter } = props;
 
-  const [localFilter, setLocalFilter] = useState(filter);
+  const [localFilter, setLocalFilter] = useState<Filter>(filter);
   const [isFreeChecked, setIsFreeChecked] = useState(false);
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000]);
-  const [playtimeRange, setPlaytimeRange] = useState<number[]>([0, 10]);
-
-  const toggleDropdown = (dropdown: string) => {
-    setVisibleDropdown(prev => (prev === dropdown ? null : dropdown));
-  };
 
   const handlePriceChange = (values: number[]) => {
     const newFilter = {
@@ -248,24 +196,8 @@ const SelectParameter = (props: any) => {
   const handleFreeCheckboxChange = () => {
     setIsFreeChecked(!isFreeChecked);
     const newFilter = { ...localFilter };
-    newFilter['Price'][0] = !isFreeChecked;
-    for (let i = 1; i <= 11; i++) {
-      newFilter['Price'][i] = false;
-    }
-    setLocalFilter(newFilter);
-  };
-
-  const handlePlaytimeChange = (values: number[]) => {
-    setPlaytimeRange(values);
-    const newFilter = { ...localFilter };
-    for (let key in playtimeMapping) {
-      const playtimeLevel = parseInt(key);
-      if (playtimeLevel >= values[0] + 1 && playtimeLevel <= values[1]) {
-        newFilter['Playtime'][key] = true;
-      } else {
-        newFilter['Playtime'][key] = false;
-      }
-    }
+    newFilter['Price'].startPrice = !isFreeChecked ? 0 : priceRange[0];
+    newFilter['Price'].endPrice = !isFreeChecked ? 0 : priceRange[1];
     setLocalFilter(newFilter);
   };
 
@@ -280,84 +212,74 @@ const SelectParameter = (props: any) => {
     })();
   }, [])
 
-  const handleClickFilter = () => {
+  const handleClickFilter = (filter: Filter) => {
     (async() => {
       const d = await getFilterData('unique_id');
       if(d) {
         updateFilterData({
+          ...filter,
           id: 'unique_id',
-          ...localFilter
         });
 
       } else {
         addFilterData({
+          ...filter,
           id: 'unique_id',
-          ...localFilter
         });
       }
     })();
-    setFilter(localFilter)
+    setFilter(filter)
+    setLocalFilter(filter)
+    if(filter === DEFAULT_FILTER) {
+      setPriceRange([0, 10000]);
+      setIsFreeChecked(false);
+    }
   }
 
   return (
-    <div className="p-4" style={{ maxHeight: '90vh', overflowY: 'auto'}}>
-      <div className="flex justify-end mb-4">
-        <button
-          className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2"
-          onClick={() => handleClickFilter()}
-        >
-          フィルターを適用
-        </button>
-      </div>
+    <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px'}}>
       <Dropdown
         displayTag = "カテゴリー"
         title="Categories"
-        mapping={genreMapping}
-        isVisible={visibleDropdown === "Categories"}
-        toggleVisibility={() => toggleDropdown("Categories")}
+        mapping={GENRE_MAPPING}
         localFilter={localFilter}
         setLocalFilter={setLocalFilter}
       />
       <div className="relative mb-4">
         <button
-          className="bg-gray-900 hover:bg-gray-800 text-white rounded px-4 py-2 mb-2 flex items-center justify-between w-full"
-          onClick={() => toggleDropdown("Price")}
+          className="bg-gray-900 text-white rounded px-4 py-2 mb-2 flex items-center justify-between w-full"
         >
           価格
-          <span className="ml-2">{visibleDropdown === 'Price' ? '▲' : '▼'}</span>
         </button>
-        {visibleDropdown === 'Price' && (
-          <div className="rounded mt-1 w-full z-10 overflow-hidden">
-            <div className="p-4 text-white">
-              <div className="mb-4">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox h-5 w-5 text-gray-600"
-                      checked={isFreeChecked}
-                      onChange={handleFreeCheckboxChange}
-                    />
-                    <span className="ml-2 text-white">無料</span>
-                  </label>
-              </div>
-              <SliderFilter
-                min={0}
-                max={10000}
-                values={priceRange}
-                onChange={handlePriceChange}
-                valueFormatter={(value) => (value === 1 ? '1円' : `${(value)}円`)}
-                disabled={isFreeChecked}
-              />
+
+        <div className="rounded mt-1 w-full z-10 overflow-hidden">
+          <div className="p-4 text-white">
+            <div className="mb-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-5 w-5 text-gray-600"
+                    checked={isFreeChecked}
+                    onChange={handleFreeCheckboxChange}
+                  />
+                  <span className="ml-2 text-white">無料</span>
+                </label>
             </div>
+            <SliderFilter
+              min={0}
+              max={10000}
+              values={priceRange}
+              onChange={handlePriceChange}
+              valueFormatter={(value) => (value === 1 ? '1円' : `${(value)}円`)}
+              disabled={isFreeChecked}
+            />
           </div>
-        )}
+        </div>
       </div>
       <Dropdown
         displayTag = "モード"
         title="Mode"
         mapping={modeMapping}
-        isVisible={visibleDropdown === "Mode"}
-        toggleVisibility={() => toggleDropdown("Mode")}
         localFilter={localFilter}
         setLocalFilter={setLocalFilter}
       />
@@ -366,11 +288,24 @@ const SelectParameter = (props: any) => {
         displayTag = "対応デバイス"
         title="Device"
         mapping={deviceMapping}
-        isVisible={visibleDropdown === "Device"}
-        toggleVisibility={() => toggleDropdown("Device")}
         localFilter={localFilter}
         setLocalFilter={setLocalFilter}
       />
+        
+      <div className="absolute bottom-0 left-0 p-4 w-[calc(25%-12px)] z-10" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
+        <button
+          className="text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500 w-full mb-2"
+          onClick={() => handleClickFilter(localFilter)}
+        >
+          フィルターを適用
+        </button>
+        <button
+          onClick={() => handleClickFilter(DEFAULT_FILTER)}
+          className="text-white rounded px-4 py-2 w-full"
+        >
+          フィルターを解除
+        </button>
+      </div>
     </div>
   );
 };

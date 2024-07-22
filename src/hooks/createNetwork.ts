@@ -124,13 +124,10 @@ const createNetwork = async () => {
 
   const nodes: Node[] = Object.values(data).filter((item: any) => {
     if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
-    /* const priceId = item.gameData.price < 1000 ? 1 : Math.floor(item.gameData.price / 1000) + 1; */
-    /* if(!filter["Price"][priceId]) return false; */
+    if(!(filter.Price.startPrice <= item.gameData.price && item.gameData.price <= filter.Price.endPrice)) return false;
     if(!((item.gameData.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.gameData.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
     if(!((item.gameData.device.windows && filter.Device.windows) || (item.gameData.device.mac && filter.Device.mac))) return false;
-    /* const playtimeId = item.playtime < 100 ? 1 : Math.floor(item.playtime / 100) + 1;
-    if(!filter["Playtime"][playtimeId]) return false; */
-    
+   
     return true;
   }).map((node: any, index) => ({
     id: index,
