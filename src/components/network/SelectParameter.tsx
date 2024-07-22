@@ -269,7 +269,7 @@ const SelectParameter = (props: any) => {
   }
 
   return (
-    <div className="p-4" style={{ maxHeight: '90vh', overflowY: 'auto', paddingBottom: '120px'}}>
+    <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px'}}>
       <Dropdown
         displayTag = "カテゴリー"
         title="Categories"
