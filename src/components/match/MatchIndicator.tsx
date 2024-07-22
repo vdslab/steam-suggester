@@ -124,16 +124,6 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
     return (adjustedPrice / maxPrice) * 100;
   };
 
-  // const calculateRangePosition = (startPrice: number, endPrice: number) => {
-  //   const maxPrice = 10000;
-  //   const start = Math.min(startPrice, maxPrice);
-  //   const end = Math.min(endPrice, maxPrice);
-  //   return {
-  //     startPosition: (start / maxPrice) * 100,
-  //     endPosition: (end / maxPrice) * 100,
-  //   };
-  // };
-
   const localFilterPrice = () => {
     const startPricePosition = priceBarPosition(localFilter.Price.startPrice);
     const endPricePosition = priceBarPosition(localFilter.Price.endPrice);
@@ -230,11 +220,10 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
                 ></div>
                 
                 {localFilterPrice()}
-                {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
                 <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
                 <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
                 <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-orange-700`}>
-                  {data.price.toLocaleString()}円
+                  {data.price.toLocaleString()}
                 </div>
               </div>
             ) : (
@@ -260,8 +249,8 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
         </div>
         {data.price && data.price != 0 ? (
           <div className="flex justify-between text-xs">
-            <span>0円</span>
-            <span>10000円</span>
+            <span>0</span>
+            <span>10,000</span>
           </div>
         ) : null}
       </div>
@@ -279,7 +268,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
 
         <p className='mt-3'>対応デバイス</p>
         <div className="flex">
-          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.windows ? 'bg-green-300 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.windows ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
             Windows
           </span>
           <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.mac ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
