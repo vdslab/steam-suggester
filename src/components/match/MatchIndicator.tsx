@@ -205,7 +205,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
               </div>
             ) : (
               <div
-                className="h-4 rounded-lg bg-gray-400 flex items-center justify-center text-white bg-green-400 text-xs"
+                className="h-4 rounded-lg bg-gray-400 flex items-center justify-center text-white text-xs"
                 style={{
                   width: '100%',
                 }}
@@ -236,11 +236,11 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
       <div className="mb-4">
         <p>プレイモード</p>
         <div className="flex">
-          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isMultiPlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
-            マルチプレイヤー
-          </span>
           <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isSinglePlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
             シングルプレイヤー
+          </span>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isMultiPlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            マルチプレイヤー
           </span>
         </div>
 
