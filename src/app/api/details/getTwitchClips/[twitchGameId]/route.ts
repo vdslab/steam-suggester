@@ -1,5 +1,5 @@
 import TwitchToken from "@/app/api/TwitchToken";
-import { TwitchClipApiType, TwitchClipDataType, TwitchClipType } from "@/types/api/DetailsTypes";
+import { TwitchClipApiType, TwitchClipDataType, TwitchClipType } from "@/types/api/getTwitchClipType";
 import { NextResponse } from "next/server";
 
 type Params = {

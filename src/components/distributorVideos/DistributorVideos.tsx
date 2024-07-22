@@ -1,13 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
-import { TwitchClipType } from "@/types/api/DetailsTypes";
+import { TwitchClipType } from "@/types/api/getTwitchClipType";
 import Headline from "../common/Headline";
 import ClipSlideshow from "./ClipSlideshow";
+import { DetailsPropsType } from "@/types/DetailsType";
 
-type Props = {
-  twitchGameId: string;
-};
-
-const DistributorVideos = async (props: Props) => {
+const DistributorVideos = async (props: DetailsPropsType) => {
 
   const { twitchGameId } = props;
 

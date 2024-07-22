@@ -2,9 +2,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import DisplayClip from "./DisplayClip";
-import { TwitchClipType } from "@/types/api/DetailsTypes";
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { TwitchClipType } from "@/types/api/getTwitchClipType";
 
 type Props = {
   data: TwitchClipType[];

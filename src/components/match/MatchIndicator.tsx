@@ -2,36 +2,16 @@
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
 import { Filter } from '@/types/api/FilterType';
-import { steamGameGenreType } from '@/types/api/steamDataType';
-import { DeviceType } from '@/types/match/MatchDataType';
+import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
 import * as d3 from 'd3';
 import React, { useState, useEffect } from 'react';
 
-interface Genre {
-  id: string;
-  description: string;
-}
-
-interface Category {
-  id: number;
-  description: string;
-}
-
-interface MatchIndicatorProps {
-  data: {
-    name: string;
-    imgURL: string;
-    genres: Genre[];
-    categories: Category[];
-    isSinglePlayer: boolean;
-    isMultiPlayer: boolean;
-    price: number;
-    device: DeviceType;
-  }
+type Props = {
+  data: SteamDetailsDataType;
 };
 
-const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
-  const data = props.data;
+const MatchIndicator = ( props:Props ) => {
+  const { data } = props;
   const [localFilter, setLocalFilter] = useState<Filter>(DEFAULT_FILTER);
   const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
   const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
@@ -65,10 +45,10 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
     setOverallMatchPercentage(overallMatchPercentage);
   }, [data, localFilter]);
 
-  const calcGenresPercentage = (filter: Filter, genres: steamGameGenreType[]) => {
+  const calcGenresPercentage = (filter: Filter, genres: SteamGenreType[]) => {
     let genreCount = 0;
   
-    genres.forEach((genre: steamGameGenreType) => {
+    genres.forEach((genre: SteamGenreType) => {
       if(filter.Categories[genre.id]) {
         genreCount++;
       }
@@ -107,7 +87,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
     return (modeCount / 2) * 100;
   }
   
-  const calcDevicePercentage = (filter: Filter, devices: DeviceType) => {
+  const calcDevicePercentage = (filter: Filter, devices: SteamDeviceType) => {
     let deviceCount = 0;
     Object.keys(devices).forEach((device: string) => {
       if((device === "windows" && filter.Device.windows) || (device === "mac" && filter.Device.mac)) {

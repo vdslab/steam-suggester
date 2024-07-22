@@ -1,10 +1,8 @@
 import * as d3 from 'd3';
-import { gameDetailType } from "@/types/api/gameDetailsType";
-import { steamGameGenreType, steamGameDeviceType } from '@/types/api/steamDataType';
 import { getFilterData } from './indexedDB';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
-import { DeviceType } from '@/types/match/MatchDataType';
 import { Filter } from '@/types/api/FilterType';
+import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
 
 type Node = {
   circleScale?: number,
@@ -23,17 +21,17 @@ type Node = {
 }
 
 type GameData = {
-  genres : steamGameGenreType[],
+  genres : SteamGenreType[],
   price: number,
   isSinglePlayer: boolean,
   isMultiPlayer: boolean,
-  device: steamGameDeviceType,
+  device: SteamDeviceType,
 }
 
-const calcGenresPercentage = (filter: Filter, genres: steamGameGenreType[]) => {
+const calcGenresPercentage = (filter: Filter, genres: SteamGenreType[]) => {
   let genreCount = 0;
 
-  genres.forEach((genre: steamGameGenreType) => {
+  genres.forEach((genre: SteamGenreType) => {
     if(filter.Categories[genre.id]) {
       genreCount++;
     }
@@ -72,7 +70,7 @@ const calcModePercentage = (filter: Filter, modes: {isSinglePlayer: boolean, isM
   return (modeCount / 2) * 100;
 }
 
-const calcDevicePercentage = (filter: Filter, devices: DeviceType) => {
+const calcDevicePercentage = (filter: Filter, devices: SteamDeviceType) => {
   let deviceCount = 0;
   Object.keys(devices).forEach((device: string) => {
     if((device === "windows" && filter.Device.windows) || (device === "mac" && filter.Device.mac)) {
@@ -95,10 +93,6 @@ const calcCommonGenres = (game1:any, game2:any) => {
   );
   genresWeight *= 10;
 
-  const priceWeight = Math.abs(game1.price - game2.price);
-  // const deviceWeight = game1.device === game2.device ? 1 : 0;
-  // const playtimeWeight = Math.abs(game1.playtime - game2.playtime);
-  const totalWeight = genresWeight * 10 + (1 / priceWeight) * 100;
   return 1 / genresWeight;
 };
 
@@ -109,7 +103,7 @@ const createNetwork = async () => {
   if(!res) {
     return {};
   }
-  const data:gameDetailType[] = await res.json();
+  const data:SteamDetailsDataType[] = await res.json();
 
   const d = await getFilterData('unique_id');
   const filter: Filter = d ? d : DEFAULT_FILTER;

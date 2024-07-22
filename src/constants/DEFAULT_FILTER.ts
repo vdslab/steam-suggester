@@ -82,7 +82,7 @@ export const GENRE_MAPPING = {
   81: "ドキュメンタリー",
 };
 
-export const BUN_MAPPING = {
+export const BAN_MAPPING = {
   37: "無料プレイ",
   72: "Nudity",
   50: "Accounting",

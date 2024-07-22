@@ -1,6 +1,6 @@
 import { PG_POOL } from "@/constants/PG_POOL";
-import { gameDetailType } from "@/types/api/gameDetailsType";
-import { steamGameCategoryType } from "@/types/api/steamDataType";
+import { gameDetailType } from "@/types/api/getMatchGamesType";
+import { SteamCategoryType } from "@/types/api/getSteamDetailType";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -49,8 +49,8 @@ export async function GET() {
         gameData: {
           genres: gameDetailData.genres,
           price: gameDetailData.price_overview ? gameDetailData.price_overview.final / 100 : 0,
-          isSinglePlayer: gameDetailData.categories.some((category: steamGameCategoryType) => category.id === 2),
-          isMultiPlayer: gameDetailData.categories.some((category: steamGameCategoryType) => category.id === 1),
+          isSinglePlayer: gameDetailData.categories.some((category: SteamCategoryType) => category.id === 2),
+          isMultiPlayer: gameDetailData.categories.some((category: SteamCategoryType) => category.id === 1),
           device: {
             windows: gameDetailData.platforms.windows,
             mac: gameDetailData.platforms.mac,
