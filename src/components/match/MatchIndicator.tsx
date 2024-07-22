@@ -125,60 +125,68 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
     return (adjustedPrice / maxPrice) * 100;
   };
 
-  const calculateUserSelectedPrice = () => {
-    let price = 0;
-    Object.keys(localFilter.Price).forEach((key, index) => {
-      price = index === 0 ? 0 : (index + 1) * 1000;
-    });
-    return price;
-  };
-
-  const calculateRangePosition = (startPrice: number, endPrice: number) => {
-    const maxPrice = 10000;
-    const start = Math.min(startPrice, maxPrice);
-    const end = Math.min(endPrice, maxPrice);
-    return {
-      startPosition: (start / maxPrice) * 100,
-      endPosition: (end / maxPrice) * 100,
-    };
-  };
+  // const calculateRangePosition = (startPrice: number, endPrice: number) => {
+  //   const maxPrice = 10000;
+  //   const start = Math.min(startPrice, maxPrice);
+  //   const end = Math.min(endPrice, maxPrice);
+  //   return {
+  //     startPosition: (start / maxPrice) * 100,
+  //     endPosition: (end / maxPrice) * 100,
+  //   };
+  // };
 
   const localFilterPrice = () => {
+    const startPricePosition = priceBarPosition(localFilter.Price.startPrice);
+    const endPricePosition = priceBarPosition(localFilter.Price.endPrice);
+  
+    const startLabelStyle = {
+      left: `${startPricePosition}%`,
+      whiteSpace: 'nowrap',
+      transform: startPricePosition < 5 ? 'none' : 'translateX(-50%)'
+    };
+  
+    const endLabelStyle = {
+      left: `${endPricePosition}%`,
+      whiteSpace: 'nowrap',
+      transform: endPricePosition > 95 ? 'translateX(-100%)' : 'translateX(-50%)'
+    };
+  
     return (
       <>
         <div
           className="absolute top-0 transform -translate-x-1/2 h-full w-0.5 bg-orange-800"
-          style={{ left: `${priceBarPosition(localFilter.Price.startPrice)}%` }}
+          style={{ left: `${startPricePosition}%` }}
         >
           <span
-            className="absolute -top-5 -translate-x-1/2 mt-1 text-xs text-orange-400"
-            style={{ whiteSpace: 'nowrap' }}
+            className="absolute -top-5 mt-1 text-xs text-orange-400"
+            style={startLabelStyle}
           >
-            {localFilter.Price.startPrice.toLocaleString()}円
+            {localFilter.Price.startPrice.toLocaleString()}
           </span>
         </div>
         <div
           className="absolute top-0 transform -translate-x-1/2 h-full w-0.5 bg-orange-800"
-          style={{ left: `${priceBarPosition(localFilter.Price.endPrice)}%` }}
+          style={{ left: `${endPricePosition}%` }}
         >
           <span
-            className="absolute -top-5 -translate-x-1/2 mt-1 text-xs text-orange-400"
-            style={{ whiteSpace: 'nowrap' }}
+            className="absolute -top-5 mt-1 text-xs text-orange-400"
+            style={endLabelStyle}
           >
-            {localFilter.Price.endPrice.toLocaleString()}円
+            {localFilter.Price.endPrice.toLocaleString()}
           </span>
         </div>
-
+  
         <div
-          className="absolute top-0 h-full rounded-lg bg-orange-800/20"
+          className="absolute top-0 h-full bg-orange-800/20"
           style={{
-            left: `${calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).startPosition}%`,
-            width: `${calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).endPosition - calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).startPosition}%`,
+            left: `${startPricePosition}%`,
+            width: `${endPricePosition - startPricePosition}%`,
           }}
         ></div>
       </>
-    );
+    );  
   };
+  
 
   return (
     <div className='text-white'>
@@ -268,17 +276,17 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
       <div className="mb-4">
         <p>プレイモード</p>
         <div className="flex">
-          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isMultiPlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isMultiPlayer ? 'bg-green-300 text-green-800' : 'bg-gray-400 text-green-800'}`}>
             マルチプレイヤー
           </span>
-          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isSinglePlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isSinglePlayer ? 'bg-green-300 text-green-800' : 'bg-gray-400 text-green-800'}`}>
             シングルプレイヤー
           </span>
         </div>
 
         <p className='mt-3'>対応デバイス</p>
         <div className="flex">
-          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.windows ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.windows ? 'bg-green-300 text-green-800' : 'bg-gray-400 text-green-800'}`}>
             Windows
           </span>
           <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.mac ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
