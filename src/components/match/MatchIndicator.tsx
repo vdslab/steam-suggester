@@ -119,7 +119,8 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
   }
 
   const priceBarPosition = (price: number) => {
-    const maxPrice = calculateUserSelectedPrice() === 0 ? 1000 : calculateUserSelectedPrice() * 2;
+    // const maxPrice = calculateUserSelectedPrice() === 0 ? 1000 : calculateUserSelectedPrice() * 2;
+    const maxPrice = 10000;
     const adjustedPrice = Math.min(price, maxPrice);
     return (adjustedPrice / maxPrice) * 100;
   };
@@ -130,6 +131,16 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
       price = index === 0 ? 0 : (index + 1) * 1000;
     });
     return price;
+  };
+
+  const calculateRangePosition = (startPrice: number, endPrice: number) => {
+    const maxPrice = 10000;
+    const start = Math.min(startPrice, maxPrice);
+    const end = Math.min(endPrice, maxPrice);
+    return {
+      startPosition: (start / maxPrice) * 100,
+      endPosition: (end / maxPrice) * 100,
+    };
   };
 
   return (
@@ -154,9 +165,9 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
         </div>
         <div className="w-full bg-gray-300 rounded-b-lg pt-0 pb-1 pl-2 pr-1 ">
           {data.genres.map((genre) => (
-            <small key={genre.id} className="text-gray-700">
-              {genre.description}&nbsp;
-            </small>
+            <div key={genre.id} className="inline-block bg-white text-gray-700 rounded-md px-2 py-0 my-0.5 cursor-pointer">
+              <small>{genre.description}</small>
+            </div>
           ))}
         </div>
       </div>
@@ -173,38 +184,28 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
                     width: `${priceBarPosition(data.price)}%`,
                   }}
                 ></div>
-                 {Object.keys(localFilter.Price).map((key) => {
-                    const minPrice = Math.max((Number(key) - 2), 0) * 1000;
-                    const maxPrice = Math.min((Number(key) - 1), 10) * 1000;
-
-                    // バーの位置と幅を計算
-                    const barWidth = (maxPrice - minPrice) / (calculateUserSelectedPrice() * 2) * 100;
-                    const barLeft = (minPrice / (calculateUserSelectedPrice() * 2)) * 100;
-
-                    return (
-                      <div
-                        key={key}
-                        className="absolute top-0 left-0 h-full"
-                        style={{
-                          width: `${barWidth}%`,
-                          left: `${barLeft}%`,
-                          backgroundColor: 'rgba(0, 165, 0, 0.5)',
-                        }}
-                      ></div>
-                    );
-                })}
+                <div
+                  className="absolute top-0 h-full rounded-lg bg-orange-800/20"
+                  style={{
+                    left: `${calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).startPosition}%`,
+                    width: `${calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).endPosition - calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).startPosition}%`,
+                  }}
+                ></div>
                 {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
                 <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
                 <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
+                <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-orange-700`}>
+                  {data.price.toLocaleString()}円
+                </div>
+                {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
                   <span className="absolute top-full -translate-x-1/2 mt-1 text-xs"  style={{ whiteSpace: 'nowrap' }}>
                     {calculateUserSelectedPrice() != 0 ? calculateUserSelectedPrice().toLocaleString() + "円" : "1000円"}
                   </span>
-                </div>
+                </div> */}
               </div>
             ) : (
               <div
-                className="h-4 rounded-lg bg-gray-400 flex items-center justify-center text-white text-xs"
+                className="h-4 rounded-lg bg-gray-400 flex items-center justify-center text-white bg-green-400 text-xs"
                 style={{
                   width: '100%',
                 }}
@@ -223,34 +224,35 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
             </div>
           }
         </div>
-        <div className="flex justify-between text-xs">
-          <span>0円</span>
-          <span>{(calculateUserSelectedPrice() * 2).toLocaleString()}円</span>
-        </div>
-        {data.price ? <small className="text-gray-400">価格:{data.price.toLocaleString()}円</small> : null}
+        {data.price && data.price != 0 ? (
+          <div className="flex justify-between text-xs">
+            <span>0円</span>
+            {/* <span>{(calculateUserSelectedPrice() * 2).toLocaleString()}円</span> */}
+            <span>10000円</span>
+          </div>
+        ) : null}
       </div>
 
       <div className="mb-4">
         <p>プレイモード</p>
-        {data.isSinglePlayer ?
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded mr-1">シングルプレイヤー</span>
-          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded mr-1">シングルプレイヤー</span>}
-        {data.isMultiPlayer ?
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">マルチプレイヤー</span>
-          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">マルチプレイヤー</span>}
-        
+        <div className="flex">
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isMultiPlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            マルチプレイヤー
+          </span>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.isSinglePlayer ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            シングルプレイヤー
+          </span>
+        </div>
 
         <p className='mt-3'>対応デバイス</p>
-        {data.device.windows ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">Windows</span>
-        ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">Windows</span>
-        )}
-        {data.device.mac ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">mac</span>
-        ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">mac</span>
-        )}
+        <div className="flex">
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.windows ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            Windows
+          </span>
+          <span className={`flex-1 px-2 py-1 rounded cursor-pointer text-center ${data.device.mac ? 'bg-green-200 text-green-800' : 'bg-gray-400 text-green-800'}`}>
+            mac
+          </span>
+        </div>
       </div>
     </div>
   );

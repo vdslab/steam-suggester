@@ -23,12 +23,24 @@ const Popularity = async(props:Props) => {
       {steamData && twitchData ? (
         <div className="flex">
           <div className="border border-gray-500 p-3">
-            <div className="text-white">Steamレビュー数</div>
-            <StackedAreaChart data={steamData} width={300} height={200} colorRange={STEAM_COLOR_RANGE}/>
+            <div className="text-white pb-3">Steamレビュー数</div>
+            <StackedAreaChart
+              data={steamData}
+              width={300}
+              height={200}
+              colorRange={STEAM_COLOR_RANGE}
+              labelTxt={{ bottom:'レビュー日（月/日）', left:'レビュー数（件）' }}
+            />
           </div>
           <div className="border border-gray-500 ml-2 p-3">
-            <div className="text-white">Twitch視聴数</div>
-            <StackedAreaChart data={twitchData} width={300} height={200} colorRange={TWITCH_COLOR_RANGE} />
+            <div className="text-white pb-3">Twitch視聴数</div>
+            <StackedAreaChart
+              data={twitchData}
+              width={300}
+              height={200}
+              colorRange={TWITCH_COLOR_RANGE}
+              labelTxt={{ bottom: "視聴日（月/日）", left: "視聴数（人）"}} 
+            />
           </div>
         </div>
       ) : null}

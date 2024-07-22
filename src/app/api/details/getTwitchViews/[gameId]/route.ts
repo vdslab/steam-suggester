@@ -34,7 +34,7 @@ export async function GET(req: Request, params: Params) {
         date: unixTime,
         count: d.total_views
       }
-    })
+    }).sort((d1, d2) => d1.date - d2.date);
 
     return NextResponse.json(formatData)
 
