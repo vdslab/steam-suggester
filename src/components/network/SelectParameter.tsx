@@ -228,8 +228,8 @@ const SelectParameter = (props: any) => {
   const handleFreeCheckboxChange = () => {
     setIsFreeChecked(!isFreeChecked);
     const newFilter = { ...localFilter };
-    newFilter['Price'].startPrice = !isFreeChecked ? 0 : newFilter['Price'].startPrice;
-    newFilter['Price'].endPrice = !isFreeChecked ? 0 : newFilter['Price'].endPrice;
+    newFilter['Price'].startPrice = !isFreeChecked ? 0 : priceRange[0];
+    newFilter['Price'].endPrice = !isFreeChecked ? 0 : priceRange[1];
     setLocalFilter(newFilter);
   };
 
