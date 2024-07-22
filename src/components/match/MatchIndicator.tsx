@@ -165,9 +165,9 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
         </div>
         <div className="w-full bg-gray-300 rounded-b-lg pt-0 pb-1 pl-2 pr-1 ">
           {data.genres.map((genre) => (
-            <small key={genre.id} className="text-gray-700">
-              {genre.description}&nbsp;
-            </small>
+            <div key={genre.id} className="inline-block bg-white text-gray-700 rounded-md px-2 py-0 my-0.5 cursor-pointer">
+              <small>{genre.description}</small>
+            </div>
           ))}
         </div>
       </div>
@@ -252,22 +252,22 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
       <div className="mb-4">
         <p>プレイモード</p>
         {data.isMultiPlayer ?
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">マルチプレイヤー</span>
-          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">マルチプレイヤー</span>}
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded cursor-pointer">マルチプレイヤー</span>
+          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded cursor-pointer">マルチプレイヤー</span>}
         {data.isSinglePlayer ?
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded mr-1">シングルプレイヤー</span>
-          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded mr-1">シングルプレイヤー</span>}
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded mr-1 cursor-pointer">シングルプレイヤー</span>
+          : <span className="px-2 py-1 bg-gray-400 text-green-800 rounded mr-1 cursor-pointer">シングルプレイヤー</span>}
 
         <p className='mt-3'>対応デバイス</p>
         {data.device.windows ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">Windows</span>
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded cursor-pointer">Windows</span>
         ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">Windows</span>
+          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded cursor-pointer">Windows</span>
         )}
         {data.device.mac ? (
-          <span className="px-2 py-1 bg-green-200 text-green-800 rounded">mac</span>
+          <span className="px-2 py-1 bg-green-200 text-green-800 rounded cursor-pointer">mac</span>
         ) : (
-          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded">mac</span>
+          <span className="px-2 py-1 bg-gray-400 text-green-800 rounded cursor-pointer">mac</span>
         )}
       </div>
     </div>
