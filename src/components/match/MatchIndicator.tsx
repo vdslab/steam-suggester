@@ -119,7 +119,8 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
   }
 
   const priceBarPosition = (price: number) => {
-    const maxPrice = calculateUserSelectedPrice() === 0 ? 1000 : calculateUserSelectedPrice() * 2;
+    // const maxPrice = calculateUserSelectedPrice() === 0 ? 1000 : calculateUserSelectedPrice() * 2;
+    const maxPrice = 10000;
     const adjustedPrice = Math.min(price, maxPrice);
     return (adjustedPrice / maxPrice) * 100;
   };
@@ -130,6 +131,16 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
       price = index === 0 ? 0 : (index + 1) * 1000;
     });
     return price;
+  };
+
+  const calculateRangePosition = (startPrice: number, endPrice: number) => {
+    const maxPrice = 10000;
+    const start = Math.min(startPrice, maxPrice);
+    const end = Math.min(endPrice, maxPrice);
+    return {
+      startPosition: (start / maxPrice) * 100,
+      endPosition: (end / maxPrice) * 100,
+    };
   };
 
   return (
@@ -173,7 +184,14 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
                     width: `${priceBarPosition(data.price)}%`,
                   }}
                 ></div>
-                 {Object.keys(localFilter.Price).map((key) => {
+                <div
+                  className="absolute top-0 h-full rounded-lg bg-orange-800/20"
+                  style={{
+                    left: `${calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).startPosition}%`,
+                    width: `${calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).endPosition - calculateRangePosition(localFilter.Price.startPrice, localFilter.Price.endPrice).startPosition}%`,
+                  }}
+                ></div>
+                 {/* {Object.keys(localFilter.Price).map((key) => {
                     const minPrice = Math.max((Number(key) - 2), 0) * 1000;
                     const maxPrice = Math.min((Number(key) - 1), 10) * 1000;
 
@@ -192,15 +210,15 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
                         }}
                       ></div>
                     );
-                })}
+                })} */}
                 {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black"></div> */}
                 <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
                 <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
+                {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-black">
                   <span className="absolute top-full -translate-x-1/2 mt-1 text-xs"  style={{ whiteSpace: 'nowrap' }}>
                     {calculateUserSelectedPrice() != 0 ? calculateUserSelectedPrice().toLocaleString() + "円" : "1000円"}
                   </span>
-                </div>
+                </div> */}
               </div>
             ) : (
               <div
@@ -225,7 +243,8 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
         </div>
         <div className="flex justify-between text-xs">
           <span>0円</span>
-          <span>{(calculateUserSelectedPrice() * 2).toLocaleString()}円</span>
+          {/* <span>{(calculateUserSelectedPrice() * 2).toLocaleString()}円</span> */}
+          <span>10000円</span>
         </div>
         {data.price ? <small className="text-gray-400">価格:{data.price.toLocaleString()}円</small> : null}
       </div>
