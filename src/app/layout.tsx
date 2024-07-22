@@ -21,6 +21,19 @@ export default function RootLayout({
       <head>
         <title>Steam Suggester</title>
         <meta name="description" content="Steam game suggestions based on trends" />
+
+        {/* OGP */}
+        <head prefix="og: https://ogp.me/ns#"></head>
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Steam Suggester" />
+        <meta property="og:description" content="TwitchとSteamを組み合わせたゲーム提案を可視化するウェブサイト。最適なゲーム体験を見つけよう！" />
+        <meta property="og:url" content={process.env.NEXT_PUBLIC_CURRENT_URL} />
+        <meta property="og:site_name" content="Steam Suggester" />
+        <meta property="og:image" content={`${process.env.NEXT_PUBLIC_CURRENT_URL}/ogp.png`} />
+        <meta property="og:locale" content="ja_JP" />
+
+        <meta name="keywords" content="Steam, Twitch, Game Network, Game Recommendations, Visualization" />
+
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className}>
