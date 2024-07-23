@@ -3,7 +3,7 @@ import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
 import { Filter } from '@/types/api/FilterType';
 import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { calcAllMatchPercentage, calcGenresPercentage } from '../common/CalcMatch';
 
 type Props = {
@@ -17,20 +17,16 @@ const MatchIndicator = ( props:Props ) => {
   const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
 
   useEffect(() => {
-    const genreMatchPercentage = calcGenresPercentage(localFilter, data.genres);
-    const overallMatchPercentage = calcAllMatchPercentage(localFilter, data);
-
-    setGenreMatchPercentage(genreMatchPercentage);
-    setOverallMatchPercentage(overallMatchPercentage);
-
     (async() => {
       const d = await getFilterData('unique_id');
       if(d) {
         setLocalFilter(d);
+
+        setGenreMatchPercentage( calcGenresPercentage(d, data.genres) );
+        setOverallMatchPercentage( calcAllMatchPercentage(d, data) );
       }
     })();
   }, [])
-
 
   const priceBarPosition = (price: number) => {
     const maxPrice = 10000;
