@@ -1,20 +1,9 @@
 "use client";
-import { DEFAULT_FILTER, GENRE_MAPPING } from "@/constants/DEFAULT_FILTER";
+import { DEFAULT_FILTER, DEVICE_MAPPING, GENRE_MAPPING, MODE_MAPPING } from "@/constants/DEFAULT_FILTER";
 import { addFilterData, getFilterData, updateFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
 import { useState, useEffect } from "react";
 import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
-
-
-const modeMapping: any = {
-  isSinglePlayer: "シングルプレイヤー",
-  isMultiPlayer: "マルチプレイヤー"
-};
-
-const deviceMapping: any = {
-  windows: "windows",
-  mac: "mac"
-};
 
 const SliderFilter = ({ min, max, values, onChange, valueFormatter, disabled }: { min: number, max: number, values: number[], onChange: (values: number[]) => void, valueFormatter: (value: number) => string, disabled: boolean }) => {
   const [domain] = useState([min, max]);
@@ -174,11 +163,16 @@ const Dropdown = ({ displayTag, title, mapping, localFilter, setLocalFilter }: {
   );
 };
 
-const SelectParameter = (props: any) => {
+type Props = {
+  filter: Filter;
+  setFilter: React.Dispatch<React.SetStateAction<Filter>>;
+};
+
+const SelectParameter = (props: Props) => {
   const { filter, setFilter } = props;
 
   const [localFilter, setLocalFilter] = useState<Filter>(filter);
-  const [isFreeChecked, setIsFreeChecked] = useState(false);
+  const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000]);
 
   const handlePriceChange = (values: number[]) => {
@@ -279,7 +273,7 @@ const SelectParameter = (props: any) => {
       <Dropdown
         displayTag = "モード"
         title="Mode"
-        mapping={modeMapping}
+        mapping={MODE_MAPPING}
         localFilter={localFilter}
         setLocalFilter={setLocalFilter}
       />
@@ -287,7 +281,7 @@ const SelectParameter = (props: any) => {
       <Dropdown
         displayTag = "対応デバイス"
         title="Device"
-        mapping={deviceMapping}
+        mapping={DEVICE_MAPPING}
         localFilter={localFilter}
         setLocalFilter={setLocalFilter}
       />

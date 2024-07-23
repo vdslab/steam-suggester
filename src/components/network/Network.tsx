@@ -3,9 +3,10 @@ import { useState } from 'react';
 import NodeLink from "./NodeLink";
 import SelectParameter from './SelectParameter';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
+import { Filter } from '@/types/api/FilterType';
 
 const Network = () => {
-  const [filter, setFilter] = useState(DEFAULT_FILTER);
+  const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
 
   return (
     <div className="flex h-[92dvh] overflow-hidden">

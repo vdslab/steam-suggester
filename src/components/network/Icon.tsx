@@ -1,12 +1,13 @@
 'use client';
-import { useState } from "react";
+import { useState, MouseEvent } from "react";
 import { useRouter } from 'next/navigation';
+import { IconType } from "@/types/NetworkType";
 
-const Icon = (props:any) => {
+const Icon = (props:IconType) => {
   const { title, imgURL, index, steamGameId, twitchGameId, circleScale } = props;
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
-  const handleClick = (e:any) => {
+  const handleClick = (e: MouseEvent<SVGElement>) => {
     e.preventDefault();
     router.push(`/desktop/details/${steamGameId}/${twitchGameId}`);
   };
