@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-/* import { TITLE } from "@/constants/titile"; */
 import Header from "@/components/common/Header";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,7 +20,7 @@ export default function RootLayout({
       <head>
         <title>Steam Suggester</title>
         <meta name="description" content="Steam game suggestions based on trends" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/icon.png" type="image/png" sizes="any" />
       </head>
       <body className={inter.className}>
         <Header />
