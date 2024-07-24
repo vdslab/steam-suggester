@@ -26,7 +26,7 @@ const GameExplanation = async(props:Props) => {
         />
         <div className="p-6">
           {/* <h1 className="text-2xl font-bold mb-4">{data.title}</h1> */}
-          <p className="text-white">{data.description}</p>
+          <div className="text-white max-h-20 overflow-y-auto">{data.description}</div>
         </div>
       </div>
     </div>
