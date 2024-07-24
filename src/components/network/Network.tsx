@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import NodeLink from "./NodeLink";
-import SelectParameter from './SelectParameter';
+import SelectParameter from './selectParameter/SelectParameter';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 
