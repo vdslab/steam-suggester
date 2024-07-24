@@ -208,10 +208,9 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
 
       <div className="mb-4">
         <p>価格(円)</p>
-        <div className="relative w-full h-8 bg-gray-200 rounded-lg mb-1 mt-4">
           {data.price ? (
-            data.price != 0 ? (
-              <div>
+            data.price > 0 ? (
+              <div className="relative w-full h-8 bg-gray-200 rounded-lg mb-1 mt-4">
                 <div
                   className={`absolute top-0 left-0 h-full rounded-lg bg-orange-400`}
                   style={{
@@ -246,8 +245,7 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
               データがありません
             </div>
           }
-        </div>
-        {data.price && data.price != 0 ? (
+        {data.price && data.price > 0 ? (
           <div className="flex justify-between text-xs">
             <span>0</span>
             <span>10,000</span>
