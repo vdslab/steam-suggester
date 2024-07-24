@@ -5,6 +5,8 @@ export type MatchDataType = {
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
   device: DeviceType;
+  description: string;
+  header_image: string;
 };
 
 export type GenreType = {

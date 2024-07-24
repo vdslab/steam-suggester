@@ -1,5 +1,6 @@
 import GameTitle from "@/components/common/GameTitle"
 import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
+import GameExplanation from "@/components/GameExplanation/GameExplanation"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
 import SimilarGames from "@/components/simlarGames/SimilarGames"
@@ -21,7 +22,8 @@ export default function Page({
         <div className="basis-6/10 flex flex-row space-x-5">
           <div className="basis-1/2">
             <GameTitle steamGameId={steamGameId} />
-            <div className="text-white">開発中</div>
+            {/* <div className="text-white">開発中</div> */}
+            <GameExplanation steamGameId={steamGameId} />
           </div>
           <div className="basis-1/2">
             <Match steamGameId={steamGameId} />
