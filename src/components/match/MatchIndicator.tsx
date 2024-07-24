@@ -182,8 +182,8 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
       <div className="mb-4">
         <p className="text-lg font-bold">全体の一致度</p>
         <div className="w-full bg-gray-200 rounded-lg h-8 mb-1 relative">
-          <div className="bg-purple-600 h-8 rounded-lg match-all-bgcolor" style={{ width: `${overallMatchPercentage}%` }}></div>
-          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold match-all-color`}>
+          <div className="bg-purple-600 h-8 rounded-lg bg-[#aa64fa]" style={{ width: `${overallMatchPercentage}%` }}></div>
+          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-[#8a00b8]`}>
             {overallMatchPercentage}%
           </div>
         </div>
@@ -192,8 +192,8 @@ const MatchIndicator: React.FC<MatchIndicatorProps> = ( props ) => {
       <div className="mb-4">
         <p className="text-lg">ジャンル一致度</p>
         <div className="w-full bg-gray-200 rounded-t-lg h-8 relative">
-          <div className="bg-blue-600 h-8 rounded-t-lg match-genre-bgcolor" style={{ width: `${genreMatchPercentage}%` }}></div>
-          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold match-genre-color`}>
+          <div className="bg-blue-600 h-8 rounded-t-lg bg-[#6496fa]" style={{ width: `${genreMatchPercentage}%` }}></div>
+          <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-[#0037b8]`}>
             {genreMatchPercentage}%
           </div>
         </div>

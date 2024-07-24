@@ -46,15 +46,3 @@ body {
   background-color: #555;
 }
 
-.match-genre-bgcolor {
-  background-color: rgb(100 150 250);
-}
-.match-genre-color {
-  color: rgb(0 55 184);
-}
-.match-all-bgcolor {
-  background-color: rgb(170, 100, 250);
-}
-.match-all-color {
-  color: rgb(138, 0, 184);
-}
