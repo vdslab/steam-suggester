@@ -18,7 +18,6 @@ const SelectParameter = (props: Props) => {
 
   const [localFilter, setLocalFilter] = useState<Filter>(filter);
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
-  const [priceRange, setPriceRange] = useState<number[]>([0, 10000]);
 
   useEffect(() => {
     (async() => {
@@ -26,7 +25,9 @@ const SelectParameter = (props: Props) => {
       if(d) {
         setFilter(d);
         setLocalFilter(d);
-        setPriceRange([d.Price.startPrice, d.Price.endPrice]);
+        if(d.Price.startPrice === 0 && d.Price.endPrice === 0) {
+          setIsFreeChecked(true);
+        }
       }
     })();
   }, [])
@@ -39,15 +40,14 @@ const SelectParameter = (props: Props) => {
         endPrice: values[1]
       }
     };
-    setPriceRange(values);
     setLocalFilter(newFilter);
   };
 
   const handleFreeCheckboxChange = () => {
     setIsFreeChecked(!isFreeChecked);
     const newFilter = { ...localFilter };
-    newFilter['Price'].startPrice = !isFreeChecked ? 0 : priceRange[0];
-    newFilter['Price'].endPrice = !isFreeChecked ? 0 : priceRange[1];
+    newFilter['Price'].startPrice = !isFreeChecked ? 0 : localFilter.Price.startPrice;
+    newFilter['Price'].endPrice = !isFreeChecked ? 0 : localFilter.Price.endPrice;
     setLocalFilter(newFilter);
   };
 
@@ -55,22 +55,14 @@ const SelectParameter = (props: Props) => {
     (async() => {
       const d = await getFilterData('unique_id');
       if(d) {
-        updateFilterData({
-          ...filter,
-          id: 'unique_id',
-        });
-
+        updateFilterData(filter);
       } else {
-        addFilterData({
-          ...filter,
-          id: 'unique_id',
-        });
+        addFilterData(filter);
       }
     })();
     setFilter(filter)
     setLocalFilter(filter)
     if(filter === DEFAULT_FILTER) {
-      setPriceRange([0, 10000]);
       setIsFreeChecked(false);
     }
   }
@@ -131,7 +123,7 @@ const SelectParameter = (props: Props) => {
             </div>
             <FilterSlider
               domain={[0, 10000]}
-              values={priceRange}
+              values={[localFilter.Price.startPrice, localFilter.Price.endPrice]}
               onChange={handlePriceChange}
               valueFormatter={(value) => (value === 1 ? '1円' : `${(value)}円`)}
               disabled={isFreeChecked}
