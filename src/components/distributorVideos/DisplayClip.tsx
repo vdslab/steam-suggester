@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CloseIcon from '@mui/icons-material/Close';
-import { TwitchClipType } from "@/types/api/DetailsTypes";
+import { TwitchClipType } from "@/types/api/getTwitchClipType";
 
 const DisplayClip = (props: TwitchClipType) => {
 

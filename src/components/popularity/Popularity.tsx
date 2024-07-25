@@ -1,6 +1,7 @@
 import { STEAM_COLOR_RANGE, TWITCH_COLOR_RANGE } from "@/constants/STYLES";
 import StackedAreaChart from "./StackedAreaChart"
 import Headline from "../common/Headline";
+import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 
 type Props = {
   twitchGameId: string;
@@ -11,10 +12,15 @@ const Popularity = async(props:Props) => {
 
   const { twitchGameId, steamGameId } = props;
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countRecentSteamReviews/${steamGameId}`);
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countRecentSteamReviews/${steamGameId}`,
+    {next: { revalidate: ISR_FETCH_INTERVAL }}
+  );
   const steamData = await response.json();
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchViews/${twitchGameId}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchViews/${twitchGameId}`,
+    {next: { revalidate: ISR_FETCH_INTERVAL}}
+  );
   const twitchData = await res.json();
 
   return (

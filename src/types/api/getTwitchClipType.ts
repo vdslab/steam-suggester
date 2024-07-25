@@ -1,4 +1,3 @@
-
 // https://dev.twitch.tv/docs/api/reference/#get-clips
 export type TwitchClipApiType = {
   data: TwitchClipDataType[];
@@ -34,3 +33,8 @@ export type TwitchClipType = {
   image: string;
   title: string;
 };
+
+export type TwitchViews = {
+  get_date: string;
+  total_views: number;
+}

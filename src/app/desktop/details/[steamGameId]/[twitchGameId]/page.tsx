@@ -15,16 +15,16 @@ export default function Page({
   return (
     <div className="flex h-[92dvh]">
       <div className="w-1/4 bg-[#1b2838]">
-        <SimilarGames steamGameId={steamGameId} />
+        <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
       </div>
-      <div className="w-3/4 bg-[#2a475e] flex flex-col p-4">
+      <div className="w-3/4 bg-base-color flex flex-col p-4">
         <div className="basis-6/10 flex flex-row space-x-5">
           <div className="basis-1/2">
-            <GameTitle steamGameId={steamGameId} />
+            <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
             <div className="text-white">開発中</div>
           </div>
           <div className="basis-1/2">
-            <Match steamGameId={steamGameId} />
+            <Match steamGameId={steamGameId} twitchGameId={twitchGameId}/>
           </div>
         </div>
         <div className="basis-3/10 flex flex-row space-x-5">
@@ -32,7 +32,7 @@ export default function Page({
             <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
           </div>
           <div className="basis-1/3">
-            <DistributorVideos twitchGameId={twitchGameId} />
+            <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
           </div>
         </div>
       </div>

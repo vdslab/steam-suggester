@@ -1,8 +1,8 @@
-import { GameDetails } from "@/types/similarGames/GameDetails";
+import { SimilarGamePropsType } from "@/types/DetailsType";
 import Image from "next/image";
 import Link from "next/link";
 
-const DisplayGame = (props:GameDetails) => {
+const DisplayGame = (props:SimilarGamePropsType) => {
 
   const { name, image, url, steamGameId, twitchGameId } = props;
 

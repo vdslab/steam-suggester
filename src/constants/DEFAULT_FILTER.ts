@@ -1,3 +1,4 @@
+// フィルターの初期値
 export const DEFAULT_FILTER = {
   "id": "unique_id",
   "Categories": {
@@ -82,7 +83,8 @@ export const GENRE_MAPPING = {
   81: "ドキュメンタリー",
 };
 
-export const BUN_MAPPING = {
+// 使用しないフィルター
+export const BAN_MAPPING = {
   37: "無料プレイ",
   72: "Nudity",
   50: "Accounting",
@@ -92,3 +94,13 @@ export const BUN_MAPPING = {
   59: "Web publishing",
   84: "Tutorial"
 }
+
+export const MODE_MAPPING = {
+  isSinglePlayer: "シングルプレイヤー",
+  isMultiPlayer: "マルチプレイヤー"
+};
+
+export const DEVICE_MAPPING = {
+  windows: "windows",
+  mac: "mac"
+};

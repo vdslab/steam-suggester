@@ -2,12 +2,11 @@
 import { AreaStack } from '@visx/shape';
 import { SeriesPoint } from '@visx/shape/lib/types';
 import { scaleTime, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { CountSteamReviews } from '@/types/Popularity/CountSteamReviews';
-import { StackedAreasProps } from '@/types/Popularity/StackedAreaProps';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { BG_COLOR_STACKED_AREA } from '@/constants/STYLES';
 import { curveBasis } from 'd3-shape';
 import { formatDate, getFirstOfMonthTicks } from './FormatLabel';
+import { CountSteamReviews, StackedAreasProps } from '@/types/DetailsType';
 
 const getX = (d: CountSteamReviews) => d.date * 1000;
 const getY0 = (d: SeriesPoint<CountSteamReviews>) => d[0];

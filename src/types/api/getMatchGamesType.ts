@@ -1,4 +1,4 @@
-import { steamGameDeviceType} from "./steamDataType"
+import { SteamDeviceType } from "./getSteamDetailType"
 
 export type gameDetailType = {
   twitchGameId: string,
@@ -11,6 +11,6 @@ export type gameDetailType = {
     price: number,
     isSinglePlayer: boolean,
     isMultiPlayer: boolean,
-    device: steamGameDeviceType,
+    device: SteamDeviceType,
   }
 }

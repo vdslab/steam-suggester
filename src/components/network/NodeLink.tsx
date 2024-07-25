@@ -1,9 +1,9 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
 import * as d3 from 'd3';
 import Icon from "./Icon";
 import createNetwork from "@/hooks/createNetwork";
+import { Filter } from "@/types/api/FilterType";
 
 const ZoomableSVG = (props: any) => {
   const { children } = props;
@@ -34,7 +34,11 @@ const ZoomableSVG = (props: any) => {
   );
 };
 
-const NodeLink = (props: any) => {
+type Props = {
+  filter: Filter;
+};
+
+const NodeLink = (props: Props) => {
   const { filter } = props;
 
   const [nodes, setNodes] = useState<any>([]);
