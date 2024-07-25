@@ -49,15 +49,17 @@ const MatchIndicator = ( props:Props ) => {
       </div>
 
       <div className="mb-4">
-        <p className="text-lg">ジャンル一致度<span className="text-green-500 text-sm">(ユーザー選択は緑)</span></p>
+        <p className="text-lg">
+          ジャンル一致度
+        </p>
         <PercentBar baseStyle='bg-[#6496fa] rounded-t-lg' txtStyle='text-[#2f37b8]' percent={genreMatchPercentage} />
         
         <div className="w-full bg-gray-500 rounded-b-lg pt-0.5 pb-1 pl-2 pr-1 ">
           {data.genres.map((genre) => (
             <div
               key={genre.id}
-              className={`border border-solid border-gray-300 inline-block text-blue-100 rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-pointer border-b-4 ${
-                localFilter.Categories[genre.id] ? 'border-b-4 border-green-800' : ''
+              className={`border border-solid border-gray-400 inline-block text-blue-100 rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-pointer border-b-2 ${
+                localFilter.Categories[genre.id] ? 'border-green-500' : ''
               }`}
             >
               <small>{genre.description}</small>
@@ -79,8 +81,8 @@ const MatchIndicator = ( props:Props ) => {
                     }}></div>
                   
                   <LocalFilterPrice startPrice={localFilter.Price.startPrice} endPrice={localFilter.Price.endPrice} startPricePosition={startPricePosition} endPricePosition={endPricePosition} />
-                  <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-black"></div>
-                  <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5 bg-black"></div>
+                  {/* <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-green-500"></div> */}
+                  <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5"></div>
                   <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-orange-700`}>
                     {data.price.toLocaleString()}
                   </div>
