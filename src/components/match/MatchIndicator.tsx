@@ -45,21 +45,21 @@ const MatchIndicator = ( props:Props ) => {
     <div className='text-white'>
       <div className="mb-4">
         <p className="text-lg font-bold">全体の一致度</p>
-        <PercentBar baseStyle='bg-[#aa64fa] rounded-lg' txtStyle='text-[#8a00b8]' percent={overallMatchPercentage} />
+        <PercentBar baseStyle='bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 rounded-lg' txtStyle='text-blue-500' percent={overallMatchPercentage} />
       </div>
 
       <div className="mb-4">
         <p className="text-lg">
           ジャンル一致度
         </p>
-        <PercentBar baseStyle='bg-[#6496fa] rounded-t-lg' txtStyle='text-[#2f37b8]' percent={genreMatchPercentage} />
-        
-        <div className="w-full bg-gray-500 rounded-b-lg pt-0.5 pb-1 pl-2 pr-1 ">
+        <PercentBar baseStyle='bg-gradient-to-r from-blue-400 to-purple-400 rounded-t-lg' txtStyle='text-blue-500' percent={genreMatchPercentage} />
+        <div className="border-b border-blue-300"></div>
+        <div className="w-full bg-gray-400 rounded-b-lg pt-0.5 pb-1 pl-2 pr-1 ">
           {data.genres.map((genre) => (
             <div
               key={genre.id}
-              className={`border border-solid border-gray-400 inline-block text-blue-100 rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-pointer border-b-2 ${
-                localFilter.Categories[genre.id] ? 'border-green-500' : ''
+              className={`inline-block rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-normal border-2 ${
+                localFilter.Categories[genre.id] ? 'bg-blue-500 border-white text-white' : 'bg-gray-200 border-blue-500 text-blue-400'
               }`}
             >
               <small>{genre.description}</small>
@@ -75,7 +75,7 @@ const MatchIndicator = ( props:Props ) => {
               <div className="relative w-full h-8 bg-gray-200 rounded-lg mb-1 mt-4">
                 <div>
                   <div
-                    className={`absolute top-0 left-0 h-full rounded-lg bg-orange-400`}
+                    className={`absolute top-0 left-0 h-full rounded-lg bg-gradient-to-r from-blue-400 to-purple-400`}
                     style={{
                       width: `${priceBarPosition(data.price)}%`,
                     }}></div>
@@ -83,7 +83,7 @@ const MatchIndicator = ( props:Props ) => {
                   <LocalFilterPrice startPrice={localFilter.Price.startPrice} endPrice={localFilter.Price.endPrice} startPricePosition={startPricePosition} endPricePosition={endPricePosition} />
                   {/* <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-green-500"></div> */}
                   <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5"></div>
-                  <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-orange-700`}>
+                  <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-text`}>
                     {data.price.toLocaleString()}
                   </div>
                 </div>

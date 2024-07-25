@@ -87,13 +87,13 @@ const SelectParameter = (props: Props) => {
       <div className="p-2">
         <button
           onClick={() => handleAllCategories(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 mr-2"
+          className="bg-green-700 hover:bg-green-600 text-white rounded px-4 py-2 mr-2"
         >
           全選択
         </button>
         <button
           onClick={() => handleAllCategories(false)}
-          className="bg-red-600 hover:bg-red-500 text-white rounded px-4 py-2"
+          className="border border-green-600 text-green-600 hover:bg-sky-950 rounded px-4 py-2"
         >
           全解除
         </button>
