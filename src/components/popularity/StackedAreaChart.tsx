@@ -1,4 +1,4 @@
-
+'use client'
 import { AreaStack } from '@visx/shape';
 import { SeriesPoint } from '@visx/shape/lib/types';
 import { scaleTime, scaleLinear, scaleOrdinal } from '@visx/scale';
