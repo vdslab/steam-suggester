@@ -97,7 +97,7 @@ const MatchIndicator = ( props:Props ) => {
                 width: '100%',
               }}
             >
-              データがありません
+              0円
             </div>
           }
         </div>

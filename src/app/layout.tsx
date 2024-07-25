@@ -17,12 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
+      <head prefix="og: http://ogp.me/ns# website: http://ogp.me/ns/website#">
         <title>Steam Suggester</title>
         <meta name="description" content="Steam game suggestions based on trends" />
 
         {/* OGP */}
-        <head prefix="og: https://ogp.me/ns#"></head>
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Steam Suggester" />
         <meta property="og:description" content="TwitchとSteamを組み合わせたゲーム提案を可視化するウェブサイト。最適なゲーム体験を見つけよう！" />
