@@ -25,22 +25,22 @@ const LocalFilterPrice = (props:Props) => {
   return (
     <>
       <div
-        className="absolute top-0 transform -translate-x-1/2 h-full w-0.5 bg-green-800"
+        className="absolute top-0 transform -translate-x-1/2 h-full w-0.5 bg-blue-800"
         style={{ left: `${startPricePosition}%` }}
       >
         <span
-          className="absolute -top-5 mt-1 text-xs text-green-400"
+          className="absolute -top-5 mt-1 text-xs text-blue-500"
           style={startLabelStyle}
         >
           {startPrice.toLocaleString()}
         </span>
       </div>
       <div
-        className="absolute top-0 transform -translate-x-1/2 h-full w-0.5 bg-green-800"
+        className="absolute top-0 transform -translate-x-1/2 h-full w-0.5 bg-blue-800"
         style={{ left: `${endPricePosition}%` }}
       >
         <span
-          className="absolute -top-5 mt-1 text-xs text-green-400"
+          className="absolute -top-5 mt-1 text-xs text-blue-500"
           style={endLabelStyle}
         >
           {endPrice.toLocaleString()}
@@ -48,7 +48,7 @@ const LocalFilterPrice = (props:Props) => {
       </div>
 
       <div
-        className="absolute top-0 h-full bg-green-800/20"
+        className="absolute top-0 h-full bg-blue-800/20"
         style={{
           left: `${startPricePosition}%`,
           width: `${endPricePosition - startPricePosition}%`,
