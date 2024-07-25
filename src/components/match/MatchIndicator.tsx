@@ -101,9 +101,9 @@ const MatchIndicator = ( props:Props ) => {
 
       <div className="mb-4">
         <p>プレイモード</p>
-        <IsAbleBar isLeft={data.isSinglePlayer} isRight={data.isMultiPlayer} leftTxt='シングルプレイヤー' rightTxt='マルチプレイヤー' />
+        <IsAbleBar isLeft={data.isSinglePlayer} isRight={data.isMultiPlayer} isUserLeft={localFilter.Mode.isSinglePlayer} isUserRight={localFilter.Mode.isMultiPlayer} leftTxt='シングルプレイヤー' rightTxt='マルチプレイヤー' />
         <p className='mt-3'>対応デバイス</p>
-        <IsAbleBar isLeft={data.device.windows} isRight={data.device.mac} leftTxt='Windows' rightTxt='mac' />
+        <IsAbleBar isLeft={data.device.windows} isRight={data.device.mac} isUserLeft={localFilter.Device.windows} isUserRight={localFilter.Device.mac} leftTxt='Windows' rightTxt='mac' />
       </div>
     </div>
   );
