@@ -33,7 +33,7 @@ const FilterButtonGroup = (props:Props) => {
           {Object.keys(mapping).map((key: any) => {
             const flag = localFilter[title][key];
             return (
-              <div key={key} className={`w-1/${rowLevel} p-2`}>
+              <div key={key} className={`p-2`} style={{ width: `${100 / rowLevel}%` }}>
                 <button
                   onClick={() => handleChangeFilter(key)}
                   className={`
