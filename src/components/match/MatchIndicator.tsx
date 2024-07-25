@@ -88,7 +88,7 @@ const MatchIndicator = ( props:Props ) => {
             </div>
             ) : (
               <div
-                className="h-8 rounded-lg bg-gray-400 flex items-center justify-center text-lg font-bold text-white"
+                className="h-8 rounded-lg bg-gray-500 flex items-center justify-center text-lg font-bold text-white"
                 style={{
                   width: '100%',
                 }}
