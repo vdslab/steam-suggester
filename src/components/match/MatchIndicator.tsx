@@ -45,16 +45,16 @@ const MatchIndicator = ( props:Props ) => {
     <div className='text-white'>
       <div className="mb-4">
         <p className="text-lg font-bold">全体の一致度</p>
-        <PercentBar baseStyle='bg-match-all-bg rounded-lg' txtStyle='text-match-all' percent={overallMatchPercentage} />
+        <PercentBar baseStyle='bg-[#aa64fa] rounded-lg' txtStyle='text-[#8a00b8]' percent={overallMatchPercentage} />
       </div>
 
       <div className="mb-4">
         <p className="text-lg">ジャンル一致度</p>
-        <PercentBar baseStyle='bg-match-genre-bg rounded-t-lg' txtStyle='text-match-genre' percent={genreMatchPercentage} />
+        <PercentBar baseStyle='bg-[#6496fa] rounded-t-lg' txtStyle='text-[#2f37b8]' percent={genreMatchPercentage} />
         
-        <div className="w-full bg-gray-300 rounded-b-lg pt-0.5 pb-1 pl-2 pr-1 ">
+        <div className="w-full bg-gray-500 rounded-b-lg pt-0.5 pb-1 pl-2 pr-1 ">
           {data.genres.map((genre) => (
-            <div key={genre.id} className="inline-block bg-white text-gray-700 rounded-md px-2 py-0 my-0.5 cursor-pointer">
+            <div key={genre.id} className="border border-solid border-gray-300 inline-block text-blue-100 rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-pointer">
               <small>{genre.description}</small>
             </div>
           ))}
