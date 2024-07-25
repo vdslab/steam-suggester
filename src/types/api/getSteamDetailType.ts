@@ -8,6 +8,8 @@ export type SteamDetailsDataType = {
   name: string;
   image: string;
   url: string;
+  header_image: string;
+  short_description: string;
 }
 
 export type SteamDetailApiType = {
