@@ -32,6 +32,11 @@ export async function GET(req: Request, {params}: Params) {
     name: gameDetailData.name,
     image: gameDetailData.header_image,
     url: `https://store.steampowered.com/app/${steamGameId}`,
+
+    // 説明欄で使用
+    short_description: gameDetailData.short_description,
+    header_image: gameDetailData.header_image,
+    
   }
 
   return NextResponse.json(result);
