@@ -11,7 +11,7 @@ export const calcGenresPercentage = (filter: Filter, genres: SteamGenreType[]) =
     }
   });
 
-  return (genreCount / genres.length) * 100;
+  return parseFloat(((genreCount / genres.length) * 100).toFixed(1));
 }
 
 const calcPricePercentage = (filter: Filter, price: number) => {
