@@ -49,12 +49,17 @@ const MatchIndicator = ( props:Props ) => {
       </div>
 
       <div className="mb-4">
-        <p className="text-lg">ジャンル一致度</p>
+        <p className="text-lg">ジャンル一致度<span className="text-green-500 text-sm">(ユーザー選択は緑)</span></p>
         <PercentBar baseStyle='bg-[#6496fa] rounded-t-lg' txtStyle='text-[#2f37b8]' percent={genreMatchPercentage} />
         
         <div className="w-full bg-gray-500 rounded-b-lg pt-0.5 pb-1 pl-2 pr-1 ">
           {data.genres.map((genre) => (
-            <div key={genre.id} className="border border-solid border-gray-300 inline-block text-blue-100 rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-pointer">
+            <div
+              key={genre.id}
+              className={`border border-solid border-gray-300 inline-block text-blue-100 rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-pointer border-b-4 ${
+                localFilter.Categories[genre.id] ? 'border-b-4 border-green-800' : ''
+              }`}
+            >
               <small>{genre.description}</small>
             </div>
           ))}
