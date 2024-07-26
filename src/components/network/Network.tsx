@@ -10,10 +10,10 @@ const Network = () => {
 
   return (
     <div className="flex h-[92dvh] overflow-hidden">
-      <div className="w-1/4 bg-[#1b2838] overflow-y-auto overflow-x-hidden">
+      <div className="w-1/4 bg-stone-950 overflow-y-auto overflow-x-hidden">
         <SelectParameter filter={filter} setFilter={setFilter} />
       </div>
-      <div className="w-3/4 bg-[#2a475e] flex flex-col overflow-y-hidden overflow-x-hidden">
+      <div className="w-3/4 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
         <NodeLink filter={filter} />
       </div>
     </div>

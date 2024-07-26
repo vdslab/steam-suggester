@@ -9,22 +9,22 @@ type Props = {
   rightTxt: string,
 }
 
-const IsAbleBar = (props:Props) => {
-
+const IsAbleBar = (props: Props) => {
   const { isLeft, isRight, isUserRight, isUserLeft, leftTxt, rightTxt } = props;
 
+  const leftStyle = `${isLeft ? 'bg-green-300 text-gray-900' : 'bg-gray-400 text-gray-900'}`;
+  const rightStyle = `${isRight ? 'bg-green-300 text-gray-900' : 'bg-gray-400 text-gray-900'}`;
+
   return (
-    <div className="flex">
-      <span
-        className={`flex-1 px-2 py-1 cursor-default rounded text-center border-4  ${isUserLeft ? 'border-blue-500' : isLeft ? 'border-[#9684fc]' : 'border-blue-500'} ${isLeft ? 'bg-[#9684fc] text-blue-100' : 'bg-gray-400 text-blue-900'}`}>
+    <div className="flex h-7 flex-1">
+      <span className={`flex-1 rounded text-center ${leftStyle}`}>
         {leftTxt}
       </span>
-      <span
-        className={`flex-1 px-2 py-1 cursor-default rounded text-center border-4 ${isUserRight ? 'border-blue-500' : isRight ? 'border-[#9684fc]' : 'border-blue-500'} ${isRight ? 'bg-[#9684fc] text-blue-100' : 'bg-gray-400 text-blue-900'}`}>
+      <span className={`flex-1 rounded text-center ${rightStyle}`}>
         {rightTxt}
       </span>
     </div>
-  )
-}
+  );
+};
 
 export default IsAbleBar

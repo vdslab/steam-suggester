@@ -15,24 +15,24 @@ export default function Page({
 
   return (
     <div className="flex h-[92dvh]">
-      <div className="w-1/4 bg-[#1b2838]">
+      <div className="w-1/5 bg-stone-950">
         <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
       </div>
-      <div className="w-3/4 bg-base-color flex flex-col p-4">
+      <div className="w-4/5 bg-gray-900 flex flex-col p-4">
         <div className="basis-6/10 flex flex-row space-x-5">
-          <div className="basis-1/2">
+          <div className="basis-1/2 h-1/2">
             <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
             <GameExplanation steamGameId={steamGameId} twitchGameId={twitchGameId} />
           </div>
-          <div className="basis-1/2">
+          <div className="basis-1/2 h-1/2 select-none">
             <Match steamGameId={steamGameId} twitchGameId={twitchGameId}/>
           </div>
         </div>
         <div className="basis-3/10 flex flex-row space-x-5">
-          <div className="basis-2/3">
+          <div className="basis-2/3 h-1/2 select-none">
             <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
           </div>
-          <div className="basis-1/3">
+          <div className="basis-1/3 h-1/2">
             <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
           </div>
         </div>
