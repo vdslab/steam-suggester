@@ -14,7 +14,7 @@ export default function Page({
   const { steamGameId, twitchGameId } = params;
 
   return (
-    <div className="flex h-[92dvh]">
+    <div className="flex h-[92dvh] ">
       <div className="w-1/4 bg-stone-950">
         <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
       </div>
