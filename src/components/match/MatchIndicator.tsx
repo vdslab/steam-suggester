@@ -45,7 +45,7 @@ const MatchIndicator = ( props:Props ) => {
     <div className='text-white'>
       <div className="mb-3">
         <p className="text-lg">全体の一致度</p>
-        <PercentBar baseStyle='bg-cyan-300 rounded-lg' txtStyle='text-gray-600' percent={overallMatchPercentage} />
+        <PercentBar baseStyle='bg-cyan-300 rounded-lg' txtStyle='text-gray-600 text-xl' percent={overallMatchPercentage} />
       </div>
 
       <div className="mb-3">
@@ -83,7 +83,7 @@ const MatchIndicator = ( props:Props ) => {
                   <LocalFilterPrice startPrice={localFilter.Price.startPrice} endPrice={localFilter.Price.endPrice} startPricePosition={startPricePosition} endPricePosition={endPricePosition} />
                   <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5"></div>
                   <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-gray-600`}>
-                    {data.price.toLocaleString()}
+                    ¥{data.price.toLocaleString()}
                   </div>
                 </div>
               </div>
