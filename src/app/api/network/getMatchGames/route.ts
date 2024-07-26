@@ -1,65 +1,56 @@
 import { PG_POOL } from "@/constants/PG_POOL";
-import { steamGameCategoryType } from "@/types/api/steamDataType";
+import { gameDetailType } from "@/types/api/getMatchGamesType";
+import { SteamCategoryType } from "@/types/api/getSteamDetailType";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-
   try {
-
     const today = new Date();
-    today.setDate(today.getDate() -1);
+    today.setDate(today.getDate() - 2);
     const dateString = today.toISOString().split('T')[0];
 
     const query = `
-      SELECT get_date, game_title, twitch_id, steam_id, total_views
-      FROM game_views
-      WHERE get_date::date = $1
+      SELECT gv.get_date, gv.game_title, gv.twitch_id, gv.steam_id, gv.total_views,
+             sd.game_title as name, sd.img_url as image, sd.price,
+             sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
+             array_agg(json_build_object('id', g.genre_id, 'description', g.genre_name)) as genres
+      FROM game_views gv
+      JOIN steam_data sd ON gv.steam_id = sd.steam_game_id
+      LEFT JOIN steam_data_genres sdg ON sd.steam_game_id = sdg.steam_game_id
+      LEFT JOIN genres g ON sdg.genre_id = g.genre_id
+      WHERE gv.get_date::date = $1
+      GROUP BY gv.get_date, gv.game_title, gv.twitch_id, gv.steam_id,
+               sd.game_title, sd.img_url, sd.price, sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac
     `;
+
     const { rows } = await PG_POOL.query(query, [dateString]);
 
     const data = rows
-                        .sort((a, b) => b.total_views - a.total_views)
-                        .slice(0, 120)
-                        .filter((item, index, self) => (
-                          index === self.findIndex((t) => (
-                            t.steam_id === item.steam_id
-                          ))
-                        ));
+      .sort((a, b) => b.total_views - a.total_views)
+      .slice(0, 120)
+      .filter((item, index, self) => (
+        index === self.findIndex((t) => (
+          t.steam_id === item.steam_id
+        ))
+      ));
 
-    const result = [];
-    for(let i = 0; i < data.length; i += 1) {
-
-      const twitchGameId = data[i].twitch_id;
-      const steamGameId = data[i].steam_id;
-
-
-      const response = await fetch(`https://store.steampowered.com/api/appdetails?appids=${steamGameId}&cc=jp`);
-      const responseJson = await response.json();
-      if (!responseJson[steamGameId].success) {
-        console.error('Failed to fetch game detail data:', steamGameId);
-        continue;
-      }
-      const gameDetailData = responseJson[steamGameId].data
-
-      result.push({
-        twitchGameId: twitchGameId,
-        steamGameId: steamGameId,
-        title: gameDetailData.name,
-        imgURL: gameDetailData.header_image,
-        gameData: {
-          genres: gameDetailData.genres,
-          price: gameDetailData.price_overview ? gameDetailData.price_overview.final : 0,
-          isSinglePlayer: gameDetailData.categories.some((category: steamGameCategoryType) => category.id === 2),
-          isMultiPlayer: gameDetailData.categories.some((category: steamGameCategoryType) => category.id === 1),
-          platforms: {
-            windows: gameDetailData.platforms.windows,
-            mac: gameDetailData.platforms.mac,
-            linux: gameDetailData.platforms.linux
-          }
+    const result: gameDetailType[] = data.map(item => ({
+      twitchGameId: item.twitch_id,
+      steamGameId: item.steam_id,
+      title: item.name,
+      imgURL: item.image,
+      totalViews: item.total_views,
+      gameData: {
+        genres: item.genres,
+        price: item.price,
+        isSinglePlayer: item.is_single_player,
+        isMultiPlayer: item.is_multi_player,
+        device: {
+          windows: item.is_device_windows,
+          mac: item.is_device_mac,
         }
-      })
-    }
-    
+      }
+    }));
 
     return NextResponse.json(result);
 

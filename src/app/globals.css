@@ -2,29 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
   }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
 }
 
 @layer utilities {
@@ -34,20 +23,15 @@ body {
 }
 
 /* スクロールバーデザイン */
-::-webkit-scrollbar {width: 10px;}
-::-webkit-scrollbar-track {background: #f1f1f1;}
-::-webkit-scrollbar-thumb {background-color: #888;}
-::-webkit-scrollbar-thumb:hover {background-color: #555;}
-
-.match-genre-bgcolor{
-  background-color: rgb(100 150 250);
+::-webkit-scrollbar {
+  width: 10px;
 }
-.match-genre-color{
-  color: rgb(0 55 184);
+::-webkit-scrollbar-track {
+  background: #636363;
 }
-.match-all-bgcolor{
-  background-color: rgb(170, 100, 250);
+::-webkit-scrollbar-thumb {
+  background-color: #ababab;
 }
-.match-all-color{
-  color: rgb(138, 0, 184);
+::-webkit-scrollbar-thumb:hover {
+  background-color: #dbdbdb;
 }

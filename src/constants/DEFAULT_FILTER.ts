@@ -1,3 +1,4 @@
+// フィルターの初期値
 export const DEFAULT_FILTER = {
   "id": "unique_id",
   "Categories": {
@@ -32,26 +33,16 @@ export const DEFAULT_FILTER = {
       "84": true
   },
   "Price": {
-      "0": true,
-      "1": true,
-      "2": true,
-      "3": true,
-      "4": true,
-      "5": true,
-      "6": true,
-      "7": true,
-      "8": true,
-      "9": true,
-      "10": true,
-      "11": true
+    "startPrice": 0,
+    "endPrice": 10000
   },
-  "Platforms": {
-      "1": true,
-      "2": true
+  "Mode": {
+      "isSinglePlayer": true,
+      "isMultiPlayer": true
   },
-  "device": {
-      "1": true,
-      "2": true
+  "Device": {
+      "windows": true,
+      "mac": true
   },
   "Playtime": {
       "1": true,
@@ -66,3 +57,50 @@ export const DEFAULT_FILTER = {
       "10": true
   }
 }
+
+// マッピングデータ
+export const GENRE_MAPPING = {
+  1: "アクション",
+  2: "ストラテジー",
+  3: "RPG",
+  4: "カジュアル",
+  9: "レース",
+  18: "スポーツ",
+  23: "インディー",
+  25: "アドベンチャー",
+  28: "シミュレーション",
+  29: "MMO",
+  51: "アニメーション",
+  52: "音楽",
+  53: "デザイン",
+  54: "教育",
+  56: "トレーニング",
+  60: "開発",
+  70: "早期アクセス",
+  71: "18＋",
+  73: "暴力",
+  74: "流血表現",
+  81: "ドキュメンタリー",
+};
+
+// 使用しないフィルター
+export const BAN_MAPPING = {
+  37: "無料プレイ",
+  72: "Nudity",
+  50: "Accounting",
+  55: "写真編集",
+  57: "ユーティリティ",
+  58: "Video Production",
+  59: "Web publishing",
+  84: "Tutorial"
+}
+
+export const MODE_MAPPING = {
+  isSinglePlayer: "シングルプレイヤー",
+  isMultiPlayer: "マルチプレイヤー"
+};
+
+export const DEVICE_MAPPING = {
+  windows: "windows",
+  mac: "mac"
+};

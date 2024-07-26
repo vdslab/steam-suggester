@@ -1,7 +1,11 @@
+import HomeHeader from "@/components/common/HomeHeader";
 import Network from "@/components/network/Network";
 
 export default async function Page() {
   return (
-    <Network />
+    <>
+      <HomeHeader />
+      <Network />
+    </>
   );
 }

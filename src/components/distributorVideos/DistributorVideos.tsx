@@ -1,29 +1,28 @@
-import Headline from "../common/Headline"
-import DisplayClip from "./DisplayClip"
+import { TwitchClipType } from "@/types/api/getTwitchClipType";
+import Headline from "../common/Headline";
+import ClipSlideshow from "./ClipSlideshow";
+import { DetailsPropsType } from "@/types/DetailsType";
+import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 
-const DistributorVideos = async({twitchGameId}:{twitchGameId:string}) => {
+const DistributorVideos = async (props: DetailsPropsType) => {
 
+  const { twitchGameId } = props;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchClips/${twitchGameId}`)
-  const data = await res.json()
-
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchClips/${twitchGameId}`,
+    { next: { revalidate: ISR_FETCH_INTERVAL } }
+  );
+  const data: TwitchClipType[] = await res.json();
 
   return (
     <div>
-      <Headline txt='関連配信者リスト' />
-      <div className="flex flex-row space-x-5">
-        {data.map((clip: any) => (
-          <DisplayClip
-            key={clip.id}
-            id={clip.id}
-            url={clip.url}
-            embedUrl={clip.embedUrl}
-            image={clip.image}
-            title={clip.title}/>
-        ))}
-      </div>
+      <Headline txt='配信者クリップ' />
+      {data.length === 0 ? (<div className="text-white">直近の配信者のクリップがありません</div>) :
+        <div className="relative flex items-center justify-center">
+          <ClipSlideshow data={data} />
+        </div>}
     </div>
-  )
-}
+  );
+};
 
-export default DistributorVideos
+export default DistributorVideos;

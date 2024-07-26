@@ -1,0 +1,1 @@
+export const ISR_FETCH_INTERVAL = 86400
