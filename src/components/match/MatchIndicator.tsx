@@ -1,5 +1,5 @@
 "use client"; 
-import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
+import { DEFAULT_FILTER, GENRE_MAPPING } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
 import { Filter } from '@/types/api/FilterType';
 import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
@@ -36,9 +36,6 @@ const MatchIndicator = ( props:Props ) => {
     const adjustedPrice = Math.min(price, maxPrice);
     return (adjustedPrice / maxPrice) * 100;
   };
-
-  const startPricePosition = priceBarPosition(localFilter.Price.startPrice);
-  const endPricePosition = priceBarPosition(localFilter.Price.endPrice);
 
 
   return (
@@ -91,6 +88,7 @@ const MatchIndicator = ( props:Props ) => {
             </div>
           )
         }
+
       </div>
 
       <div className="mb-3 select-none">
@@ -104,6 +102,44 @@ const MatchIndicator = ( props:Props ) => {
           <IsAbleBar isLeft={data.device.windows} isRight={data.device.mac} isUserLeft={localFilter.Device.windows} isUserRight={localFilter.Device.mac} leftTxt='Windows' rightTxt='mac' />
         </div>
       </div>
+
+      <div className='text-sm pt-3'>ユーザが選択した項目</div>
+      <div className='border border-gray-500 flex p-2 flex-wrap'>
+        {data.genres.map((genre: SteamGenreType) => (
+          <div key={genre.id} className='bg-yellow-300 rounded-sm m-1'>
+            <p className='text-center m-1 text-xs text-gray-900'>{genre.description}</p>
+          </div>
+        ))}
+        <div className='bg-rose-400 rounded-sm m-1'>
+          <p className='text-center m-1 text-xs text-gray-900'>{localFilter.Price.startPrice}円 ~ {localFilter.Price.endPrice}円</p>
+        </div>
+
+        {(localFilter.Mode.isSinglePlayer) && (
+          <div className='bg-green-400 rounded-sm m-1'>
+            <p className='text-center m-1 text-xs text-gray-900'>シングルプレイヤー</p>
+          </div>
+        )}
+          
+          {(localFilter.Mode.isMultiPlayer) && (
+            <div className='bg-green-400 rounded-sm m-1'>
+              <p className='text-center m-1 text-xs text-gray-900'>マルチプレイヤー</p>
+            </div>
+          )}
+
+          {(localFilter.Device.windows) && (
+            <div className='bg-green-400 rounded-sm m-1'>
+              <p className='text-center m-1 text-xs text-gray-900'>Windows</p>
+            </div>
+          )}
+
+          {(localFilter.Device.mac) && (
+            <div className='bg-green-400 rounded-sm m-1'>
+              <p className='text-center m-1 text-xs text-gray-900'>Mac</p>
+            </div>
+          )}
+
+      </div>
+
     </div>
   );
 };

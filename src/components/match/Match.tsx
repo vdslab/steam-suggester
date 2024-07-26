@@ -20,10 +20,10 @@ const Match = async(props:DetailsPropsType) => {
   return (
     <div className="select-none">
       <div className="flex justify-between">
-        <Headline txt='フィルター項目との一致度'/>
+        <Headline txt='ユーザ選択との一致度'/>
         <Link href="/" className="inline-block px-2 py-1 text-white rounded-lg hover:underline">
           <FindReplaceIcon className="text-xl m-2" />
-          フィルターを変更する
+          ユーザ選択を変更する
         </Link>
       </div>
 

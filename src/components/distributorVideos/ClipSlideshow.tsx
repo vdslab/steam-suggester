@@ -35,7 +35,7 @@ const ClipSlideshow = (props: Props) => {
       <div className="relative flex items-center justify-center">
         <button
           onClick={prevSlide}
-          className={`absolute left-0 z-10 ${currentSlide === 0 ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
+          className={`absolute -left-2 z-10 ${currentSlide === 0 ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}`}
           disabled={currentSlide === 0}
         >
           <ArrowBackIosNewIcon sx={{ fill: "white" }} />
@@ -43,7 +43,7 @@ const ClipSlideshow = (props: Props) => {
         <DisplayClip {...data[currentSlide]} />
         <button
           onClick={nextSlide}
-          className={`absolute right-0 z-10 ${currentSlide === data.length - 1 ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
+          className={`absolute -right-2 z-10 ${currentSlide === data.length - 1 ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}`}
           disabled={currentSlide === data.length - 1}
         >
           <ArrowForwardIosIcon sx={{ fill: "white" }} />
@@ -51,7 +51,7 @@ const ClipSlideshow = (props: Props) => {
       </div>
 
       <a
-        className="text-white w-64 mx-auto block text-center mt-2"
+        className="text-white w-64 mx-auto block text-center mt-2 truncate"
         href={data[currentSlide].url} target="_blank"
         rel="noopener noreferrer"
       >
