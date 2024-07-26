@@ -45,14 +45,14 @@ const MatchIndicator = ( props:Props ) => {
     <div className='text-white'>
       <div className="mb-4">
         <p className="text-lg font-bold">全体の一致度</p>
-        <PercentBar baseStyle='bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 rounded-lg' txtStyle='text-blue-500' percent={overallMatchPercentage} />
+        <PercentBar baseStyle='bg-cyan-300 rounded-lg' txtStyle='text-gray-600' percent={overallMatchPercentage} />
       </div>
 
       <div className="mb-4">
         <p className="text-lg">
           ジャンル一致度
         </p>
-        <PercentBar baseStyle='bg-gradient-to-r from-blue-400 to-purple-400 rounded-t-lg' txtStyle='text-blue-500' percent={genreMatchPercentage} />
+        <PercentBar baseStyle='bg-yellow-300 rounded-t-lg' txtStyle='text-gray-600' percent={genreMatchPercentage} />
         <div className="border-b border-blue-300"></div>
         <div className="w-full bg-gray-400 rounded-b-lg pt-0.5 pb-1 pl-2 pr-1 ">
           {data.genres.map((genre) => (
@@ -75,15 +75,14 @@ const MatchIndicator = ( props:Props ) => {
               <div className="relative w-full h-8 bg-gray-200 rounded-lg mb-1 mt-4">
                 <div>
                   <div
-                    className={`absolute top-0 left-0 h-full rounded-lg bg-gradient-to-r from-blue-400 to-purple-400`}
+                    className={`absolute top-0 left-0 h-full rounded-lg bg-rose-400`}
                     style={{
                       width: `${priceBarPosition(data.price)}%`,
                     }}></div>
                   
                   <LocalFilterPrice startPrice={localFilter.Price.startPrice} endPrice={localFilter.Price.endPrice} startPricePosition={startPricePosition} endPricePosition={endPricePosition} />
-                  {/* <div className="absolute top-0 left-0 transform -translate-x-1/2 h-full w-0.5 bg-green-500"></div> */}
                   <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5"></div>
-                  <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-text`}>
+                  <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-gray-600`}>
                     {data.price.toLocaleString()}
                   </div>
                 </div>

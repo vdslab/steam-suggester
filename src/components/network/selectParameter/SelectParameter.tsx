@@ -83,7 +83,7 @@ const SelectParameter = (props: Props) => {
 
   return (
     <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px'}}>
-      <FilterHeadline title="カテゴリー"/>
+      <FilterHeadline title="ジャンル"/>
       <div className="p-2">
         <button
           onClick={() => handleAllCategories(true)}
