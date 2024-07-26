@@ -14,7 +14,7 @@ const GameTitle = async (props: DetailsPropsType) => {
 
 
   return (
-    <Link href={`https://store.steampowered.com/app/${steamGameId}/`} target="_blank" rel="noopener noreferrer" className="text-5xl font-semibold mb-4 text-white flex justify-center">
+    <Link href={`https://store.steampowered.com/app/${steamGameId}/`} target="_blank" rel="noopener noreferrer" className="text-5xl font-semibold mb-4 text-white flex justify-center hover:underline">
       {data.title}
       <OpenInNewIcon className="text-3xl ml-2 mt-3" />
     </Link>

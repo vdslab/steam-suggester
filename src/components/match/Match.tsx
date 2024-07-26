@@ -4,6 +4,7 @@ import { DetailsPropsType } from "@/types/DetailsType";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import Link from "next/link";
+import FindReplaceIcon from '@mui/icons-material/FindReplace';
 
 const Match = async(props:DetailsPropsType) => {
 
@@ -17,15 +18,16 @@ const Match = async(props:DetailsPropsType) => {
   const data:SteamDetailsDataType = await res.json();
 
   return (
-    <div>
-      <Headline txt='フィルター項目との一致度'/>
-      <MatchIndicator data={data} />
-      <p className="text-blue-500 text-right">※青はフィルター項目によるもの</p>
-      <p className="text-blue-500 text-right">
-        <Link href="/" className="inline-block px-2 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors">
+    <div className="select-none">
+      <div className="flex justify-between">
+        <Headline txt='フィルター項目との一致度'/>
+        <Link href="/" className="inline-block px-2 py-1 text-white rounded-lg hover:underline">
+          <FindReplaceIcon className="text-xl m-2" />
           フィルターを変更する
         </Link>
-      </p>
+      </div>
+
+      <MatchIndicator data={data} />
     </div>
   )
 }

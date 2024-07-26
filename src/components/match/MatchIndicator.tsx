@@ -43,73 +43,76 @@ const MatchIndicator = ( props:Props ) => {
 
   return (
     <div className='text-white'>
-      <div className="mb-3">
-        <p className="text-lg">全体の一致度</p>
-        <PercentBar baseStyle='bg-cyan-300 rounded-lg' txtStyle='text-gray-600 text-xl' percent={overallMatchPercentage} />
+      <div className="mb-3 flex">
+        <p className="text-lg w-1/3">全体の一致度:</p>
+        <PercentBar baseStyle='bg-cyan-300 rounded-lg' txtStyle='text-gray-600' percent={overallMatchPercentage} />
       </div>
 
-      <div className="mb-3">
-        <p className="text-lg">
-          ジャンル一致度
-        </p>
-        <PercentBar baseStyle='bg-yellow-300 rounded-t-lg' txtStyle='text-gray-600' percent={genreMatchPercentage} />
-        <div className="border-b border-blue-300"></div>
-        <div className="w-full bg-gray-400 rounded-b-lg py-0.5 pl-2 pr-1 ">
+      <div className="mb-3 flex">
+        <p className="text-lg w-1/3">ジャンル一致度:</p>
+        <PercentBar baseStyle='bg-yellow-300 rounded-lg' txtStyle='text-gray-600' percent={genreMatchPercentage} />
+        {/* <div className="border-b border-blue-300"></div> */}
+        {/* <div className="w-full bg-gray-400 rounded-b-lg pl-2 pr-1 h-7 ">
           {data.genres.map((genre) => (
             <div
               key={genre.id}
-              className={`inline-block rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-normal border-2 ${
+              className={`inline-block rounded-md px-2 py-0 my-0.5 mx-0.5 border-2 ${
                 localFilter.Categories[genre.id] ? 'bg-blue-500 border-white text-white' : 'bg-gray-200 border-blue-500 text-blue-400 font-bold'
               }`}
             >
-              <small>{genre.description}</small>
+              <p className='h-1'>{genre.description}</p>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
 
-      <div className="mb-3">
-        <p>価格(円)</p>
-          {data.price != 0 ? (
-            <div>
-              <div className="relative w-full h-8 bg-gray-200 rounded-lg mb-1 mt-4">
-                <div>
-                  <div
-                    className={`absolute top-0 left-0 h-full rounded-lg bg-rose-400`}
-                    style={{
-                      width: `${priceBarPosition(data.price)}%`,
-                    }}></div>
-                  
-                  <LocalFilterPrice startPrice={localFilter.Price.startPrice} endPrice={localFilter.Price.endPrice} startPricePosition={startPricePosition} endPricePosition={endPricePosition} />
-                  <div className="absolute top-0 right-0 transform translate-x-1/2 h-full w-0.5"></div>
-                  <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-gray-600`}>
-                    ¥{data.price.toLocaleString()}
-                  </div>
+      <div className="flex mb-3">
+        <p className='select-none w-1/4'>価格(円):</p>
+        {data.price != 0 ? (
+          <div className='flex-1'>
+            <div className="relative h-5 bg-gray-200 rounded-lg">
+              <div>
+                <div
+                  className={`absolute top-0 left-0 h-full rounded-lg bg-rose-400`}
+                  style={{
+                    width: `${priceBarPosition(data.price)}%`,
+                  }}></div>
+                
+                <LocalFilterPrice startPrice={localFilter.Price.startPrice} endPrice={localFilter.Price.endPrice} startPricePosition={startPricePosition} endPricePosition={endPricePosition} />
+                <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-gray-600`}>
+                  ¥{data.price.toLocaleString()}
                 </div>
               </div>
-              <div className="flex justify-between text-xs">
-                <span>0</span>
-                <span>10,000</span>
-              </div>
             </div>
-            ) : (
-              <div
-                className="h-8 rounded-lg bg-gray-500 flex items-center justify-center text-lg font-bold text-white"
-                style={{
-                  width: '100%',
-                }}
-              >
-                無料
-              </div>
-            )
-          }
+            {/* bottomの目盛り */}
+            <div className="flex justify-between text-xs">
+              <span>0</span>
+              <span>10,000</span>
+            </div>
+          </div>
+          ) : (
+            <div
+              className="h-5 rounded-lg bg-gray-500 flex items-center justify-center font-bold text-white"
+              style={{
+                width: '100%',
+              }}
+            >
+              無料
+            </div>
+          )
+        }
       </div>
 
-      <div className="mb-3">
-        <p>プレイモード</p>
+      <div className="mb-3 select-none">
+        <div className='flex'>
+        <p className='w-1/4'>プレイモード</p>
         <IsAbleBar isLeft={data.isSinglePlayer} isRight={data.isMultiPlayer} isUserLeft={localFilter.Mode.isSinglePlayer} isUserRight={localFilter.Mode.isMultiPlayer} leftTxt='シングルプレイヤー' rightTxt='マルチプレイヤー' />
-        <p className='mt-3'>対応デバイス</p>
-        <IsAbleBar isLeft={data.device.windows} isRight={data.device.mac} isUserLeft={localFilter.Device.windows} isUserRight={localFilter.Device.mac} leftTxt='Windows' rightTxt='mac' />
+        </div>
+        
+        <div className='flex mt-3'>
+          <p className='w-1/4'>対応デバイス</p>
+          <IsAbleBar isLeft={data.device.windows} isRight={data.device.mac} isUserLeft={localFilter.Device.windows} isUserRight={localFilter.Device.mac} leftTxt='Windows' rightTxt='mac' />
+        </div>
       </div>
     </div>
   );
