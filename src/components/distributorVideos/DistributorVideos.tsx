@@ -15,10 +15,10 @@ const DistributorVideos = async (props: DetailsPropsType) => {
   const data: TwitchClipType[] = await res.json();
 
   return (
-    <div>
+    <div className="ml-[15%]">
       <Headline txt='配信者クリップ' />
       {data.length === 0 ? (<div className="text-white">直近の配信者のクリップがありません</div>) :
-        <div className="relative flex items-center justify-center">
+        <div className="relative w-[90%] mt-[8%]">
           <ClipSlideshow data={data} />
         </div>}
     </div>

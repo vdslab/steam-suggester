@@ -16,7 +16,7 @@ const IsAbleBar = (props: Props) => {
   const rightStyle = `${isRight ? 'bg-green-300 text-gray-900' : 'bg-gray-400 text-gray-900'}`;
 
   return (
-    <div className="flex h-6 flex-1">
+    <div className="flex h-[2.5vh] flex-1">
       <span className={`flex-1 rounded text-center ${leftStyle}`}>
         {leftTxt}
       </span>

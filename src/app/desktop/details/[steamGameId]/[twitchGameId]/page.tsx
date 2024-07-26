@@ -23,19 +23,19 @@ export default function Page({
         </div>
         <div className="w-4/5 bg-gray-900 flex flex-col p-4">
           <div className="basis-6/10 flex flex-row space-x-5">
-            <div className="basis-1/2 h-1/2">
+            <div className="basis-1/2 h-[45vh]">
               <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
               <GameExplanation steamGameId={steamGameId} twitchGameId={twitchGameId} />
             </div>
-            <div className="basis-1/2 h-1/2 select-none">
+            <div className="basis-1/2 h-[45vh] select-none">
               <Match steamGameId={steamGameId} twitchGameId={twitchGameId}/>
             </div>
           </div>
           <div className="basis-3/10 flex flex-row space-x-5">
-            <div className="basis-2/3 h-1/2 select-none">
+            <div className="basis-3/5 select-none">
               <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
             </div>
-            <div className="basis-1/3 h-1/2">
+            <div className="basis-2/5">
               <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
             </div>
           </div>
