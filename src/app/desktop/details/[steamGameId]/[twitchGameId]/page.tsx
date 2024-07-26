@@ -24,12 +24,12 @@ export default function Page({
             <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
             <GameExplanation steamGameId={steamGameId} twitchGameId={twitchGameId} />
           </div>
-          <div className="basis-1/2 h-1/2">
+          <div className="basis-1/2 h-1/2 select-none">
             <Match steamGameId={steamGameId} twitchGameId={twitchGameId}/>
           </div>
         </div>
         <div className="basis-3/10 flex flex-row space-x-5">
-          <div className="basis-2/3 h-1/2">
+          <div className="basis-2/3 h-1/2 select-none">
             <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
           </div>
           <div className="basis-1/3 h-1/2">
