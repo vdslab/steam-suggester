@@ -43,23 +43,23 @@ const MatchIndicator = ( props:Props ) => {
 
   return (
     <div className='text-white'>
-      <div className="mb-4">
-        <p className="text-lg font-bold">全体の一致度</p>
+      <div className="mb-3">
+        <p className="text-lg">全体の一致度</p>
         <PercentBar baseStyle='bg-cyan-300 rounded-lg' txtStyle='text-gray-600' percent={overallMatchPercentage} />
       </div>
 
-      <div className="mb-4">
+      <div className="mb-3">
         <p className="text-lg">
           ジャンル一致度
         </p>
         <PercentBar baseStyle='bg-yellow-300 rounded-t-lg' txtStyle='text-gray-600' percent={genreMatchPercentage} />
         <div className="border-b border-blue-300"></div>
-        <div className="w-full bg-gray-400 rounded-b-lg pt-0.5 pb-1 pl-2 pr-1 ">
+        <div className="w-full bg-gray-400 rounded-b-lg py-0.5 pl-2 pr-1 ">
           {data.genres.map((genre) => (
             <div
               key={genre.id}
               className={`inline-block rounded-md px-2 py-0 my-0.5 mx-0.5 cursor-normal border-2 ${
-                localFilter.Categories[genre.id] ? 'bg-blue-500 border-white text-white' : 'bg-gray-200 border-blue-500 text-blue-400'
+                localFilter.Categories[genre.id] ? 'bg-blue-500 border-white text-white' : 'bg-gray-200 border-blue-500 text-blue-400 font-bold'
               }`}
             >
               <small>{genre.description}</small>
@@ -68,7 +68,7 @@ const MatchIndicator = ( props:Props ) => {
         </div>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-3">
         <p>価格(円)</p>
           {data.price != 0 ? (
             <div>
@@ -105,7 +105,7 @@ const MatchIndicator = ( props:Props ) => {
           }
       </div>
 
-      <div className="mb-4">
+      <div className="mb-3">
         <p>プレイモード</p>
         <IsAbleBar isLeft={data.isSinglePlayer} isRight={data.isMultiPlayer} isUserLeft={localFilter.Mode.isSinglePlayer} isUserRight={localFilter.Mode.isMultiPlayer} leftTxt='シングルプレイヤー' rightTxt='マルチプレイヤー' />
         <p className='mt-3'>対応デバイス</p>

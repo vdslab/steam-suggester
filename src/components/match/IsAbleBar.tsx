@@ -20,7 +20,7 @@ const IsAbleBar = (props: Props) => {
       <span className={`flex-1 px-2 py-2 rounded text-center ${leftStyle}`}>
         {leftTxt}
       </span>
-      <span className={`flex-1 px-2 py-1 rounded text-center ${rightStyle}`}>
+      <span className={`flex-1 px-2 py-2 rounded text-center ${rightStyle}`}>
         {rightTxt}
       </span>
     </div>
