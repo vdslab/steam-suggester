@@ -51,23 +51,14 @@ const MatchIndicator = ( props:Props ) => {
       <div className="mb-3 flex">
         <p className="text-lg w-1/3">ジャンル一致度:</p>
         <PercentBar baseStyle='bg-yellow-300 rounded-lg' txtStyle='text-gray-600' percent={genreMatchPercentage} />
-        {/* <div className="border-b border-blue-300"></div> */}
-        {/* <div className="w-full bg-gray-400 rounded-b-lg pl-2 pr-1 h-7 ">
-          {data.genres.map((genre) => (
-            <div
-              key={genre.id}
-              className={`inline-block rounded-md px-2 py-0 my-0.5 mx-0.5 border-2 ${
-                localFilter.Categories[genre.id] ? 'bg-blue-500 border-white text-white' : 'bg-gray-200 border-blue-500 text-blue-400 font-bold'
-              }`}
-            >
-              <p className='h-1'>{genre.description}</p>
-            </div>
-          ))}
-        </div> */}
       </div>
 
       <div className="flex mb-3">
-        <p className='select-none w-1/4'>価格(円):</p>
+        {data.price != 0 ? (
+          <p className='select-none w-1/4'>価格(円):</p>
+        ) : (
+          <p className='select-none w-1/3'>価格(円):</p>
+        )}
         {data.price != 0 ? (
           <div className='flex-1'>
             <div className="relative h-5 bg-gray-200 rounded-lg">
@@ -78,7 +69,6 @@ const MatchIndicator = ( props:Props ) => {
                     width: `${priceBarPosition(data.price)}%`,
                   }}></div>
                 
-                <LocalFilterPrice startPrice={localFilter.Price.startPrice} endPrice={localFilter.Price.endPrice} startPricePosition={startPricePosition} endPricePosition={endPricePosition} />
                 <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-gray-600`}>
                   ¥{data.price.toLocaleString()}
                 </div>
