@@ -2,10 +2,9 @@
 import { DEFAULT_FILTER, GENRE_MAPPING } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
 import { Filter } from '@/types/api/FilterType';
-import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
-import React, { useState, useEffect, use } from 'react';
+import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
+import { useState, useEffect,  } from 'react';
 import { calcAllMatchPercentage, calcGenresPercentage } from '../common/CalcMatch';
-import LocalFilterPrice from './LocalFilterPrice';
 import IsAbleBar from './IsAbleBar';
 import PercentBar from './PercentBar';
 
@@ -45,9 +44,16 @@ const MatchIndicator = ( props:Props ) => {
         <PercentBar baseStyle='bg-cyan-300 rounded-lg' txtStyle='text-gray-600' percent={overallMatchPercentage} />
       </div>
 
-      <div className="mb-[2vh] flex">
+      <div className="mb-[vh] flex">
         <div className="text-lg w-1/3">ジャンル一致度:</div>
         <PercentBar baseStyle='bg-yellow-300 rounded-lg' txtStyle='text-gray-600' percent={genreMatchPercentage} />
+      </div>
+      <div className="mb-[2vh] flex">
+        <div className="text-sm w-1/4">（ジャンル）</div>
+        {data.genres.map((genre: SteamGenreType, index:number) => (
+            genre.id in GENRE_MAPPING &&
+            <div key={genre.id} className='text-center m-1 text-xs text-yellow-300'>{index !== 0 ? ', ' : ''}{genre.description}</div>
+        ))}
       </div>
 
       <div className="flex mb-[2vh]">
@@ -106,6 +112,7 @@ const MatchIndicator = ( props:Props ) => {
       <div className='pt-[3vh]'>ユーザが選択した項目</div>
       <div className='border border-gray-500 flex p-2 flex-wrap'>
         {data.genres.map((genre: SteamGenreType) => (
+          genre.id in GENRE_MAPPING &&
           <div key={genre.id} className='bg-yellow-300 rounded-sm m-1'>
             <div className='text-center m-1 text-xs text-gray-900'>{genre.description}</div>
           </div>
