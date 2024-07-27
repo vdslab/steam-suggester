@@ -40,7 +40,7 @@ const DisplayClip = (props: TwitchClipType) => {
               onClick={onHandleClose}
             />
             <iframe
-              src={`${embedUrl}`}
+              src={`${embedUrl}&output=embed`}
               width='800'
               height='600'
               allowFullScreen
