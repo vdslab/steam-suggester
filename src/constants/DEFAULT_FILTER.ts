@@ -1,6 +1,5 @@
 // フィルターの初期値
 export const DEFAULT_FILTER = {
-  "id": "unique_id",
   "Categories": {
       "1": true,
       "2": true,

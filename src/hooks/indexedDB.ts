@@ -49,7 +49,7 @@ export async function addFilterData(data: Filter) {
   const db = await dbInitialized;
   const transaction: IDBTransaction = db.transaction(['networkFilter'], 'readwrite');
   const objectStore: IDBObjectStore = transaction.objectStore('networkFilter');
-  const request: IDBRequest = objectStore.add(data);
+  const request: IDBRequest = objectStore.add({id: "unique_id", ...data});
 
   request.onsuccess = function (event: Event) {
     console.log('Data added successfully');
@@ -60,22 +60,29 @@ export async function addFilterData(data: Filter) {
   };
 }
 
-export async function getFilterData(key: string): Promise<Filter | null> {
+export async function getFilterData(): Promise<Filter | null> {
   if (typeof window === 'undefined') return null;
 
   const db = await dbInitialized;
   return new Promise((resolve, reject) => {
     const transaction: IDBTransaction = db.transaction(['networkFilter']);
     const objectStore: IDBObjectStore = transaction.objectStore('networkFilter');
-    const request: IDBRequest = objectStore.get(key);
+    const request: IDBRequest = objectStore.get('unique_id');
 
     request.onsuccess = function (event: Event) {
       const result = (event.target as IDBRequest).result;
       if (result) {
         console.log('Data retrieved successfully:', result);
-        resolve(result);
+        const filterResult: Filter = {
+          Categories: result.Categories,
+          Price: result.Price,
+          Mode: result.Mode,
+          Device: result.Device,
+          Playtime: result.Playtime
+        }
+        resolve(filterResult);
       } else {
-        console.log('No data found for key:', key);
+        console.log('No data found for key: unique_id');
         resolve(null);
       }
     };
@@ -93,7 +100,7 @@ export async function updateFilterData(data: Filter) {
   const db = await dbInitialized;
   const transaction: IDBTransaction = db.transaction(['networkFilter'], 'readwrite');
   const objectStore: IDBObjectStore = transaction.objectStore('networkFilter');
-  const request: IDBRequest = objectStore.put(data);
+  const request: IDBRequest = objectStore.put({id: "unique_id", ...data});
 
   request.onsuccess = function (event: Event) {
     console.log('Data updated successfully');

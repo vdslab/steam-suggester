@@ -50,7 +50,7 @@ const createNetwork = async () => {
   }
   const data:SteamDetailsDataType[] = await res.json();
 
-  const d = await getFilterData('unique_id');
+  const d = await getFilterData();
   const filter: Filter = d ? d : DEFAULT_FILTER;
 
   const links: any = [];

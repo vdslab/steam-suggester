@@ -21,7 +21,7 @@ const SelectParameter = (props: Props) => {
 
   useEffect(() => {
     (async() => {
-      const d = await getFilterData('unique_id');
+      const d = await getFilterData();
       if(d) {
         setFilter(d);
         setLocalFilter(d);
@@ -53,7 +53,7 @@ const SelectParameter = (props: Props) => {
 
   const handleClickFilter = (filter: Filter) => {
     (async() => {
-      const d = await getFilterData('unique_id');
+      const d = await getFilterData();
       if(d) {
         updateFilterData(filter);
       } else {
