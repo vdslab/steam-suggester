@@ -32,8 +32,8 @@ const Popularity = async(props:Props) => {
             <div className="text-white pb-3">Steamレビュー数</div>
             <StackedAreaChart
               data={steamData}
-              width={300}
-              height={180}
+              width={380}
+              height={200}
               colorRange={STEAM_COLOR_RANGE}
               labelTxt={{ bottom:'レビュー日（月/日）', left:'レビュー数（件）' }}
             />
@@ -42,8 +42,8 @@ const Popularity = async(props:Props) => {
             <div className="text-white pb-3">Twitch視聴数</div>
             <StackedAreaChart
               data={twitchData}
-              width={300}
-              height={180}
+              width={380}
+              height={200}
               colorRange={TWITCH_COLOR_RANGE}
               labelTxt={{ bottom: "視聴日（月/日）", left: "視聴数（人）"}} 
             />

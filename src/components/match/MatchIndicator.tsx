@@ -1,11 +1,10 @@
 "use client"; 
-import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
+import { DEFAULT_FILTER, GENRE_MAPPING } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
 import { Filter } from '@/types/api/FilterType';
-import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
-import React, { useState, useEffect, use } from 'react';
+import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
+import { useState, useEffect,  } from 'react';
 import { calcAllMatchPercentage, calcGenresPercentage } from '../common/CalcMatch';
-import LocalFilterPrice from './LocalFilterPrice';
 import IsAbleBar from './IsAbleBar';
 import PercentBar from './PercentBar';
 
@@ -37,31 +36,35 @@ const MatchIndicator = ( props:Props ) => {
     return (adjustedPrice / maxPrice) * 100;
   };
 
-  const startPricePosition = priceBarPosition(localFilter.Price.startPrice);
-  const endPricePosition = priceBarPosition(localFilter.Price.endPrice);
-
 
   return (
     <div className='text-white'>
-      <div className="mb-3 flex">
-        <p className="text-lg w-1/3">全体の一致度:</p>
+      <div className="mb-[2vh] flex">
+        <div className="text-lg w-1/3">全体の一致度:</div>
         <PercentBar baseStyle='bg-cyan-300 rounded-lg' txtStyle='text-gray-600' percent={overallMatchPercentage} />
       </div>
 
-      <div className="mb-3 flex">
-        <p className="text-lg w-1/3">ジャンル一致度:</p>
+      <div className="mb-[vh] flex">
+        <div className="text-lg w-1/3">ジャンル一致度:</div>
         <PercentBar baseStyle='bg-yellow-300 rounded-lg' txtStyle='text-gray-600' percent={genreMatchPercentage} />
       </div>
+      <div className="mb-[2vh] flex">
+        <div className="text-sm w-1/4">（ジャンル）</div>
+        {data.genres.map((genre: SteamGenreType, index:number) => (
+            genre.id in GENRE_MAPPING &&
+            <div key={genre.id} className='text-center m-1 text-xs text-yellow-300'>{index !== 0 ? ', ' : ''}{genre.description}</div>
+        ))}
+      </div>
 
-      <div className="flex mb-3">
+      <div className="flex mb-[2vh]">
         {data.price != 0 ? (
-          <p className='select-none w-1/4'>価格(円):</p>
+          <div className='w-1/4'>価格(円):</div>
         ) : (
-          <p className='select-none w-1/3'>価格(円):</p>
+          <div className='w-1/3'>価格(円):</div>
         )}
         {data.price != 0 ? (
           <div className='flex-1'>
-            <div className="relative h-5 bg-gray-200 rounded-lg">
+            <div className="relative h-[2.5vh] bg-gray-200 rounded-lg">
               <div>
                 <div
                   className={`absolute top-0 left-0 h-full rounded-lg bg-rose-400`}
@@ -82,7 +85,7 @@ const MatchIndicator = ( props:Props ) => {
           </div>
           ) : (
             <div
-              className="h-5 rounded-lg bg-gray-500 flex items-center justify-center font-bold text-white"
+              className="h-[2.5vh] rounded-lg bg-gray-500 flex items-center justify-center font-bold text-white"
               style={{
                 width: '100%',
               }}
@@ -91,19 +94,59 @@ const MatchIndicator = ( props:Props ) => {
             </div>
           )
         }
+
       </div>
 
-      <div className="mb-3 select-none">
-        <div className='flex'>
-        <p className='w-1/4'>プレイモード</p>
-        <IsAbleBar isLeft={data.isSinglePlayer} isRight={data.isMultiPlayer} isUserLeft={localFilter.Mode.isSinglePlayer} isUserRight={localFilter.Mode.isMultiPlayer} leftTxt='シングルプレイヤー' rightTxt='マルチプレイヤー' />
+      <div>
+        <div className='flex mb-[2vh]'>
+          <div className='w-1/4'>プレイモード</div>
+          <IsAbleBar isLeft={data.isSinglePlayer} isRight={data.isMultiPlayer} isUserLeft={localFilter.Mode.isSinglePlayer} isUserRight={localFilter.Mode.isMultiPlayer} leftTxt='シングルプレイヤー' rightTxt='マルチプレイヤー' />
         </div>
         
         <div className='flex mt-3'>
-          <p className='w-1/4'>対応デバイス</p>
+          <div className='w-1/4'>対応デバイス</div>
           <IsAbleBar isLeft={data.device.windows} isRight={data.device.mac} isUserLeft={localFilter.Device.windows} isUserRight={localFilter.Device.mac} leftTxt='Windows' rightTxt='mac' />
         </div>
       </div>
+
+      <div className='pt-[3vh]'>ユーザが選択した項目</div>
+      <div className='border border-gray-500 flex p-2 flex-wrap'>
+        {data.genres.map((genre: SteamGenreType) => (
+          genre.id in GENRE_MAPPING &&
+          <div key={genre.id} className='bg-yellow-300 rounded-sm m-1'>
+            <div className='text-center m-1 text-xs text-gray-900'>{genre.description}</div>
+          </div>
+        ))}
+        <div className='bg-rose-400 rounded-sm m-1'>
+          <div className='text-center m-1 text-xs text-gray-900'>{localFilter.Price.startPrice}円 ~ {localFilter.Price.endPrice}円</div>
+        </div>
+
+        {(localFilter.Mode.isSinglePlayer) && (
+          <div className='bg-green-400 rounded-sm m-1'>
+            <div className='text-center m-1 text-xs text-gray-900'>シングルプレイヤー</div>
+          </div>
+        )}
+          
+          {(localFilter.Mode.isMultiPlayer) && (
+            <div className='bg-green-400 rounded-sm m-1'>
+              <div className='text-center m-1 text-xs text-gray-900'>マルチプレイヤー</div>
+            </div>
+          )}
+
+          {(localFilter.Device.windows) && (
+            <div className='bg-green-400 rounded-sm m-1'>
+              <div className='text-center m-1 text-xs text-gray-900'>Windows</div>
+            </div>
+          )}
+
+          {(localFilter.Device.mac) && (
+            <div className='bg-green-400 rounded-sm m-1'>
+              <div className='text-center m-1 text-xs text-gray-900'>Mac</div>
+            </div>
+          )}
+
+      </div>
+
     </div>
   );
 };
