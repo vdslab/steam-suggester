@@ -1,6 +1,6 @@
 "use client";
 import { DEFAULT_FILTER, DEVICE_MAPPING, GENRE_MAPPING, MODE_MAPPING } from "@/constants/DEFAULT_FILTER";
-import { addFilterData, getFilterData, updateFilterData } from "@/hooks/indexedDB";
+import { changeFilterData, getFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
 import { useState, useEffect } from "react";
 import FilterHeadline from "./FilterHeadline";
@@ -52,14 +52,7 @@ const SelectParameter = (props: Props) => {
   };
 
   const handleClickFilter = (filter: Filter) => {
-    (async() => {
-      const d = await getFilterData();
-      if(d) {
-        updateFilterData(filter);
-      } else {
-        addFilterData(filter);
-      }
-    })();
+    changeFilterData(filter);
     setFilter(filter)
     setLocalFilter(filter)
     if(filter === DEFAULT_FILTER) {

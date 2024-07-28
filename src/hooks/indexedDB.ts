@@ -33,7 +33,6 @@ if (typeof window !== 'undefined') {
     console.error('Database error:', (event.target as IDBOpenDBRequest).error);
   };
 
-  // データベースが初期化されるのを待つPromise
   dbInitialized = new Promise((resolve, reject) => {
     request.onsuccess = function (event: Event) {
       db = (event.target as IDBOpenDBRequest).result;
@@ -46,23 +45,6 @@ if (typeof window !== 'undefined') {
       reject((event.target as IDBOpenDBRequest).error);
     };
   });
-}
-
-export async function addFilterData(data: Filter) {
-  if (typeof window === 'undefined') return;
-
-  const db = await dbInitialized;
-  const transaction: IDBTransaction = db.transaction(['networkFilter'], 'readwrite');
-  const objectStore: IDBObjectStore = transaction.objectStore('networkFilter');
-  const request: IDBRequest = objectStore.add({id: "unique_id", ...data});
-
-  request.onsuccess = function (event: Event) {
-    console.log('Data added successfully');
-  };
-
-  request.onerror = function (event: Event) {
-    console.error('Error adding data:', (event.target as IDBRequest).error);
-  };
 }
 
 export async function getFilterData(): Promise<Filter | null> {
@@ -99,7 +81,7 @@ export async function getFilterData(): Promise<Filter | null> {
   });
 }
 
-export async function updateFilterData(data: Filter) {
+export async function changeFilterData(data: Filter) {
   if (typeof window === 'undefined') return;
 
   const db = await dbInitialized;
