@@ -17,6 +17,11 @@ if (typeof window !== 'undefined') {
       networkFilterStore.createIndex('Device', 'Device', { unique: false });
       networkFilterStore.createIndex('Playtime', 'Playtime', { unique: false });
     }
+
+    if (!db.objectStoreNames.contains('userAddedGames')) {
+      const userAddedGamesStore: IDBObjectStore = db.createObjectStore('userAddedGames', {keyPath: 'id'});
+      userAddedGamesStore.createIndex('steamGameId', 'steamGameId', { unique: false });
+    }
   };
 
   request.onsuccess = function (event: Event) {
@@ -101,6 +106,49 @@ export async function updateFilterData(data: Filter) {
   const transaction: IDBTransaction = db.transaction(['networkFilter'], 'readwrite');
   const objectStore: IDBObjectStore = transaction.objectStore('networkFilter');
   const request: IDBRequest = objectStore.put({id: "unique_id", ...data});
+
+  request.onsuccess = function (event: Event) {
+    console.log('Data updated successfully');
+  };
+
+  request.onerror = function (event: Event) {
+    console.error('Error updating data:', (event.target as IDBRequest).error);
+  };
+}
+
+export async function getGameIdData(): Promise<string[] | null> {
+  if (typeof window === 'undefined') return null;
+  const db = await dbInitialized;
+  return new Promise((resolve, reject) => {
+    const transaction: IDBTransaction = db.transaction(['userAddedGames']);
+    const objectStore: IDBObjectStore = transaction.objectStore('userAddedGames');
+    const request: IDBRequest = objectStore.get('unique_id');
+
+    request.onsuccess = function (event: Event) {
+      const result = (event.target as IDBRequest).result;
+      if (result) {
+        console.log('Data retrieved successfully:', result);
+        resolve(result.steamGameId);
+      } else {
+        console.log('No data found for key: unique_id');
+        resolve(null);
+      }
+    };
+
+    request.onerror = function (event: Event) {
+      console.error('Error retrieving data:', (event.target as IDBRequest).error);
+      reject((event.target as IDBRequest).error);
+    };
+  });
+}
+
+export async function changeGameIdData(steamGameId: string[]) {
+  if (typeof window === 'undefined') return;
+
+  const db = await dbInitialized;
+  const transaction: IDBTransaction = db.transaction(['userAddedGames'], 'readwrite');
+  const objectStore: IDBObjectStore = transaction.objectStore('userAddedGames');
+  const request: IDBRequest = objectStore.put({id: "unique_id", steamGameId});
 
   request.onsuccess = function (event: Event) {
     console.log('Data updated successfully');
