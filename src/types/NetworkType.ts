@@ -6,3 +6,8 @@ export type IconType = {
   twitchGameId: string;
   circleScale: string;
 }
+
+export type SteamListType = {
+  steamGameId: string;
+  title: string;
+}
