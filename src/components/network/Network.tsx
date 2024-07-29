@@ -14,6 +14,8 @@ const Network = () => {
 
   const [nodes, setNodes] = useState<NodeType[]>([]);
   const [links, setLinks] = useState<LinkType[]>([]);
+  const [centerX, setCenterX] = useState(0);
+  const [centerY, setCenterY] = useState(0);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,10 +37,10 @@ const Network = () => {
           <SelectParameter filter={filter} setFilter={setFilter} />
         </div>
         <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
-          <NodeLink nodes={nodes} links={links} />
+          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY}/>
         </div>
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          <GameList />
+          <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} />
         </div>
       </div> : <Loading />
       }
