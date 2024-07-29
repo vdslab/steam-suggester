@@ -142,7 +142,7 @@ const SelectParameter = (props: Props) => {
         rowLevel={2}
       />
         
-      <div className="absolute bottom-0 left-0 p-4 w-[calc(25%-12px)] z-10" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
+      <div className="absolute bottom-0 left-0 p-4 w-[calc(20%-12px)] z-10" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
         <button
           className="text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500 w-full mb-2"
           onClick={() => handleClickFilter(localFilter)}
