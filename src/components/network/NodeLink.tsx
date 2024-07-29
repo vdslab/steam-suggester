@@ -2,8 +2,6 @@
 import { useState, useEffect, useRef } from "react";
 import * as d3 from 'd3';
 import Icon from "./Icon";
-import createNetwork from "@/hooks/createNetwork";
-import { Filter } from "@/types/api/FilterType";
 
 const ZoomableSVG = (props: any) => {
   const { children } = props;
@@ -34,33 +32,13 @@ const ZoomableSVG = (props: any) => {
   );
 };
 
-type Props = {
-  filter: Filter;
-};
-
-const NodeLink = (props: Props) => {
-  const { filter } = props;
-
-  const [nodes, setNodes] = useState<any>([]);
-  const [links, setLinks] = useState([]);
-
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const { nodes, links } = await createNetwork();
-      setNodes(nodes);
-      setLinks(links);
-      setIsLoading(false);
-    })();
-
-  }, [filter]);
+const NodeLink = (props: any) => {
+  const { nodes, links } = props;
 
   return (
-    <div>
-      {!isLoading ? <ZoomableSVG>
+      <ZoomableSVG>
         {links.length !== 0 &&
-          links.map((link: any, i) => (
+          links.map((link: any, i: number) => (
             <line
               key={i}
               className="link"
@@ -86,9 +64,7 @@ const NodeLink = (props: Props) => {
               </g>
             );
           })}
-      </ZoomableSVG> : <div>Loading...</div>
-      }
-    </div>
+      </ZoomableSVG>
   );
 };
 
