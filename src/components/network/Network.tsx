@@ -7,18 +7,21 @@ import { Filter } from '@/types/api/FilterType';
 import GameList from './gameList/GameList';
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
+import { LinkType, NodeType } from '@/types/NetworkType';
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
 
-  const [nodes, setNodes] = useState<any>([]);
-  const [links, setLinks] = useState([]);
+  const [nodes, setNodes] = useState<NodeType[]>([]);
+  const [links, setLinks] = useState<LinkType[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const { nodes, links } = await createNetwork();
+      const result = await createNetwork();
+      const nodes = result?.nodes ?? [];
+      const links = result?.links ?? [];
       setNodes(nodes);
       setLinks(links);
       setIsLoading(false);

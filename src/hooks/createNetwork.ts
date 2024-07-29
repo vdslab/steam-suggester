@@ -2,26 +2,9 @@ import * as d3 from 'd3';
 import { getFilterData } from './indexedDB';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
-import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
 import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 import { calcAllMatchPercentage } from '@/components/common/CalcMatch';
-
-type Node = {
-  circleScale?: number,
-  gameData: SteamDetailsDataType,
-  id: number,
-  imgURL: string,
-  index?: number,
-  steamGameId: string,
-  title: string,
-  totalViews: number,
-  twitchGameId: string,
-  vx?: number,
-  vy?: number,
-  x?: number,
-  y?: number,
-}
-
+import { NodeType } from '@/types/NetworkType';
 
 const calcCommonGenres = (game1:any, game2:any) => {
   let genresWeight = 1;
@@ -48,7 +31,7 @@ const createNetwork = async () => {
   if(!res) {
     return {};
   }
-  const data:SteamDetailsDataType[] = await res.json();
+  const data: NodeType[] = await res.json();
 
   const d = await getFilterData();
   const filter: Filter = d ? d : DEFAULT_FILTER;
@@ -61,14 +44,15 @@ const createNetwork = async () => {
                       .domain([0, 100])
                       .range([1, 3])
 
-  const nodes: Node[] = Object.values(data).filter((item: any) => {
+  const nodes: NodeType[] = Object.values(data).filter((item: any) => {
     if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
     if(!(filter.Price.startPrice <= item.gameData.price && item.gameData.price <= filter.Price.endPrice)) return false;
     if(!((item.gameData.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.gameData.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
     if(!((item.gameData.device.windows && filter.Device.windows) || (item.gameData.device.mac && filter.Device.mac))) return false;
    
     return true;
-  }).map((node: any, index) => ({
+  }).map((node: NodeType, index: number) => {
+    return {
     id: index,
     title: node.title,
     imgURL: node.imgURL,
@@ -76,7 +60,7 @@ const createNetwork = async () => {
     steamGameId: node.steamGameId,
     twitchGameId: node.twitchGameId,
     totalViews: node.totalViews,
-  }));
+  }});
 
   for (let i = 0; i < nodes.length; i++) {
     const array = nodes
@@ -161,7 +145,7 @@ const createNetwork = async () => {
 
   });
 
-  nodes.forEach((node: Node) => {
+  nodes.forEach((node: NodeType) => {
     // 一致度を計算(全体)
     const overallMatchPercent = calcAllMatchPercentage(filter, node.gameData);
     node.circleScale = matchScale(overallMatchPercent);
