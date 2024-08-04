@@ -12,7 +12,7 @@ const ZoomableSVG = (props: any) => {
 
   useEffect(() => {
     zoom.current = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 8]) 
+      .scaleExtent([0.2, 4]) 
       .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         setTransform(event.transform);
       });
