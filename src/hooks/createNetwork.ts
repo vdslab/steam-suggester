@@ -128,21 +128,20 @@ const createNetwork = async () => {
   links.forEach((link: any) => {
     const sourceGame = link.source;
     const targetGame = link.target;
-
-    const isSourceGameIncluded = similarGames[sourceGame.steamGameId].some((game:any) => 
-      game.steamGameId === targetGame.steamGameId && targetGame.twitchGameId === targetGame.twitchGameId
+  
+    const isSourceGameIncluded = similarGames[sourceGame.steamGameId].some((game: any) =>
+      game.steamGameId === targetGame.steamGameId && game.twitchGameId === targetGame.twitchGameId
     );
-    if(!isSourceGameIncluded) {
-      similarGames[sourceGame.steamGameId].push({steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId});
+    if (!isSourceGameIncluded) {
+      similarGames[sourceGame.steamGameId].push({ steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId });
     }
-   
-    const isTargetGameIncluded = similarGames[targetGame.steamGameId].some((game:any) => 
+  
+    const isTargetGameIncluded = similarGames[targetGame.steamGameId].some((game: any) =>
       game.steamGameId === sourceGame.steamGameId && game.twitchGameId === sourceGame.twitchGameId
     );
-    if(!isTargetGameIncluded) {
-      similarGames[targetGame.steamGameId].push({steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId});
+    if (!isTargetGameIncluded) {
+      similarGames[targetGame.steamGameId].push({ steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId });
     }
-
   });
 
   nodes.forEach((node: NodeType) => {
