@@ -12,7 +12,7 @@ const ZoomableSVG = (props: any) => {
 
   useEffect(() => {
     zoom.current = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 10]) 
+      .scaleExtent([0.1, 8]) 
       .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         setTransform(event.transform);
       });
@@ -27,7 +27,7 @@ const ZoomableSVG = (props: any) => {
     if (svgRef.current && zoom.current) {
       const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
 
-      const initialTransform = d3.zoomIdentity.translate(window.innerWidth / 2 - centerX, window.innerHeight / 2 - centerY).scale(transform.k);
+      const initialTransform = d3.zoomIdentity.translate(window.innerWidth / 2 - window.innerWidth / 5 - centerX, window.innerHeight / 2 - centerY).scale(1);
       svg.call(zoom.current.transform, initialTransform);
       setTransform(initialTransform);
     }
@@ -35,7 +35,7 @@ const ZoomableSVG = (props: any) => {
 
   return (
     <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight}>
-      <g transform={`translate(${transform.x - window.innerWidth / 5},${transform.y})scale(${transform.k})`}>
+      <g transform={`translate(${transform.x},${transform.y})scale(${transform.k})`}>
         {children}
       </g>
     </svg>
@@ -47,33 +47,34 @@ const NodeLink = (props: any) => {
 
   return (
     <ZoomableSVG centerX={centerX} centerY={centerY}>
-      {links.length !== 0 &&
-        links.map((link: any, i: number) => (
-          <line
-            key={i}
-            className="link"
-            x1={link.source.x}
-            y1={link.source.y}
-            x2={link.target.x}
-            y2={link.target.y}
-            style={{ stroke: "white", strokeWidth: "0.5" }}
-          />
-        ))}
-      {nodes.length !== 0 &&
-        nodes.map((node: any, i: any) => {
-          return (
-            <g transform={`translate(${node.x},${node.y})`} key={i}>
-              <Icon
-                title={node.title}
-                imgURL={node.imgURL}
-                index={node.index}
-                steamGameId={node.steamGameId}
-                twitchGameId={node.twitchGameId}
-                circleScale={node.circleScale}
-              ></Icon>
-            </g>
-          );
-        })}
+       <>
+          {links.length !== 0 &&
+            links.map((link: any, i: number) => (
+              <line
+                key={i}
+                className="link"
+                x1={link.source.x}
+                y1={link.source.y}
+                x2={link.target.x}
+                y2={link.target.y}
+                style={{ stroke: "white", strokeWidth: "0.5" }}
+              />
+            ))}
+          {nodes.length !== 0 &&
+            nodes.map((node: any, i: any) => (
+              <g transform={`translate(${node.x},${node.y})`} key={i}>
+                <Icon
+                  title={node.title}
+                  imgURL={node.imgURL}
+                  index={node.index}
+                  steamGameId={node.steamGameId}
+                  twitchGameId={node.twitchGameId}
+                  circleScale={node.circleScale}
+                />
+              </g>
+            ))}
+        </>
+
     </ZoomableSVG>
   );
 };
