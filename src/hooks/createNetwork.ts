@@ -72,7 +72,7 @@ const createNetwork = async () => {
         };
       })
       .filter((e) => e);
-    array.sort((a, b) => a.weight - b.weight);
+    array.sort((a, b) => b.weight - a.weight);
 
     const newArray = array.map((item) => item.index);
 
@@ -84,11 +84,9 @@ const createNetwork = async () => {
       const isTargetOk =
         links.filter((item:any) => item.target === index || item.source === index)
           .length < k;
-      if (count < k && isSourceOk && isTargetOk) {
-        if (i !== index) {
-          links.push({ source: i, target: index });
-          count++;
-        }
+      if (count < k && isSourceOk && isTargetOk && i !== index) {
+        links.push({ source: i, target: index });
+        count++;
         if (
           links.filter((item:any) => item.target === i || item.source === i)
             .length >= k
