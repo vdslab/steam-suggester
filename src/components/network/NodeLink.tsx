@@ -93,6 +93,18 @@ const NodeLink = (props: any) => {
                   fill="white"
                   fontSize="30px"
                   pointerEvents="none"
+                  style={{
+                    textShadow: `
+                      -1px -1px 0 #000,
+                      1px -1px 0 #000,
+                      -1px 1px 0 #000,
+                      1px 1px 0 #000,
+                      -1px 0 0 #000,
+                      1px 0 0 #000,
+                      0 -1px 0 #000,
+                      0 1px 0 #000
+                    `
+                  }}
                 >
                   {nodes[hoveredIndex].title}
                 </text>
