@@ -122,7 +122,6 @@ const createNetwork = async () => {
         })
     )
     .force("charge", d3.forceManyBody().strength(-1000))
-    .force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2))
     .force("collide", d3.forceCollide().radius((d: any) => d.circleScale * 20)) // 衝突半径を設定
 
   simulation.tick(300).stop()
