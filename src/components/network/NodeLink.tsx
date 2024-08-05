@@ -28,8 +28,12 @@ const ZoomableSVG = (props: any) => {
       const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
 
       const initialTransform = d3.zoomIdentity.translate(window.innerWidth / 2 - window.innerWidth / 5 - centerX, window.innerHeight / 2 - centerY).scale(1);
-      svg.call(zoom.current.transform, initialTransform);
-      setTransform(initialTransform);
+      svg.transition()
+        .duration(1200)
+        .call(zoom.current.transform, initialTransform)
+        .on('end', () => {
+          setTransform(initialTransform);
+        });
     }
   }, [centerX, centerY]);
 
