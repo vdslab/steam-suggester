@@ -150,8 +150,6 @@ const createNetwork = async () => {
     }
   });
 
-  
-
   return {nodes, links, similarGames};
 };
 

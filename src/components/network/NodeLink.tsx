@@ -57,7 +57,7 @@ const NodeLink = (props: any) => {
                 y1={link.source.y}
                 x2={link.target.x}
                 y2={link.target.y}
-                style={{ stroke: "white", strokeWidth: "0.5" }}
+                style={{ stroke: "white", strokeWidth: "1" }}
               />
             ))}
           {nodes.length !== 0 &&
