@@ -45,6 +45,8 @@ const ZoomableSVG = (props: any) => {
 const NodeLink = (props: any) => {
   const { nodes, links, centerX, centerY } = props;
 
+  const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
+
   return (
     <ZoomableSVG centerX={centerX} centerY={centerY}>
        <>
@@ -61,8 +63,11 @@ const NodeLink = (props: any) => {
               />
             ))}
           {nodes.length !== 0 &&
-            nodes.map((node: any, i: any) => (
-              <g transform={`translate(${node.x},${node.y})`} key={i}>
+            nodes.map((node: any, i: number) => (
+              <g transform={`translate(${node.x},${node.y})`}
+                 onMouseEnter={() => setHoveredIndex(i)}
+                 onMouseLeave={() => setHoveredIndex(-1)}
+                 key={i}>
                 <Icon
                   title={node.title}
                   imgURL={node.imgURL}
@@ -71,8 +76,25 @@ const NodeLink = (props: any) => {
                   twitchGameId={node.twitchGameId}
                   circleScale={node.circleScale}
                 />
+                
               </g>
             ))}
+          {hoveredIndex !== -1 && (
+            <g transform={`translate(${nodes[hoveredIndex].x},${nodes[hoveredIndex].y})`}>
+              <g>
+                <text
+                  x={0}
+                  y={80}
+                  textAnchor="middle"
+                  fill="white"
+                  fontSize="30px"
+                  pointerEvents="none"
+                >
+                  {nodes[hoveredIndex].title}
+                </text>
+              </g>
+            </g>
+          )}
         </>
 
     </ZoomableSVG>
