@@ -14,8 +14,8 @@ const Network = () => {
 
   const [nodes, setNodes] = useState<NodeType[]>([]);
   const [links, setLinks] = useState<LinkType[]>([]);
-  const [centerX, setCenterX] = useState(0);
-  const [centerY, setCenterY] = useState(0);
+  const [centerX, setCenterX] = useState<number>(0);
+  const [centerY, setCenterY] = useState<number>(0);
 
   const [isLoading, setIsLoading] = useState(true);
 
