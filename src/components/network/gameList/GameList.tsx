@@ -96,11 +96,8 @@ const GameList = (props: Props) => {
         {userAddedGames.map((gameId, index) => {
           const game = steamList.find(game => game.steamGameId === gameId);
           return game ? (
-            <div className='flex pb-2 justify-between items-center'>
-              <div
-                className="cursor-pointer text-white hover:bg-gray-700 p-2 rounded"
-                key={game.steamGameId}
-              >
+            <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
+              <div className="cursor-pointer text-white hover:bg-gray-700 p-2 rounded">
                 {game.title}
               </div>
               <DeleteIcon 
@@ -108,7 +105,6 @@ const GameList = (props: Props) => {
                 onClick={() => handleGameDelete(game.steamGameId)}
               />
             </div>
-            
           ) : null;
         })}
       </div>
