@@ -55,17 +55,24 @@ const NodeLink = (props: any) => {
     <ZoomableSVG centerX={centerX} centerY={centerY}>
        <>
           {links.length !== 0 &&
-            links.map((link: any, i: number) => (
-              <line
-                key={i}
-                className="link"
-                x1={link.source.x}
-                y1={link.source.y}
-                x2={link.target.x}
-                y2={link.target.y}
-                style={{ stroke: "white", strokeWidth: "1" }}
-              />
-            ))}
+            links.map((link: any, i: number) => {
+              const isHovered = link.source.id === hoveredIndex || link.target.id === hoveredIndex;
+              return (
+                <line
+                  key={i}
+                  className="link"
+                  x1={link.source.x}
+                  y1={link.source.y}
+                  x2={link.target.x}
+                  y2={link.target.y}
+                  style={{
+                    stroke: isHovered ? "cyan" : "white",
+                    strokeWidth: isHovered ? "2" : "1"
+                  }}
+                />
+              )
+            })
+          }
           {nodes.length !== 0 &&
             nodes.map((node: any, i: number) => (
               <g transform={`translate(${node.x},${node.y})`}
@@ -80,7 +87,6 @@ const NodeLink = (props: any) => {
                   twitchGameId={node.twitchGameId}
                   circleScale={node.circleScale}
                 />
-                
               </g>
             ))}
           {hoveredIndex !== -1 && (
