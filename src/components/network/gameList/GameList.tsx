@@ -1,6 +1,8 @@
 "use client";
 
+import DeleteIcon from '@mui/icons-material/Delete';
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
 import { useEffect, useState } from "react";
 
@@ -16,28 +18,42 @@ const GameList = (props: Props) => {
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
+  const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
 
-  const handleMouseClick = (index: number) => {
+  const handleGameClick = (index: number) => {
     setCenterX(nodes[index].x ?? 0);
     setCenterY(nodes[index].y ?? 0);
   };
 
+  const handleGameDelete = (steamGameId: string) => {
+    const newUserAddedGames = userAddedGames.filter((gameId: string) => gameId !== steamGameId);
+    setUserAddedGames(newUserAddedGames);
+    changeGameIdData(newUserAddedGames);
+  }
+
   const handleSearchClick = (steamGameId: string) => {
-    console.log("Selected Steam Game ID: ", steamGameId);
+    if (!userAddedGames.includes(steamGameId)) {
+      const newUserAddedGames = [...userAddedGames, steamGameId];
+      setUserAddedGames(newUserAddedGames);
+      changeGameIdData(newUserAddedGames);
+    }
   };
 
   useEffect(() => {
     (async () => {
-      const res = await fetch(
+      const res1 = await fetch(
         `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`,
         { next: { revalidate: ISR_FETCH_INTERVAL } }
       );
-      if (!res) {
+      if (!res1) {
         return {};
       }
-      const data = await res.json();
+      const data = await res1.json();
+      const res2 = await getGameIdData();
+
       setSteamList(data);
       setFilteredSteamList(data);
+      setUserAddedGames(res2 ?? []);
     })();
   }, []);
 
@@ -75,13 +91,34 @@ const GameList = (props: Props) => {
           ))}
         </div>
       )}
+      <div className="bg-gray-800 p-2 rounded-lg mb-4">
+        <h2 className="text-white mb-2">User Added Games</h2>
+        {userAddedGames.map((gameId, index) => {
+          const game = steamList.find(game => game.steamGameId === gameId);
+          return game ? (
+            <div className='flex pb-2 justify-between items-center'>
+              <div
+                className="cursor-pointer text-white hover:bg-gray-700 p-2 rounded"
+                key={game.steamGameId}
+              >
+                {game.title}
+              </div>
+              <DeleteIcon 
+                className='cursor-pointer hover:bg-gray-700 rounded'
+                onClick={() => handleGameDelete(game.steamGameId)}
+              />
+            </div>
+            
+          ) : null;
+        })}
+      </div>
       <h2 className="text-white mb-2">Network Nodes</h2>
       {nodes.map((node: NodeType, index: number) => (
         <div
           className={`cursor-pointer text-slate-${hoveredGameIdx === index ? 50 : 300} pb-2 hover:bg-gray-700 p-2 rounded`}
           onMouseEnter={() => setHoveredGameIdx(index)}
           onMouseLeave={() => setHoveredGameIdx(-1)}
-          onClick={() => handleMouseClick(index)}
+          onClick={() => handleGameClick(index)}
           key={index}
         >
           {node.title}

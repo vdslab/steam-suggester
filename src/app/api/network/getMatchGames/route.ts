@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const today = new Date();
-    today.setDate(today.getDate() - 2);
+    today.setDate(today.getDate() - 1);
     const dateString = today.toISOString().split('T')[0];
 
     const query = `

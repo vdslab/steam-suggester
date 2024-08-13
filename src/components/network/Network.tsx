@@ -26,8 +26,8 @@ const Network = () => {
       const links = result?.links ?? [];
       const buffNodes = nodes.concat();
       buffNodes.sort((node1: NodeType, node2: NodeType) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0));
-      setCenterX(buffNodes[0].x ?? 0);
-      setCenterY(buffNodes[0].y ?? 0);
+      setCenterX(buffNodes[0]?.x ?? 0);
+      setCenterY(buffNodes[0]?.y ?? 0);
       setNodes(nodes);
       setLinks(links);
     })();
