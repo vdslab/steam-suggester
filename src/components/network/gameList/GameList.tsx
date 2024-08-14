@@ -14,6 +14,7 @@ type Props = {
 
 const GameList = (props: Props) => {
   const { nodes, setCenterX, setCenterY } = props;
+
   const [hoveredGameIdx, setHoveredGameIdx] = useState<number>(-1);
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');

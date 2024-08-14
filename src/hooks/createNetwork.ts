@@ -110,6 +110,8 @@ const createNetwork = async () => {
     node.circleScale = matchScale(overallMatchPercent);
   });
 
+  nodes.sort((node1: NodeType, node2: NodeType) => (node2?.circleScale ?? 0) - (node1?.circleScale ?? 0));
+
   const simulation = d3
     .forceSimulation(nodes)
     .force(

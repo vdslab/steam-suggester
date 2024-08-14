@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import * as d3 from 'd3';
 import Icon from "./Icon";
+import { NodeType } from "@/types/NetworkType";
 
 const ZoomableSVG = (props: any) => {
   const { children, centerX, centerY } = props;
@@ -51,6 +52,10 @@ const NodeLink = (props: any) => {
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
+  const findHoveredNode = () => {
+    return nodes.find((node: NodeType) => node.id === hoveredIndex)
+  }
+
   return (
     <ZoomableSVG centerX={centerX} centerY={centerY}>
        <>
@@ -74,23 +79,23 @@ const NodeLink = (props: any) => {
             })
           }
           {nodes.length !== 0 &&
-            nodes.map((node: any, i: number) => (
+            nodes.map((node: NodeType, i: number) => (
               <g transform={`translate(${node.x},${node.y})`}
-                 onMouseEnter={() => setHoveredIndex(i)}
+                 onMouseEnter={() => setHoveredIndex(node.id)}
                  onMouseLeave={() => setHoveredIndex(-1)}
                  key={i}>
                 <Icon
                   title={node.title}
                   imgURL={node.imgURL}
-                  index={node.index}
+                  index={node.index ?? i}
                   steamGameId={node.steamGameId}
                   twitchGameId={node.twitchGameId}
-                  circleScale={node.circleScale}
+                  circleScale={node.circleScale ?? 1}
                 />
               </g>
             ))}
           {hoveredIndex !== -1 && (
-            <g transform={`translate(${nodes[hoveredIndex].x},${nodes[hoveredIndex].y})`}>
+            <g transform={`translate(${findHoveredNode().x},${findHoveredNode().y})`}>
               <g>
                 <text
                   x={0}
@@ -112,7 +117,7 @@ const NodeLink = (props: any) => {
                     `
                   }}
                 >
-                  {nodes[hoveredIndex].title}
+                  {findHoveredNode().title}
                 </text>
               </g>
             </g>
