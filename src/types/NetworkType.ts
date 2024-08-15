@@ -17,7 +17,7 @@ export type SteamListType = {
 export type NodeType = {
   steamGameId: string;
   twitchGameId: string;
-  totalViews?: string;
+  totalViews?: number;
   title: string;
   genres : SteamGenreType[];
   price: number;

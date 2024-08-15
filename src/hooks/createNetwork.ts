@@ -5,6 +5,7 @@ import { Filter } from '@/types/api/FilterType';
 import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 import { calcAllMatchPercentage } from '@/components/common/CalcMatch';
 import { NodeType } from '@/types/NetworkType';
+import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 
 const calcCommonGenres = (game1:any, game2:any) => {
   let genresWeight = 1;
@@ -31,7 +32,7 @@ const createNetwork = async () => {
   if(!res) {
     return {};
   }
-  const data: NodeType[] = await res.json();
+  const data: SteamDetailsDataType[] = await res.json();
 
   const d = await getFilterData();
   const filter: Filter = d ? d : DEFAULT_FILTER;
@@ -44,12 +45,11 @@ const createNetwork = async () => {
                       .domain([0, 100])
                       .range([1, 3])
 
-  const nodes: NodeType[] = Object.values(data).filter((item: any) => {
+  const nodes: NodeType[] = data.filter((item: SteamDetailsDataType) => {
     if(!item.genres.find((value:any) => filter["Categories"][value.id])) return false;
     if(!(filter.Price.startPrice <= item.price && item.price <= filter.Price.endPrice)) return false;
     if(!((item.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
     if(!((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))) return false;
-   
     return true;
   });
 
