@@ -51,20 +51,7 @@ const createNetwork = async () => {
     if(!((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))) return false;
    
     return true;
-  }).map((node: NodeType, index: number) => {
-    return {
-    id: index,
-    title: node.title,
-    imgURL: node.imgURL,
-    genres : node.genres,
-    price: node.price,
-    isSinglePlayer: node.isSinglePlayer,
-    isMultiPlayer: node.isMultiPlayer,
-    device: node.device,
-    steamGameId: node.steamGameId,
-    twitchGameId: node.twitchGameId,
-    totalViews: node.totalViews,
-  }});
+  });
 
   for (let i = 0; i < nodes.length; i++) {
     const array = nodes
@@ -122,7 +109,7 @@ const createNetwork = async () => {
       "link",
       d3
         .forceLink(links)
-        .id((d:any) => d.id)
+        .id((d:any) => d.index)
         .distance((item: any) => {
           return calcCommonGenres(item.source, item.target);
         })

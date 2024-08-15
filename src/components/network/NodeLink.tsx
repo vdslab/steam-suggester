@@ -53,7 +53,7 @@ const NodeLink = (props: any) => {
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
   const findHoveredNode = () => {
-    return nodes.find((node: NodeType) => node.id === hoveredIndex)
+    return nodes.find((node: NodeType) => node.index === hoveredIndex)
   }
 
   return (
@@ -61,7 +61,7 @@ const NodeLink = (props: any) => {
        <>
           {links.length !== 0 &&
             links.map((link: any, i: number) => {
-              const isHovered = link.source.id === hoveredIndex || link.target.id === hoveredIndex;
+              const isHovered = link.source.index === hoveredIndex || link.target.index === hoveredIndex;
               return (
                 <line
                   key={i}
@@ -81,7 +81,7 @@ const NodeLink = (props: any) => {
           {nodes.length !== 0 &&
             nodes.map((node: NodeType, i: number) => (
               <g transform={`translate(${node.x},${node.y})`}
-                 onMouseEnter={() => setHoveredIndex(node.id)}
+                 onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
                  onMouseLeave={() => setHoveredIndex(-1)}
                  key={i}>
                 <Icon
