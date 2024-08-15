@@ -51,23 +51,24 @@ body {
   }
 }
 
-.gold{
-  background: linear-gradient(45deg, #DAAF08 0%, #DAAF08 45%, #FEE9A0 70%, #DAAF08 85%, #DAAF08 90% 100%);
+.gold, .silver, .bronze {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
   background-size: 800% 400%;
   animation: gradient 5s infinite cubic-bezier(.62, .28, .23, .99) both;
-  color: white;
+  display: inline-block;
+  font-weight: bold;
 }
 
-.silver{
-  background: linear-gradient(45deg, #757575 0%, #9E9E9E 45%, #E8E8E8 70%, #9E9E9E 85%, #757575 90% 100%);
-  background-size: 800% 400%;
-  animation: gradient 5s infinite cubic-bezier(.62, .28, .23, .99) both;
-  color: white;
+.gold {
+  background-image: linear-gradient(45deg, #DAAF08 0%, #DAAF08 45%, #FEE9A0 70%, #DAAF08 85%, #DAAF08 90% 100%);
 }
 
-.bronze{
-  background: linear-gradient(45deg, #a57e65 0%, #a57e65 45%, #f3cfb8 70%, #a57e65 85%, #a57e65 90% 100%);
-  background-size: 800% 400%;
-  animation: gradient 5s infinite cubic-bezier(.62, .28, .23, .99) both;
-  color: white;
+.silver {
+  background-image: linear-gradient(45deg, #757575 0%, #9E9E9E 45%, #E8E8E8 70%, #9E9E9E 85%, #757575 90% 100%);
+}
+
+.bronze {
+  background-image: linear-gradient(45deg, #a57e65 0%, #a57e65 45%, #f3cfb8 70%, #a57e65 85%, #a57e65 90% 100%);
 }

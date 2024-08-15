@@ -101,7 +101,7 @@ const GameList = (props: Props) => {
         </div>
       )}
       <div className="bg-gray-800 p-2 rounded-lg mb-4">
-        <h2 className="text-white mb-2">User Added Games</h2>
+        <h2 className="text-yellow-300 mb-2">User Added Games</h2>
         {userAddedGames.map((gameId, index) => {
           const game = steamList.find(game => game.steamGameId === gameId);
           return game ? (
