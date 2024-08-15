@@ -18,13 +18,12 @@ export type NodeType = {
   id: number;
   title: string;
   imgURL: string;
-  gameData: {
-    genres : SteamGenreType[],
-    price: number,
-    isSinglePlayer: boolean,
-    isMultiPlayer: boolean,
-    device: SteamDeviceType,
-  };
+  genres : SteamGenreType[];
+  price: number;
+  isSinglePlayer: boolean;
+  isMultiPlayer: boolean;
+  device: SteamDeviceType;
+
   steamGameId: string;
   twitchGameId: string;
   totalViews: string;

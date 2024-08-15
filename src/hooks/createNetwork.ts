@@ -45,10 +45,10 @@ const createNetwork = async () => {
                       .range([1, 3])
 
   const nodes: NodeType[] = Object.values(data).filter((item: any) => {
-    if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
-    if(!(filter.Price.startPrice <= item.gameData.price && item.gameData.price <= filter.Price.endPrice)) return false;
-    if(!((item.gameData.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.gameData.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
-    if(!((item.gameData.device.windows && filter.Device.windows) || (item.gameData.device.mac && filter.Device.mac))) return false;
+    if(!item.genres.find((value:any) => filter["Categories"][value.id])) return false;
+    if(!(filter.Price.startPrice <= item.price && item.price <= filter.Price.endPrice)) return false;
+    if(!((item.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
+    if(!((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))) return false;
    
     return true;
   }).map((node: NodeType, index: number) => {
@@ -56,7 +56,11 @@ const createNetwork = async () => {
     id: index,
     title: node.title,
     imgURL: node.imgURL,
-    gameData: node.gameData,
+    genres : node.genres,
+    price: node.price,
+    isSinglePlayer: node.isSinglePlayer,
+    isMultiPlayer: node.isMultiPlayer,
+    device: node.device,
     steamGameId: node.steamGameId,
     twitchGameId: node.twitchGameId,
     totalViews: node.totalViews,
@@ -68,7 +72,7 @@ const createNetwork = async () => {
       .map((node, index) => {
         return {
           index,
-          weight: calcCommonGenres(nodes[i].gameData, node.gameData)
+          weight: calcCommonGenres(nodes[i], node)
         };
       })
       .filter((e) => e);
@@ -106,7 +110,7 @@ const createNetwork = async () => {
 
   nodes.forEach((node: NodeType) => {
     // 一致度を計算(全体)
-    const overallMatchPercent = calcAllMatchPercentage(filter, node.gameData);
+    const overallMatchPercent = calcAllMatchPercentage(filter, node);
     node.circleScale = matchScale(overallMatchPercent);
   });
 
@@ -120,7 +124,7 @@ const createNetwork = async () => {
         .forceLink(links)
         .id((d:any) => d.id)
         .distance((item: any) => {
-          return calcCommonGenres(item.source.gameData, item.target.gameData);
+          return calcCommonGenres(item.source, item.target);
         })
     )
     .force("charge", d3.forceManyBody().strength(-1000))

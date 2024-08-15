@@ -6,11 +6,9 @@ export type gameDetailType = {
   title: string,
   imgURL: string,
   totalViews: number,
-  gameData: {
-    genres : string[],
-    price: number,
-    isSinglePlayer: boolean,
-    isMultiPlayer: boolean,
-    device: SteamDeviceType,
-  }
+  genres : string[],
+  price: number,
+  isSinglePlayer: boolean,
+  isMultiPlayer: boolean,
+  device: SteamDeviceType,
 }

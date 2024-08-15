@@ -40,15 +40,13 @@ export async function GET() {
       title: item.name,
       imgURL: item.image,
       totalViews: item.total_views,
-      gameData: {
-        genres: item.genres,
-        price: item.price,
-        isSinglePlayer: item.is_single_player,
-        isMultiPlayer: item.is_multi_player,
-        device: {
-          windows: item.is_device_windows,
-          mac: item.is_device_mac,
-        }
+      genres: item.genres,
+      price: item.price,
+      isSinglePlayer: item.is_single_player,
+      isMultiPlayer: item.is_multi_player,
+      device: {
+        windows: item.is_device_windows,
+        mac: item.is_device_mac,
       }
     }));
 
