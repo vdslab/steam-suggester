@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { getFilterData } from './indexedDB';
+import { getFilterData, getGameIdData } from './indexedDB';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
@@ -25,17 +25,33 @@ const calcCommonGenres = (game1:any, game2:any) => {
 const createNetwork = async () => {
   const k = 4;
 
-  const res = await fetch(
+  const response = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     {next: { revalidate: ISR_FETCH_INTERVAL }}
   );
-  if(!res) {
+  if(!response) {
     return {};
   }
-  const data: SteamDetailsDataType[] = await res.json();
+  const data: SteamDetailsDataType[] = await response.json();
 
-  const d = await getFilterData();
-  const filter: Filter = d ? d : DEFAULT_FILTER;
+  const gameIds = await getGameIdData() ?? [];
+
+  const promises = gameIds
+    .filter((gameId: string) => 
+      !data.find((d: SteamDetailsDataType) => d.steamGameId === gameId)
+    )
+    .map(async (gameId: string) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`,
+        { next: { revalidate: ISR_FETCH_INTERVAL } }
+      );
+      const d = await res.json();
+      data.push(d);
+    });
+
+  await Promise.all(promises);
+
+  const filter: Filter = await getFilterData() ?? DEFAULT_FILTER;
 
   const links: any = [];
   const similarGames: any = {};
