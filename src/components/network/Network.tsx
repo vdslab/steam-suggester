@@ -19,25 +19,32 @@ const Network = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      const result = await createNetwork();
-      const nodes = result?.nodes ?? [];
-      const links = result?.links ?? [];
-      const buffNodes = nodes.concat();
-      buffNodes.sort((node1: NodeType, node2: NodeType) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0));
-      setCenterX(buffNodes[0]?.x ?? 0);
-      setCenterY(buffNodes[0]?.y ?? 0);
-      setNodes(nodes);
-      setLinks(links);
-    })();
-  }, [filter]);
+  const initialNodes = async () => {
+    const result = await createNetwork();
+    const nodes = result?.nodes ?? [];
+    const links = result?.links ?? [];
+    const buffNodes = nodes.concat();
+    buffNodes.sort((node1: NodeType, node2: NodeType) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0));
+    setCenterX(buffNodes[0]?.x ?? 0);
+    setCenterY(buffNodes[0]?.y ?? 0);
+    setNodes(nodes);
+    setLinks(links);
+  };
 
   useEffect(() => {
-    if(centerX && centerY) {
-      setIsLoading(false);
+    if(isLoading) {
+      (async () => {
+        await initialNodes();
+        setIsLoading(false);
+      })();
     }
-  });
+  }, [isLoading]);
+
+  useEffect(() => {
+    if(!isLoading) {
+      initialNodes();
+    }
+  }, [filter]);
 
   return (
     <div>
@@ -49,7 +56,7 @@ const Network = () => {
           <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY}/>
         </div>
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} />
+          <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
         </div>
       </div> : <Loading />
       }

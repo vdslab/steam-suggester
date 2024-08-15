@@ -10,10 +10,11 @@ type Props = {
   nodes: NodeType[];
   setCenterX: React.Dispatch<React.SetStateAction<number>>;
   setCenterY: React.Dispatch<React.SetStateAction<number>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const GameList = (props: Props) => {
-  const { nodes, setCenterX, setCenterY } = props;
+  const { nodes, setCenterX, setCenterY, setIsLoading } = props;
 
   const [hoveredGameIdx, setHoveredGameIdx] = useState<number>(-1);
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
@@ -30,6 +31,7 @@ const GameList = (props: Props) => {
     const newUserAddedGames = userAddedGames.filter((gameId: string) => gameId !== steamGameId);
     setUserAddedGames(newUserAddedGames);
     changeGameIdData(newUserAddedGames);
+    setIsLoading(true);
   }
 
   const handleSearchClick = (steamGameId: string) => {
@@ -37,6 +39,7 @@ const GameList = (props: Props) => {
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
       changeGameIdData(newUserAddedGames);
+      setIsLoading(true);
     }
   };
 
