@@ -1,4 +1,7 @@
 export type SteamDetailsDataType = {
+  twitchGameId: string;
+  steamGameId: string;
+  totalViews?: number;
   title: string;
   genres: SteamGenreType[];
   price: number;

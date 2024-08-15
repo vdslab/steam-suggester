@@ -1,6 +1,5 @@
 import { PG_POOL } from "@/constants/PG_POOL";
-import { gameDetailType } from "@/types/api/getMatchGamesType";
-import { SteamCategoryType } from "@/types/api/getSteamDetailType";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -11,7 +10,7 @@ export async function GET() {
 
     const query = `
       SELECT gv.get_date, gv.game_title, gv.twitch_id, gv.steam_id, gv.total_views,
-             sd.game_title as name, sd.img_url as image, sd.price,
+             sd.game_title as name, sd.webpage_url as url, sd.img_url as image, sd.price,
              sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
              array_agg(json_build_object('id', g.genre_id, 'description', g.genre_name)) as genres
       FROM game_views gv
@@ -20,7 +19,7 @@ export async function GET() {
       LEFT JOIN genres g ON sdg.genre_id = g.genre_id
       WHERE gv.get_date::date = $1
       GROUP BY gv.get_date, gv.game_title, gv.twitch_id, gv.steam_id,
-               sd.game_title, sd.img_url, sd.price, sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac
+               sd.game_title, sd.webpage_url, sd.img_url, sd.price, sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac
     `;
 
     const { rows } = await PG_POOL.query(query, [dateString]);
@@ -34,11 +33,12 @@ export async function GET() {
         ))
       ));
 
-    const result: gameDetailType[] = data.map(item => ({
+    const result: SteamDetailsDataType[] = data.map(item => ({
       twitchGameId: item.twitch_id,
       steamGameId: item.steam_id,
       title: item.name,
       imgURL: item.image,
+      url: item.url,
       totalViews: item.total_views,
       genres: item.genres,
       price: item.price,
