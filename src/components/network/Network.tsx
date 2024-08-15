@@ -8,6 +8,7 @@ import GameList from './gameList/GameList';
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
 import { LinkType, NodeType } from '@/types/NetworkType';
+import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -19,8 +20,8 @@ const Network = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const initialNodes = async () => {
-    const result = await createNetwork();
+  const initialNodes = async (filter: Filter, gameIds: string[]) => {
+    const result = await createNetwork(filter, gameIds);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -34,7 +35,10 @@ const Network = () => {
   useEffect(() => {
     if(isLoading) {
       (async () => {
-        await initialNodes();
+        const filter = await getFilterData() ?? DEFAULT_FILTER;
+        const gameIds = await getGameIdData() ?? [];
+        setFilter(filter);
+        await initialNodes(filter, gameIds);
         setIsLoading(false);
       })();
     }
@@ -42,7 +46,10 @@ const Network = () => {
 
   useEffect(() => {
     if(!isLoading) {
-      initialNodes();
+      (async () => {
+        const gameIds = await getGameIdData() ?? [];
+        initialNodes(filter, gameIds);
+      })();
     }
   }, [filter]);
 

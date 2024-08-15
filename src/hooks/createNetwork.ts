@@ -1,6 +1,4 @@
 import * as d3 from 'd3';
-import { getFilterData, getGameIdData } from './indexedDB';
-import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 import { calcAllMatchPercentage } from '@/components/common/CalcMatch';
@@ -22,7 +20,7 @@ const calcCommonGenres = (game1:any, game2:any) => {
   return 1 / genresWeight;
 };
 
-const createNetwork = async () => {
+const createNetwork = async (filter: Filter, gameIds: string[]) => {
   const k = 4;
 
   const response = await fetch(
@@ -33,8 +31,6 @@ const createNetwork = async () => {
     return {};
   }
   const data: SteamDetailsDataType[] = await response.json();
-
-  const gameIds = await getGameIdData() ?? [];
 
   const promises = gameIds
     .filter((gameId: string) => 
@@ -50,8 +46,6 @@ const createNetwork = async () => {
     });
 
   await Promise.all(promises);
-
-  const filter: Filter = await getFilterData() ?? DEFAULT_FILTER;
 
   const links: any = [];
   const similarGames: any = {};
@@ -69,47 +63,48 @@ const createNetwork = async () => {
     return true;
   });
 
-  for (let i = 0; i < nodes.length; i++) {
-    const array = nodes
-      .filter((_,index) => i !== index)
-      .map((node, index) => {
-        return {
-          index,
-          weight: calcCommonGenres(nodes[i], node)
-        };
-      })
-      .filter((e) => e);
-    array.sort((a, b) => b.weight - a.weight);
-
-    const newArray = array.map((item) => item.index);
-
-    let count = 0;
-    newArray.forEach((index) => {
-      const isSourceOk =
-        links.filter((item:any) => item.target === i || item.source === i)
-          .length < k;
-      const isTargetOk =
-        links.filter((item:any) => item.target === index || item.source === index)
-          .length < k;
-      if (count < k && isSourceOk && isTargetOk && i !== index) {
-        links.push({ source: i, target: index });
-        count++;
-        if (
-          links.filter((item:any) => item.target === i || item.source === i)
-            .length >= k
-        ) {
-          ngIndex.push(i);
-        } else if (
-          links.filter(
-            (item:any) => item.target === index || item.source === index
-          ).length >= k
-        ) {
-          ngIndex.push(index);
-          count++;
-        }
-      }
-    });
+  const addLink = (links: any[], source: number, target: number, k: number): void => {
+    links.push({ source, target });
+  
+    const sourceConnections = links.filter(item => item.target === source || item.source === source).length;
+    const targetConnections = links.filter(item => item.target === target || item.source === target).length;
+  
+    if (sourceConnections >= k) {
+      ngIndex.push(source);
+    }
+    if (targetConnections >= k) {
+      ngIndex.push(target);
+    }
   }
+  
+  const canAddLink = (links: any[], index: number, nodeIndex: number, k: number): boolean => {
+    const sourceConnections = links.filter(item => item.target === nodeIndex || item.source === nodeIndex).length;
+    const targetConnections = links.filter(item => item.target === index || item.source === index).length;
+  
+    return sourceConnections < k && targetConnections < k && nodeIndex !== index;
+  }
+  
+  nodes.forEach((node: NodeType, i: number) => {
+    const otherNodes = nodes.filter((_, index) => i !== index);
+    const weightedNodes = otherNodes.map((node, index) => ({
+      index,
+      weight: calcCommonGenres(nodes[i], node),
+    }));
+  
+    weightedNodes.sort((a, b) => b.weight - a.weight);
+  
+    const sortedIndexes = weightedNodes.map(item => item.index);
+    let addedLinks = 0;
+  
+    for (const index of sortedIndexes) {
+      if (addedLinks >= k) break;
+  
+      if (canAddLink(links, index, i, k)) {
+        addLink(links, i, index, k);
+        addedLinks++;
+      }
+    }
+  })
 
   nodes.forEach((node: NodeType) => {
     // 一致度を計算(全体)

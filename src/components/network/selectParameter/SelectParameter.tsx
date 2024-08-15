@@ -1,6 +1,6 @@
 "use client";
 import { DEFAULT_FILTER, DEVICE_MAPPING, GENRE_MAPPING, MODE_MAPPING } from "@/constants/DEFAULT_FILTER";
-import { changeFilterData, getFilterData } from "@/hooks/indexedDB";
+import { changeFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
 import { useState, useEffect } from "react";
 import FilterHeadline from "./FilterHeadline";
@@ -20,16 +20,9 @@ const SelectParameter = (props: Props) => {
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
 
   useEffect(() => {
-    (async() => {
-      const d = await getFilterData();
-      if(d) {
-        setFilter(d);
-        setLocalFilter(d);
-        if(d.Price.startPrice === 0 && d.Price.endPrice === 0) {
-          setIsFreeChecked(true);
-        }
-      }
-    })();
+    if(filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {
+      setIsFreeChecked(true);
+    }
   }, [])
 
   const handlePriceChange = (values: number[]) => {
