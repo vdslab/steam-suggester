@@ -5,8 +5,7 @@ export type SteamDetailsDataType = {
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
   device: SteamDeviceType;
-  name: string;
-  image: string;
+  imgURL: string;
   url: string;
   /* header_image: string;
   short_description: string; */

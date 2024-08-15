@@ -26,7 +26,7 @@ const SimilarGames = async (props: DetailsPropsType) => {
     <div>
       <Headline txt="類似してるゲーム" />
       {data.map((game: SimilarGamePropsType) => (
-        <DisplayGame key={game.url} name={game.name} image={game.image} url={game.url} steamGameId={game.steamGameId} twitchGameId={game.twitchGameId} />
+        <DisplayGame key={game.imgURL} title={game.title} imgURL={game.imgURL} steamGameId={game.steamGameId} twitchGameId={game.twitchGameId} />
       ))}
     </div>
   )

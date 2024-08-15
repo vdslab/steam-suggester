@@ -6,9 +6,8 @@ export type DetailsPropsType = {
 
 // 類似ゲームで使用
 export type SimilarGamePropsType = {
-  name: string;
-  image: string;
-  url: string;
+  title: string;
+  imgURL: string;
   steamGameId: string;
   twitchGameId: string;
 }

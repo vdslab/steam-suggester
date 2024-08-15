@@ -47,8 +47,7 @@ export async function GET(req: Request, { params }: Params) {
       },
 
       // 類似度で使用
-      name: gameDetailData.name,
-      image: gameDetailData.image,
+      imgURL: gameDetailData.image,
       url: gameDetailData.url,
     };
 
