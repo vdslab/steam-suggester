@@ -66,9 +66,11 @@ const GameList = (props: Props) => {
     if (searchQuery === '') {
       setFilteredSteamList(steamList);
     } else {
-      const filteredList = steamList.filter((game) =>
-        game.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const filteredList = steamList
+        .filter((game) =>
+          game.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .filter((game) => !userAddedGames.find((gameId: string) => gameId === game.steamGameId));
       setFilteredSteamList(filteredList);
     }
   }, [searchQuery, steamList]);
