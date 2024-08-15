@@ -120,16 +120,28 @@ const GameList = (props: Props) => {
       <h2 className="text-white mb-2">Network Nodes</h2>
       {nodes.map((node: NodeType, index: number) => {
         const isUserAdded = userAddedGames.find((gameId: string) => gameId === node.steamGameId);
+        const rankColor = index === 0 
+                        ? "gold" 
+                        : index === 1 
+                        ? "silver" 
+                        : index === 2 
+                        ? "bronze" 
+                        : "text-slate-100";
         const textColor = isUserAdded ? "text-yellow-300" : "text-slate-100";
         return (
-          <div
-            className={`cursor-pointer ${textColor} pb-2 hover:bg-gray-700 p-2 rounded`}
-            onMouseEnter={() => setHoveredGameIdx(index)}
-            onMouseLeave={() => setHoveredGameIdx(-1)}
-            onClick={() => handleGameClick(index)}
-            key={index}
-          >
-            {node.title}
+          <div className='flex items-center' key={node.index}>
+            <div className={`${rankColor} pb-2 p-2`}>
+              {index + 1}
+            </div>
+            <div
+              className={`cursor-pointer ${textColor} pb-2 hover:bg-gray-700 p-2 rounded`}
+              onMouseEnter={() => setHoveredGameIdx(index)}
+              onMouseLeave={() => setHoveredGameIdx(-1)}
+              onClick={() => handleGameClick(index)}
+              key={index}
+            >
+              {node.title}
+            </div>
           </div>
         );
       })}
