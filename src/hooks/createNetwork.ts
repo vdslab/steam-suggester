@@ -3,14 +3,14 @@ import { Filter } from '@/types/api/FilterType';
 import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 import { calcAllMatchPercentage } from '@/components/common/CalcMatch';
 import { NodeType } from '@/types/NetworkType';
-import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
+import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
 
-const calcCommonGenres = (game1:any, game2:any) => {
+const calcCommonGenres = (game1: SteamGenreType[], game2: SteamGenreType[]) => {
   let genresWeight = 1;
 
-  game1.genres.forEach((item:any) =>
-    game2.genres.forEach((i:any) => {
-      if (i.id === item.id) {
+  game1.forEach((g1: SteamGenreType) =>
+    game2.forEach((g2: SteamGenreType) => {
+      if (g1.id === g2.id) {
         genresWeight++;
       }
     })
@@ -88,7 +88,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     const otherNodes = nodes.filter((_, index) => i !== index);
     const weightedNodes = otherNodes.map((node, index) => ({
       index,
-      weight: calcCommonGenres(nodes[i], node),
+      weight: calcCommonGenres(nodes[i].genres, node.genres),
     }));
   
     weightedNodes.sort((a, b) => b.weight - a.weight);
