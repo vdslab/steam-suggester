@@ -1,5 +1,6 @@
 "use client";
 
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
@@ -85,13 +86,15 @@ const GameList = (props: Props) => {
         <div className="bg-gray-800 p-2 rounded-lg mb-4">
           <h2 className="text-white mb-2">Search Results</h2>
           {filteredSteamList.map((game, index) => (
-            <div
-              className="cursor-pointer text-white pb-2 hover:bg-gray-700 p-2 rounded"
-              onClick={() => handleSearchClick(game.steamGameId)}
-              key={game.steamGameId}
-            >
-              {game.title}
-            </div>
+            <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
+              <div className="text-white p-2 rounded">
+                {game.title}
+              </div>
+              <PlaylistAddIcon
+                className='cursor-pointer hover:bg-gray-700 rounded'
+                onClick={() => handleSearchClick(game.steamGameId)}
+              />
+          </div>
           ))}
         </div>
       )}
@@ -101,7 +104,7 @@ const GameList = (props: Props) => {
           const game = steamList.find(game => game.steamGameId === gameId);
           return game ? (
             <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
-              <div className="cursor-pointer text-white hover:bg-gray-700 p-2 rounded">
+              <div className="text-white p-2 rounded">
                 {game.title}
               </div>
               <DeleteIcon 
