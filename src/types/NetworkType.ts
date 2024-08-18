@@ -27,7 +27,7 @@ export type NodeType = {
   imgURL: string;
   url: string;
 
-  index?: number;
+  index: number;
   x?: number;
   y?: number;
   vx?: number;
@@ -36,7 +36,7 @@ export type NodeType = {
 }
 
 export type LinkType = {
-  source: NodeType;
-  target: NodeType;
+  source: number | NodeType;
+  target: number | NodeType;
   index: number;
 }
