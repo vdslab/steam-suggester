@@ -80,7 +80,8 @@ const NodeLink = (props: any) => {
           }
           {nodes.length !== 0 &&
             nodes.map((node: NodeType, i: number) => (
-              <g transform={`translate(${node.x},${node.y})`}
+              <g className={`brightness-${hoveredIndex === node.index ? "125" : "100"}`}
+                 transform={`translate(${node.x},${node.y})`}
                  onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
                  onMouseLeave={() => setHoveredIndex(-1)}
                  key={i}>
