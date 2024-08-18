@@ -36,7 +36,14 @@ export type NodeType = {
 }
 
 export type LinkType = {
-  source: number | NodeType;
-  target: number | NodeType;
-  index: number;
+  source: NodeType | number;
+  target: NodeType | number;
+  index?: number;
+}
+
+export type SimilarGameType = {
+  [key: string]: {
+    steamGameId: string;
+    twitchGameId: string;
+  }[]
 }

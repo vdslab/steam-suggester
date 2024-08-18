@@ -4,6 +4,8 @@ import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 import { calcAllMatchPercentage } from '@/components/common/CalcMatch';
 import { LinkType, NodeType } from '@/types/NetworkType';
 import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
+import { SimilarGameType } from '@/types/NetworkType';
+
 
 const calcCommonGenres = (game1: SteamGenreType[], game2: SteamGenreType[]) => {
   let genresWeight = 1;
@@ -47,8 +49,8 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
 
   await Promise.all(promises);
 
-  const links: any = [];
-  const similarGames: any = {};
+  const links: LinkType[] = [];
+  const similarGames: SimilarGameType = {};
 
   const matchScale = d3.scaleLinear()
                       .domain([0, 100])
@@ -62,7 +64,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     return true;
   }).map((item: SteamDetailsDataType, i: number) => {return {...item, index: i}}))];
 
-  const canAddLink = (links: any[], sourceIndex: number, targetIndex: number): boolean => {
+  const canAddLink = (links: LinkType[], sourceIndex: number, targetIndex: number): boolean => {
     const sourceConnections = links.filter(item => item.source === sourceIndex || item.target === sourceIndex).length;
     const targetConnections = links.filter(item => item.source === targetIndex || item.target === targetIndex).length;
     
@@ -113,37 +115,47 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
   nodes.sort((node1: NodeType, node2: NodeType) => (node2?.circleScale ?? 0) - (node1?.circleScale ?? 0));
 
   const simulation = d3
-    .forceSimulation(nodes)
+    .forceSimulation<NodeType>(nodes)
     .force(
       "link",
       d3
-        .forceLink(links)
-        .id((d:any) => d.index)
-        .distance((item: any) => {
-          return calcCommonGenres(item.source.genres, item.target.genres);
+        .forceLink<NodeType, LinkType>(links)
+        .id((d: NodeType) => d.index)
+        .distance((item: LinkType) => {
+          const sourceNode = item.source as NodeType;
+          const targetNode = item.target as NodeType;
+          
+          if(typeof sourceNode !== "number" && typeof targetNode !== "number") {
+            return calcCommonGenres(sourceNode.genres, targetNode.genres);
+          }
+          return 0;
         })
     )
-    .force("charge", d3.forceManyBody().strength(-1000))
-    .force("collide", d3.forceCollide().radius((d: any) => d.circleScale * 20)) // 衝突半径を設定
+    .force("charge", d3.forceManyBody<NodeType>().strength(-1000))
+    .force("collide", d3.forceCollide<NodeType>().radius((d: NodeType) => (d.circleScale ?? 1) * 20));
 
-  simulation.tick(300).stop()
+  simulation.tick(300).stop();
 
-  nodes.forEach((node: any) => {
-    similarGames[node.steamGameId] = [];
+  nodes.forEach((node: NodeType) => {
+    similarGames[node.steamGameId] = [] as { steamGameId: string; twitchGameId: string }[];
   })
 
-  links.forEach((link: any) => {
-    const sourceGame = link.source;
-    const targetGame = link.target;
+  links.forEach((link: LinkType) => {
+    type GameType = {
+      steamGameId: string;
+      twitchGameId: string;
+    }
+    const sourceGame = link.source as NodeType;
+    const targetGame = link.target as NodeType;
   
-    const isSourceGameIncluded = similarGames[sourceGame.steamGameId].some((game: any) =>
+    const isSourceGameIncluded = similarGames[sourceGame.steamGameId].some((game: GameType) => 
       game.steamGameId === targetGame.steamGameId && game.twitchGameId === targetGame.twitchGameId
     );
     if(!isSourceGameIncluded) {
       similarGames[sourceGame.steamGameId].push({ steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId });
     }
   
-    const isTargetGameIncluded = similarGames[targetGame.steamGameId].some((game: any) =>
+    const isTargetGameIncluded = similarGames[targetGame.steamGameId].some((game: GameType) =>
       game.steamGameId === sourceGame.steamGameId && game.twitchGameId === sourceGame.twitchGameId
     );
     if(!isTargetGameIncluded) {

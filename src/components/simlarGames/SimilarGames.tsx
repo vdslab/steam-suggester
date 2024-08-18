@@ -21,18 +21,21 @@ const SimilarGames = (props: DetailsPropsType) => {
       const filter = await getFilterData() ?? DEFAULT_FILTER;
       const gameIds = await getGameIdData() ?? [];
       const { similarGames } = await createNetwork(filter, gameIds);
-      const promises = similarGames[steamGameId].map(async (game: GameType) => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${game.steamGameId}`);
-        const d = await res.json();
-        return {
-          ...d, 
-          steamGameId: game.steamGameId,
-          twitchGameId: game.twitchGameId
-        };
-      });
   
-      const data = await Promise.all(promises);
-      setData(data);
+      if(similarGames && similarGames[steamGameId]) {
+        const promises = similarGames[steamGameId].map(async (game: GameType) => {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${game.steamGameId}`);
+          const d = await res.json();
+          return {
+            ...d, 
+            steamGameId: game.steamGameId,
+            twitchGameId: game.twitchGameId
+          };
+        });
+  
+        const data = await Promise.all(promises);
+        setData(data);
+      }
     })();
   }, []);
 
