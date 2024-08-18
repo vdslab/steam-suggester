@@ -17,10 +17,11 @@ type Props = {
 const GameList = (props: Props) => {
   const { nodes, setCenterX, setCenterY, setIsLoading } = props;
 
-  const [hoveredGameIdx, setHoveredGameIdx] = useState<number>(-1);
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchSteamQuery, setSearchSteamQuery] = useState<string>('');
+  const [searchNodesQuery, setSearchNodesQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
+  const [filteredNodeList, setFilteredNodeList] = useState<NodeType[]>(nodes);
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
 
   const handleGameClick = (index: number) => {
@@ -36,7 +37,7 @@ const GameList = (props: Props) => {
   }
 
   const handleSearchClick = (steamGameId: string) => {
-    if (!userAddedGames.includes(steamGameId)) {
+    if(!userAddedGames.includes(steamGameId)) {
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
       changeGameIdData(newUserAddedGames);
@@ -50,7 +51,7 @@ const GameList = (props: Props) => {
         `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`,
         { next: { revalidate: ISR_FETCH_INTERVAL } }
       );
-      if (!res1) {
+      if(!res1) {
         return {};
       }
       const data = await res1.json();
@@ -63,28 +64,40 @@ const GameList = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    if (searchQuery === '') {
+    if(searchSteamQuery === '') {
       setFilteredSteamList(steamList);
     } else {
       const filteredList = steamList
         .filter((game) =>
-          game.title.toLowerCase().includes(searchQuery.toLowerCase())
+          game.title.toLowerCase().includes(searchSteamQuery.toLowerCase())
         )
         .filter((game) => !userAddedGames.find((gameId: string) => gameId === game.steamGameId));
       setFilteredSteamList(filteredList);
     }
-  }, [searchQuery, steamList]);
+  }, [steamList, searchSteamQuery]);
+
+  useEffect(() => {
+    if(searchNodesQuery === '') {
+      setFilteredNodeList(nodes);
+    } else {
+      const filteredList = nodes
+        .filter((game) =>
+          game.title.toLowerCase().includes(searchNodesQuery.toLowerCase())
+        )
+      setFilteredNodeList(filteredList);
+    }
+  }, [nodes, searchNodesQuery]);
 
   return (
     <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px' }}>
       <input
         type="text"
         placeholder="Search for a game title"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        value={searchSteamQuery}
+        onChange={(e) => setSearchSteamQuery(e.target.value)}
         className="w-full p-2 mb-2 text-black"
       />
-      {searchQuery !== '' && (
+      {searchSteamQuery !== '' && (
         <div className="bg-gray-800 p-2 rounded-lg mb-4">
           <h2 className="text-white mb-2">Search Results</h2>
           {filteredSteamList.map((game, index) => (
@@ -102,7 +115,7 @@ const GameList = (props: Props) => {
       )}
       <div className="bg-gray-800 p-2 rounded-lg mb-4">
         <h2 className="text-white mb-2">User Added Games</h2>
-        {userAddedGames.map((gameId, index) => {
+        {userAddedGames.map((gameId) => {
           const isInNodes = nodes.find((node: NodeType) => node.steamGameId === gameId);
           const game = steamList.find(game => game.steamGameId === gameId);
           const textColor = isInNodes ? "text-yellow-300" : "text-slate-400";
@@ -119,8 +132,16 @@ const GameList = (props: Props) => {
           ) : null;
         })}
       </div>
+      <input
+        type="text"
+        placeholder="Search for a game node"
+        value={searchNodesQuery}
+        onChange={(e) => setSearchNodesQuery(e.target.value)}
+        className="w-full p-2 mb-2 text-black"
+      />
       <h2 className="text-white mb-2">Network Nodes</h2>
       {nodes.map((node: NodeType, index: number) => {
+        if(!filteredNodeList.find((item) => item === node)) return null;
         const isUserAdded = userAddedGames.find((gameId: string) => gameId === node.steamGameId);
         const rankColor = index === 0 
                         ? "gold" 
@@ -137,8 +158,6 @@ const GameList = (props: Props) => {
             </div>
             <div
               className={`cursor-pointer ${textColor} pb-2 hover:bg-gray-700 p-2 rounded`}
-              onMouseEnter={() => setHoveredGameIdx(index)}
-              onMouseLeave={() => setHoveredGameIdx(-1)}
               onClick={() => handleGameClick(index)}
               key={index}
             >
