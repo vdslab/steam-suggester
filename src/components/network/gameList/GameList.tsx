@@ -134,7 +134,8 @@ const GameList = (props: Props) => {
           }).map((gameId) => {
           const nodeIndex = nodes.findIndex((node: NodeType) => node.steamGameId === gameId);
           const game = steamList.find(game => game.steamGameId === gameId);
-          const { textColor, rankColor } = selectColor(nodeIndex, nodeIndex >= 0);
+          const isInNodes = nodeIndex >= 0;
+          const { textColor, rankColor } = selectColor(nodeIndex, isInNodes);
           return game ? (
             <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
               <div className='flex items-center'>
@@ -142,7 +143,14 @@ const GameList = (props: Props) => {
                   {nodeIndex >= 0 && nodeIndex + 1}
                 </div>
                 <div className={`${textColor} p-2 rounded`}>
-                  {game.title}
+                  {isInNodes ? <div 
+                    className='cursor-pointer'
+                    onClick={() => handleGameClick(nodeIndex)}
+                  >
+                    {game.title}
+                  </div> : <div>
+                    {game.title}
+                  </div>}
                 </div>
               </div>
               <DeleteIcon 
