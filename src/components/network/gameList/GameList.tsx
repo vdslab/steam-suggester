@@ -24,6 +24,18 @@ const GameList = (props: Props) => {
   const [filteredNodeList, setFilteredNodeList] = useState<NodeType[]>(nodes);
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
 
+  const selectColor = (index: number, flag: boolean) => {
+    const textColor = flag ? "text-yellow-300" : "text-slate-400";
+    const rankColor = index === 0 
+                    ? "gold" 
+                    : index === 1 
+                    ? "silver" 
+                    : index === 2 
+                    ? "bronze" 
+                    : "text-slate-100";
+    return { textColor, rankColor };
+  }
+
   const handleGameClick = (index: number) => {
     setCenterX(nodes[index].x ?? 0);
     setCenterY(nodes[index].y ?? 0);
@@ -115,14 +127,23 @@ const GameList = (props: Props) => {
       )}
       <div className="bg-gray-800 p-2 rounded-lg mb-4">
         <h2 className="text-white mb-2">User Added Games</h2>
-        {userAddedGames.map((gameId) => {
-          const isInNodes = nodes.find((node: NodeType) => node.steamGameId === gameId);
+        {userAddedGames.slice().sort((gameId1: string, gameId2: string) => {
+            const index1 = nodes.findIndex((node: NodeType) => node.steamGameId === gameId1);
+            const index2 = nodes.findIndex((node: NodeType) => node.steamGameId === gameId2);
+            return index1 - index2;
+          }).map((gameId) => {
+          const nodeIndex = nodes.findIndex((node: NodeType) => node.steamGameId === gameId);
           const game = steamList.find(game => game.steamGameId === gameId);
-          const textColor = isInNodes ? "text-yellow-300" : "text-slate-400";
+          const { textColor, rankColor } = selectColor(nodeIndex, nodeIndex >= 0);
           return game ? (
             <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
-              <div className={`${textColor} p-2 rounded`}>
-                {game.title}
+              <div className='flex items-center'>
+                <div className={`${rankColor} pb-2 p-2`}>
+                  {nodeIndex >= 0 && nodeIndex + 1}
+                </div>
+                <div className={`${textColor} p-2 rounded`}>
+                  {game.title}
+                </div>
               </div>
               <DeleteIcon 
                 className='cursor-pointer hover:bg-gray-700 rounded'
@@ -143,14 +164,7 @@ const GameList = (props: Props) => {
       {nodes.map((node: NodeType, index: number) => {
         if(!filteredNodeList.find((item) => item === node)) return null;
         const isUserAdded = userAddedGames.find((gameId: string) => gameId === node.steamGameId);
-        const rankColor = index === 0 
-                        ? "gold" 
-                        : index === 1 
-                        ? "silver" 
-                        : index === 2 
-                        ? "bronze" 
-                        : "text-slate-100";
-        const textColor = isUserAdded ? "text-yellow-300" : "text-slate-100";
+        const { textColor, rankColor } = selectColor(index, isUserAdded ? true : false);
         return (
           <div className='flex items-center' key={node.index}>
             <div className={`${rankColor} pb-2 p-2`}>
