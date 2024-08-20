@@ -45,11 +45,14 @@ const GameList = (props: Props) => {
     const newUserAddedGames = userAddedGames.filter((gameId: string) => gameId !== steamGameId);
     setUserAddedGames(newUserAddedGames);
     changeGameIdData(newUserAddedGames);
+    handleGameClick(0);
     setIsLoading(true);
   }
 
   const handleSearchClick = (steamGameId: string) => {
     if(!userAddedGames.includes(steamGameId)) {
+      const index = filteredNodeList.findIndex((node: NodeType) => node.steamGameId === steamGameId);
+      if(index !== -1) handleGameClick(index);
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
       changeGameIdData(newUserAddedGames);
@@ -112,7 +115,7 @@ const GameList = (props: Props) => {
       {searchSteamQuery !== '' && (
         <div className="bg-gray-800 p-2 rounded-lg mb-4">
           <h2 className="text-white mb-2">Search Results</h2>
-          {filteredSteamList.map((game, index) => (
+          {filteredSteamList.map((game) => (
             <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
               <div className="text-white p-2 rounded">
                 {game.title}
