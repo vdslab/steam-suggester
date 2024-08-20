@@ -25,7 +25,7 @@ const GameList = (props: Props) => {
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
 
   const selectColor = (index: number, flag: boolean) => {
-    const textColor = flag ? "text-yellow-300" : "text-slate-400";
+    const textColor = flag ? "text-yellow-300" : "text-slate-100";
     const rankColor = index === 0 
                     ? "gold" 
                     : index === 1 
@@ -130,6 +130,8 @@ const GameList = (props: Props) => {
         {userAddedGames.slice().sort((gameId1: string, gameId2: string) => {
             const index1 = nodes.findIndex((node: NodeType) => node.steamGameId === gameId1);
             const index2 = nodes.findIndex((node: NodeType) => node.steamGameId === gameId2);
+            if(index1 === -1) return 1;
+            if(index2 === -1) return -1;
             return index1 - index2;
           }).map((gameId) => {
           const nodeIndex = nodes.findIndex((node: NodeType) => node.steamGameId === gameId);
@@ -148,7 +150,9 @@ const GameList = (props: Props) => {
                     onClick={() => handleGameClick(nodeIndex)}
                   >
                     {game.title}
-                  </div> : <div>
+                  </div> : <div
+                    className='text-slate-400'
+                  >
                     {game.title}
                   </div>}
                 </div>
