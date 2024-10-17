@@ -1,5 +1,6 @@
 module.exports = {
   images: {
+    domains: ['static-cdn.jtvnw.net'],
     remotePatterns: [
       {
         protocol: "https",
