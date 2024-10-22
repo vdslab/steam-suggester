@@ -1,12 +1,14 @@
 export type SteamDetailsDataType = {
+  twitchGameId: string;
+  steamGameId: string;
+  totalViews?: number;
   title: string;
   genres: SteamGenreType[];
   price: number;
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
   device: SteamDeviceType;
-  name: string;
-  image: string;
+  imgURL: string;
   url: string;
   /* header_image: string;
   short_description: string; */

@@ -20,7 +20,7 @@ const GameExplanation = async(props:Props) => {
   return (
     <div className="container w-4/5 mx-auto p-4 max-w-3xl">
       <div className="rounded-lg overflow-hidden border border-gray-400">
-        <Image src={data.image} alt="Game Header" width={1000} height={0} className="w-full h-auto" />
+        <Image src={data.imgURL} alt="Game Header" width={1000} height={0} className="w-full h-auto" />
         {/* <div className="p-6">
           <div className="text-white max-h-20 overflow-y-auto">{data.short_description}</div>
         </div> */}

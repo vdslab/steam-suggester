@@ -20,7 +20,7 @@ const MatchIndicator = ( props:Props ) => {
 
   useEffect(() => {
     (async() => {
-      const d = await getFilterData('unique_id');
+      const d = await getFilterData();
       if(d) {
         setLocalFilter(d);
 

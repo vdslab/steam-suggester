@@ -1,5 +1,4 @@
 export type Filter = {
-  id: string;
   Categories: { [key: string]: boolean };
   Price: { startPrice: number, endPrice: number };
   Mode: {

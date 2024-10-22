@@ -1,6 +1,6 @@
 "use client";
 import { DEFAULT_FILTER, DEVICE_MAPPING, GENRE_MAPPING, MODE_MAPPING } from "@/constants/DEFAULT_FILTER";
-import { addFilterData, getFilterData, updateFilterData } from "@/hooks/indexedDB";
+import { changeFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
 import { useState, useEffect } from "react";
 import FilterHeadline from "./FilterHeadline";
@@ -20,16 +20,9 @@ const SelectParameter = (props: Props) => {
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
 
   useEffect(() => {
-    (async() => {
-      const d = await getFilterData('unique_id');
-      if(d) {
-        setFilter(d);
-        setLocalFilter(d);
-        if(d.Price.startPrice === 0 && d.Price.endPrice === 0) {
-          setIsFreeChecked(true);
-        }
-      }
-    })();
+    if(filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {
+      setIsFreeChecked(true);
+    }
   }, [])
 
   const handlePriceChange = (values: number[]) => {
@@ -52,14 +45,7 @@ const SelectParameter = (props: Props) => {
   };
 
   const handleClickFilter = (filter: Filter) => {
-    (async() => {
-      const d = await getFilterData('unique_id');
-      if(d) {
-        updateFilterData(filter);
-      } else {
-        addFilterData(filter);
-      }
-    })();
+    changeFilterData(filter);
     setFilter(filter)
     setLocalFilter(filter)
     if(filter === DEFAULT_FILTER) {
@@ -149,7 +135,7 @@ const SelectParameter = (props: Props) => {
         rowLevel={2}
       />
         
-      <div className="absolute bottom-0 left-0 p-4 w-[calc(25%-12px)] z-10" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
+      <div className="absolute bottom-0 left-0 p-4 w-[calc(20%-12px)] z-10" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
         <button
           className="text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500 w-full mb-2"
           onClick={() => handleClickFilter(localFilter)}

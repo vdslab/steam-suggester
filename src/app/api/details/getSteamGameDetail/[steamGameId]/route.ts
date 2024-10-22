@@ -15,7 +15,7 @@ export async function GET(req: Request, { params }: Params) {
     const client = await PG_POOL.connect();
 
     const query = `
-      SELECT sd.steam_game_id, sd.game_title as name, sd.webpage_url as url, sd.img_url as image, sd.price,
+      SELECT sd.steam_game_id, sd.twitch_game_id, sd.game_title as name, sd.webpage_url as url, sd.img_url as image, sd.price,
              sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
              array_agg(json_build_object('id', g.genre_id, 'description', g.genre_name)) as genres
       FROM steam_data sd
@@ -36,6 +36,8 @@ export async function GET(req: Request, { params }: Params) {
 
     const formattedResult: SteamDetailsDataType = {
       // マッチ度で使用
+      steamGameId: gameDetailData.steam_game_id,
+      twitchGameId: gameDetailData.twitch_game_id,
       title: gameDetailData.name,
       genres: gameDetailData.genres,
       price: gameDetailData.price,
@@ -47,8 +49,7 @@ export async function GET(req: Request, { params }: Params) {
       },
 
       // 類似度で使用
-      name: gameDetailData.name,
-      image: gameDetailData.image,
+      imgURL: gameDetailData.image,
       url: gameDetailData.url,
     };
 

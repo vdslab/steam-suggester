@@ -4,12 +4,12 @@ import Link from "next/link";
 
 const DisplayGame = (props:SimilarGamePropsType) => {
 
-  const { name, image, url, steamGameId, twitchGameId } = props;
+  const { title, imgURL, steamGameId, twitchGameId } = props;
 
   return (
     <Link className="flex flex-col box-border mt-[3vh]" href={`/desktop/details/${steamGameId}/${twitchGameId}`}>
-      <Image width={1000} height={0} src={image} alt={name} priority className="mx-auto h-auto w-4/6" />
-      <p className="text-center my-2 text-white">{name}</p>
+      <Image width={1000} height={0} src={imgURL} alt={title} priority className="mx-auto h-auto w-4/6" />
+      <p className="text-center my-2 text-white">{title}</p>
     </Link>
   )
 }

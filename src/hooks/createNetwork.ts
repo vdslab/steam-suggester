@@ -1,34 +1,18 @@
 import * as d3 from 'd3';
-import { getFilterData } from './indexedDB';
-import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
-import { SteamDetailsDataType, SteamDeviceType, SteamGenreType } from '@/types/api/getSteamDetailType';
 import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 import { calcAllMatchPercentage } from '@/components/common/CalcMatch';
-
-type Node = {
-  circleScale?: number,
-  gameData: SteamDetailsDataType,
-  id: number,
-  imgURL: string,
-  index?: number,
-  steamGameId: string,
-  title: string,
-  totalViews: number,
-  twitchGameId: string,
-  vx?: number,
-  vy?: number,
-  x?: number,
-  y?: number,
-}
+import { LinkType, NodeType } from '@/types/NetworkType';
+import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
+import { SimilarGameType } from '@/types/NetworkType';
 
 
-const calcCommonGenres = (game1:any, game2:any) => {
+const calcCommonGenres = (game1: SteamGenreType[], game2: SteamGenreType[]) => {
   let genresWeight = 1;
 
-  game1.genres.forEach((item:any) =>
-    game2.genres.forEach((i:any) => {
-      if (i.id === item.id) {
+  game1.forEach((g1: SteamGenreType) =>
+    game2.forEach((g2: SteamGenreType) => {
+      if(g1.id === g2.id) {
         genresWeight++;
       }
     })
@@ -38,133 +22,145 @@ const calcCommonGenres = (game1:any, game2:any) => {
   return 1 / genresWeight;
 };
 
-const createNetwork = async () => {
+const createNetwork = async (filter: Filter, gameIds: string[]) => {
   const k = 4;
 
-  const res = await fetch(
+  const response = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     {next: { revalidate: ISR_FETCH_INTERVAL }}
   );
-  if(!res) {
+  if(!response) {
     return {};
   }
-  const data:SteamDetailsDataType[] = await res.json();
+  const data: SteamDetailsDataType[] = await response.json();
 
-  const d = await getFilterData('unique_id');
-  const filter: Filter = d ? d : DEFAULT_FILTER;
+  const promises = gameIds
+    .filter((gameId: string) => 
+      !data.find((d: SteamDetailsDataType) => d.steamGameId === gameId)
+    )
+    .map(async (gameId: string) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`,
+        { next: { revalidate: ISR_FETCH_INTERVAL } }
+      );
+      const d = await res.json();
+      data.push(d);
+    });
 
-  const links: any = [];
-  const similarGames: any = {};
-  const ngIndex = [];
+  await Promise.all(promises);
+
+  const links: LinkType[] = [];
+  const similarGames: SimilarGameType = {};
 
   const matchScale = d3.scaleLinear()
                       .domain([0, 100])
                       .range([1, 3])
 
-  const nodes: Node[] = Object.values(data).filter((item: any) => {
-    if(!item.gameData.genres.find((value:any) => filter["Categories"][value.id])) return false;
-    if(!(filter.Price.startPrice <= item.gameData.price && item.gameData.price <= filter.Price.endPrice)) return false;
-    if(!((item.gameData.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.gameData.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
-    if(!((item.gameData.device.windows && filter.Device.windows) || (item.gameData.device.mac && filter.Device.mac))) return false;
-   
+  const nodes: NodeType[] = [...new Set(data.filter((item: SteamDetailsDataType) => {
+    if(!item.genres.find((value: SteamGenreType) => filter["Categories"][value.id])) return false;
+    if(!(filter.Price.startPrice <= item.price && item.price <= filter.Price.endPrice)) return false;
+    if(!((item.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
+    if(!((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))) return false;
     return true;
-  }).map((node: any, index) => ({
-    id: index,
-    title: node.title,
-    imgURL: node.imgURL,
-    gameData: node.gameData,
-    steamGameId: node.steamGameId,
-    twitchGameId: node.twitchGameId,
-    totalViews: node.totalViews,
-  }));
+  }).map((item: SteamDetailsDataType, i: number) => {return {...item, index: i}}))];
 
-  for (let i = 0; i < nodes.length; i++) {
-    const array = nodes
-      .filter((_,index) => i !== index)
-      .map((node, index) => {
-        return {
-          index,
-          weight: calcCommonGenres(nodes[i].gameData, node.gameData)
-        };
-      })
-      .filter((e) => e);
-    array.sort((a, b) => a.weight - b.weight);
-
-    const newArray = array.map((item) => item.index);
-
-    let count = 0;
-    newArray.forEach((index) => {
-      const isSourceOk =
-        links.filter((item:any) => item.target === i || item.source === i)
-          .length < k;
-      const isTargetOk =
-        links.filter((item:any) => item.target === index || item.source === index)
-          .length < k;
-      if (count < k && isSourceOk && isTargetOk) {
-        if (i !== index) {
-          links.push({ source: i, target: index });
-          count++;
-        }
-        if (
-          links.filter((item:any) => item.target === i || item.source === i)
-            .length >= k
-        ) {
-          ngIndex.push(i);
-        } else if (
-          links.filter(
-            (item:any) => item.target === index || item.source === index
-          ).length >= k
-        ) {
-          ngIndex.push(index);
-          count++;
-        }
-      }
-    });
+  const canAddLink = (links: LinkType[], sourceIndex: number, targetIndex: number): boolean => {
+    const sourceConnections = links.filter(item => item.source === sourceIndex || item.target === sourceIndex).length;
+    const targetConnections = links.filter(item => item.source === targetIndex || item.target === targetIndex).length;
+    
+    return sourceIndex !== targetIndex && sourceConnections < k && targetConnections < k;
   }
 
+  nodes.forEach((sourceNode: NodeType) => {
+    const weightedNodes = nodes
+      .filter(targetNode => sourceNode !== targetNode)
+      .map((targetNode) => ({
+        node: targetNode,
+        weight: calcCommonGenres(sourceNode.genres, targetNode.genres),
+      }))
+      .sort((a, b) => b.weight - a.weight);
+
+    let addedLinks = 0;
+    for(const { node: targetNode } of weightedNodes) {
+      if(addedLinks >= k) break;
+
+      if(canAddLink(links, sourceNode.index, targetNode.index)) {
+        links.push({ source: sourceNode.index, target: targetNode.index });
+        addedLinks++;
+      }
+    }
+  });
+
+  nodes.forEach((node) => {
+    let sourceConnections = links.filter((link: LinkType) => link.source === node.index || link.target === node.index).length;
+
+    if(sourceConnections < k) {
+      for(const targetNode of nodes) {
+        if(sourceConnections >= k) break;
+
+        if(canAddLink(links, node.index, targetNode.index)) {
+          links.push({ source: node.index, target: targetNode.index });
+          sourceConnections++;
+        }
+      }
+    }
+  });
+
+  nodes.forEach((node: NodeType) => {
+    // 一致度を計算(全体)
+    const overallMatchPercent = calcAllMatchPercentage(filter, node);
+    node.circleScale = matchScale(overallMatchPercent);
+  });
+
+  nodes.sort((node1: NodeType, node2: NodeType) => (node2?.circleScale ?? 0) - (node1?.circleScale ?? 0));
+
   const simulation = d3
-    .forceSimulation(nodes)
+    .forceSimulation<NodeType>(nodes)
     .force(
       "link",
       d3
-        .forceLink(links)
-        .id((d:any) => d.id)
-        .distance((item: any) => {
-          return calcCommonGenres(item.source.gameData, item.target.gameData);
+        .forceLink<NodeType, LinkType>(links)
+        .id((d: NodeType) => d.index)
+        .distance((item: LinkType) => {
+          const sourceNode = item.source as NodeType;
+          const targetNode = item.target as NodeType;
+          
+          if(typeof sourceNode !== "number" && typeof targetNode !== "number") {
+            return calcCommonGenres(sourceNode.genres, targetNode.genres);
+          }
+          return 0;
         })
     )
-    .force("charge", d3.forceManyBody().strength(-1000))
+    .force("charge", d3.forceManyBody<NodeType>().strength(-1000))
+    .force("collide", d3.forceCollide<NodeType>().radius((d: NodeType) => (d.circleScale ?? 1) * 20));
 
-  simulation.tick(300).stop()
+  simulation.tick(300).stop();
 
-  nodes.forEach((node: any) => {
-    similarGames[node.steamGameId] = [];
+  nodes.forEach((node: NodeType) => {
+    similarGames[node.steamGameId] = [] as { steamGameId: string; twitchGameId: string }[];
   })
 
-  links.forEach((link: any) => {
-    const sourceGame = link.source;
-    const targetGame = link.target;
-
-    const isSourceGameIncluded = similarGames[sourceGame.steamGameId].some((game:any) => 
-      game.steamGameId === targetGame.steamGameId && targetGame.twitchGameId === targetGame.twitchGameId
+  links.forEach((link: LinkType) => {
+    type GameType = {
+      steamGameId: string;
+      twitchGameId: string;
+    }
+    const sourceGame = link.source as NodeType;
+    const targetGame = link.target as NodeType;
+  
+    const isSourceGameIncluded = similarGames[sourceGame.steamGameId].some((game: GameType) => 
+      game.steamGameId === targetGame.steamGameId && game.twitchGameId === targetGame.twitchGameId
     );
     if(!isSourceGameIncluded) {
-      similarGames[sourceGame.steamGameId].push({steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId});
+      similarGames[sourceGame.steamGameId].push({ steamGameId: targetGame.steamGameId, twitchGameId: targetGame.twitchGameId });
     }
-   
-    const isTargetGameIncluded = similarGames[targetGame.steamGameId].some((game:any) => 
+  
+    const isTargetGameIncluded = similarGames[targetGame.steamGameId].some((game: GameType) =>
       game.steamGameId === sourceGame.steamGameId && game.twitchGameId === sourceGame.twitchGameId
     );
     if(!isTargetGameIncluded) {
-      similarGames[targetGame.steamGameId].push({steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId});
+      similarGames[targetGame.steamGameId].push({ steamGameId: sourceGame.steamGameId, twitchGameId: sourceGame.twitchGameId });
     }
-
-  });
-
-  nodes.forEach((node: Node) => {
-    // 一致度を計算(全体)
-    const overallMatchPercent = calcAllMatchPercentage(filter, node.gameData);
-    node.circleScale = matchScale(overallMatchPercent);
   });
 
   return {nodes, links, similarGames};
