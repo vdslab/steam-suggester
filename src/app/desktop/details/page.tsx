@@ -6,14 +6,9 @@ import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
 import SimilarGames from "@/components/simlarGames/SimilarGames"
 
-export default function Page({
-  params
-}: {
-  params: { steamGameId: string, twitchGameId: string }
-}){
-
-  const { steamGameId, twitchGameId } = params;
-
+export default function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
+  const steamGameId = searchParams.steam_id || "";
+  const twitchGameId = searchParams.twitch_id || "";
   return (
     <>
       <Header />
