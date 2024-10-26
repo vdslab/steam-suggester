@@ -25,7 +25,14 @@ export async function GET(req: Request, { params }: Params) {
       GROUP BY sd.steam_game_id;
     `;
 
+    const tagsQuery = `
+      SELECT tag_name
+      FROM steam_data_tags
+      WHERE steam_game_id = $1;
+    `;
+
     const result = await client.query(query, [steamGameId]);
+    const tagsResult = await client.query(tagsQuery, [steamGameId]);
     client.release();
 
     if (result.rows.length === 0) {
@@ -33,6 +40,7 @@ export async function GET(req: Request, { params }: Params) {
     }
 
     const gameDetailData = result.rows[0];
+    const tags = tagsResult.rows.length > 0 ? tagsResult.rows.map(row => row.tag_name) : [];
 
     const formattedResult: SteamDetailsDataType = {
       // マッチ度で使用
@@ -47,6 +55,7 @@ export async function GET(req: Request, { params }: Params) {
         windows: gameDetailData.is_device_windows,
         mac: gameDetailData.is_device_mac,
       },
+      tags: tags,
 
       // 類似度で使用
       imgURL: gameDetailData.image,

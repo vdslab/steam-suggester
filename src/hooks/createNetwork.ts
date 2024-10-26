@@ -6,21 +6,37 @@ import { LinkType, NodeType } from '@/types/NetworkType';
 import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
 import { SimilarGameType } from '@/types/NetworkType';
 
+const calcWeight = (game1: NodeType, game2: NodeType) => {
+  let totalWeight = 1;
 
-const calcCommonGenres = (game1: SteamGenreType[], game2: SteamGenreType[]) => {
   let genresWeight = 1;
+  const genres1: SteamGenreType[] = game1.genres;
+  const genres2: SteamGenreType[] = game2.genres;
 
-  game1.forEach((g1: SteamGenreType) =>
-    game2.forEach((g2: SteamGenreType) => {
-      if(g1.id === g2.id) {
+  genres1.forEach((genre1: SteamGenreType) => {
+    genres2.forEach((genre2: SteamGenreType) => {
+      if(genre1.id === genre2.id) {
         genresWeight++;
+      }
+    });
+  });
+
+  let tagsWeight = 1;
+  const tags1: string[] = game1.tags;
+  const tags2: string[] = game2.tags;
+
+  tags1.forEach((tag1: string) =>
+    tags2.forEach((tag2: string) => {
+      if(tag1 === tag2) {
+        tagsWeight++;
       }
     })
   );
-  genresWeight *= 10;
 
-  return 1 / genresWeight;
-};
+  totalWeight += (genresWeight + tagsWeight) * 10;
+
+  return totalWeight;
+}
 
 const createNetwork = async (filter: Filter, gameIds: string[]) => {
   const k = 4;
@@ -76,7 +92,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
       .filter(targetNode => sourceNode !== targetNode)
       .map((targetNode) => ({
         node: targetNode,
-        weight: calcCommonGenres(sourceNode.genres, targetNode.genres),
+        weight: calcWeight(sourceNode, targetNode)
       }))
       .sort((a, b) => b.weight - a.weight);
 
@@ -126,7 +142,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
           const targetNode = item.target as NodeType;
           
           if(typeof sourceNode !== "number" && typeof targetNode !== "number") {
-            return calcCommonGenres(sourceNode.genres, targetNode.genres);
+            return 1 / calcWeight(sourceNode, targetNode);
           }
           return 0;
         })

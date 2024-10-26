@@ -20,6 +20,7 @@ export type NodeType = {
   totalViews?: number;
   title: string;
   genres : SteamGenreType[];
+  tags: string[];
   price: number;
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
