@@ -92,6 +92,7 @@ const NodeLink = (props: any) => {
                   steamGameId={node.steamGameId}
                   twitchGameId={node.twitchGameId}
                   circleScale={node.circleScale ?? 1}
+                  suggestValue={node.suggestValue}
                 />
               </g>
             ))}

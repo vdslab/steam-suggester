@@ -7,6 +7,7 @@ export type IconType = {
   steamGameId: string;
   twitchGameId: string;
   circleScale: number;
+  suggestValue: number;
 }
 
 export type SteamListType = {
@@ -27,6 +28,7 @@ export type NodeType = {
   device: SteamDeviceType;
   imgURL: string;
   url: string;
+  suggestValue: number;
 
   index: number;
   x?: number;

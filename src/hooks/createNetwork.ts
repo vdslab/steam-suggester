@@ -79,7 +79,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     if(!((item.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
     if(!((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))) return false;
     return true;
-  }).map((item: SteamDetailsDataType, i: number) => {return {...item, index: i}}))];
+  }).map((item: SteamDetailsDataType, i: number) => {return {...item, index: i, suggestValue: 0}}))];
 
   const canAddLink = (links: LinkType[], sourceIndex: number, targetIndex: number): boolean => {
     const sourceConnections = links.filter(item => item.source === sourceIndex || item.target === sourceIndex).length;

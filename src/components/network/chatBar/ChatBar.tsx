@@ -1,32 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { NodeType } from '@/types/NetworkType';
+import { useState, useEffect } from 'react';
+
+type Props = {
+  nodes: NodeType[];
+  setNodes: React.Dispatch<React.SetStateAction<NodeType[]>>;
+};
 
 type GameResponse = {
-  priceRange: string;
+  priceRange: string[];
   tags: string[];
 };
 
-const parseResponse= (response: string): GameResponse => {
+const parseResponse = (response: string): GameResponse => {
   const parts = response.split(" ");
-
-  // 各項目をマップに基づいて変換
-  const priceRange = parts[0] === "-1" && parts[1] === "-1" 
-    ? "該当なし" 
-    : `${parts[0]}円 〜 ${parts[1]}円`;
-
-  // タグ部分をフィルタリングして配列に変換
-  const tags = parts.slice(2).filter(tag => tag !== "-1");
-
-  return {
-    priceRange,
-    tags
-  };
+  const priceRange = [parts[0], parts[1]];
+  const tags = parts.slice(2).filter(tag => tag !== "0");
+  return { priceRange, tags };
 };
 
-const ChatBar = () => {
+const ChatBar = (props: Props) => {
+  const { nodes, setNodes } = props;
   const [input, setInput] = useState('');
-  const [response, setResponse] = useState<any>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -34,36 +30,40 @@ const ChatBar = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
       const res = await fetch('/api/network/openaiHandler', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userQuestion: input }),
       });
-
       if (res.ok) {
         const data = await res.json();
         const parsedResponse = parseResponse(data.response);
-        console.log(data.response);
-        setResponse(parsedResponse);
+        const buffNodes = [...nodes];
+        const suggestValueList = buffNodes.map((node: NodeType) => {
+          const minPrice = parseInt(parsedResponse.priceRange[0]);
+          const maxPrice = parseInt(parsedResponse.priceRange[1]);
+          if ((minPrice !== -1 && minPrice > node.price) || (maxPrice !== -1 && maxPrice < node.price)) return 0;
+          return parsedResponse.tags.filter(resTag => node.tags.includes(resTag)).length;
+        });
+
+        const maxValue = Math.max(...suggestValueList);
+        const scaleSuggestValueList = suggestValueList.map((value: number) => value / maxValue);
+
+        setNodes((prevNodes) => prevNodes.map((node: NodeType, index: number) => {
+          return { ...node, suggestValue: scaleSuggestValueList[index] };
+        }));
       } else {
         console.error("API request failed:", res.statusText);
-        setResponse("エラーが発生しました。");
       }
     } catch (error) {
       console.error("Fetch error:", error);
-      setResponse("エラーが発生しました。");
     }
-
     setInput('');
   };
 
   return (
-    <div style={{
-      display: 'flex', 
-      justifyContent: 'center', 
-    }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <form 
         onSubmit={handleSubmit} 
         style={{
@@ -107,22 +107,6 @@ const ChatBar = () => {
           ↑
         </button>
       </form>
-      {response && (
-        <div style={{
-          color: 'white', 
-          backgroundColor: '#333', 
-          borderRadius: '8px',
-          maxWidth: '600px'
-        }}>
-          {response.onlineStatus}
-          <br />
-          {response.playerMode}
-          <br />
-          {response.platform}
-          <br />
-          {response?.tags && response.tags.length !== 0 &&response.tags.map((tag: any) => tag + " ")}
-        </div>
-      )}
     </div>
   );
 };
