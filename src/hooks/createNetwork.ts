@@ -6,7 +6,7 @@ import { LinkType, NodeType } from '@/types/NetworkType';
 import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
 import { SimilarGameType } from '@/types/NetworkType';
 
-const calcWeight = (game1: NodeType, game2: NodeType) => {
+const calcWeight = (game1: NodeType, game2: NodeType, tagCount: Map<string, number>) => {
   let totalWeight = 1;
 
   let genresWeight = 1;
@@ -25,13 +25,14 @@ const calcWeight = (game1: NodeType, game2: NodeType) => {
   const tags1: string[] = game1.tags;
   const tags2: string[] = game2.tags;
 
-  tags1.forEach((tag1: string) =>
+  tags1.forEach((tag1: string) => {
     tags2.forEach((tag2: string) => {
-      if(tag1 === tag2) {
-        tagsWeight++;
+      if (tag1 === tag2) {
+        const tagFrequency = tagCount.get(tag1) || 1;
+        tagsWeight += tagFrequency;
       }
-    })
-  );
+    });
+  });
 
   totalWeight += (genresWeight + tagsWeight) * 10;
 
@@ -87,12 +88,19 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     return sourceIndex !== targetIndex && sourceConnections < k && targetConnections < k;
   }
 
+  const tagCount = new Map();
+  nodes.forEach((node) => {
+    node.tags.forEach((tag) => {
+      tagCount.set(tag, (tagCount.get(tag) || 0) + 1);
+    });
+  });
+
   nodes.forEach((sourceNode: NodeType) => {
     const weightedNodes = nodes
       .filter(targetNode => sourceNode !== targetNode)
       .map((targetNode) => ({
         node: targetNode,
-        weight: calcWeight(sourceNode, targetNode)
+        weight: calcWeight(sourceNode, targetNode, tagCount)
       }))
       .sort((a, b) => b.weight - a.weight);
 
@@ -142,7 +150,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
           const targetNode = item.target as NodeType;
           
           if(typeof sourceNode !== "number" && typeof targetNode !== "number") {
-            return 1 / calcWeight(sourceNode, targetNode);
+            return 1 / calcWeight(sourceNode, targetNode, tagCount);
           }
           return 0;
         })
