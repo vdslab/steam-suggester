@@ -6,13 +6,12 @@ import { StreamerListType } from "@/types/NetworkType";
 import { useEffect, useState } from "react";
 
 type Props = {
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   streamerIds: StreamerListType[];
   setStreamerIds: React.Dispatch<React.SetStateAction<StreamerListType[]>>;
 };
 
 const StreamedList = (props: Props) => {
-  const { setIsLoading, streamerIds, setStreamerIds } = props;
+  const { streamerIds, setStreamerIds } = props;
 
   const [streamerList, setStreamerList] = useState<StreamerListType[]>([]);
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
@@ -24,7 +23,6 @@ const StreamedList = (props: Props) => {
     if (game && !streamerIds.find((addedGame) => addedGame.twitchUserId.some((id) => game.twitchUserId.includes(id)))) {
       const newUserAddedGames = [...streamerIds, game];
       setStreamerIds(newUserAddedGames);
-      setIsLoading(true);
     }
   };
 
@@ -33,7 +31,6 @@ const StreamedList = (props: Props) => {
       !game.twitchUserId.some((id) => twitchUserIds.includes(id))
     );
     setStreamerIds(updatedUserAddedGames);
-    setIsLoading(true);
   };
 
   const data: StreamerListType[] = [
