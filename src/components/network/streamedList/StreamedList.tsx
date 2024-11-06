@@ -15,7 +15,7 @@ const StreamedList = (props: Props) => {
   const { setIsLoading, streamerIds, setStreamerIds } = props;
 
   const [streamerList, setStreamerList] = useState<StreamerListType[]>([]);
-  const [searchSteamQuery, setSearchSteamQuery] = useState<string>('');
+  const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
 
   const handleSearchClick = (twitchUserId: string) => {
@@ -45,31 +45,31 @@ const StreamedList = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    if (searchSteamQuery === '') {
+    if (searchStreamerQuery === '') {
       setFilteredStreamerList(streamerList.filter((game) =>
         !streamerIds.some((addedGame) => addedGame.twitchUserId === game.twitchUserId)
       ));
     } else {
       const filteredList = streamerList
         .filter((game) =>
-          game.name.toLowerCase().includes(searchSteamQuery.toLowerCase()) &&
+          game.name.toLowerCase().includes(searchStreamerQuery.toLowerCase()) &&
           !streamerIds.some((addedGame) => addedGame.twitchUserId === game.twitchUserId)
         );
       setFilteredStreamerList(filteredList);
     }
-  }, [streamerList, searchSteamQuery, streamerIds]);
+  }, [streamerList, searchStreamerQuery, streamerIds]);
 
   return (
     <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px' }}>
       <input
         type="text"
         placeholder="Search for a game title"
-        value={searchSteamQuery}
-        onChange={(e) => setSearchSteamQuery(e.target.value)}
+        value={searchStreamerQuery}
+        onChange={(e) => setSearchStreamerQuery(e.target.value)}
         className="w-full p-2 mb-2 text-black"
       />
 
-      {searchSteamQuery !== '' && (
+      {searchStreamerQuery !== '' && (
         <div className="bg-gray-800 p-2 rounded-lg mb-4">
           <h2 className="text-white mb-2">Search Results</h2>
           {filteredStreamerList.map((game) => (
@@ -87,15 +87,15 @@ const StreamedList = (props: Props) => {
       )}
 
       <div className="bg-gray-800 p-2 rounded-lg mb-4">
-        <h2 className="text-white mb-2">User Added Games</h2>
+        <h2 className="text-white mb-2">User Added streamers</h2>
         {streamerIds.map((game) => (
           <div className="flex pb-2 justify-between items-center" key={game.twitchUserId}>
             <div className="text-white p-2 rounded cursor-pointer">
-              {game.name} {/* nameを表示 */}
+              {game.name}
             </div>
             <DeleteIcon
               className="cursor-pointer hover:bg-gray-700 rounded"
-              onClick={() => handleGameDelete(game.twitchUserId)} // twitchUserIdを使用
+              onClick={() => handleGameDelete(game.twitchUserId)}
             />
           </div>
         ))}

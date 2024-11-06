@@ -66,7 +66,6 @@ const Network = () => {
           <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
             <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} streamerIds={streamerIds} />
           </div>
-          {/* 左側のサイドバーの横幅はそのままで、右側のサイドバーを縦に並べる */}
           <div className="flex flex-col w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
             <div className="flex-grow">
               <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
