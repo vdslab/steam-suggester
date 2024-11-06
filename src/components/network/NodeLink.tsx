@@ -48,8 +48,7 @@ const ZoomableSVG = (props: any) => {
 };
 
 const NodeLink = (props: any) => {
-  const { nodes, links, centerX, centerY } = props;
-
+  const { nodes, links, centerX, centerY, streamerIds } = props;
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
   const findHoveredNode = () => {
@@ -79,22 +78,25 @@ const NodeLink = (props: any) => {
             })
           }
           {nodes.length !== 0 &&
-            nodes.map((node: NodeType, i: number) => (
-              <g className={`brightness-${hoveredIndex === node.index ? "125" : "100"}`}
-                 transform={`translate(${node.x},${node.y})`}
-                 onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
-                 onMouseLeave={() => setHoveredIndex(-1)}
-                 key={i}>
-                <Icon
-                  title={node.title}
-                  imgURL={node.imgURL}
-                  index={node.index ?? i}
-                  steamGameId={node.steamGameId}
-                  twitchGameId={node.twitchGameId}
-                  circleScale={node.circleScale ?? 1}
-                />
-              </g>
-            ))}
+            nodes.map((node: NodeType, i: number) => {
+              return(
+                <g className={`brightness-${hoveredIndex === node.index ? "125" : "100"}`}
+                  transform={`translate(${node.x},${node.y})`}
+                  onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
+                  onMouseLeave={() => setHoveredIndex(-1)}
+                  key={i}>
+                  <Icon
+                    title={node.title}
+                    imgURL={node.imgURL}
+                    index={node.index ?? i}
+                    steamGameId={node.steamGameId}
+                    twitchGameId={node.twitchGameId}
+                    circleScale={node.circleScale ?? 1}
+                    strongColor={streamerIds && streamerIds.length > 0  ? streamerIds.some((game: { twitchUserId: string; }) => game.twitchUserId === node.twitchGameId): false }
+                  />
+                </g>
+              )
+          })}
           {hoveredIndex !== -1 && (
             <g transform={`translate(${findHoveredNode().x},${findHoveredNode().y})`}>
               <g>

@@ -5,9 +5,10 @@ import SelectParameter from './selectParameter/SelectParameter';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 import GameList from './gameList/GameList';
+import StreamedList from './streamedList/StreamedList';
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
-import { LinkType, NodeType } from '@/types/NetworkType';
+import { LinkType, NodeType, StreamerListType } from '@/types/NetworkType';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 
 const Network = () => {
@@ -17,7 +18,7 @@ const Network = () => {
   const [links, setLinks] = useState<LinkType[]>([]);
   const [centerX, setCenterX] = useState<number>(0);
   const [centerY, setCenterY] = useState<number>(0);
-
+  const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]); 
   const [isLoading, setIsLoading] = useState(true);
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
@@ -62,10 +63,13 @@ const Network = () => {
           <SelectParameter filter={filter} setFilter={setFilter} />
         </div>
         <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
-          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY}/>
+          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} streamerIds={streamerIds}/>
         </div>
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
           <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
+        </div>
+        <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
+          <StreamedList setIsLoading={setIsLoading} streamerIds={streamerIds} setStreamerIds={setStreamerIds}/>
         </div>
       </div> : <Loading />
       }

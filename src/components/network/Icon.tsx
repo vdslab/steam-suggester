@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { IconType } from "@/types/NetworkType";
 
 const Icon = (props:IconType) => {
-  const { title, imgURL, index, steamGameId, twitchGameId, circleScale } = props;
+  const { title, imgURL, index, steamGameId, twitchGameId, circleScale, strongColor } = props;
   const router = useRouter();
   const handleClick = (e: MouseEvent<SVGElement>) => {
     e.preventDefault();
@@ -30,6 +30,9 @@ const Icon = (props:IconType) => {
         y={-30}
         clipPath={`url(#clip-${index})`}
       />
+      {strongColor && (
+        <circle r={17} fill="none" stroke="orange" strokeWidth={3} />
+      )}
     </g>
   );
 };
