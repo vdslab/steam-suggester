@@ -58,23 +58,28 @@ const Network = () => {
 
   return (
     <div>
-      {!isLoading ? <div className="flex h-[92dvh] overflow-hidden">
-        <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          <SelectParameter filter={filter} setFilter={setFilter} />
+      {!isLoading ? (
+        <div className="flex h-[92dvh] overflow-hidden">
+          <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
+            <SelectParameter filter={filter} setFilter={setFilter} />
+          </div>
+          <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
+            <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} streamerIds={streamerIds} />
+          </div>
+          {/* 左側のサイドバーの横幅はそのままで、右側のサイドバーを縦に並べる */}
+          <div className="flex flex-col w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
+            <div className="flex-grow">
+              <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
+            </div>
+            <div className="flex-grow">
+              <StreamedList setIsLoading={setIsLoading} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
+            </div>
+          </div>
         </div>
-        <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
-          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} streamerIds={streamerIds}/>
-        </div>
-        <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
-        </div>
-        <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          <StreamedList setIsLoading={setIsLoading} streamerIds={streamerIds} setStreamerIds={setStreamerIds}/>
-        </div>
-      </div> : <Loading />
-      }
+      ) : (
+        <Loading />
+      )}
     </div>
-    
   );
 }
 
