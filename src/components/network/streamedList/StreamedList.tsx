@@ -63,7 +63,7 @@ const StreamedList = (props: Props) => {
     <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px' }}>
       <input
         type="text"
-        placeholder="Search for a game title"
+        placeholder="Search for streamers"
         value={searchStreamerQuery}
         onChange={(e) => setSearchStreamerQuery(e.target.value)}
         className="w-full p-2 mb-2 text-black"
