@@ -18,25 +18,27 @@ const StreamedList = (props: Props) => {
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
 
-  const handleSearchClick = (twitchUserId: string) => {
-    const game = streamerList.find((game) => game.twitchUserId === twitchUserId);
+  const handleSearchClick = (twitchUserIds: string[]) => {
+    const game = streamerList.find((game) => game.twitchUserId.some((id) => twitchUserIds.includes(id)));
 
-    if (game && !streamerIds.find((addedGame) => addedGame.twitchUserId === twitchUserId)) {
+    if (game && !streamerIds.find((addedGame) => addedGame.twitchUserId.some((id) => game.twitchUserId.includes(id)))) {
       const newUserAddedGames = [...streamerIds, game];
       setStreamerIds(newUserAddedGames);
       setIsLoading(true);
     }
   };
 
-  const handleGameDelete = (twitchUserId: string) => {
-    const updatedUserAddedGames = streamerIds.filter((game) => game.twitchUserId !== twitchUserId);
+  const handleGameDelete = (twitchUserIds: string[]) => {
+    const updatedUserAddedGames = streamerIds.filter((game) =>
+      !game.twitchUserId.some((id) => twitchUserIds.includes(id))
+    );
     setStreamerIds(updatedUserAddedGames);
     setIsLoading(true);
   };
 
   const data: StreamerListType[] = [
-    { name: "Game Title 1", twitchUserId: "512980" }, 
-    { name: "Game Title 2", twitchUserId: "30921" },
+    { name: "streamer 1", twitchUserId: ["512980", "2091165871"] },
+    { name: "streamer 2", twitchUserId: ["30921"] },
   ];
 
   useEffect(() => {
@@ -47,13 +49,17 @@ const StreamedList = (props: Props) => {
   useEffect(() => {
     if (searchStreamerQuery === '') {
       setFilteredStreamerList(streamerList.filter((game) =>
-        !streamerIds.some((addedGame) => addedGame.twitchUserId === game.twitchUserId)
+        !streamerIds.some((addedGame) =>
+          addedGame.twitchUserId.some((id) => game.twitchUserId.includes(id))
+        )
       ));
     } else {
       const filteredList = streamerList
         .filter((game) =>
           game.name.toLowerCase().includes(searchStreamerQuery.toLowerCase()) &&
-          !streamerIds.some((addedGame) => addedGame.twitchUserId === game.twitchUserId)
+          !streamerIds.some((addedGame) =>
+            addedGame.twitchUserId.some((id) => game.twitchUserId.includes(id))
+          )
         );
       setFilteredStreamerList(filteredList);
     }
@@ -73,9 +79,9 @@ const StreamedList = (props: Props) => {
         <div className="bg-gray-800 p-2 rounded-lg mb-4">
           <h2 className="text-white mb-2">Search Results</h2>
           {filteredStreamerList.map((game) => (
-            <div className="flex pb-2 justify-between items-center" key={game.twitchUserId}>
+            <div className="flex pb-2 justify-between items-center" key={game.twitchUserId.join(', ')}>
               <div className="text-white p-2 rounded">
-                {game.name} {/* nameを表示 */}
+                {game.name}
               </div>
               <PlaylistAddIcon
                 className="cursor-pointer hover:bg-gray-700 rounded"
@@ -89,7 +95,7 @@ const StreamedList = (props: Props) => {
       <div className="bg-gray-800 p-2 rounded-lg mb-4">
         <h2 className="text-white mb-2">User Added streamers</h2>
         {streamerIds.map((game) => (
-          <div className="flex pb-2 justify-between items-center" key={game.twitchUserId}>
+          <div className="flex pb-2 justify-between items-center" key={game.twitchUserId.join(', ')}>
             <div className="text-white p-2 rounded cursor-pointer">
               {game.name}
             </div>
