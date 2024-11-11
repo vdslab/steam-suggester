@@ -4,6 +4,7 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { StreamerListType } from "@/types/NetworkType";
 import { useEffect, useState } from "react";
+import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 
 type Props = {
   streamerIds: StreamerListType[];
@@ -17,37 +18,54 @@ const StreamedList = (props: Props) => {
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
 
-  const handleSearchClick = (twitchUserIds: string[]) => {
-    const game = streamerList.find((game) => game.twitchUserId.some((id) => twitchUserIds.includes(id)));
+  const handleSearchClick = (twitchGameIds: string[]) => {
+    const game = streamerList.find((game) => game.twitchGameId.some((id) => twitchGameIds.includes(id)));
 
-    if (game && !streamerIds.find((addedGame) => addedGame.twitchUserId.some((id) => game.twitchUserId.includes(id)))) {
+    if (game && !streamerIds.find((addedGame) => addedGame.twitchGameId.some((id) => game.twitchGameId.includes(id)))) {
       const newUserAddedGames = [...streamerIds, game];
       setStreamerIds(newUserAddedGames);
     }
   };
 
-  const handleGameDelete = (twitchUserIds: string[]) => {
+  const handleGameDelete = (twitchGameIds: string[]) => {
     const updatedUserAddedGames = streamerIds.filter((game) =>
-      !game.twitchUserId.some((id) => twitchUserIds.includes(id))
+      !game.twitchGameId.some((id) => twitchGameIds.includes(id))
     );
     setStreamerIds(updatedUserAddedGames);
   };
 
-  const data: StreamerListType[] = [
-    { name: "streamer 1", twitchUserId: ["512980", "2091165871"] },
-    { name: "streamer 2", twitchUserId: ["30921"] },
-  ];
 
+  //テスト
   useEffect(() => {
-    setStreamerList(data);
-    setFilteredStreamerList(data);
-  }, []);
+    const fetchData = async () => {
+      if (!searchStreamerQuery) return;
+
+      try {
+        const encodedUsername = encodeURIComponent(searchStreamerQuery); // フォームの内容をstreamerUsernameにセット
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodedUsername}`
+        );
+        const data = await response.json();
+        console.log(data);
+        if (Array.isArray(data)) {
+          setStreamerList(data);
+          setFilteredStreamerList(data);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchData();
+  }, [searchStreamerQuery]);
+
 
   useEffect(() => {
     if (searchStreamerQuery === '') {
       setFilteredStreamerList(streamerList.filter((game) =>
         !streamerIds.some((addedGame) =>
-          addedGame.twitchUserId.some((id) => game.twitchUserId.includes(id))
+          addedGame.twitchGameId.some((id) => game.twitchGameId.includes(id))
         )
       ));
     } else {
@@ -55,7 +73,7 @@ const StreamedList = (props: Props) => {
         .filter((game) =>
           game.name.toLowerCase().includes(searchStreamerQuery.toLowerCase()) &&
           !streamerIds.some((addedGame) =>
-            addedGame.twitchUserId.some((id) => game.twitchUserId.includes(id))
+            addedGame.twitchGameId.some((id) => game.twitchGameId.includes(id))
           )
         );
       setFilteredStreamerList(filteredList);
@@ -75,30 +93,30 @@ const StreamedList = (props: Props) => {
       {searchStreamerQuery !== '' && (
         <div className="bg-gray-800 p-2 rounded-lg mb-4">
           <h2 className="text-white mb-2">Search Results</h2>
-          {filteredStreamerList.map((game) => (
-            <div className="flex pb-2 justify-between items-center" key={game.twitchUserId.join(', ')}>
+          {filteredStreamerList? filteredStreamerList.map((game) => (
+            <div className="flex pb-2 justify-between items-center" key={game.twitchGameId.join(', ')}>
               <div className="text-white p-2 rounded">
                 {game.name}
               </div>
               <PlaylistAddIcon
                 className="cursor-pointer hover:bg-gray-700 rounded"
-                onClick={() => handleSearchClick(game.twitchUserId)}
+                onClick={() => handleSearchClick(game.twitchGameId)}
               />
             </div>
-          ))}
+          )):null}
         </div>
       )}
 
       <div className="bg-gray-800 p-2 rounded-lg mb-4">
         <h2 className="text-white mb-2">User Added streamers</h2>
         {streamerIds.map((game) => (
-          <div className="flex pb-2 justify-between items-center" key={game.twitchUserId.join(', ')}>
+          <div className="flex pb-2 justify-between items-center" key={game.twitchGameId.join(', ')}>
             <div className="text-white p-2 rounded cursor-pointer">
               {game.name}
             </div>
             <DeleteIcon
               className="cursor-pointer hover:bg-gray-700 rounded"
-              onClick={() => handleGameDelete(game.twitchUserId)}
+              onClick={() => handleGameDelete(game.twitchGameId)}
             />
           </div>
         ))}

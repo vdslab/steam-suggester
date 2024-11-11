@@ -16,8 +16,8 @@ export type SteamListType = {
 }
 
 export type StreamerListType = {
-  twitchUserId: string[];
   name: string;
+  twitchGameId: string[];
 }
 
 export type NodeType = {

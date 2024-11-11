@@ -94,8 +94,8 @@ const NodeLink = (props: any) => {
                     circleScale={node.circleScale ?? 1}
                     strongColor={
                       streamerIds && streamerIds.length > 0
-                        ? streamerIds.some((game: { twitchUserId: string[] }) =>
-                            game.twitchUserId.some((id) => id === node.twitchGameId)
+                        ? streamerIds.some((game: { twitchGameId: string[] }) =>
+                            game.twitchGameId.some((id) => id === node.twitchGameId)
                           )
                         : false
                     }
