@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // 環境変数からAPIキーを取得
+  // apiKey: process.env.OPENAI_API_KEY,
+  apiKey: "",
 });
 
 export async function POST(req: NextRequest) {
