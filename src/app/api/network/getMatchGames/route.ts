@@ -33,6 +33,24 @@ export async function GET() {
         ))
       ));
 
+    const tagQuery = `
+      SELECT steam_game_id, tag_name
+      FROM steam_data_tags
+      WHERE steam_game_id = ANY($1::text[]);
+    `;
+
+    const steamIds = data.map(item => item.steam_id);
+    const tagsResult = await PG_POOL.query(tagQuery, [steamIds]);
+
+    const tagsMap: { [key: string]: string[] } = {};
+    tagsResult.rows.forEach(row => {
+      const { steam_game_id, tag_name } = row;
+      if (!tagsMap[steam_game_id]) {
+        tagsMap[steam_game_id] = [];
+      }
+      tagsMap[steam_game_id].push(tag_name);
+    });
+
     const result: SteamDetailsDataType[] = data.map(item => ({
       twitchGameId: item.twitch_id,
       steamGameId: item.steam_id,
@@ -47,7 +65,8 @@ export async function GET() {
       device: {
         windows: item.is_device_windows,
         mac: item.is_device_mac,
-      }
+      },
+      tags: tagsMap[item.steam_id] || []
     }));
 
     return NextResponse.json(result);

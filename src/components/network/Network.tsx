@@ -9,6 +9,8 @@ import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
 import { LinkType, NodeType } from '@/types/NetworkType';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
+import ChatBar from './chatBar/ChatBar';
+import Popup from './Popup';
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -17,6 +19,8 @@ const Network = () => {
   const [links, setLinks] = useState<LinkType[]>([]);
   const [centerX, setCenterX] = useState<number>(0);
   const [centerY, setCenterY] = useState<number>(0);
+
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -62,10 +66,15 @@ const Network = () => {
           <SelectParameter filter={filter} setFilter={setFilter} />
         </div>
         <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
-          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY}/>
+          <ChatBar nodes={nodes} setNodes={setNodes} />
+          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} />
         </div>
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
+          {selectedIndex !== -1 ? 
+            <Popup nodes={nodes} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} /> 
+            : 
+            <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
+          }
         </div>
       </div> : <Loading />
       }

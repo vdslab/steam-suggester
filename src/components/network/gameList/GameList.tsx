@@ -38,7 +38,7 @@ const GameList = (props: Props) => {
 
   const handleGameClick = (index: number) => {
     setCenterX(nodes[index].x ?? 0);
-    setCenterY(nodes[index].y ?? 0);
+    setCenterY((nodes[index].y ?? 0) + 100);
   };
 
   const handleGameDelete = (steamGameId: string) => {

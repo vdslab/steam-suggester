@@ -1,5 +1,5 @@
 import { Filter } from "@/types/api/FilterType";
-import { SteamGenreType, SteamDeviceType, SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import { SteamGenreType, SteamDeviceType } from "@/types/api/getSteamDetailType";
 import * as d3 from "d3";
 
 export const calcGenresPercentage = (filter: Filter, genres: SteamGenreType[]) => {

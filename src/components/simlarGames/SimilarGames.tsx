@@ -13,17 +13,30 @@ type GameType = {
 }
 
 const SimilarGames = (props: DetailsPropsType) => {
-  const { steamGameId } = props;
+  const [currentSteamGameId, setCurrentSteamGameId] = useState(props.steamGameId);
+  const [currentTwitchGameId, setCurrentTwitchGameId] = useState(props.twitchGameId);
   const [data, setData] = useState<SimilarGamePropsType[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    setCurrentSteamGameId(props.steamGameId);
+    setCurrentTwitchGameId(props.twitchGameId);
+  }, [props.steamGameId, props.twitchGameId]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+
     (async () => {
       const filter = await getFilterData() ?? DEFAULT_FILTER;
       const gameIds = await getGameIdData() ?? [];
       const { similarGames } = await createNetwork(filter, gameIds);
   
-      if(similarGames && similarGames[steamGameId]) {
-        const promises = similarGames[steamGameId].map(async (game: GameType) => {
+      if (similarGames && similarGames[currentSteamGameId]) {
+        const promises = similarGames[currentSteamGameId].map(async (game: GameType) => {
           const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${game.steamGameId}`);
           const d = await res.json();
           return {
@@ -37,7 +50,9 @@ const SimilarGames = (props: DetailsPropsType) => {
         setData(data);
       }
     })();
-  }, []);
+  }, [currentSteamGameId, currentTwitchGameId, isHydrated]);
+
+  if (!isHydrated) return null;
 
   return (
     <div>
@@ -46,7 +61,7 @@ const SimilarGames = (props: DetailsPropsType) => {
         <DisplayGame key={game.imgURL} title={game.title} imgURL={game.imgURL} steamGameId={game.steamGameId} twitchGameId={game.twitchGameId} />
       ))}
     </div>
-  )
+  );
 }
 
-export default SimilarGames
+export default SimilarGames;
