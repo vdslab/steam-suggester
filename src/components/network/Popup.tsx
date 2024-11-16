@@ -1,5 +1,6 @@
 import React from "react";
 import { useRouter } from 'next/navigation';
+import Image from "next/image";
 import { SteamGenreType } from "@/types/api/getSteamDetailType";
 import { NodeType } from "@/types/NetworkType";
 
@@ -31,16 +32,15 @@ const Popup = (props: PopupProps) => {
       }}
     >
       <h2 style={{ marginBottom: "8px" }}><strong>{node.index + 1}位</strong>{" "}{node.title}</h2>
-      <img
-        src={node.imgURL}
-        alt={node.title}
-        style={{
-          width: "100%",
-          height: "auto",
-          borderRadius: "4px",
-          marginBottom: "12px",
-        }}
-      />
+      <Image
+          src={node.imgURL}
+          alt={node.title}
+          width={1000}
+          height={0}
+          style={{
+            borderRadius: "4px",
+          }}
+        />
       <div style={{ marginBottom: "8px" }}>
         <strong>Tags:</strong> {node.genres?.map((item: SteamGenreType) => item.description).join(", ") || "No tags"}
       </div>
