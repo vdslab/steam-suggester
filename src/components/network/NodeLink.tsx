@@ -48,7 +48,7 @@ const ZoomableSVG = (props: any) => {
 };
 
 const NodeLink = (props: any) => {
-  const { nodes, links, centerX, centerY } = props;
+  const { nodes, links, centerX, centerY, setSelectedIndex } = props;
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
@@ -84,6 +84,7 @@ const NodeLink = (props: any) => {
                  transform={`translate(${node.x},${node.y})`}
                  onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
                  onMouseLeave={() => setHoveredIndex(-1)}
+                 onClick={() => setSelectedIndex(node.index)}
                  key={i}>
                 <Icon
                   title={node.title}
