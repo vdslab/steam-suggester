@@ -105,26 +105,25 @@ const StreamedList = (props: Props) => {
         className="w-full p-2 mb-2 text-black"
       />
 
-{searchStreamerQuery !== '' && (
-  <div className="bg-gray-800 p-2 rounded-lg mb-4">
-    <h2 className="text-white mb-2">Search Results</h2>
-    {filteredStreamerList ? filteredStreamerList.map((game) => (
-      <div
-        className="flex pb-2 justify-between items-center"
-        key={`${game.name}-${game.twitchGameId.join(', ')}`} // 一意のキーを生成
-      >
-        <div className="text-white p-2 rounded">
-          {game.name}
+      {searchStreamerQuery !== '' && (
+        <div className="bg-gray-800 p-2 rounded-lg mb-4">
+          <h2 className="text-white mb-2">Search Results</h2>
+          {filteredStreamerList ? filteredStreamerList.map((game) => (
+            <div
+              className="flex pb-2 justify-between items-center"
+              key={`${game.name}-${game.twitchGameId.join(', ')}`} // 一意のキーを生成
+            >
+              <div className="text-white p-2 rounded">
+                {game.name}
+              </div>
+              <PlaylistAddIcon
+                className="cursor-pointer hover:bg-gray-700 rounded"
+                onClick={() => handleSearchClick(game.twitchGameId)}
+              />
+            </div>
+          )) : null}
         </div>
-        <PlaylistAddIcon
-          className="cursor-pointer hover:bg-gray-700 rounded"
-          onClick={() => handleSearchClick(game.twitchGameId)}
-        />
-      </div>
-    )) : null}
-  </div>
-)}
-
+      )}
 
       <div className="bg-gray-800 p-2 rounded-lg mb-4">
         <h2 className="text-white mb-2">User Added streamers</h2>

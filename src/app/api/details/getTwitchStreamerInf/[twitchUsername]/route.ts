@@ -1,6 +1,6 @@
 import TwitchToken from "@/app/api/TwitchToken";
 import { NextResponse } from "next/server";
-import { TwitchUserDataType, TwitchStreamDataType } from "@/types/api/TwitchTypes";
+import { TwitchUserDataType, TwitchStreamDataType, TwitchVideoDataType } from "@/types/api/TwitchTypes";
 import { StreamerListType } from "@/types/NetworkType";
 
 type Params = {
@@ -24,7 +24,7 @@ export async function GET(req: Request, { params }: Params) {
       'Authorization': `Bearer ${token}`,
     });
 
-    // Step 1: Try fetching user data using the Twitch user endpoint
+    // ユーザーIDでの検索を試みる
     let userRes = await fetch(`https://api.twitch.tv/helix/users?login=${streamerUsername}`, {
       headers,
     });
@@ -35,7 +35,7 @@ export async function GET(req: Request, { params }: Params) {
       userData = await userRes.json();
     }
 
-    // Step 2: If no user data is found, try searching by channel name
+    // 検索結果がまだなかったら、チャンネル名で検索
     if (!userData || userData.data.length === 0) {
       console.log("User not found by ID, searching by channel name...");
       userRes = await fetch(`https://api.twitch.tv/helix/search/channels?query=${streamerUsername}`, {
@@ -55,13 +55,14 @@ export async function GET(req: Request, { params }: Params) {
       }
     }
 
-    // Step 3: For each of the found channels, fetch stream data
+    // ユーザーIDに変換
     const result: StreamerListType[] = [];
     for (const channel of userData.data) {
       const streamerName = channel.display_name;
       const userId = channel.id;
 
-      const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userId}`, {
+      // 現在配信されている(liveの)ゲームIDを取得
+      const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userId}`, { 
         headers,
       });
 
@@ -73,11 +74,40 @@ export async function GET(req: Request, { params }: Params) {
       const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
       const gamesPlayed = new Set<string>();
 
+      // 現在配信されているゲームIDを追加
       gamesData.data.forEach((stream) => {
         if (stream.game_id) {
           gamesPlayed.add(stream.game_id);
         }
       });
+
+      // 過去の配信をページネーションを使って取得
+      let paginationCursor: string | undefined = undefined;
+
+      do {
+        const videosRes = await fetch(`https://api.twitch.tv/helix/videos?user_id=${userId}&after=${paginationCursor || ''}`, {
+          headers,
+        });
+
+        if (!videosRes.ok) {
+          console.error("Error fetching video data:", videosRes.status, await videosRes.text());
+          return NextResponse.error();
+        }
+
+        const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
+
+        // console.log("Videos Data:", videosData);
+
+        // 過去の配信ゲームIDを追加
+        videosData.data.forEach((video) => {
+          if (video.id) {
+            gamesPlayed.add(video.id);
+          }
+        });
+
+        // 次のページがあれば、paginationCursorを更新
+        paginationCursor = videosData.pagination?.cursor;
+      } while (paginationCursor); // 次のページがあれば続ける
 
       const resultGames = Array.from(gamesPlayed);
 
