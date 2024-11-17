@@ -96,7 +96,7 @@ export async function GET(req: Request, { params }: Params) {
 
         const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
 
-        // console.log("Videos Data:", videosData);
+        console.log("Videos Data:", videosData);
 
         // 過去の配信ゲームIDを追加
         videosData.data.forEach((video) => {
