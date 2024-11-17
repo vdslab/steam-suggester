@@ -24,56 +24,73 @@ export async function GET(req: Request, { params }: Params) {
       'Authorization': `Bearer ${token}`,
     });
 
-    // Fetch user ID based on username
-    const userRes = await fetch(`https://api.twitch.tv/helix/users?login=${streamerUsername}`, {
+    // Step 1: Try fetching user data using the Twitch user endpoint
+    let userRes = await fetch(`https://api.twitch.tv/helix/users?login=${streamerUsername}`, {
       headers,
     });
 
-    if (!userRes.ok) {
-      console.error("Error fetching user data:", userRes.status, await userRes.text());
-      return NextResponse.error();
+    let userData: { data: TwitchUserDataType[] } | null = null;
+
+    if (userRes.ok) {
+      userData = await userRes.json();
     }
 
-    const userData: { data: TwitchUserDataType[] } = await userRes.json();
-    if (userData.data.length === 0) {
-      console.error("User not found");
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    // Step 2: If no user data is found, try searching by channel name
+    if (!userData || userData.data.length === 0) {
+      console.log("User not found by ID, searching by channel name...");
+      userRes = await fetch(`https://api.twitch.tv/helix/search/channels?query=${streamerUsername}`, {
+        headers,
+      });
 
-    const userId = userData.data[0].id;
-    const streamerName = userData.data[0].display_name;
-
-    // Fetch past streams data
-    const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userId}`, {//videos streams
-      headers,
-    });
-
-    if (!gamesRes.ok) {
-      console.error("Error fetching stream data:", gamesRes.status, await gamesRes.text());
-      return NextResponse.error();
-    }
-
-    const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
-    const gamesPlayed = new Set<string>();
-
-    gamesData.data.forEach((stream) => {
-      if (stream.game_id) {
-        gamesPlayed.add(stream.game_id);
+      if (!userRes.ok) {
+        console.error("Error fetching channel search data:", userRes.status, await userRes.text());
+        return NextResponse.error();
       }
-    });
-    
-    const resultGames = Array.from(gamesPlayed);
-    const result: StreamerListType[] = [
-      {
+
+      userData = await userRes.json();
+
+      if (userData.data.length === 0) {
+        console.error("Channel not found");
+        return NextResponse.json({ error: "User or channel not found" }, { status: 404 });
+      }
+    }
+
+    // Step 3: For each of the found channels, fetch stream data
+    const result: StreamerListType[] = [];
+    for (const channel of userData.data) {
+      const streamerName = channel.display_name;
+      const userId = channel.id;
+
+      const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userId}`, {
+        headers,
+      });
+
+      if (!gamesRes.ok) {
+        console.error("Error fetching stream data:", gamesRes.status, await gamesRes.text());
+        return NextResponse.error();
+      }
+
+      const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
+      const gamesPlayed = new Set<string>();
+
+      gamesData.data.forEach((stream) => {
+        if (stream.game_id) {
+          gamesPlayed.add(stream.game_id);
+        }
+      });
+
+      const resultGames = Array.from(gamesPlayed);
+
+      result.push({
         name: streamerName,
         twitchGameId: [...resultGames],
-      },
-    ];
+      });
+    }
 
     return NextResponse.json(result);
 
   } catch (error) {
-    console.error('Error fetching user games:', error);
+    console.error('Error fetching user or channel data:', error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
