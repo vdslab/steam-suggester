@@ -49,7 +49,7 @@ export async function GET(req: Request, { params }: Params) {
 
       userData = await userRes.json();
 
-      if (userData.data.length === 0) {
+      if (!userData || userData.data.length === 0) {
         console.error("Channel not found");
         return NextResponse.json({ error: "User or channel not found" }, { status: 404 });
       }
@@ -59,6 +59,8 @@ export async function GET(req: Request, { params }: Params) {
     const result: StreamerListType[] = [];
     for (const channel of userData.data) {
       const streamerName = channel.display_name;
+      const streamerId = channel.id;
+      const thumbnail = channel.thumbnail_url;
       const userId = channel.id;
 
       // 現在配信されている(liveの)ゲームIDを取得
@@ -72,17 +74,19 @@ export async function GET(req: Request, { params }: Params) {
       }
 
       const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
-      const gamesPlayed = new Set<string>();
+      const currentStreamGames = new Set<string>();
 
       // 現在配信されているゲームIDを追加
       gamesData.data.forEach((stream) => {
         if (stream.game_id) {
-          gamesPlayed.add(stream.game_id);
+          currentStreamGames.add(stream.game_id);
         }
       });
 
       // 過去の配信をページネーションを使って取得
       let paginationCursor: string | undefined = undefined;
+
+      const pastVideosGames = new Set<string>();
 
       do {
         const videosRes = await fetch(`https://api.twitch.tv/helix/videos?user_id=${userId}&after=${paginationCursor || ''}`, {
@@ -100,8 +104,8 @@ export async function GET(req: Request, { params }: Params) {
 
         // 過去の配信ゲームIDを追加
         videosData.data.forEach((video) => {
-          if (video.id) {
-            gamesPlayed.add(video.id);
+          if (video.title) {
+            pastVideosGames.add(video.title);
           }
         });
 
@@ -109,12 +113,17 @@ export async function GET(req: Request, { params }: Params) {
         paginationCursor = videosData.pagination?.cursor;
       } while (paginationCursor); // 次のページがあれば続ける
 
-      const resultGames = Array.from(gamesPlayed);
-
-      result.push({
+      const resultData: StreamerListType = {
         name: streamerName,
-        twitchGameId: [...resultGames],
-      });
+        id: streamerId,
+        color: 'defaultColor',
+        thumbnail: thumbnail,
+        twitchStreamId: Array.from(currentStreamGames), // 現在配信されているゲームID
+        // twitchVideoId: Array.from(pastVideosGames),  // 過去の配信ゲームID
+        twitchVideoId: Array.from(pastVideosGames),  // 過去の配信ゲームID
+      };
+
+      result.push(resultData);
     }
 
     return NextResponse.json(result);

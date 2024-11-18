@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Key } from "react";
 import * as d3 from 'd3';
 import Icon from "./Icon";
 import { NodeType } from "@/types/NetworkType";
@@ -78,31 +78,57 @@ const NodeLink = (props: any) => {
             })
           }
           {nodes.length !== 0 &&
-            nodes.map((node: NodeType, i: number) => {
-              return(
-                <g className={`brightness-${hoveredIndex === node.index ? "125" : "100"}`}
-                  transform={`translate(${node.x},${node.y})`}
-                  onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
-                  onMouseLeave={() => setHoveredIndex(-1)}
-                  key={i}>
-                  <Icon
-                    title={node.title}
-                    imgURL={node.imgURL}
-                    index={node.index ?? i}
-                    steamGameId={node.steamGameId}
-                    twitchGameId={node.twitchGameId}
-                    circleScale={node.circleScale ?? 1}
-                    strongColor={
-                      streamerIds && streamerIds.length > 0
-                        ? streamerIds.some((game: { twitchGameId: string[] }) =>
-                            game.twitchGameId.some((id) => id === node.twitchGameId)
-                          )
-                        : false
-                    }
-                  />
-                </g>
+          nodes.map((node: NodeType, i: number) => {
+            const streamerColors = streamerIds
+              .filter((game: { twitchVideoId: string[] }) =>
+                game.twitchVideoId.some((id) => id === node.twitchGameId)
               )
+              .map((game: { color: string; }) => game.color); // 配信者の色をすべて取得
+            
+            // それぞれの色を等間隔で分けるための角度計算
+            const angleStep = 360 / streamerColors.length;
+
+            return (
+              <g
+                className={`brightness-${hoveredIndex === node.index ? "125" : "100"}`}
+                transform={`translate(${node.x},${node.y})`}
+                onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
+                onMouseLeave={() => setHoveredIndex(-1)}
+                key={i}
+              >
+                <Icon
+                  title={node.title}
+                  imgURL={node.imgURL}
+                  index={node.index ?? i}
+                  steamGameId={node.steamGameId}
+                  twitchGameId={node.twitchGameId}
+                  circleScale={node.circleScale ?? 1}
+                />
+                
+                {/* 色付きセグメントを描画 */}
+                {streamerColors.length > 0 &&
+                  streamerColors.map((color: string | undefined, index: number | 0) => {
+                    const angleStart = -90 + angleStep * index; // -90は真上
+                    const angleEnd = angleStart + angleStep;
+
+                    return (
+                      <circle
+                        key={index}
+                        cx="0"
+                        cy="0"
+                        r="45" // 半径
+                        stroke={color}
+                        strokeWidth="5"
+                        fill="transparent"
+                        strokeDasharray={`${angleStep} ${360 - angleStep}`}
+                        strokeDashoffset={-angleStart}
+                      />
+                    );
+                  })}
+              </g>
+            );
           })}
+
           {hoveredIndex !== -1 && (
             <g transform={`translate(${findHoveredNode().x},${findHoveredNode().y})`}>
               <g>

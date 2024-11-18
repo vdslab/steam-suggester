@@ -9,6 +9,7 @@ export type TwitchUserDataType = {
     offline_image_url: string;
     view_count: number;
     created_at: string;
+    thumbnail: string;
 };
   
 export type TwitchStreamDataType = {

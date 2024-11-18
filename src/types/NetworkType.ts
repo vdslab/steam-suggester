@@ -7,7 +7,6 @@ export type IconType = {
   steamGameId: string;
   twitchGameId: string;
   circleScale: number;
-  strongColor: boolean;
 }
 
 export type SteamListType = {
@@ -17,10 +16,15 @@ export type SteamListType = {
 
 export type StreamerListType = {
   name: string;
-  twitchGameId: string[];
+  id: string;
+  twitchStreamId: string[];
+  twitchVideoId: string[];
+  color: string;
+  thumbnail: string;
 }
 
 export type NodeType = {
+  twitchVideoTitle: string;
   steamGameId: string;
   twitchGameId: string;
   totalViews?: number;

@@ -71,7 +71,7 @@ const Network = () => {
               <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
             </div>
             <div className="flex-grow">
-              <StreamedList streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
+              <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
             </div>
           </div>
         </div>
