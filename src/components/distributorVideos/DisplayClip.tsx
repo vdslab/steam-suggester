@@ -40,7 +40,7 @@ const DisplayClip = (props: TwitchClipType) => {
               onClick={onHandleClose}
             />
             <iframe
-              src={`${embedUrl}&parent=steam-suggester.vdslab.jp`}
+              src={`${embedUrl}&parent=${process.env.NEXT_PUBLIC_DOMAIN}`}
               width='800'
               height='600'
               allowFullScreen

@@ -82,9 +82,9 @@ const StackedAreaChart =({
         left={margin.left}
         keys={keys}
         data={data}
-        x={(d) => xScale(getX(d.data)) + 70 ?? 0}
-        y0={(d) => yScale(getY0(d)) + margin.top ?? 0}
-        y1={(d) => yScale(getY1(d)) + margin.top ?? 0}
+        x={(d) => xScale(getX(d.data)) + 70}
+        y0={(d) => yScale(getY0(d)) + margin.top}
+        y1={(d) => yScale(getY1(d)) + margin.top}
         curve={ curveBasis }
       >
         {({ stacks, path }) =>
