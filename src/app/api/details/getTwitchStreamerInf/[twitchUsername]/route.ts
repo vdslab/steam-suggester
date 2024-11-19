@@ -11,6 +11,7 @@ type Params = {
 
 export async function GET(req: Request, { params }: Params) {
   const streamerUsername = params.twitchUsername;
+  const getUserLimit = 20; //最大取得配信者数
 
   try {
     const token = await TwitchToken();
@@ -37,7 +38,7 @@ export async function GET(req: Request, { params }: Params) {
 
     // 検索結果がまだなかったら、チャンネル名で検索
     if (!userData || userData.data.length === 0) {
-      console.log("User not found by ID, searching by channel name...");
+      // console.log("User not found by ID, searching by channel name...");
       userRes = await fetch(`https://api.twitch.tv/helix/search/channels?query=${streamerUsername}`, {
         headers,
       });
@@ -58,6 +59,7 @@ export async function GET(req: Request, { params }: Params) {
     // ユーザーIDに変換
     const result: StreamerListType[] = [];
     for (const channel of userData.data) {
+      if (result.length >= getUserLimit) break; // getUserLimit人まで
       const streamerName = channel.display_name;
       const streamerId = channel.id;
       const thumbnail = channel.thumbnail_url;
@@ -75,6 +77,7 @@ export async function GET(req: Request, { params }: Params) {
 
       const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
       const currentStreamGames = new Set<string>();
+      const viewer_count = gamesData.data.length > 0 ? gamesData.data[0].viewer_count : -1;
 
       // 現在配信されているゲームIDを追加
       gamesData.data.forEach((stream) => {
@@ -100,7 +103,7 @@ export async function GET(req: Request, { params }: Params) {
 
         const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
 
-        console.log("Videos Data:", videosData);
+        // console.log("Videos Data:", videosData);
 
         // 過去の配信ゲームIDを追加
         videosData.data.forEach((video) => {
@@ -116,11 +119,11 @@ export async function GET(req: Request, { params }: Params) {
       const resultData: StreamerListType = {
         name: streamerName,
         id: streamerId,
-        color: 'defaultColor',
-        thumbnail: thumbnail,
-        twitchStreamId: Array.from(currentStreamGames), // 現在配信されているゲームID
-        // twitchVideoId: Array.from(pastVideosGames),  // 過去の配信ゲームID
-        twitchVideoId: Array.from(pastVideosGames),  // 過去の配信ゲームID
+        color: 'default',
+        thumbnail: 'default',
+        viewer_count: viewer_count,
+        twitchStreamId: ['defalult'], // 現在配信されているゲームID
+        twitchVideoId: ['defalult'],  // 過去の配信ゲームID
       };
 
       result.push(resultData);

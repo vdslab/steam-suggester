@@ -4,6 +4,7 @@ import { NodeType, StreamerListType } from "@/types/NetworkType";
 import { useEffect, useState } from "react";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 const similarity : any = require('string-similarity');
+import CircularProgress from '@mui/material/CircularProgress';
 
 type Props = {
   nodes: NodeType[];
@@ -14,9 +15,9 @@ type Props = {
 const StreamedList = (props: Props) => {
   const { nodes, streamerIds, setStreamerIds } = props;
   // console.log(nodes)
-  const [streamedTitleList, setStreamedTitleList] = useState<StreamerListType[]>([]);
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
+  const [isLoading, setIsLoading] = useState<string[]>([]);
 
   // string-similariライブラリ(動画タイトル全文とゲームタイトルを比較)
   const isSimilar = (str1: string, str2: string, threshold: number = 0.6) => {
@@ -94,53 +95,70 @@ const StreamedList = (props: Props) => {
   
 
 
-  const handleSearchClick = (data: StreamerListType) => {
-    // 追加ボタンが押されたゲームのみをフィルタリング
-    const streamedGameList = nodes.reduce((acc: StreamerListType[], node) => {
-      data.twitchVideoId.forEach((videoId) => {
-        // タイトルを比較する前に、単語単位で比較
-        if (compareTitlesByWords(videoId, node.title)) {
-          const existingGame = acc.find((g) => g.name === data.name);
-          if (existingGame) {
-            if (!existingGame.twitchVideoId.includes(node.twitchGameId)) {
-              existingGame.twitchVideoId.push(node.twitchGameId);
-            }
-          } else {
-            const updatedGame = { ...data, twitchVideoId: [node.twitchGameId] };
-            acc.push(updatedGame);
-          }
-        }
-      });
-      return acc;
-    }, []);
-  
-    // 新しいゲームが `streamerIds` に存在しない場合に追加
-    const newGames = streamedGameList.filter(
-      (newGame) => !streamerIds.some((existingGame) => existingGame.name === newGame.name)
-    );
-  
-    if (newGames.length > 0) {
-      const randomColor = getRandomColor();
-      setStreamerIds((prevStreamerIds) => [
-        ...prevStreamerIds,
-        { ...newGames[0], color: randomColor } // newGames[0]を展開し、colorを追加
-      ]);
-
-      // console.log(streamerIds)
-      setSearchStreamerQuery(''); // 検索バーをリセット
-    } else {
-      const isAlreadyAdded = streamerIds.some((existingGame) => existingGame.name === data.name);
-      if (isAlreadyAdded) {
-        alert(`「${data.name}」は既に追加されています。`);
-        return;
-      }else if (streamedGameList.length === 0) {
-        alert(`「${data.name}」のデータが見つかりませんでした。`);
-        return;
-      }else{
-        alert("追加できませんでした。");
+  const handleSearchClick = async (data: StreamerListType) => {
+    setIsLoading((prev) => [...prev, data.id]);
+    try {
+      // APIを呼び出してstreamerの詳細情報を取得
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerStreamedVideoTitle/${data.id}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch streamer data");
       }
+      const updatedData: StreamerListType = await response.json();
+  
+      // 取得したデータを基にstreamedGameListを作成
+      const streamedGameList = nodes.reduce((acc: StreamerListType[], node) => {
+        updatedData.twitchVideoId.forEach((videoId) => {
+          if (compareTitlesByWords(videoId, node.title)) {
+            const existingGame = acc.find((g) => g.name === updatedData.name);
+            if (existingGame) {
+              if (!existingGame.twitchVideoId.includes(node.twitchGameId)) {
+                existingGame.twitchVideoId.push(node.twitchGameId);
+              }
+            } else {
+              const newGame = { ...updatedData, twitchVideoId: [node.twitchGameId] };
+              acc.push(newGame);
+            }
+          }
+        });
+        return acc;
+      }, []);
+  
+      // 新しいゲームが `streamerIds` に存在しない場合に追加
+      const newGames = streamedGameList.filter(
+        (newGame) => !streamerIds.some((existingGame) => existingGame.name === newGame.name)
+      );
+  
+      if (newGames.length > 0) {
+        const randomColor = getRandomColor();
+        setStreamerIds((prevStreamerIds) => [
+          ...prevStreamerIds,
+          { ...newGames[0], color: randomColor }
+        ]);
+  
+        // 検索バーをリセット（stateを更新）
+        setSearchStreamerQuery('');
+      } else {
+        const isAlreadyAdded = streamerIds.some((existingGame) => existingGame.name === updatedData.name);
+        if (isAlreadyAdded) {
+          alert(`「${updatedData.name}」は既に追加されています。`);
+          return;
+        } else if (streamedGameList.length === 0) {
+          alert(`「${updatedData.name}」のデータが見つかりませんでした。`);
+          return;
+        } else {
+          alert("追加できませんでした。");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching streamer details:", error);
+      alert("配信者の情報を取得できませんでした。");
+    } finally {
+      setIsLoading((prev) => prev.filter((id) => id !== data.id));
     }
   };
+  
 
 
   const handleGameDelete = (game: StreamerListType) => {
@@ -164,8 +182,10 @@ const StreamedList = (props: Props) => {
         const data = await response.json();
         // console.log(data);
         if (Array.isArray(data)) {
-          setStreamedTitleList(data);
-          setFilteredStreamerList(data);
+          // viewer_count順に並び替え
+          const sortedData = data.sort((a: any, b: any) => b.viewer_count - a.viewer_count);
+  
+          setFilteredStreamerList(sortedData);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -196,10 +216,26 @@ const StreamedList = (props: Props) => {
                   key={id.name}
                 >
                   <div className="text-white font-medium">{id.name}</div>
-                  <PlaylistAddIcon
-                    className="cursor-pointer hover:bg-blue-600 p-1 rounded-full transition-all"
-                    onClick={() => handleSearchClick(id)}
-                  />
+                  <div className="flex items-center">
+                    {/* 配信中の場合の赤い点（PlaylistAddIconのすぐ左に配置） */}
+                    {id.viewer_count !== -1 && (
+                      <div
+                        className="w-2 h-2 rounded-full bg-red-600 mr-2"
+                        style={{ flexShrink: 0 }}
+                      ></div>
+                    )}
+                    <button
+                      className="relative"
+                      onClick={() => handleSearchClick(id)}
+                      disabled={isLoading.includes(id.id)}  // ローディング中はボタンを無効化
+                    >
+                      {isLoading.includes(id.id) ? (
+                        <CircularProgress size={20} color="inherit" className="p-1" />
+                      ) : (
+                        <PlaylistAddIcon className="cursor-pointer hover:bg-blue-600 p-1 rounded-full transition-all" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

@@ -21,6 +21,7 @@ export type StreamerListType = {
   twitchVideoId: string[];
   color: string;
   thumbnail: string;
+  viewer_count: number;
 }
 
 export type NodeType = {

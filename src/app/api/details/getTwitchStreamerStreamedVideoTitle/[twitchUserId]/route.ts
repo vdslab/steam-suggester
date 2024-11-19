@@ -24,47 +24,28 @@ export async function GET(req: Request, { params }: Params) {
       'Authorization': `Bearer ${token}`,
     });
 
-    // ユーザーIDでの検索を試みる
-    let userRes = await fetch(`https://api.twitch.tv/helix/users?login=${streamerUserId}`, {
-      headers,
-    });
+    // ユーザー情報の取得
+    const userRes = await fetch(`https://api.twitch.tv/helix/users?id=${streamerUserId}`, { headers });
 
-    let userData: { data: TwitchUserDataType[] } | null = null;
-
-    if (userRes.ok) {
-      userData = await userRes.json();
+    if (!userRes.ok) {
+      console.error("Error fetching user data:", userRes.status, await userRes.text());
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // ユーザーが見つからなければ、チャンネル名で検索
-    if (!userData || userData.data.length === 0) {
-      console.log("User not found by ID, searching by channel name...");
-      userRes = await fetch(`https://api.twitch.tv/helix/search/channels?query=${streamerUserId}`, {
-        headers,
-      });
-
-      if (!userRes.ok) {
-        console.error("Error fetching channel search data:", userRes.status, await userRes.text());
-        return NextResponse.error();
-      }
-
-      userData = await userRes.json();
-
-      if (!userData || userData.data.length === 0) {
-        console.error("Channel not found");
-        return NextResponse.json({ error: "User or channel not found" }, { status: 404 });
-      }
+    const userData: { data: TwitchUserDataType[] } = await userRes.json();
+    if (userData.data.length === 0) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const channel = userData.data[0];
-    const streamerName = channel.display_name;
-    const streamerId = channel.id;
-    const thumbnail = channel.thumbnail_url;
-    const userId = channel.id;
+    const user = userData.data[0];
+    const streamerName = user.display_name;
+    const streamerId = user.id;
+    const thumbnail = user.profile_image_url;
+    const view_count = user.view_count;
+    // console.log(user);
 
     // 現在配信されているゲームIDを取得
-    const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userId}`, { 
-      headers,
-    });
+    const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${streamerId}`, { headers });
 
     if (!gamesRes.ok) {
       console.error("Error fetching stream data:", gamesRes.status, await gamesRes.text());
@@ -74,7 +55,6 @@ export async function GET(req: Request, { params }: Params) {
     const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
     const currentStreamGames = new Set<string>();
 
-    // 現在配信中のゲームIDを取得
     gamesData.data.forEach((stream) => {
       if (stream.game_id) {
         currentStreamGames.add(stream.game_id);
@@ -84,9 +64,10 @@ export async function GET(req: Request, { params }: Params) {
     // 過去の配信データを取得
     let paginationCursor: string | undefined = undefined;
     const pastVideosGames = new Set<string>();
+    let i = 0;
 
     do {
-      const videosRes = await fetch(`https://api.twitch.tv/helix/videos?user_id=${userId}&after=${paginationCursor || ''}`, {
+      const videosRes = await fetch(`https://api.twitch.tv/helix/videos?user_id=${streamerId}&after=${paginationCursor || ''}`, {
         headers,
       });
 
@@ -97,31 +78,34 @@ export async function GET(req: Request, { params }: Params) {
 
       const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
 
-      // 過去の配信タイトルを追加
       videosData.data.forEach((video) => {
         if (video.title) {
           pastVideosGames.add(video.title);
         }
       });
 
-      // 次のページがあれば、paginationCursorを更新
       paginationCursor = videosData.pagination?.cursor;
-    } while (paginationCursor); // 次のページがあれば続ける
 
-    // 最終的な結果を作成
+      i += videosData.data.length;
+      if (i >= 1000) {
+        break;
+      }
+    } while (paginationCursor);
+
+    // 最終結果の作成
     const result = {
       name: streamerName,
       id: streamerId,
-      color: 'defaultColor',  // 色は固定で設定
+      color: 'defaultColor',
       thumbnail: thumbnail,
-      twitchStreamId: Array.from(currentStreamGames), // 現在配信中のゲームID
-      twitchVideoId: Array.from(pastVideosGames),    // 過去の配信タイトル
+      twitchStreamId: Array.from(currentStreamGames),
+      twitchVideoId: Array.from(pastVideosGames),
     };
 
     return NextResponse.json(result);
 
   } catch (error) {
-    console.error('Error fetching user or channel data:', error);
+    console.error('Error fetching user data:', error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
