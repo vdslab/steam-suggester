@@ -259,7 +259,8 @@ const StreamedList = (props: Props) => {
           className="w-full px-3 py-1 mb-0 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
         {searchStreamerQuery && (
-          <div className="bg-gray-700 p-2 rounded-lg mt-0">
+          // ここで relative コンテナを追加
+          <div className="bg-gray-700 p-2 rounded-lg mt-0 relative">
             <h2 className="text-gray-400 text-xs font-semibold mb-2">検索結果</h2>
             <div className="max-h-40 overflow-y-auto">
               {filteredStreamerList.map((streamer) => (
@@ -277,7 +278,7 @@ const StreamedList = (props: Props) => {
                     <div className="text-white font-medium">{streamer.name}</div>
                   </div>
                   <div className="flex items-center">
-                    {/* 配信中の場合の赤い点（PlaylistAddIconのすぐ左に配置） */}
+                    {/* 配信中の場合の赤い点 */}
                     {streamer.viewer_count !== 'default' && streamer.viewer_count !== -1 && (
                       <div
                         className="w-2 h-2 rounded-full bg-red-600 mr-2"
@@ -285,12 +286,14 @@ const StreamedList = (props: Props) => {
                       ></div>
                     )}
                     <button
-                      className="relative"
+                      className="relative flex items-center"
                       onClick={() => handleSearchClick(streamer)}
                       disabled={isLoading.includes(streamer.id)}  // ローディング中はボタンを無効化
                     >
                       {isLoading.includes(streamer.id) ? (
-                        <CircularProgress size={20} color="inherit" className="p-1" />
+                        <>
+                          <CircularProgress size={20} color="inherit" className="p-1 mr-2" />
+                        </>
                       ) : (
                         <PlaylistAddIcon className="cursor-pointer hover:bg-blue-600 p-1 rounded-full transition-all" />
                       )}
@@ -299,6 +302,13 @@ const StreamedList = (props: Props) => {
                 </div>
               ))}
             </div>
+
+            {/* 追加: ローディングオーバーレイ */}
+            {isLoading.length > 0 && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg p-3">
+                <span className="text-white text-lg">データを取得中。<br/>これには時間がかかることがあります。</span>
+              </div>
+            )}
           </div>
         )}
       </div>
