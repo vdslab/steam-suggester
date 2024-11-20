@@ -1,3 +1,5 @@
+// src/components/StreamedList.tsx
+
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import YouTubeIcon from '@mui/icons-material/YouTube';
@@ -7,6 +9,8 @@ import { useCallback, useEffect, useState } from "react";
 import similarity from 'string-similarity';
 import CircularProgress from '@mui/material/CircularProgress';
 import debounce from 'lodash.debounce';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
 type Props = {
   nodes: NodeType[];
@@ -16,10 +20,15 @@ type Props = {
 
 const StreamedList = (props: Props) => {
   const { nodes, streamerIds, setStreamerIds } = props;
-  console.log(streamerIds)
+  console.log(streamerIds);
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
   const [isLoading, setIsLoading] = useState<string[]>([]);
+  const [showLimitAlert, setShowLimitAlert] = useState<boolean>(false); // 配信者追加制限アラート
+  const [showDataNotFoundAlert, setShowDataNotFoundAlert] = useState<boolean>(false); // データ未発見アラート
+  const [showDuplicateAlert, setShowDuplicateAlert] = useState<boolean>(false); // 重複追加アラート
+
+  const MAX_STREAMERS = 10; // 最大配信者数
 
   // string-similarityライブラリ(動画タイトル全文とゲームタイトルを比較)
   const isSimilar = (str1: string, str2: string, threshold: number = 0.6) => {
@@ -55,6 +64,7 @@ const StreamedList = (props: Props) => {
     '#33FFF5', // 水色
     '#F533FF', // マゼンタ
     '#F5FF33', // 黄
+    '#33FF8F', // ライムグリーン
   ];
 
   const getRandomColor = (() => {
@@ -73,6 +83,12 @@ const StreamedList = (props: Props) => {
   })();
 
   const handleSearchClick = async (data: StreamerListType) => {
+    // 追加: 10件に達している場合は追加を防止
+    if (streamerIds.length >= MAX_STREAMERS) {
+      setShowLimitAlert(true);
+      return;
+    }
+
     setIsLoading((prev) => [...prev, data.id]);
     try {
       let updatedData: StreamerListType;
@@ -162,18 +178,19 @@ const StreamedList = (props: Props) => {
       } else {
         const isAlreadyAdded = streamerIds.some((existingGame) => existingGame.name === updatedData.name && existingGame.platform === updatedData.platform);
         if (isAlreadyAdded) {
-          alert(`「${updatedData.name}」は既に追加されています。`);
+          setShowDuplicateAlert(true); // 重複アラートを表示
           return;
         } else if (streamedGameList.length === 0) {
-          alert(`「${updatedData.name}」のデータが見つかりませんでした。`);
+          setShowDataNotFoundAlert(true); // データ未発見アラートを表示
           return;
         } else {
-          alert("追加できませんでした。");
+          setShowDataNotFoundAlert(true); // その他のエラーもデータ未発見として扱う
+          return;
         }
       }
     } catch (error) {
       console.error("Error fetching streamer details:", error);
-      alert("配信者の情報を取得できませんでした。");
+      setShowDataNotFoundAlert(true); // エラー時にもデータ未発見アラートを表示
     } finally {
       setIsLoading((prev) => prev.filter((id) => id !== data.id));
     }
@@ -228,7 +245,7 @@ const StreamedList = (props: Props) => {
         // TwitchとYouTubeのデータを統合
         const combinedData = [...twitchData, ...youtubeData];
 
-        // viewer_count順
+        // viewer_count順に並び替え（数字のみ比較）
         const sortedData = combinedData.sort((a, b) => {
           const viewerA = typeof a.viewer_count === 'number' ? a.viewer_count : parseInt(a.viewer_count) || 0;
           const viewerB = typeof b.viewer_count === 'number' ? b.viewer_count : parseInt(b.viewer_count) || 0;
@@ -239,17 +256,65 @@ const StreamedList = (props: Props) => {
       } catch (error) {
         console.error('Error:', error);
       }
-    }, 1000), // 仮 1s遅延
+    }, 1000), // 1秒の遅延
     [nodes] // 依存配列
   );
 
   useEffect(() => {
     debouncedFetch(searchStreamerQuery);
     return debouncedFetch.cancel;
-  }, [searchStreamerQuery]);
+  }, [searchStreamerQuery, debouncedFetch]);
 
   return (
     <div className="bg-gray-800 p-2 rounded-lg shadow-lg max-w-xl mx-auto">
+      {/* 制限アラートの表示 */}
+      <Snackbar
+        open={showLimitAlert}
+        autoHideDuration={6000}
+        onClose={() => setShowLimitAlert(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setShowLimitAlert(false)}
+          severity="warning"
+          sx={{ width: '100%' }}
+        >
+          配信者の追加は最大10件までです。不要な配信者を削除してから追加してください。
+        </Alert>
+      </Snackbar>
+
+      {/* データ未発見アラートの表示 */}
+      <Snackbar
+        open={showDataNotFoundAlert}
+        autoHideDuration={6000}
+        onClose={() => setShowDataNotFoundAlert(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setShowDataNotFoundAlert(false)}
+          severity="error"
+          sx={{ width: '100%' }}
+        >
+          データが見つかりませんでした。もう一度お試しください。
+        </Alert>
+      </Snackbar>
+
+      {/* 重複追加アラートの表示 */}
+      <Snackbar
+        open={showDuplicateAlert}
+        autoHideDuration={6000}
+        onClose={() => setShowDuplicateAlert(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setShowDuplicateAlert(false)}
+          severity="info"
+          sx={{ width: '100%' }}
+        >
+          この配信者は既に追加されています。
+        </Alert>
+      </Snackbar>
+
       <div className="mb-0">
         <input
           type="text"
@@ -259,13 +324,12 @@ const StreamedList = (props: Props) => {
           className="w-full px-3 py-1 mb-0 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
         {searchStreamerQuery && (
-          // ここで relative コンテナを追加
           <div className="bg-gray-700 p-2 rounded-lg mt-0 relative">
             <h2 className="text-gray-400 text-xs font-semibold mb-2">検索結果</h2>
             <div className="max-h-40 overflow-y-auto">
               {filteredStreamerList.map((streamer) => (
                 <div
-                  className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all cursor-pointer"
+                  className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all"
                   key={`${streamer.platform}-${streamer.id}`}
                 >
                   <div className="flex items-center">
@@ -288,14 +352,23 @@ const StreamedList = (props: Props) => {
                     <button
                       className="relative flex items-center"
                       onClick={() => handleSearchClick(streamer)}
-                      disabled={isLoading.includes(streamer.id)}  // ローディング中はボタンを無効化
+                      disabled={isLoading.includes(streamer.id) || streamerIds.length >= MAX_STREAMERS}  // ローディング中や制限時にボタンを無効化
+                      aria-disabled={isLoading.includes(streamer.id) || streamerIds.length >= MAX_STREAMERS}
                     >
                       {isLoading.includes(streamer.id) ? (
                         <>
                           <CircularProgress size={20} color="inherit" className="p-1 mr-2" />
+                          <span className="text-gray-300 text-sm">
+                            データを追加しています。<br />
+                            これには時間がかかることがあります。
+                          </span>
                         </>
                       ) : (
-                        <PlaylistAddIcon className="cursor-pointer hover:bg-blue-600 p-1 rounded-full transition-all" />
+                        <PlaylistAddIcon
+                          className={`cursor-pointer hover:bg-blue-600 p-1 rounded-full transition-all ${
+                            streamerIds.length >= MAX_STREAMERS ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                        />
                       )}
                     </button>
                   </div>
@@ -305,14 +378,23 @@ const StreamedList = (props: Props) => {
 
             {/* 追加: ローディングオーバーレイ */}
             {isLoading.length > 0 && (
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg p-3">
-                <span className="text-white text-lg">データを取得中。<br/>これには時間がかかることがあります。</span>
+              <div
+                className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-lg transition-opacity duration-300"
+                role="alert"
+                aria-live="assertive"
+              >
+                <CircularProgress size={40} color="inherit" className="mb-4" />
+                <span className="text-white text-lg text-center">
+                  データを追加しています。<br />
+                  これには時間がかかることがあります。
+                </span>
               </div>
             )}
           </div>
         )}
       </div>
 
+      {/* 追加済みの配信者ブロック */}
       <div className="bg-gray-700 p-2 rounded-lg shadow-lg mt-0">
         <h2 className="text-white text-lg font-semibold mb-2">追加済みの配信者</h2>
         {streamerIds.length === 0 ? (
@@ -320,7 +402,7 @@ const StreamedList = (props: Props) => {
         ) : (
           streamerIds.map((streamer) => (
             <div
-              className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all cursor-pointer"
+              className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all"
               key={`${streamer.platform}-${streamer.id}`}
             >
               <div className="flex items-center">
