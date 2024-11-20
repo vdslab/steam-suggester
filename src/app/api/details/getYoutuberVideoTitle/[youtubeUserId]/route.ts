@@ -1,12 +1,10 @@
-// src/app/api/details/getYoutuberVideoTitle/[youtubeUserId]/route.ts
-
 import { NextResponse } from "next/server";
 import { getCachedData, setCachedData } from "../../../../lib/cache";
 import { StreamerListType } from "@/types/NetworkType";
 
 const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
 const MAX_RESULTS = 20; // 最大取得数
-const GAMING_CATEGORY_ID = "20"; // Gaming カテゴリ ID
+const GAMING_CATEGORY_ID = "20"; // GamingカテゴリID
 
 type Params = {
   params: {
@@ -135,7 +133,6 @@ export async function GET(req: Request, { params }: Params) {
       nextPageToken = videosData.nextPageToken;
     } while (nextPageToken);
 
-    // 結果の整形
     const result: StreamerListType = {
       name: streamerName,
       id: streamerId,
@@ -143,7 +140,7 @@ export async function GET(req: Request, { params }: Params) {
       color: 'defaultColor',
       thumbnail: thumbnail || 'default',
       viewer_count: 'default',
-      streamId: Array.from(currentStreamGames), // ゲームカテゴリ名
+      streamId: Array.from(currentStreamGames),
       videoId: Array.from(pastVideosGames),
     };
 

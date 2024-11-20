@@ -1,5 +1,3 @@
-// src/app/api/details/getTwitchStreamerInf/[twitchUsername]/route.ts
-
 import TwitchToken from "@/app/api/TwitchToken";
 import { NextResponse } from "next/server";
 import { TwitchUserDataType, TwitchStreamDataType, TwitchVideoDataType } from "@/types/api/TwitchTypes";
@@ -27,7 +25,7 @@ export async function GET(req: Request, { params }: Params) {
       'Authorization': `Bearer ${token}`,
     });
 
-    // ユーザーIDでの検索を試みる
+    // ユーザーIDでの検索
     let userRes = await fetch(`https://api.twitch.tv/helix/users?login=${streamerUsername}`, {
       headers,
     });
@@ -60,7 +58,7 @@ export async function GET(req: Request, { params }: Params) {
     // ユーザーIDに変換
     const result: StreamerListType[] = [];
     for (const channel of userData.data) {
-      if (result.length >= getUserLimit) break; // 最大取得数に達したら終了
+      if (result.length >= getUserLimit) break;
 
       const streamerName = channel.display_name;
       const streamerId = channel.id;

@@ -1,15 +1,13 @@
-// src/lib/cache.ts
-
 type CacheEntry = {
   timestamp: number;
   data: any;
 };
 
 const cache: { [key: string]: CacheEntry } = {};
-const CACHE_DURATION = 60 * 60 * 1000; // 1時間（ミリ秒単位）
+const CACHE_DURATION = 60 * 60 * 1000; // 1時間
 
 /**
- * キャッシュからデータを取得します。
+ * キャッシュからデータを取得
  * @param key キャッシュキー
  * @returns キャッシュデータまたは null
  */
@@ -22,7 +20,7 @@ export const getCachedData = (key: string) => {
 };
 
 /**
- * キャッシュにデータを保存します。
+ * キャッシュにデータを保存
  * @param key キャッシュキー
  * @param data 保存するデータ
  */

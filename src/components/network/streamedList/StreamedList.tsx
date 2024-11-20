@@ -1,5 +1,3 @@
-// src/components/StreamedList.tsx
-
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import YouTubeIcon from '@mui/icons-material/YouTube';
@@ -199,7 +197,7 @@ const StreamedList = (props: Props) => {
       }
 
       try {
-        // Twitch APIを呼び出す
+        // Twitch API
         const twitchResponse = await fetch(
           `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodeURIComponent(query)}`
         );
@@ -213,7 +211,7 @@ const StreamedList = (props: Props) => {
           }));
         }
 
-        // YouTube APIを呼び出す
+        // YouTube API
         const youtubeResponse = await fetch(
           `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberInf/${encodeURIComponent(query)}`
         );
@@ -230,7 +228,7 @@ const StreamedList = (props: Props) => {
         // TwitchとYouTubeのデータを統合
         const combinedData = [...twitchData, ...youtubeData];
 
-        // viewer_count順に並び替え（数字のみ比較）
+        // viewer_count順
         const sortedData = combinedData.sort((a, b) => {
           const viewerA = typeof a.viewer_count === 'number' ? a.viewer_count : parseInt(a.viewer_count) || 0;
           const viewerB = typeof b.viewer_count === 'number' ? b.viewer_count : parseInt(b.viewer_count) || 0;
@@ -242,7 +240,7 @@ const StreamedList = (props: Props) => {
         console.error('Error:', error);
       }
     }, 1000), // 仮 1s遅延
-    [nodes] // 必要に応じて依存配列を調整
+    [nodes] // 依存配列
   );
 
   useEffect(() => {

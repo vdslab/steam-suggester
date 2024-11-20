@@ -1,5 +1,3 @@
-// src/app/api/details/getTwitchStreamerStreamedVideoTitle/[twitchUserId]/route.ts
-
 import TwitchToken from "@/app/api/TwitchToken";
 import { NextResponse } from "next/server";
 import { TwitchUserDataType, TwitchStreamDataType, TwitchVideoDataType } from "@/types/api/TwitchTypes";

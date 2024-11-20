@@ -81,7 +81,7 @@ const NodeLink = (props: any) => {
           nodes.map((node: NodeType, i: number) => {
             const streamerColors = streamerIds
               .filter((game: StreamerListType) =>
-                game.videoId.some((id) => id === node.twitchGameId) // videoId を使用
+                game.videoId.some((id) => id === node.twitchGameId)
               )
               .map((game: { color: string; }) => game.color); // 配信者の色をすべて取得
 

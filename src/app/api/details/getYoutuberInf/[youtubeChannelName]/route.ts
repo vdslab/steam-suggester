@@ -43,7 +43,6 @@ export async function GET(req: Request, { params }: Params) {
       return NextResponse.json({ error: "No channels found" }, { status: 404 });
     }
 
-    // 結果を整形
     const result: StreamerListType[] = channelData.items.map((channel: any) => ({
       name: channel.snippet.channelTitle,
       id: channel.id.channelId,
@@ -51,8 +50,8 @@ export async function GET(req: Request, { params }: Params) {
       color: 'default',
       thumbnail: channel.snippet.thumbnails.default.url || "default",
       viewer_count: 'default',
-      streamId: ['default'], // Twitch用フィールドを削除
-      videoId: ['default'],  // Twitch用フィールドを削除
+      streamId: ['default'],
+      videoId: ['default'],
     }));
 
     // キャッシュに保存
