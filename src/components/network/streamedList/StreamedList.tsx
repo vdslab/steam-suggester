@@ -1,10 +1,14 @@
+// components/StreamedList.tsx
+
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { NodeType, StreamerListType } from "@/types/NetworkType";
 import { useEffect, useState } from "react";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
-const similarity : any = require('string-similarity');
+const similarity: any = require('string-similarity');
 import CircularProgress from '@mui/material/CircularProgress';
+import YouTubeIcon from '@mui/icons-material/YouTube'; // YouTubeアイコン
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports'; // Twitchアイコン
 
 type Props = {
   nodes: NodeType[];
@@ -14,7 +18,6 @@ type Props = {
 
 const StreamedList = (props: Props) => {
   const { nodes, streamerIds, setStreamerIds } = props;
-  // console.log(nodes)
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
   const [isLoading, setIsLoading] = useState<string[]>([]);
@@ -84,63 +87,90 @@ const StreamedList = (props: Props) => {
   
     return () => {
       let color;
+      let attempts = 0;
       do {
         color = generateColor();
+        attempts++;
+        if (attempts > 100) {
+          console.warn("Failed to generate a distinct bright color after 100 attempts.");
+          break;
+        }
       } while (!isBrightEnough(color) || !isDistinctEnough(color));
   
       usedColors.push(color); // 生成した色を記録
       return color;
     };
   })();
-  
-
 
   const handleSearchClick = async (data: StreamerListType) => {
     setIsLoading((prev) => [...prev, data.id]);
     try {
-      // APIを呼び出してstreamerの詳細情報を取得
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerStreamedVideoTitle/${data.id}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch streamer data");
+      let updatedData: StreamerListType;
+
+      if (data.platform === 'twitch') {
+        // Twitchの詳細情報を取得
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerStreamedVideoTitle/${data.id}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch Twitch streamer data");
+        }
+        updatedData = await response.json();
+      } else if (data.platform === 'youtube') {
+        // YouTubeの詳細情報を取得
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberVideoTitle/${data.id}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch YouTube streamer data");
+        }
+        updatedData = await response.json();
+      } else {
+        throw new Error("Unknown platform");
       }
-      const updatedData: StreamerListType = await response.json();
-  
+
       // 取得したデータを基にstreamedGameListを作成
       const streamedGameList = nodes.reduce((acc: StreamerListType[], node) => {
-        updatedData.twitchVideoId.forEach((videoId) => {
+        const videoIds = data.platform === 'twitch' ? updatedData.twitchVideoId : updatedData.youtubeVideoId;
+        videoIds.forEach((videoId) => {
           if (compareTitlesByWords(videoId, node.title)) {
-            const existingGame = acc.find((g) => g.name === updatedData.name);
+            const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
             if (existingGame) {
-              if (!existingGame.twitchVideoId.includes(node.twitchGameId)) {
+              if (data.platform === 'twitch' && !existingGame.twitchVideoId.includes(node.twitchGameId)) {
                 existingGame.twitchVideoId.push(node.twitchGameId);
               }
+              if (data.platform === 'youtube' && !existingGame.youtubeVideoId.includes(node.twitchGameId)) {
+                existingGame.youtubeVideoId.push(node.twitchGameId);
+              }
             } else {
-              const newGame = { ...updatedData, twitchVideoId: [node.twitchGameId] };
+              const newGame: StreamerListType = {
+                ...updatedData,
+                twitchVideoId: data.platform === 'twitch' ? [node.twitchGameId] : updatedData.twitchVideoId,
+                youtubeVideoId: data.platform === 'youtube' ? [node.twitchGameId] : updatedData.youtubeVideoId,
+              };
               acc.push(newGame);
             }
           }
         });
         return acc;
       }, []);
-  
+
       // 新しいゲームが `streamerIds` に存在しない場合に追加
       const newGames = streamedGameList.filter(
-        (newGame) => !streamerIds.some((existingGame) => existingGame.name === newGame.name)
+        (newGame) => !streamerIds.some((existingGame) => existingGame.name === newGame.name && existingGame.platform === newGame.platform)
       );
-  
+
       if (newGames.length > 0) {
         const randomColor = getRandomColor();
         setStreamerIds((prevStreamerIds) => [
           ...prevStreamerIds,
           { ...newGames[0], color: randomColor }
         ]);
-  
+
         // 検索バーをリセット（stateを更新）
         setSearchStreamerQuery('');
       } else {
-        const isAlreadyAdded = streamerIds.some((existingGame) => existingGame.name === updatedData.name);
+        const isAlreadyAdded = streamerIds.some((existingGame) => existingGame.name === updatedData.name && existingGame.platform === updatedData.platform);
         if (isAlreadyAdded) {
           alert(`「${updatedData.name}」は既に追加されています。`);
           return;
@@ -158,43 +188,71 @@ const StreamedList = (props: Props) => {
       setIsLoading((prev) => prev.filter((id) => id !== data.id));
     }
   };
-  
-
 
   const handleGameDelete = (game: StreamerListType) => {
-    // 削除するゲームの名前が一致するゲームを削除
-    const updatedUserAddedGames = streamerIds.filter((existingGame) => existingGame.name !== game.name);
-  
+    // 削除するゲームの名前とプラットフォームが一致するゲームを削除
+    const updatedUserAddedGames = streamerIds.filter(
+      (existingGame) => !(existingGame.name === game.name && existingGame.platform === game.platform)
+    );
+
     setStreamerIds(updatedUserAddedGames);
   };
-  
 
   useEffect(() => {
     const fetchData = async () => {
       if (!searchStreamerQuery) return;
 
       try {
-        const encodedQuery = encodeURIComponent(searchStreamerQuery); // 検索クエリをエンコード
-
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodedQuery}`
+        // Twitch APIを呼び出す
+        const twitchResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodeURIComponent(searchStreamerQuery)}`
         );
-        const data = await response.json();
-        // console.log(data);
-        if (Array.isArray(data)) {
-          // viewer_count順に並び替え
-          const sortedData = data.sort((a: any, b: any) => b.viewer_count - a.viewer_count);
-  
-          setFilteredStreamerList(sortedData);
+        let twitchData: StreamerListType[] = [];
+        if (twitchResponse.ok) {
+          twitchData = await twitchResponse.json();
+          // 各Twitchストリーマーにプラットフォーム情報を追加
+          twitchData = twitchData.map((streamer) => ({
+            ...streamer,
+            platform: 'twitch',
+            youtubeStreamId: [],
+            youtubeVideoId: [],
+          }));
         }
+
+        // YouTube APIを呼び出す
+        const youtubeResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberInf/${encodeURIComponent(searchStreamerQuery)}`
+        );
+        let youtubeData: StreamerListType[] = [];
+        if (youtubeResponse.ok) {
+          youtubeData = await youtubeResponse.json();
+          // 各YouTubeストリーマーにプラットフォーム情報を追加
+          youtubeData = youtubeData.map((streamer) => ({
+            ...streamer,
+            platform: 'youtube',
+            twitchStreamId: [],
+            twitchVideoId: [],
+          }));
+        }
+
+        // TwitchとYouTubeのデータを統合
+        const combinedData = [...twitchData, ...youtubeData];
+
+        // viewer_count順に並び替え（数字のみ比較）
+        const sortedData = combinedData.sort((a, b) => {
+          const viewerA = typeof a.viewer_count === 'number' ? a.viewer_count : parseInt(a.viewer_count) || 0;
+          const viewerB = typeof b.viewer_count === 'number' ? b.viewer_count : parseInt(b.viewer_count) || 0;
+          return viewerB - viewerA;
+        });
+
+        setFilteredStreamerList(sortedData);
       } catch (error) {
         console.error('Error:', error);
       }
     };
 
     fetchData();
-  }, [searchStreamerQuery]);
-
+  }, [searchStreamerQuery, nodes]);
 
   return (
     <div className="bg-gray-800 p-2 rounded-lg shadow-lg max-w-xl mx-auto">
@@ -213,12 +271,20 @@ const StreamedList = (props: Props) => {
               {filteredStreamerList.map((id) => (
                 <div
                   className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all cursor-pointer"
-                  key={id.name}
+                  key={`${id.platform}-${id.name}`}
                 >
-                  <div className="text-white font-medium">{id.name}</div>
+                  <div className="flex items-center">
+                    {/* プラットフォームアイコン */}
+                    {id.platform === 'twitch' ? (
+                      <SportsEsportsIcon className="text-purple-500 mr-2" />
+                    ) : (
+                      <YouTubeIcon className="text-red-600 mr-2" />
+                    )}
+                    <div className="text-white font-medium">{id.name}</div>
+                  </div>
                   <div className="flex items-center">
                     {/* 配信中の場合の赤い点（PlaylistAddIconのすぐ左に配置） */}
-                    {id.viewer_count !== -1 && (
+                    {id.viewer_count !== 'default' && id.viewer_count !== -1 && (
                       <div
                         className="w-2 h-2 rounded-full bg-red-600 mr-2"
                         style={{ flexShrink: 0 }}
@@ -243,7 +309,6 @@ const StreamedList = (props: Props) => {
         )}
       </div>
 
-
       <div className="bg-gray-700 p-2 rounded-lg shadow-lg mt-0">
         <h2 className="text-white text-lg font-semibold mb-2">追加済みの配信者</h2>
         {streamerIds.length === 0 ? (
@@ -252,22 +317,33 @@ const StreamedList = (props: Props) => {
           streamerIds.map((id) => (
             <div
               className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all cursor-pointer"
-              key={id.twitchVideoId.join(", ")}
+              key={`${id.platform}-${id.id}`}
             >
-              <div
-                className="w-10 h-10 rounded-full mr-3 border-4 flex-shrink-0"
-                style={{
-                  borderColor: id.color,
-                  overflow: "hidden",
-                }}
-              >
-                <img
-                  src={id.thumbnail}
-                  alt={`${id.name} Thumbnail`}
-                  className="w-full h-full object-cover"
-                />
+              <div className="flex items-center">
+                {/* 色付きの枠を持つ丸 */}
+                <div
+                  className="w-10 h-10 rounded-full mr-3 border-4 flex-shrink-0"
+                  style={{
+                    borderColor: id.color,
+                    overflow: "hidden",
+                  }}
+                >
+                  <img
+                    src={id.thumbnail}
+                    alt={`${id.name} Thumbnail`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex items-center">
+                  {/* プラットフォームアイコン */}
+                  {id.platform === 'twitch' ? (
+                    <SportsEsportsIcon className="text-purple-500 mr-2" />
+                  ) : (
+                    <YouTubeIcon className="text-red-600 mr-2" />
+                  )}
+                  <div className="text-white font-medium">{id.name}</div>
+                </div>
               </div>
-              <div className="text-white font-medium flex-grow">{id.name}</div>
               <DeleteIcon
                 className="cursor-pointer hover:bg-red-600 p-1 rounded-full transition-all"
                 onClick={() => handleGameDelete(id)}

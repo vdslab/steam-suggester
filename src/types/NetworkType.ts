@@ -14,15 +14,20 @@ export type SteamListType = {
   title: string;
 }
 
+
 export type StreamerListType = {
   name: string;
   id: string;
-  twitchStreamId: string[];
-  twitchVideoId: string[];
+  platform: 'twitch' | 'youtube';
   color: string;
   thumbnail: string;
-  viewer_count: number;
-}
+  viewer_count: number | string;
+  twitchStreamId: string[];
+  twitchVideoId: string[];
+  youtubeStreamId: string[];
+  youtubeVideoId: string[];
+};
+
 
 export type NodeType = {
   twitchVideoTitle: string;
