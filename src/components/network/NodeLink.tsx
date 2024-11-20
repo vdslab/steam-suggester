@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect, useRef, Key } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as d3 from 'd3';
 import Icon from "./Icon";
-import { NodeType } from "@/types/NetworkType";
+import { NodeType, StreamerListType } from "@/types/NetworkType";
 
 const ZoomableSVG = (props: any) => {
   const { children, centerX, centerY } = props;
@@ -80,13 +80,13 @@ const NodeLink = (props: any) => {
           {nodes.length !== 0 &&
           nodes.map((node: NodeType, i: number) => {
             const streamerColors = streamerIds
-              .filter((game: { twitchVideoId: string[] }) =>
-                game.twitchVideoId.some((id) => id === node.twitchGameId)
+              .filter((game: StreamerListType) =>
+                game.videoId.some((id) => id === node.twitchGameId) // videoId を使用
               )
               .map((game: { color: string; }) => game.color); // 配信者の色をすべて取得
-            
+
             // それぞれの色を等間隔で分けるための角度計算
-            const angleStep = 360 / streamerColors.length;
+            const angleStep = streamerColors.length > 0 ? 360 / streamerColors.length : 0;
 
             return (
               <g
@@ -107,7 +107,7 @@ const NodeLink = (props: any) => {
                 
                 {/* 色付きセグメントを描画 */}
                 {streamerColors.length > 0 &&
-                  streamerColors.map((color: string | undefined, index: number | 0) => {
+                  streamerColors.map((color: string, index: number) => {
                     const angleStart = -90 + angleStep * index; // -90は真上
                     const angleEnd = angleStart + angleStep;
 
@@ -116,9 +116,9 @@ const NodeLink = (props: any) => {
                         key={index}
                         cx="0"
                         cy="0"
-                        r="45" // 半径
+                        r="50" // 半径
                         stroke={color}
-                        strokeWidth="5"
+                        strokeWidth="10"
                         fill="transparent"
                         strokeDasharray={`${angleStep} ${360 - angleStep}`}
                         strokeDashoffset={-angleStart}

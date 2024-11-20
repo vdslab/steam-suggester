@@ -1,6 +1,9 @@
+// src/app/api/details/getTwitchStreamerStreamedVideoTitle/[twitchUserId]/route.ts
+
 import TwitchToken from "@/app/api/TwitchToken";
 import { NextResponse } from "next/server";
 import { TwitchUserDataType, TwitchStreamDataType, TwitchVideoDataType } from "@/types/api/TwitchTypes";
+import { StreamerListType } from "@/types/NetworkType";
 
 type Params = {
   params: {
@@ -16,7 +19,7 @@ export async function GET(req: Request, { params }: Params) {
     const token = await TwitchToken();
     if (!token || !process.env.TWITCH_CLIENT_ID) {
       console.error("Missing token or client ID");
-      return NextResponse.error();
+      return NextResponse.json({ error: "Missing token or client ID" }, { status: 500 });
     }
 
     const headers = new Headers({
@@ -42,14 +45,13 @@ export async function GET(req: Request, { params }: Params) {
     const streamerId = user.id;
     const thumbnail = user.profile_image_url;
     const view_count = user.view_count;
-    // console.log(user);
 
-    // 現在配信されているゲームIDを取得
+    // 現在配信中のゲームIDを取得
     const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${streamerId}`, { headers });
 
     if (!gamesRes.ok) {
       console.error("Error fetching stream data:", gamesRes.status, await gamesRes.text());
-      return NextResponse.error();
+      return NextResponse.json({ error: "Failed to fetch stream data" }, { status: 500 });
     }
 
     const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
@@ -73,7 +75,7 @@ export async function GET(req: Request, { params }: Params) {
 
       if (!videosRes.ok) {
         console.error("Error fetching video data:", videosRes.status, await videosRes.text());
-        return NextResponse.error();
+        return NextResponse.json({ error: "Failed to fetch video data" }, { status: 500 });
       }
 
       const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
@@ -87,25 +89,27 @@ export async function GET(req: Request, { params }: Params) {
       paginationCursor = videosData.pagination?.cursor;
 
       i += videosData.data.length;
-      if (i >= 1000) {
+      if (i >= 1000) { // 安全策として最大1000件
         break;
       }
     } while (paginationCursor);
 
-    // 最終結果の作成
-    const result = {
+    // 結果の整形
+    const result: StreamerListType = {
       name: streamerName,
       id: streamerId,
+      platform: 'twitch',
       color: 'defaultColor',
-      thumbnail: thumbnail,
-      twitchStreamId: Array.from(currentStreamGames),
-      twitchVideoId: Array.from(pastVideosGames),
+      thumbnail: thumbnail || 'default',
+      viewer_count: view_count,
+      streamId: Array.from(currentStreamGames),
+      videoId: Array.from(pastVideosGames),
     };
 
     return NextResponse.json(result);
 
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    console.error("Error fetching streamer details:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -1,3 +1,5 @@
+// src/app/api/details/getTwitchStreamerInf/[twitchUsername]/route.ts
+
 import TwitchToken from "@/app/api/TwitchToken";
 import { NextResponse } from "next/server";
 import { TwitchUserDataType, TwitchStreamDataType, TwitchVideoDataType } from "@/types/api/TwitchTypes";
@@ -11,13 +13,13 @@ type Params = {
 
 export async function GET(req: Request, { params }: Params) {
   const streamerUsername = params.twitchUsername;
-  const getUserLimit = 20; //最大取得配信者数
+  const getUserLimit = 20; // 最大取得配信者数
 
   try {
     const token = await TwitchToken();
     if (!token || !process.env.TWITCH_CLIENT_ID) {
       console.error("Missing token or client ID");
-      return NextResponse.error();
+      return NextResponse.json({ error: "Missing token or client ID" }, { status: 500 });
     }
 
     const headers = new Headers({
@@ -38,7 +40,6 @@ export async function GET(req: Request, { params }: Params) {
 
     // 検索結果がまだなかったら、チャンネル名で検索
     if (!userData || userData.data.length === 0) {
-      // console.log("User not found by ID, searching by channel name...");
       userRes = await fetch(`https://api.twitch.tv/helix/search/channels?query=${streamerUsername}`, {
         headers,
       });
@@ -59,13 +60,14 @@ export async function GET(req: Request, { params }: Params) {
     // ユーザーIDに変換
     const result: StreamerListType[] = [];
     for (const channel of userData.data) {
-      if (result.length >= getUserLimit) break; // getUserLimit人まで
+      if (result.length >= getUserLimit) break; // 最大取得数に達したら終了
+
       const streamerName = channel.display_name;
       const streamerId = channel.id;
-      const thumbnail = channel.thumbnail_url;
+      const thumbnail = channel.profile_image_url;
       const userId = channel.id;
 
-      // 現在配信されている(liveの)ゲームIDを取得
+      // 現在配信されているゲームIDを取得
       const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userId}`, { 
         headers,
       });
@@ -103,8 +105,6 @@ export async function GET(req: Request, { params }: Params) {
 
         const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
 
-        // console.log("Videos Data:", videosData);
-
         // 過去の配信ゲームIDを追加
         videosData.data.forEach((video) => {
           if (video.title) {
@@ -114,16 +114,17 @@ export async function GET(req: Request, { params }: Params) {
 
         // 次のページがあれば、paginationCursorを更新
         paginationCursor = videosData.pagination?.cursor;
-      } while (paginationCursor); // 次のページがあれば続ける
+      } while (paginationCursor);
 
       const resultData: StreamerListType = {
         name: streamerName,
         id: streamerId,
+        platform: 'twitch',
         color: 'default',
-        thumbnail: 'default',
+        thumbnail: thumbnail || 'default',
         viewer_count: viewer_count,
-        twitchStreamId: ['defalult'], // 現在配信されているゲームID
-        twitchVideoId: ['defalult'],  // 過去の配信ゲームID
+        streamId: Array.from(currentStreamGames),
+        videoId: Array.from(pastVideosGames),
       };
 
       result.push(resultData);

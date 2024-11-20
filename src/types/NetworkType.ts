@@ -14,7 +14,6 @@ export type SteamListType = {
   title: string;
 }
 
-
 export type StreamerListType = {
   name: string;
   id: string;
@@ -22,10 +21,8 @@ export type StreamerListType = {
   color: string;
   thumbnail: string;
   viewer_count: number | string;
-  twitchStreamId: string[];
-  twitchVideoId: string[];
-  youtubeStreamId: string[];
-  youtubeVideoId: string[];
+  streamId: string[];
+  videoId: string[];
 };
 
 
@@ -42,6 +39,7 @@ export type NodeType = {
   device: SteamDeviceType;
   imgURL: string;
   url: string;
+  gameName: string;
 
   index: number;
   x?: number;

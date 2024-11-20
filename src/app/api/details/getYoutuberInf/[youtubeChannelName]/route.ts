@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { getCachedData, setCachedData } from "../../../../lib/cache"; 
+import { StreamerListType } from "@/types/NetworkType";
 
 const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
-const MAX_RESULTS = 20; // 最大取得数
+const MAX_RESULTS = 10; // 最大取得数
 
 type Params = {
   params: {
@@ -12,10 +14,17 @@ type Params = {
 export async function GET(req: Request, { params }: Params) {
   const channelName = params.youtubeChannelName;
   const apiKey = process.env.YOUTUBE_API_KEY;
+  const cacheKey = `youtubeChannelName-${channelName}`;
 
   if (!apiKey) {
     console.error("Missing YouTube API key");
     return NextResponse.json({ error: "Missing API key" }, { status: 500 });
+  }
+
+  // キャッシュチェック
+  const cached = getCachedData(cacheKey);
+  if (cached) {
+    return NextResponse.json(cached);
   }
 
   try {
@@ -35,15 +44,19 @@ export async function GET(req: Request, { params }: Params) {
     }
 
     // 結果を整形
-    const result = channelData.items.map((channel: any) => ({
+    const result: StreamerListType[] = channelData.items.map((channel: any) => ({
       name: channel.snippet.channelTitle,
       id: channel.id.channelId,
-      color: "default",
+      platform: 'youtube',
+      color: 'default',
       thumbnail: channel.snippet.thumbnails.default.url || "default",
-      viewer_count: -1,
-      youtubeStreamId: ["default"],
-      youtubeVideoId: ["default"],
+      viewer_count: 'default',
+      streamId: ['default'], // Twitch用フィールドを削除
+      videoId: ['default'],  // Twitch用フィールドを削除
     }));
+
+    // キャッシュに保存
+    setCachedData(cacheKey, result);
 
     return NextResponse.json(result);
   } catch (error) {

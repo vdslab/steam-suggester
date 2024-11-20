@@ -1,14 +1,14 @@
-// components/StreamedList.tsx
+// src/components/StreamedList.tsx
 
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { NodeType, StreamerListType } from "@/types/NetworkType";
-import { useEffect, useState } from "react";
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
-const similarity: any = require('string-similarity');
+import { useCallback, useEffect, useState } from "react";
+import similarity from 'string-similarity';
 import CircularProgress from '@mui/material/CircularProgress';
-import YouTubeIcon from '@mui/icons-material/YouTube'; // YouTubeアイコン
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports'; // Twitchアイコン
+import debounce from 'lodash.debounce';
 
 type Props = {
   nodes: NodeType[];
@@ -18,16 +18,17 @@ type Props = {
 
 const StreamedList = (props: Props) => {
   const { nodes, streamerIds, setStreamerIds } = props;
+  console.log(streamerIds)
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
   const [isLoading, setIsLoading] = useState<string[]>([]);
 
-  // string-similariライブラリ(動画タイトル全文とゲームタイトルを比較)
+  // string-similarityライブラリ(動画タイトル全文とゲームタイトルを比較)
   const isSimilar = (str1: string, str2: string, threshold: number = 0.6) => {
     const similarityScore = similarity.compareTwoStrings(str1, str2);
     return similarityScore >= threshold;
   };
-  
+
   // 単語とゲームタイトルの比較
   const compareTitlesByWords = (title1: string, title2: string, threshold: number = 0.9) => {
     // タイトルを単語に分割(空白で)
@@ -45,59 +46,30 @@ const StreamedList = (props: Props) => {
     return false;
   };
 
-  // ランダムな色を生成する関数（暗すぎる色を除外）
+  // 事前定義された色のパレットを使用
+  const colorPalette = [
+    '#FF5733', // 赤
+    '#33FF57', // 緑
+    '#3357FF', // 青
+    '#FF33A8', // ピンク
+    '#FF8F33', // オレンジ
+    '#8F33FF', // 紫
+    '#33FFF5', // 水色
+    '#F533FF', // マゼンタ
+    '#F5FF33', // 黄
+  ];
+
   const getRandomColor = (() => {
-    const letters = '0123456789ABCDEF';
     const usedColors: string[] = [];
-  
-    // 色差を計算する関数 (RGB間のユークリッド距離)
-    const getColorDifference = (color1: string, color2: string) => {
-      const r1 = parseInt(color1.substring(1, 3), 16);
-      const g1 = parseInt(color1.substring(3, 5), 16);
-      const b1 = parseInt(color1.substring(5, 7), 16);
-  
-      const r2 = parseInt(color2.substring(1, 3), 16);
-      const g2 = parseInt(color2.substring(3, 5), 16);
-      const b2 = parseInt(color2.substring(5, 7), 16);
-  
-      return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
-    };
-  
-    // 新しい色が既存の色と十分に異なるかを確認
-    const isDistinctEnough = (color: string) => {
-      const threshold = 100; // 色差の閾値 (調整可能)
-      return usedColors.every((usedColor) => getColorDifference(color, usedColor) > threshold);
-    };
-  
-    const generateColor = () => {
-      let color = '#';
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    };
-  
-    const isBrightEnough = (color: string) => {
-      const r = parseInt(color.substring(1, 3), 16);
-      const g = parseInt(color.substring(3, 5), 16);
-      const b = parseInt(color.substring(5, 7), 16);
-      const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-      return brightness > 50;
-    };
-  
+
     return () => {
-      let color;
-      let attempts = 0;
-      do {
-        color = generateColor();
-        attempts++;
-        if (attempts > 100) {
-          console.warn("Failed to generate a distinct bright color after 100 attempts.");
-          break;
-        }
-      } while (!isBrightEnough(color) || !isDistinctEnough(color));
-  
-      usedColors.push(color); // 生成した色を記録
+      const availableColors = colorPalette.filter(color => !usedColors.includes(color));
+      if (availableColors.length === 0) {
+        console.warn("No more unique colors available in the palette.");
+        return '#FFFFFF'; // 代替色
+      }
+      const color = availableColors[Math.floor(Math.random() * availableColors.length)];
+      usedColors.push(color);
       return color;
     };
   })();
@@ -131,27 +103,47 @@ const StreamedList = (props: Props) => {
 
       // 取得したデータを基にstreamedGameListを作成
       const streamedGameList = nodes.reduce((acc: StreamerListType[], node) => {
-        const videoIds = data.platform === 'twitch' ? updatedData.twitchVideoId : updatedData.youtubeVideoId;
-        videoIds.forEach((videoId) => {
-          if (compareTitlesByWords(videoId, node.title)) {
+        const relevantStreamIds = updatedData.streamId; // gameName を含む
+        const relevantVideoIds = updatedData.videoId; // video titles
+
+        // ゲーム名でフィルタリング
+        relevantStreamIds.forEach((gameName) => {
+          if (gameName === node.gameName) { // gameName と一致
             const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
             if (existingGame) {
-              if (data.platform === 'twitch' && !existingGame.twitchVideoId.includes(node.twitchGameId)) {
-                existingGame.twitchVideoId.push(node.twitchGameId);
-              }
-              if (data.platform === 'youtube' && !existingGame.youtubeVideoId.includes(node.twitchGameId)) {
-                existingGame.youtubeVideoId.push(node.twitchGameId);
+              if (!existingGame.streamId.includes(gameName)) {
+                existingGame.streamId.push(gameName);
               }
             } else {
               const newGame: StreamerListType = {
                 ...updatedData,
-                twitchVideoId: data.platform === 'twitch' ? [node.twitchGameId] : updatedData.twitchVideoId,
-                youtubeVideoId: data.platform === 'youtube' ? [node.twitchGameId] : updatedData.youtubeVideoId,
+                streamId: [gameName],
+                videoId: updatedData.videoId,
               };
               acc.push(newGame);
             }
           }
         });
+
+        // 過去のビデオタイトルとの関連性でフィルタリング
+        relevantVideoIds.forEach((videoTitle) => {
+          if (compareTitlesByWords(videoTitle, node.title)) {
+            const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
+            if (existingGame) {
+              if (!existingGame.videoId.includes(node.twitchGameId)) {
+                existingGame.videoId.push(node.twitchGameId);
+              }
+            } else {
+              const newGame: StreamerListType = {
+                ...updatedData,
+                streamId: updatedData.streamId,
+                videoId: [node.twitchGameId],
+              };
+              acc.push(newGame);
+            }
+          }
+        });
+
         return acc;
       }, []);
 
@@ -198,14 +190,18 @@ const StreamedList = (props: Props) => {
     setStreamerIds(updatedUserAddedGames);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!searchStreamerQuery) return;
+  // デバウンスされた検索関数
+  const debouncedFetch = useCallback(
+    debounce(async (query: string) => {
+      if (!query) {
+        setFilteredStreamerList([]);
+        return;
+      }
 
       try {
         // Twitch APIを呼び出す
         const twitchResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodeURIComponent(searchStreamerQuery)}`
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodeURIComponent(query)}`
         );
         let twitchData: StreamerListType[] = [];
         if (twitchResponse.ok) {
@@ -214,14 +210,12 @@ const StreamedList = (props: Props) => {
           twitchData = twitchData.map((streamer) => ({
             ...streamer,
             platform: 'twitch',
-            youtubeStreamId: [],
-            youtubeVideoId: [],
           }));
         }
 
         // YouTube APIを呼び出す
         const youtubeResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberInf/${encodeURIComponent(searchStreamerQuery)}`
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberInf/${encodeURIComponent(query)}`
         );
         let youtubeData: StreamerListType[] = [];
         if (youtubeResponse.ok) {
@@ -230,8 +224,6 @@ const StreamedList = (props: Props) => {
           youtubeData = youtubeData.map((streamer) => ({
             ...streamer,
             platform: 'youtube',
-            twitchStreamId: [],
-            twitchVideoId: [],
           }));
         }
 
@@ -249,10 +241,14 @@ const StreamedList = (props: Props) => {
       } catch (error) {
         console.error('Error:', error);
       }
-    };
+    }, 1000), // 仮 1s遅延
+    [nodes] // 必要に応じて依存配列を調整
+  );
 
-    fetchData();
-  }, [searchStreamerQuery, nodes]);
+  useEffect(() => {
+    debouncedFetch(searchStreamerQuery);
+    return debouncedFetch.cancel;
+  }, [searchStreamerQuery]);
 
   return (
     <div className="bg-gray-800 p-2 rounded-lg shadow-lg max-w-xl mx-auto">
@@ -268,23 +264,23 @@ const StreamedList = (props: Props) => {
           <div className="bg-gray-700 p-2 rounded-lg mt-0">
             <h2 className="text-gray-400 text-xs font-semibold mb-2">検索結果</h2>
             <div className="max-h-40 overflow-y-auto">
-              {filteredStreamerList.map((id) => (
+              {filteredStreamerList.map((streamer) => (
                 <div
                   className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all cursor-pointer"
-                  key={`${id.platform}-${id.name}`}
+                  key={`${streamer.platform}-${streamer.id}`}
                 >
                   <div className="flex items-center">
                     {/* プラットフォームアイコン */}
-                    {id.platform === 'twitch' ? (
+                    {streamer.platform === 'twitch' ? (
                       <SportsEsportsIcon className="text-purple-500 mr-2" />
                     ) : (
                       <YouTubeIcon className="text-red-600 mr-2" />
                     )}
-                    <div className="text-white font-medium">{id.name}</div>
+                    <div className="text-white font-medium">{streamer.name}</div>
                   </div>
                   <div className="flex items-center">
                     {/* 配信中の場合の赤い点（PlaylistAddIconのすぐ左に配置） */}
-                    {id.viewer_count !== 'default' && id.viewer_count !== -1 && (
+                    {streamer.viewer_count !== 'default' && streamer.viewer_count !== -1 && (
                       <div
                         className="w-2 h-2 rounded-full bg-red-600 mr-2"
                         style={{ flexShrink: 0 }}
@@ -292,10 +288,10 @@ const StreamedList = (props: Props) => {
                     )}
                     <button
                       className="relative"
-                      onClick={() => handleSearchClick(id)}
-                      disabled={isLoading.includes(id.id)}  // ローディング中はボタンを無効化
+                      onClick={() => handleSearchClick(streamer)}
+                      disabled={isLoading.includes(streamer.id)}  // ローディング中はボタンを無効化
                     >
-                      {isLoading.includes(id.id) ? (
+                      {isLoading.includes(streamer.id) ? (
                         <CircularProgress size={20} color="inherit" className="p-1" />
                       ) : (
                         <PlaylistAddIcon className="cursor-pointer hover:bg-blue-600 p-1 rounded-full transition-all" />
@@ -314,39 +310,39 @@ const StreamedList = (props: Props) => {
         {streamerIds.length === 0 ? (
           <p className="text-gray-400">配信者が追加されていません。追加すると配信者が配信したゲームのアイコンに枠が表示されます</p>
         ) : (
-          streamerIds.map((id) => (
+          streamerIds.map((streamer) => (
             <div
               className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all cursor-pointer"
-              key={`${id.platform}-${id.id}`}
+              key={`${streamer.platform}-${streamer.id}`}
             >
               <div className="flex items-center">
                 {/* 色付きの枠を持つ丸 */}
                 <div
                   className="w-10 h-10 rounded-full mr-3 border-4 flex-shrink-0"
                   style={{
-                    borderColor: id.color,
+                    borderColor: streamer.color,
                     overflow: "hidden",
                   }}
                 >
                   <img
-                    src={id.thumbnail}
-                    alt={`${id.name} Thumbnail`}
+                    src={streamer.thumbnail}
+                    alt={`${streamer.name} Thumbnail`}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex items-center">
                   {/* プラットフォームアイコン */}
-                  {id.platform === 'twitch' ? (
+                  {streamer.platform === 'twitch' ? (
                     <SportsEsportsIcon className="text-purple-500 mr-2" />
                   ) : (
                     <YouTubeIcon className="text-red-600 mr-2" />
                   )}
-                  <div className="text-white font-medium">{id.name}</div>
+                  <div className="text-white font-medium">{streamer.name}</div>
                 </div>
               </div>
               <DeleteIcon
                 className="cursor-pointer hover:bg-red-600 p-1 rounded-full transition-all"
-                onClick={() => handleGameDelete(id)}
+                onClick={() => handleGameDelete(streamer)}
               />
             </div>
           ))
