@@ -1,11 +1,15 @@
 'use client'
 
-import Link from "next/link"
+import { getSession, signIn, signOut } from 'next-auth/react'
 
-export const SteamOuth = () => {
+
+export const SteamOuth = async() => {
+  const session = await getSession()
 
 
   return (
-    <Link href="/api/steamAuth">Steamログイン</Link>
+    <div>
+      <button onClick={() => signIn()}>Steamでログイン</button>
+    </div>
   )
 }
