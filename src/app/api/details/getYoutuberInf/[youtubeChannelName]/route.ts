@@ -13,7 +13,7 @@ type Params = {
 
 export async function GET(req: Request, { params }: Params) {
   const channelName = params.youtubeChannelName;
-  const apiKey = "";//process.env.YOUTUBE_API_KEY
+  const apiKey = process.env.YOUTUBE_API_KEY;//process.env.YOUTUBE_API_KEY
   const cacheKey = `youtubeChannelName-${channelName}`;
 
   if (!apiKey) {

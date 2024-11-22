@@ -14,7 +14,7 @@ type Params = {
 
 export async function GET(req: Request, { params }: Params) {
   const userId = params.youtubeUserId;
-  const apiKey = "";//process.env.YOUTUBE_API_KEY
+  const apiKey = process.env.YOUTUBE_API_KEY;// process.env.YOUTUBE_API_KEY
   const cacheKey = `youtubeUserId-${userId}`;
 
   if (!apiKey) {
