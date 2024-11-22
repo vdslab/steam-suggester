@@ -7,7 +7,7 @@ import { Filter } from '@/types/api/FilterType';
 import GameList from './gameList/GameList';
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
-import { LinkType, NodeType } from '@/types/NetworkType';
+import { LinkType, NodeType, StreamerListType } from '@/types/NetworkType';
 import StreamedList from './streamedList/StreamedList';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
@@ -24,6 +24,8 @@ const Network = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]); 
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -65,6 +67,7 @@ const Network = () => {
       {!isLoading ? <div className="flex h-[92dvh] overflow-hidden">
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
           <SelectParameter filter={filter} setFilter={setFilter} />
+          <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
         </div>
         <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
           <ChatBar nodes={nodes} setNodes={setNodes} />
