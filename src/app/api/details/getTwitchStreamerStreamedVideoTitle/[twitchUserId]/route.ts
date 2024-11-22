@@ -33,7 +33,7 @@ export async function GET(req: Request, { params }: Params) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const userData: { data: TwitchUserDataType[] } = await userRes.json();
+    const userData: { data: any } = await userRes.json();
     if (userData.data.length === 0) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -52,10 +52,10 @@ export async function GET(req: Request, { params }: Params) {
       return NextResponse.json({ error: "Failed to fetch stream data" }, { status: 500 });
     }
 
-    const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
+    const gamesData: { data: any } = await gamesRes.json();
     const currentStreamGames = new Set<string>();
 
-    gamesData.data.forEach((stream) => {
+    gamesData.data.forEach((stream: { game_id: string; }) => {
       if (stream.game_id) {
         currentStreamGames.add(stream.game_id);
       }
@@ -76,9 +76,9 @@ export async function GET(req: Request, { params }: Params) {
         return NextResponse.json({ error: "Failed to fetch video data" }, { status: 500 });
       }
 
-      const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
+      const videosData: { data: any, pagination?: { cursor: string } } = await videosRes.json();
 
-      videosData.data.forEach((video) => {
+      videosData.data.forEach((video: { title: string; }) => {
         if (video.title) {
           pastVideosGames.add(video.title);
         }
@@ -93,7 +93,7 @@ export async function GET(req: Request, { params }: Params) {
     } while (paginationCursor);
 
     // 結果の整形
-    const result: StreamerListType = {
+    const result: any = {
       name: streamerName,
       id: streamerId,
       platform: 'twitch',
