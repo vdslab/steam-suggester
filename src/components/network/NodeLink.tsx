@@ -48,7 +48,7 @@ const ZoomableSVG = (props: any) => {
 };
 
 const NodeLink = (props: any) => {
-  const { nodes, links, centerX, centerY, setSelectedIndex, streamerIds } = props;
+  const { nodes, links, centerX, centerY, setSelectedIndex, streamerIds = [] } = props;
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
@@ -81,55 +81,55 @@ const NodeLink = (props: any) => {
           {nodes.length !== 0 &&
               nodes.map((node: NodeType, i: number) => {
                 const streamerColors = streamerIds
-                .filter((game: StreamerListType) =>
-                  game.videoId.some((id) => id === node.twitchGameId)
-                )
-                .map((game: { color: string; }) => game.color); // 配信者の色をすべて取得
+                  .filter((game: StreamerListType) =>
+                    game.videoId.some((id) => id === node.twitchGameId)
+                  )
+                  .map((game: { color: string }) => game.color); // 配信者の色をすべて取得
 
-              // それぞれの色を等間隔で分けるための角度計算
-              const angleStep = streamerColors.length > 0 ? 360 / streamerColors.length : 0;
+                // それぞれの色を等間隔で分けるための角度計算
+                const angleStep = streamerColors.length > 0 ? 360 / streamerColors.length : 0;
 
-              return(
-                <g className={`brightness-${hoveredIndex === node.index ? "125" : "100"}`}
-                  transform={`translate(${node.x},${node.y})`}
-                  onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
-                  onMouseLeave={() => setHoveredIndex(-1)}
-                  onClick={() => setSelectedIndex(node.index)}
-                  key={i}>
-                  <Icon
-                    title={node.title}
-                    imgURL={node.imgURL}
-                    index={node.index ?? i}
-                    steamGameId={node.steamGameId}
-                    twitchGameId={node.twitchGameId}
-                    circleScale={node.circleScale ?? 1}
-                    suggestValue={node.suggestValue}
-                  />
-                {/* 色付きセグメントを描画 */}
-                {streamerColors.length > 0 &&
-                    streamerColors.map((color: string, index: number) => {
-                      const angleStart = -90 + angleStep * index; // -90は真上
-                      const angleEnd = angleStart + angleStep;
+                return(
+                  <g className={`brightness-${hoveredIndex === node.index ? "125" : "100"}`}
+                    transform={`translate(${node.x},${node.y})`}
+                    onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
+                    onMouseLeave={() => setHoveredIndex(-1)}
+                    onClick={() => setSelectedIndex(node.index)}
+                    key={i}>
+                    <Icon
+                      title={node.title}
+                      imgURL={node.imgURL}
+                      index={node.index ?? i}
+                      steamGameId={node.steamGameId}
+                      twitchGameId={node.twitchGameId}
+                      circleScale={node.circleScale ?? 1}
+                      suggestValue={node.suggestValue}
+                    />
+                  {/* 色付きセグメントを描画 */}
+                  {streamerColors.length > 0 &&
+                      streamerColors.map((color: string, index: number) => {
+                        const angleStart = -90 + angleStep * index; // -90は真上
+                        const angleEnd = angleStart + angleStep;
 
-                      return (
-                        <circle
-                          key={index}
-                          cx="0"
-                          cy="0"
-                          r="50" // 半径
-                          stroke={color}
-                          strokeWidth="10"
-                          fill="transparent"
-                          strokeDasharray={`${angleStep} ${360 - angleStep}`}
-                          strokeDashoffset={-angleStart}
-                        />
-                      );
-                    })}
-                </g>
-              );
-            })}
+                        return (
+                          <circle
+                            key={index}
+                            cx="0"
+                            cy="0"
+                            r="50" // 半径
+                            stroke={color}
+                            strokeWidth="10"
+                            fill="transparent"
+                            strokeDasharray={`${angleStep} ${360 - angleStep}`}
+                            strokeDashoffset={-angleStart}
+                          />
+                        );
+                      })}
+                  </g>
+                );
+              })}
 
-            {hoveredIndex !== -1 && (
+            {hoveredIndex !== -1 && findHoveredNode() && (
               <g transform={`translate(${findHoveredNode().x},${findHoveredNode().y})`}>
                 <g>
                   <text
@@ -152,7 +152,7 @@ const NodeLink = (props: any) => {
                       `
                     }}
                   >
-                    {findHoveredNode().title}
+                    {findHoveredNode()?.title}
                   </text>
                 </g>
               </g>
