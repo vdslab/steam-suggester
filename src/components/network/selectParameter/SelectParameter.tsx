@@ -54,12 +54,11 @@ const SelectParameter = (props: Props) => {
   }
 
   // カテゴリーの全選択解除
-  const handleToggleAllCategories = () => {
-    const allSelected = Object.values(localFilter.Categories).every(value => value === true);
+  const handleAllCategories = (isAll: boolean) => {
     const newFilter = { ...localFilter.Categories };
   
     for (let key in newFilter) {
-      newFilter[key] = !allSelected;
+      newFilter[key] = isAll;
     }
   
     setLocalFilter({
@@ -74,15 +73,18 @@ const SelectParameter = (props: Props) => {
       <FilterHeadline title="ジャンル"/>
       
       <div className="p-2">
-        <label className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            checked={Object.values(localFilter.Categories).every(value => value === true)}
-            onChange={handleToggleAllCategories}
-            className="form-checkbox text-green-700"
-          />
-          <span className="text-green-700">全選択/全解除</span>
-        </label>
+        <button
+            onClick={() => handleAllCategories(true)}
+            className="bg-green-700 hover:bg-green-600 text-white rounded px-4 py-2 mr-2"
+          >
+            全選択
+          </button>
+          <button
+            onClick={() => handleAllCategories(false)}
+            className="border border-green-600 text-green-600 hover:bg-sky-950 rounded px-4 py-2"
+          >
+            全解除
+        </button>
       </div>
       <FilterButtonGroup
         title="Categories"
