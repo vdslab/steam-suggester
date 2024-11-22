@@ -9,6 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import debounce from 'lodash.debounce';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import Image from 'next/image';
 
 type Props = {
   nodes: NodeType[];
@@ -412,11 +413,15 @@ const StreamedList = (props: Props) => {
                     overflow: "hidden",
                   }}
                 >
-                  <img
+                  <Image
                     src={streamer.thumbnail}
                     alt={`${streamer.name} Thumbnail`}
+                    layout="responsive"
+                    width={16}
+                    height={9}
                     className="w-full h-full object-cover"
                   />
+
                 </div>
                 <div className="flex items-center">
                   {/* プラットフォームアイコン */}

@@ -77,7 +77,7 @@ export async function GET(req: Request, { params }: Params) {
 
       const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
       const currentStreamGames = new Set<string>();
-      const viewer_count = gamesData.data.length > 0 ? gamesData.data[0].viewer_count : -1;
+      const viewer_count = gamesData.data.length > 0 ? gamesData.data[0].view_count : -1;
 
       // 現在配信されているゲームIDを追加
       gamesData.data.forEach((stream) => {
