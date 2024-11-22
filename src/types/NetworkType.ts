@@ -21,7 +21,7 @@ export type StreamerListType = {
   platform: 'twitch' | 'youtube';
   color: string;
   thumbnail: string;
-  viewer_count: number;
+  viewer_count: number | 'default';
   streamId: string[];
   videoId: string[];
 };
