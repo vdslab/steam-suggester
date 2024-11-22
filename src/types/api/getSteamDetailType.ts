@@ -10,6 +10,7 @@ export type SteamDetailsDataType = {
   device: SteamDeviceType;
   imgURL: string;
   url: string;
+  tags: string[]
   /* header_image: string;
   short_description: string; */
 }
