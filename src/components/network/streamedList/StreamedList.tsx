@@ -11,15 +11,8 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import Image from 'next/image';
 
-type Props = {
-  nodes: NodeType[];
-  streamerIds: StreamerListType[];
-  setStreamerIds: React.Dispatch<React.SetStateAction<StreamerListType[]>>;
-};
 
-const StreamedList = (props: Props) => {
-    const { nodes, streamerIds, setStreamerIds } = props;
-    console.log(streamerIds);
+const StreamedList = () => {
   
     return (
       <div>
