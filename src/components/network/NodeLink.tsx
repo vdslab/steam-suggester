@@ -1,134 +1,137 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import * as d3 from 'd3';
-import Icon from "./Icon";
-import { NodeType } from "@/types/NetworkType";
+import TwitchToken from "@/app/api/TwitchToken";
+import { NextResponse } from "next/server";
+import { TwitchUserDataType, TwitchStreamDataType, TwitchVideoDataType } from "@/types/api/TwitchTypes";
+import { StreamerListType } from "@/types/NetworkType";
 
-const ZoomableSVG = (props: any) => {
-  const { children, centerX, centerY } = props;
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [transform, setTransform] = useState(d3.zoomIdentity);
+type Params = {
+  params: {
+    twitchUsername: string;
+  };
+};
 
-  const zoom = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+export async function GET(req: Request, { params }: Params) {
+  const streamerUsername = params.twitchUsername;
+  const getUserLimit = 20; // 最大取得配信者数
 
-  useEffect(() => {
-    zoom.current = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.2, 4]) 
-      .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
-        setTransform(event.transform);
+  try {
+    const token = await TwitchToken();
+    if (!token || !process.env.TWITCH_CLIENT_ID) {
+      console.error("Missing token or client ID");
+      return NextResponse.json({ error: "Missing token or client ID" }, { status: 500 });
+    }
+
+    const headers = new Headers({
+      'Client-ID': process.env.TWITCH_CLIENT_ID,
+      'Authorization': `Bearer ${token}`,
+    });
+
+    // ユーザーIDでの検索
+    let userRes = await fetch(`https://api.twitch.tv/helix/users?login=${streamerUsername}`, {
+      headers,
+    });
+
+    let userData: { data: TwitchUserDataType[] } | null = null;
+
+    if (userRes.ok) {
+      userData = await userRes.json();
+    }
+
+    // 検索結果がまだなかったら、チャンネル名で検索
+    if (!userData || userData.data.length === 0) {
+      userRes = await fetch(`https://api.twitch.tv/helix/search/channels?query=${streamerUsername}`, {
+        headers,
       });
 
-    if (svgRef.current) {
-      const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
-      svg.call(zoom.current);
+      if (!userRes.ok) {
+        console.error("Error fetching channel search data:", userRes.status, await userRes.text());
+        return NextResponse.error();
+      }
+
+      userData = await userRes.json();
+
+      if (!userData || userData.data.length === 0) {
+        console.error("Channel not found");
+        return NextResponse.json({ error: "User or channel not found" }, { status: 404 });
+      }
     }
-  }, []);
 
-  useEffect(() => {
-    if (svgRef.current && zoom.current) {
-      const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
+    // ユーザーIDに変換
+    const result: StreamerListType[] = [];
+    for (const channel of userData.data) {
+      if (result.length >= getUserLimit) break;
 
-      const initialTransform = d3.zoomIdentity.translate(window.innerWidth / 2 - window.innerWidth / 5 - centerX, window.innerHeight / 2 - centerY).scale(1);
-      svg.transition()
-        .duration(1200)
-        .call(zoom.current.transform, initialTransform)
-        .on('end', () => {
-          setTransform(initialTransform);
+      const streamerName = channel.display_name;
+      const streamerId = channel.id;
+      const thumbnail = channel.profile_image_url;
+      const userId = channel.id;
+
+      // 現在配信されているゲームIDを取得
+      const gamesRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userId}`, { 
+        headers,
+      });
+
+      if (!gamesRes.ok) {
+        console.error("Error fetching stream data:", gamesRes.status, await gamesRes.text());
+        return NextResponse.error();
+      }
+
+      const gamesData: { data: TwitchStreamDataType[] } = await gamesRes.json();
+      const currentStreamGames = new Set<string>();
+      const viewer_count = gamesData.data.length > 0 ? gamesData.data[0].view_count : -1;
+
+      // 現在配信されているゲームIDを追加
+      gamesData.data.forEach((stream) => {
+        if (stream.game_id) {
+          currentStreamGames.add(stream.game_id);
+        }
+      });
+
+      // 過去の配信をページネーションを使って取得
+      let paginationCursor: string | undefined = undefined;
+
+      const pastVideosGames = new Set<string>();
+
+      do {
+        const videosRes = await fetch(`https://api.twitch.tv/helix/videos?user_id=${userId}&after=${paginationCursor || ''}`, {
+          headers,
         });
-    }
-  }, [centerX, centerY]);
 
-  return (
-    <svg ref={svgRef} width={window.innerWidth} height={window.innerHeight}>
-      <g transform={`translate(${transform.x},${transform.y})scale(${transform.k})`}>
-        {children}
-      </g>
-    </svg>
-  );
-};
+        if (!videosRes.ok) {
+          console.error("Error fetching video data:", videosRes.status, await videosRes.text());
+          return NextResponse.error();
+        }
 
-const NodeLink = (props: any) => {
-  const { nodes, links, centerX, centerY, setSelectedIndex } = props;
+        const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
 
-  const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
-
-  const findHoveredNode = () => {
-    return nodes.find((node: NodeType) => node.index === hoveredIndex)
-  }
-
-  return (
-    <ZoomableSVG centerX={centerX} centerY={centerY}>
-       <>
-          {links.length !== 0 &&
-            links.map((link: any, i: number) => {
-              const isHovered = link.source.index === hoveredIndex || link.target.index === hoveredIndex;
-              return (
-                <line
-                  key={i}
-                  className="link"
-                  x1={link.source.x}
-                  y1={link.source.y}
-                  x2={link.target.x}
-                  y2={link.target.y}
-                  style={{
-                    stroke: isHovered ? "cyan" : "white",
-                    strokeWidth: isHovered ? "2" : "1"
-                  }}
-                />
-              )
-            })
+        // 過去の配信ゲームIDを追加
+        videosData.data.forEach((video) => {
+          if (video.title) {
+            pastVideosGames.add(video.title);
           }
-          {nodes.length !== 0 &&
-            nodes.map((node: NodeType, i: number) => (
-              <g className={`brightness-${hoveredIndex === node.index ? "125" : "100"}`}
-                 transform={`translate(${node.x},${node.y})`}
-                 onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
-                 onMouseLeave={() => setHoveredIndex(-1)}
-                 onClick={() => setSelectedIndex(node.index)}
-                 key={i}>
-                <Icon
-                  title={node.title}
-                  imgURL={node.imgURL}
-                  index={node.index ?? i}
-                  steamGameId={node.steamGameId}
-                  twitchGameId={node.twitchGameId}
-                  circleScale={node.circleScale ?? 1}
-                  suggestValue={node.suggestValue}
-                />
-              </g>
-            ))}
-          {hoveredIndex !== -1 && (
-            <g transform={`translate(${findHoveredNode().x},${findHoveredNode().y})`}>
-              <g>
-                <text
-                  x={0}
-                  y={80}
-                  textAnchor="middle"
-                  fill="white"
-                  fontSize="30px"
-                  pointerEvents="none"
-                  style={{
-                    textShadow: `
-                      -1px -1px 0 #000,
-                      1px -1px 0 #000,
-                      -1px 1px 0 #000,
-                      1px 1px 0 #000,
-                      -1px 0 0 #000,
-                      1px 0 0 #000,
-                      0 -1px 0 #000,
-                      0 1px 0 #000
-                    `
-                  }}
-                >
-                  {findHoveredNode().title}
-                </text>
-              </g>
-            </g>
-          )}
-        </>
+        });
 
-    </ZoomableSVG>
-  );
-};
+        // 次のページがあれば、paginationCursorを更新
+        paginationCursor = videosData.pagination?.cursor;
+      } while (paginationCursor);
 
-export default NodeLink;
+      const resultData: StreamerListType = {
+        name: streamerName,
+        id: streamerId,
+        platform: 'twitch',
+        color: 'default',
+        thumbnail: thumbnail || 'default',
+        viewer_count: viewer_count,
+        streamId: Array.from(currentStreamGames),
+        videoId: Array.from(pastVideosGames),
+      };
+
+      result.push(resultData);
+    }
+
+    return NextResponse.json(result);
+
+  } catch (error) {
+    console.error('Error fetching user or channel data:', error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
