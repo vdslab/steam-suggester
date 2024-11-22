@@ -1,137 +1,65 @@
-import TwitchToken from "@/app/api/TwitchToken";
 import { NextResponse } from "next/server";
-import { TwitchUserDataType, TwitchStreamDataType, TwitchVideoDataType } from "@/types/api/TwitchTypes";
+import { getCachedData, setCachedData } from "../../../../lib/cache"; 
 import { StreamerListType } from "@/types/NetworkType";
+
+const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
+const MAX_RESULTS = 10; // 最大取得数
 
 type Params = {
   params: {
-    twitchUsername: string;
+    youtubeChannelName: string;
   };
 };
 
 export async function GET(req: Request, { params }: Params) {
-  const streamerUsername = params.twitchUsername;
-  const getUserLimit = 20; // 最大取得配信者数
+  const channelName = params.youtubeChannelName;
+  const apiKey = "";//process.env.YOUTUBE_API_KEY
+  const cacheKey = `youtubeChannelName-${channelName}`;
+
+  if (!apiKey) {
+    console.error("Missing YouTube API key");
+    return NextResponse.json({ error: "Missing API key" }, { status: 500 });
+  }
+
+  // キャッシュチェック
+  const cached = getCachedData(cacheKey);
+  if (cached) {
+    return NextResponse.json(cached);
+  }
 
   try {
-    const token = await TwitchToken();
-    if (!token || !process.env.TWITCH_CLIENT_ID) {
-      console.error("Missing token or client ID");
-      return NextResponse.json({ error: "Missing token or client ID" }, { status: 500 });
+    // 部分一致でチャンネル検索
+    const channelRes = await fetch(
+      `${YOUTUBE_API_BASE}/search?part=snippet&type=channel&q=${encodeURIComponent(channelName)}&maxResults=${MAX_RESULTS}&key=${apiKey}`
+    );
+    if (!channelRes.ok) {
+      console.error("Error fetching channel data:", channelRes.status, await channelRes.text());
+      return NextResponse.error();
     }
 
-    const headers = new Headers({
-      'Client-ID': process.env.TWITCH_CLIENT_ID,
-      'Authorization': `Bearer ${token}`,
-    });
-
-    // ユーザーIDでの検索
-    let userRes = await fetch(`https://api.twitch.tv/helix/users?login=${streamerUsername}`, {
-      headers,
-    });
-
-    let userData: { data: TwitchUserDataType[] } | null = null;
-
-    if (userRes.ok) {
-      userData = await userRes.json();
+    const channelData = await channelRes.json();
+    if (!channelData.items || channelData.items.length === 0) {
+      console.error("No channels found");
+      return NextResponse.json({ error: "No channels found" }, { status: 404 });
     }
 
-    // 検索結果がなかったら、チャンネル名で検索
-    if (!userData || userData.data.length === 0) {
-      userRes = await fetch(`https://api.twitch.tv/helix/search/channels?query=${streamerUsername}`, {
-        headers,
-      });
+    const result: StreamerListType[] = channelData.items.map((channel: any) => ({
+      name: channel.snippet.channelTitle,
+      id: channel.id.channelId,
+      platform: 'youtube',
+      color: 'default',
+      thumbnail: channel.snippet.thumbnails.default.url || "default",
+      viewer_count: 'default',
+      streamId: ['default'],
+      videoId: ['default'],
+    }));
 
-      if (!userRes.ok) {
-        console.error("Error fetching channel search data:", userRes.status, await userRes.text());
-        return NextResponse.error();
-      }
-
-      userData = await userRes.json();
-
-      if (!userData || userData.data.length === 0) {
-        console.error("Channel not found");
-        return NextResponse.json({ error: "User or channel not found" }, { status: 404 });
-      }
-    }
-
-    // ユーザーIDに変換
-    const result: StreamerListType[] = [];
-    for (const channel of userData.data) {
-      if (result.length >= getUserLimit) break;
-
-      const streamerName = channel.display_name;
-      const streamerId = channel.id;
-      const thumbnail = channel.profile_image_url;
-      const userId = channel.id;
-
-      // 現在配信されているゲームIDを取得
-      const streamsRes = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userId}`, { 
-        headers,
-      });
-
-      if (!streamsRes.ok) {
-        console.error("Error fetching stream data:", streamsRes.status, await streamsRes.text());
-        return NextResponse.error();
-      }
-
-      const streamsData: { data: TwitchStreamDataType[] } = await streamsRes.json();
-      const currentStreamGames = new Set<string>();
-      const viewer_count = streamsData.data.length > 0 ? streamsData.data[0].viewer_count : -1;
-
-      // 現在配信されているゲームIDを追加
-      streamsData.data.forEach((stream) => {
-        if (stream.game_id) {
-          currentStreamGames.add(stream.game_id);
-        }
-      });
-
-      // 過去の配信をページネーションを使って取得
-      let paginationCursor: string | undefined = undefined;
-
-      const pastVideosGames = new Set<string>();
-
-      do {
-        const videosRes = await fetch(`https://api.twitch.tv/helix/videos?user_id=${userId}&after=${paginationCursor || ''}`, {
-          headers,
-        });
-
-        if (!videosRes.ok) {
-          console.error("Error fetching video data:", videosRes.status, await videosRes.text());
-          return NextResponse.error();
-        }
-
-        const videosData: { data: TwitchVideoDataType[], pagination?: { cursor: string } } = await videosRes.json();
-
-        // 過去の配信ゲームIDを追加（ここではビデオタイトルを追加）
-        videosData.data.forEach((video) => {
-          if (video.title) {
-            pastVideosGames.add(video.title);
-          }
-        });
-
-        // 次のページがあれば、paginationCursorを更新
-        paginationCursor = videosData.pagination?.cursor;
-      } while (paginationCursor);
-
-      const resultData: StreamerListType = {
-        name: streamerName,
-        id: streamerId,
-        platform: 'twitch',
-        color: 'default',
-        thumbnail: thumbnail || 'default',
-        viewer_count: viewer_count,
-        streamId: Array.from(currentStreamGames),
-        videoTitles: Array.from(pastVideosGames), // videoId を videoTitles に変更
-      };
-
-      result.push(resultData);
-    }
+    // キャッシュに保存
+    setCachedData(cacheKey, result);
 
     return NextResponse.json(result);
-
   } catch (error) {
-    console.error('Error fetching user or channel data:', error);
+    console.error("Error fetching YouTube data:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
