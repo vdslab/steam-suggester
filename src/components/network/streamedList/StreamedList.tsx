@@ -7,9 +7,9 @@ import { useCallback, useEffect, useState } from "react";
 // import similarity from 'string-similarity';
 // import CircularProgress from '@mui/material/CircularProgress';
 // import debounce from 'lodash.debounce';
-// import Alert from '@mui/material/Alert';
-// import Snackbar from '@mui/material/Snackbar';
-// import Image from 'next/image';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import Image from 'next/image';
 
 type Props = {
   nodes: NodeType[];
