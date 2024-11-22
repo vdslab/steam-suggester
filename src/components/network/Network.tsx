@@ -1,3 +1,4 @@
+/* Network.tsx */
 "use client";
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
@@ -12,6 +13,8 @@ import { LinkType, NodeType, StreamerListType } from '@/types/NetworkType';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
 import Popup from './Popup';
+import { IconButton, Drawer, Tabs, Tab, AppBar, Toolbar } from '@mui/material';
+import { Menu as MenuIcon, ChevronLeft as ChevronLeftIcon } from '@mui/icons-material';
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -25,6 +28,13 @@ const Network = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  // 折り畳み状態の管理
+  const [leftDrawerOpen, setLeftDrawerOpen] = useState<boolean>(false);
+  const [rightDrawerOpen, setRightDrawerOpen] = useState<boolean>(false);
+
+  // タブの状態管理
+  const [rightTabIndex, setRightTabIndex] = useState<number>(0);
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -62,54 +72,106 @@ const Network = () => {
   }, [filter]);
 
   return (
-    <div>
+    <div className="h-screen flex flex-col">
+      {/* ヘッダー */}
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="open left drawer"
+            onClick={() => setLeftDrawerOpen(true)}
+          >
+            <MenuIcon />
+          </IconButton>
+          <h1 className="flex-grow text-center text-lg">Game Network Visualization</h1>
+          <IconButton
+            edge="end"
+            color="inherit"
+            aria-label="open right drawer"
+            onClick={() => setRightDrawerOpen(true)}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      {/* メインコンテンツ */}
       {!isLoading ? (
-        <div className="flex h-[92dvh] overflow-hidden">
+        <div className="flex flex-grow overflow-hidden">
           {/* 左サイドバー */}
-          <div className="w-1/5 bg-stone-950 overflow-y-auto p-4">
-            <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
-            <SelectParameter filter={filter} setFilter={setFilter} />
-          </div>
-
-          {/* 中央コンテンツ */}
-          <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden p-4">
-            {/* NodeLink */}
-            <div className="flex-1 mb-4">
-              <NodeLink 
-                nodes={nodes} 
-                links={links} 
-                centerX={centerX} 
-                centerY={centerY} 
-                setSelectedIndex={setSelectedIndex} 
-                streamerIds={streamerIds} 
-              />
+          <Drawer
+            variant="temporary"
+            open={leftDrawerOpen}
+            onClose={() => setLeftDrawerOpen(false)}
+            anchor="left"
+          >
+            <div className="w-64 bg-stone-950 h-full p-4 flex flex-col">
+              <IconButton onClick={() => setLeftDrawerOpen(false)}>
+                <ChevronLeftIcon className="text-white" />
+              </IconButton>
+              <div className="flex flex-col space-y-4 mt-4 overflow-y-auto">
+                {/* SelectParameter */}
+                <SelectParameter 
+                  filter={filter} 
+                  setFilter={setFilter} 
+                />
+              </div>
             </div>
+          </Drawer>
 
-            {/* ChatBarとStreamedList */}
-            <div className="flex flex-col h-1/3">
-              <ChatBar nodes={nodes} setNodes={setNodes} />
-              <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
-            </div>
+          {/* NodeLink */}
+          <div className="flex-grow bg-gray-900">
+            <NodeLink 
+              nodes={nodes} 
+              links={links} 
+              centerX={centerX} 
+              centerY={centerY} 
+              setSelectedIndex={setSelectedIndex} 
+              streamerIds={streamerIds} 
+            />
           </div>
 
           {/* 右サイドバー */}
-          <div className="w-1/5 bg-stone-950 overflow-y-auto p-4">
-            {selectedIndex !== -1 ? 
-              <Popup nodes={nodes} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} /> 
-              : 
-              <GameList 
-                nodes={nodes} 
-                setCenterX={setCenterX} 
-                setCenterY={setCenterY} 
-                setIsLoading={setIsLoading} 
-              />
-            }
-          </div>
-        </div> 
-        ) : (
-          <Loading />
-        )
-      }
+          <Drawer
+            variant="temporary"
+            open={rightDrawerOpen}
+            onClose={() => setRightDrawerOpen(false)}
+            anchor="right"
+          >
+            <div className="w-64 bg-stone-950 h-full flex flex-col">
+              <IconButton onClick={() => setRightDrawerOpen(false)}>
+                <ChevronLeftIcon className="text-white transform rotate-180" />
+              </IconButton>
+              {/* タブでコンテンツを切り替え */}
+              <Tabs
+                value={rightTabIndex}
+                onChange={(e, newValue) => setRightTabIndex(newValue)}
+                variant="fullWidth"
+                indicatorColor="primary"
+                textColor="inherit"
+              >
+                <Tab label="Streamers" />
+                <Tab label="Chat" />
+              </Tabs>
+              <div className="flex-grow overflow-y-auto p-4">
+                {rightTabIndex === 0 && (
+                  <StreamedList 
+                    nodes={nodes} 
+                    streamerIds={streamerIds} 
+                    setStreamerIds={setStreamerIds} 
+                  />
+                )}
+                {rightTabIndex === 1 && (
+                  <ChatBar nodes={nodes} setNodes={setNodes} />
+                )}
+              </div>
+            </div>
+          </Drawer>
+        </div>
+      ) : (
+        <Loading />
+      )}
     </div>
   );
 }
