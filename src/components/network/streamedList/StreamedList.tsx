@@ -82,7 +82,7 @@ const StreamedList = (props: Props) => {
   })();
 
   const handleSearchClick = async (data: StreamerListType) => {
-    // 追加: 10件に達している場合は追加を防止
+    // 追加: 最大配信者数に達している場合は追加を防止
     if (streamerIds.length >= MAX_STREAMERS) {
       setShowLimitAlert(true);
       return;
@@ -95,7 +95,7 @@ const StreamedList = (props: Props) => {
       if (data.platform === 'twitch') {
         // Twitchの詳細情報を取得
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerStreamedVideoTitle/${data.id}`
+          `/api/details/getTwitchStreamerStreamedVideoTitle/${data.id}` // 相対パスに変更
         );
         if (!response.ok) {
           throw new Error("Failed to fetch Twitch streamer data");
@@ -104,7 +104,7 @@ const StreamedList = (props: Props) => {
       } else if (data.platform === 'youtube') {
         // YouTubeの詳細情報を取得
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberVideoTitle/${data.id}`
+          `/api/details/getYoutuberVideoTitle/${data.id}` // 相対パスに変更
         );
         if (!response.ok) {
           throw new Error("Failed to fetch YouTube streamer data");
@@ -117,21 +117,22 @@ const StreamedList = (props: Props) => {
       // 取得したデータを基にstreamedGameListを作成
       const streamedGameList = nodes.reduce((acc: StreamerListType[], node) => {
         const relevantStreamIds = updatedData.streamId; // gameName を含む
-        const relevantVideoIds = updatedData.videoId; // video titles
+        const relevantVideoTitles = updatedData.videoTitles; // videoTitles を使用
 
         // ゲーム名でフィルタリング
-        relevantStreamIds.forEach((gameName) => {
-          if (gameName === node.gameName) { // gameName と一致
+        relevantStreamIds.forEach((gameId) => {
+          const nodeGame = nodes.find(node => node.gameId === gameId);
+          if (nodeGame) { // node.title ではなく gameId を確認
             const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
             if (existingGame) {
-              if (!existingGame.streamId.includes(gameName)) {
-                existingGame.streamId.push(gameName);
+              if (!existingGame.streamId.includes(gameId)) {
+                existingGame.streamId.push(gameId);
               }
             } else {
               const newGame: StreamerListType = {
                 ...updatedData,
-                streamId: [gameName],
-                videoId: updatedData.videoId,
+                streamId: [gameId],
+                videoTitles: updatedData.videoTitles,
               };
               acc.push(newGame);
             }
@@ -139,18 +140,18 @@ const StreamedList = (props: Props) => {
         });
 
         // 過去のビデオタイトルとの関連性でフィルタリング
-        relevantVideoIds.forEach((videoTitle) => {
+        relevantVideoTitles.forEach((videoTitle) => {
           if (compareTitlesByWords(videoTitle, node.title)) {
             const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
             if (existingGame) {
-              if (!existingGame.videoId.includes(node.twitchGameId)) {
-                existingGame.videoId.push(node.twitchGameId);
+              if (!existingGame.videoTitles.includes(videoTitle)) {
+                existingGame.videoTitles.push(videoTitle);
               }
             } else {
               const newGame: StreamerListType = {
                 ...updatedData,
                 streamId: updatedData.streamId,
-                videoId: [node.twitchGameId],
+                videoTitles: [videoTitle],
               };
               acc.push(newGame);
             }
@@ -215,7 +216,7 @@ const StreamedList = (props: Props) => {
       try {
         // Twitch API
         const twitchResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodeURIComponent(query)}`
+          `/api/details/getTwitchStreamerInf/${encodeURIComponent(query)}` // 相対パスに変更
         );
         let twitchData: StreamerListType[] = [];
         if (twitchResponse.ok) {
@@ -229,7 +230,7 @@ const StreamedList = (props: Props) => {
 
         // YouTube API
         const youtubeResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberInf/${encodeURIComponent(query)}`
+          `/api/details/getYoutuberInf/${encodeURIComponent(query)}` // 相対パスに変更
         );
         let youtubeData: StreamerListType[] = [];
         if (youtubeResponse.ok) {
@@ -246,8 +247,8 @@ const StreamedList = (props: Props) => {
 
         // viewer_count順に並び替え（数字のみ比較）
         const sortedData = combinedData.sort((a, b) => {
-          const viewerA = typeof a.viewer_count === 'number' ? a.viewer_count : parseInt(a.viewer_count) || 0;
-          const viewerB = typeof b.viewer_count === 'number' ? b.viewer_count : parseInt(b.viewer_count) || 0;
+          const viewerA = typeof a.viewer_count === 'number' ? a.viewer_count : parseInt(a.viewer_count as unknown as string) || 0;
+          const viewerB = typeof b.viewer_count === 'number' ? b.viewer_count : parseInt(b.viewer_count as unknown as string) || 0;
           return viewerB - viewerA;
         });
 
@@ -256,7 +257,7 @@ const StreamedList = (props: Props) => {
         console.error('Error:', error);
       }
     }, 1000), // 1秒の遅延
-    [nodes] // 依存配列
+    [] // 依存配列を修正
   );
 
   useEffect(() => {
@@ -329,7 +330,7 @@ const StreamedList = (props: Props) => {
               {filteredStreamerList.map((streamer) => (
                 <div
                   className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all"
-                  key={`${streamer.platform}-${streamer.id}`}
+                  key={`${streamer.platform}-${streamer.id}`} // 一意のキーを生成
                 >
                   <div className="flex items-center">
                     {/* プラットフォームアイコン */}
@@ -342,7 +343,7 @@ const StreamedList = (props: Props) => {
                   </div>
                   <div className="flex items-center">
                     {/* 配信中の場合の赤い点 */}
-                    {streamer.viewer_count !== 'default' && streamer.viewer_count !== -1 && (
+                    {streamer.viewer_count !== -1 && (
                       <div
                         className="w-2 h-2 rounded-full bg-red-600 mr-2"
                         style={{ flexShrink: 0 }}
@@ -421,7 +422,6 @@ const StreamedList = (props: Props) => {
                     height={9}
                     className="w-full h-full object-cover"
                   />
-
                 </div>
                 <div className="flex items-center">
                   {/* プラットフォームアイコン */}
