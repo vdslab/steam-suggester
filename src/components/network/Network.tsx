@@ -5,7 +5,7 @@ import SelectParameter from './selectParameter/SelectParameter';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 import GameList from './gameList/GameList';
-import StreamedList from './streamedList/streamedList';
+import StreamedList from './streamedList/StreamedList';
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
 import { LinkType, NodeType, StreamerListType } from '@/types/NetworkType';
