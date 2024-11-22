@@ -18,9 +18,15 @@ type Props = {
 };
 
 const StreamedList = (props: Props) => {
-  const { nodes, streamerIds, setStreamerIds } = props;
-  console.log(streamerIds);
- 
-};
+    const { nodes, streamerIds, setStreamerIds } = props;
+    console.log(streamerIds);
+  
+    return (
+      <div>
+        <h1>Streamed List</h1>
+      </div>
+    );
+  };
+  
 
 export default StreamedList;
