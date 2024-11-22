@@ -25,7 +25,7 @@ const Network = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]); 
+  // const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]); 
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
