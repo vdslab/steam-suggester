@@ -8,6 +8,7 @@ import GameList from './gameList/GameList';
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
 import { LinkType, NodeType } from '@/types/NetworkType';
+import StreamedList from './streamedList/StreamedList';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
 import Popup from './Popup';
