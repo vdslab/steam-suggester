@@ -23,6 +23,7 @@
     "d3": "^7.9.0",
     "lodash.debounce": "^4.0.8",
     "next": "^14.2.3",
+    "openai": "^4.68.4",
     "pg": "^8.12.0",
     "react": "^18.3.1",
     "react-compound-slider": "^3.4.0",
