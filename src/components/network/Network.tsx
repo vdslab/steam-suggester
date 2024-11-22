@@ -11,7 +11,6 @@ import { LinkType, NodeType } from '@/types/NetworkType';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
 import Popup from './Popup';
-import StreamedList from './streamedList/StreamedList';
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -24,8 +23,6 @@ const Network = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const [isLoading, setIsLoading] = useState(true);
-
-  const [streamerIds, setStreamerIds] = useState<any[]>([]); 
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -66,16 +63,11 @@ const Network = () => {
     <div>
       {!isLoading ? <div className="flex h-[92dvh] overflow-hidden">
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-        <StreamedList
-                  nodes={nodes} 
-                  streamerIds={streamerIds} 
-                  setStreamerIds={setStreamerIds} 
-                />
           <SelectParameter filter={filter} setFilter={setFilter} />
         </div>
         <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
           <ChatBar nodes={nodes} setNodes={setNodes} />
-          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} streamerIds={streamerIds} />
+          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} />
         </div>
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
           {selectedIndex !== -1 ? 
