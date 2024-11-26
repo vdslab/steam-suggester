@@ -258,11 +258,10 @@ const StreamedList = (props: Props) => {
       }
     }, 1000); // 1秒の遅延
 
-    // Cleanup function that clears the timeout if the effect is re-run before the timeout completes
     return () => {
       clearTimeout(handler);
     };
-  }, [searchStreamerQuery, nodes]); // Dependencies: searchStreamerQuery and nodes
+  }, [searchStreamerQuery, nodes]);
 
   return (
     <div className="bg-gray-800 p-2 rounded-lg shadow-lg max-w-xl mx-auto">
