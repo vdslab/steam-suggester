@@ -67,7 +67,6 @@ const Network = () => {
       {!isLoading ? <div className="flex h-[92dvh] overflow-hidden">
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
           <SelectParameter filter={filter} setFilter={setFilter} />
-          <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
         </div>
         <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
           <ChatBar nodes={nodes} setNodes={setNodes} />
@@ -79,6 +78,7 @@ const Network = () => {
             : 
             <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
           }
+            <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
         </div>
       </div> : <Loading />
       }
