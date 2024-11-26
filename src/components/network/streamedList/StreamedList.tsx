@@ -80,6 +80,120 @@ const StreamedList = (props: Props) => {
     };
   })();
 
+  const handleSearchClick = async (data: StreamerListType) => {
+    // 追加: 10件に達している場合は追加を防止
+    if (streamerIds.length >= MAX_STREAMERS) {
+      setShowLimitAlert(true);
+      return;
+    }
+
+    setIsLoading((prev) => [...prev, data.id]);
+    try {
+      let updatedData: StreamerListType;
+
+      if (data.platform === 'twitch') {
+        // Twitchの詳細情報を取得
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerStreamedVideoTitle/${data.id}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch Twitch streamer data");
+        }
+        updatedData = await response.json();
+      } else if (data.platform === 'youtube') {
+        // YouTubeの詳細情報を取得
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberVideoTitle/${data.id}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch YouTube streamer data");
+        }
+        updatedData = await response.json();
+      } else {
+        throw new Error("Unknown platform");
+      }
+
+      // 取得したデータを基にstreamedGameListを作成
+      const streamedGameList = nodes.reduce((acc: StreamerListType[], node) => {
+        const relevantStreamIds = updatedData.streamId; // gameName を含む
+        const relevantVideoIds = updatedData.videoId; // video titles
+
+        // ゲーム名でフィルタリング
+        relevantStreamIds.forEach((gameName) => {
+          if (gameName === node.gameName) { // gameName と一致
+            const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
+            if (existingGame) {
+              if (!existingGame.streamId.includes(gameName)) {
+                existingGame.streamId.push(gameName);
+              }
+            } else {
+              const newGame: StreamerListType = {
+                ...updatedData,
+                streamId: [gameName],
+                videoId: updatedData.videoId,
+              };
+              acc.push(newGame);
+            }
+          }
+        });
+
+        // 過去のビデオタイトルとの関連性でフィルタリング
+        relevantVideoIds.forEach((videoTitle) => {
+          if (compareTitlesByWords(videoTitle, node.title)) {
+            const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
+            if (existingGame) {
+              if (!existingGame.videoId.includes(node.twitchGameId)) {
+                existingGame.videoId.push(node.twitchGameId);
+              }
+            } else {
+              const newGame: StreamerListType = {
+                ...updatedData,
+                streamId: updatedData.streamId,
+                videoId: [node.twitchGameId],
+              };
+              acc.push(newGame);
+            }
+          }
+        });
+
+        return acc;
+      }, []);
+
+      // 新しいゲームが `streamerIds` に存在しない場合に追加
+      const newGames = streamedGameList.filter(
+        (newGame) => !streamerIds.some((existingGame) => existingGame.name === newGame.name && existingGame.platform === newGame.platform)
+      );
+
+      if (newGames.length > 0) {
+        const randomColor = getRandomColor();
+        setStreamerIds((prevStreamerIds) => [
+          ...prevStreamerIds,
+          { ...newGames[0], color: randomColor }
+        ]);
+
+        // 検索バーをリセット（stateを更新）
+        setSearchStreamerQuery('');
+      } else {
+        const isAlreadyAdded = streamerIds.some((existingGame) => existingGame.name === updatedData.name && existingGame.platform === updatedData.platform);
+        if (isAlreadyAdded) {
+          setShowDuplicateAlert(true); // 重複アラートを表示
+          return;
+        } else if (streamedGameList.length === 0) {
+          setShowDataNotFoundAlert(true); // データ未発見アラートを表示
+          return;
+        } else {
+          setShowDataNotFoundAlert(true); // その他のエラーもデータ未発見として扱う
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching streamer details:", error);
+      setShowDataNotFoundAlert(true); // エラー時にもデータ未発見アラートを表示
+    } finally {
+      setIsLoading((prev) => prev.filter((id) => id !== data.id));
+    }
+  };
+
   return (
    <div></div>
   );
