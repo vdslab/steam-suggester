@@ -27,7 +27,17 @@ export async function GET(req: Request, { params }: Params) {
           sd.is_device_windows, 
           sd.is_device_mac,
           sd.genres,
-          sd.tags
+          sd.tags,
+          sd.short_details,
+          sd.release_date,
+          sd.developer_name,
+          sd.sale_price,
+          sd.play_time,
+          sd.review_text,
+          sd.difficulty,
+          sd.graphics,
+          sd.story,
+          sd.music
       FROM 
           steam_game_data sd
       WHERE 
@@ -61,6 +71,18 @@ export async function GET(req: Request, { params }: Params) {
       // 類似度で使用
       imgURL: gameDetailData.image,
       url: gameDetailData.url,
+
+      // 追加項目
+      shortDetails: gameDetailData.short_details,
+      releaseDate: gameDetailData.release_date,
+      developerName: gameDetailData.developer_name,
+      salePrice: gameDetailData.sale_price,
+      playTime: gameDetailData.play_time,
+      review: gameDetailData.review_text,
+      difficulty: gameDetailData.difficulty,
+      graphics: gameDetailData.graphics,
+      story: gameDetailData.story,
+      music: gameDetailData.music
     };
 
     return NextResponse.json(formattedResult);

@@ -10,9 +10,18 @@ export type SteamDetailsDataType = {
   device: SteamDeviceType;
   imgURL: string;
   url: string;
-  tags: string[]
-  /* header_image: string;
-  short_description: string; */
+  tags: string[];
+  // 追加
+  shortDetails: string;
+  releaseDate: string;
+  developerName: string;
+  salePrice: string;
+  playTime: string;
+  review: object;
+  difficulty: number;
+  graphics: number;
+  story: number;
+  music: number;
 }
 
 export type SteamDetailApiType = {

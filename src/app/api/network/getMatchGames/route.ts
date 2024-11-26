@@ -23,7 +23,17 @@ export async function GET() {
           sd.is_device_windows, 
           sd.is_device_mac,
           sd.genres,
-          sd.tags
+          sd.tags,
+          sd.short_details,
+          sd.release_date,
+          sd.developer_name,
+          sd.sale_price,
+          sd.play_time,
+          sd.review_text,
+          sd.difficulty,
+          sd.graphics,
+          sd.story,
+          sd.music
       FROM 
           game_views gv
       JOIN 
@@ -59,7 +69,17 @@ export async function GET() {
         windows: item.is_device_windows,
         mac: item.is_device_mac,
       },
-      tags: item.tags || []
+      tags: item.tags || [],
+      shortDetails: item.short_details,
+      releaseDate: item.release_date,
+      developerName: item.developer_name,
+      salePrice: item.sale_price,
+      playTime: item.play_time,
+      review: item.review_text,
+      difficulty: item.difficulty,
+      graphics: item.graphics,
+      story: item.story,
+      music: item.music
     }));
 
     return NextResponse.json(result);

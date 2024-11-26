@@ -28,6 +28,16 @@ export type NodeType = {
   device: SteamDeviceType;
   imgURL: string;
   url: string;
+  shortDetails: string;
+  releaseDate: string;
+  developerName: string;
+  salePrice: string;
+  playTime: string;
+  review: object;
+  difficulty: number;
+  graphics: number;
+  story: number;
+  music: number;
   suggestValue: number;
 
   index: number;
