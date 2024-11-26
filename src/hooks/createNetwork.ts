@@ -115,21 +115,6 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     }
   });
 
-  nodes.forEach((node) => {
-    let sourceConnections = links.filter((link: LinkType) => link.source === node.index || link.target === node.index).length;
-
-    if(sourceConnections < k) {
-      for(const targetNode of nodes) {
-        if(sourceConnections >= k) break;
-
-        if(canAddLink(links, node.index, targetNode.index)) {
-          links.push({ source: node.index, target: targetNode.index });
-          sourceConnections++;
-        }
-      }
-    }
-  });
-
   nodes.forEach((node: NodeType) => {
     // 一致度を計算(全体)
     const overallMatchPercent = calcAllMatchPercentage(filter, node);
