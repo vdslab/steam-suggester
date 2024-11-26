@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const query = `
-      SELECT steam_game_id, game_title FROM steam_data;
+      SELECT steam_game_id, game_title FROM steam_game_data;
     `;
 
     const { rows } = await PG_POOL.query(query);

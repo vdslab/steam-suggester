@@ -74,7 +74,8 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
                       .range([1, 3])
 
   const nodes: NodeType[] = [...new Set(data.filter((item: SteamDetailsDataType) => {
-    if(!item.genres.find((value: SteamGenreType) => filter["Categories"][value.id])) return false;
+    // ジャンルid廃止のため一時的にフィルター解除
+    // if(!item.genres.find((value: SteamGenreType) => filter["Categories"][value.id])) return false;
     if(!(filter.Price.startPrice <= item.price && item.price <= filter.Price.endPrice)) return false;
     if(!((item.isSinglePlayer && filter.Mode.isSinglePlayer) || (item.isMultiPlayer && filter.Mode.isMultiPlayer))) return false;
     if(!((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))) return false;

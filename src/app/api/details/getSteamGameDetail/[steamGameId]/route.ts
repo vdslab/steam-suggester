@@ -15,24 +15,26 @@ export async function GET(req: Request, { params }: Params) {
     const client = await PG_POOL.connect();
 
     const query = `
-      SELECT sd.steam_game_id, sd.twitch_game_id, sd.game_title as name, sd.webpage_url as url, sd.img_url as image, sd.price,
-             sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
-             array_agg(json_build_object('id', g.genre_id, 'description', g.genre_name)) as genres
-      FROM steam_data sd
-      LEFT JOIN steam_data_genres sdg ON sd.steam_game_id = sdg.steam_game_id
-      LEFT JOIN genres g ON sdg.genre_id = g.genre_id
-      WHERE sd.steam_game_id = $1
-      GROUP BY sd.steam_game_id;
-    `;
-
-    const tagsQuery = `
-      SELECT tag_name
-      FROM steam_data_tags
-      WHERE steam_game_id = $1;
+      SELECT 
+          sd.steam_game_id, 
+          sd.twitch_game_id, 
+          sd.game_title AS name, 
+          sd.webpage_url AS url, 
+          sd.img_url AS image, 
+          sd.price,
+          sd.is_single_player, 
+          sd.is_multi_player, 
+          sd.is_device_windows, 
+          sd.is_device_mac,
+          sd.genres,
+          sd.tags
+      FROM 
+          steam_game_data sd
+      WHERE 
+          sd.steam_game_id = $1;
     `;
 
     const result = await client.query(query, [steamGameId]);
-    const tagsResult = await client.query(tagsQuery, [steamGameId]);
     client.release();
 
     if (result.rows.length === 0) {
@@ -40,14 +42,13 @@ export async function GET(req: Request, { params }: Params) {
     }
 
     const gameDetailData = result.rows[0];
-    const tags = tagsResult.rows.length > 0 ? tagsResult.rows.map(row => row.tag_name) : [];
 
     const formattedResult: SteamDetailsDataType = {
       // マッチ度で使用
       steamGameId: gameDetailData.steam_game_id,
       twitchGameId: gameDetailData.twitch_game_id,
       title: gameDetailData.name,
-      genres: gameDetailData.genres,
+      genres: gameDetailData.genres || [],
       price: gameDetailData.price,
       isSinglePlayer: gameDetailData.is_single_player,
       isMultiPlayer: gameDetailData.is_multi_player,
@@ -55,7 +56,7 @@ export async function GET(req: Request, { params }: Params) {
         windows: gameDetailData.is_device_windows,
         mac: gameDetailData.is_device_mac,
       },
-      tags: tags,
+      tags: gameDetailData.tags || [],
 
       // 類似度で使用
       imgURL: gameDetailData.image,
@@ -64,7 +65,7 @@ export async function GET(req: Request, { params }: Params) {
 
     return NextResponse.json(formattedResult);
   } catch (error) {
-    console.error('Error fetching game details:', error);
+    console.error("Error fetching game details:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
