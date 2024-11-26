@@ -42,7 +42,7 @@ const Popup = (props: PopupProps) => {
           }}
         />
       <div style={{ marginBottom: "8px" }}>
-        <strong>Tags:</strong> {node.genres?.map((item: SteamGenreType) => item.description).join(", ") || "No tags"}
+        <strong>Tags:</strong> {node.tags?.map((item: string) => item).join(", ") || "No tags"}
       </div>
       <div style={{ marginBottom: "8px" }}>
         
