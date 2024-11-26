@@ -203,66 +203,6 @@ const StreamedList = (props: Props) => {
     setStreamerIds(updatedUserAddedGames);
   };
 
-  // Custom debounce implementation using useEffect and setTimeout
-  useEffect(() => {
-    // If the search query is empty, clear the filtered list and return
-    if (!searchStreamerQuery) {
-      setFilteredStreamerList([]);
-      return;
-    }
-
-    // Set a timeout to perform the search after 1 second of inactivity
-    const handler = setTimeout(async () => {
-      try {
-        // Twitch API
-        const twitchResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodeURIComponent(searchStreamerQuery)}`
-        );
-        let twitchData: StreamerListType[] = [];
-        if (twitchResponse.ok) {
-          twitchData = await twitchResponse.json();
-          // 各Twitchストリーマーにプラットフォーム情報を追加
-          twitchData = twitchData.map((streamer) => ({
-            ...streamer,
-            platform: 'twitch',
-          }));
-        }
-
-        // YouTube API
-        const youtubeResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberInf/${encodeURIComponent(searchStreamerQuery)}`
-        );
-        let youtubeData: StreamerListType[] = [];
-        if (youtubeResponse.ok) {
-          youtubeData = await youtubeResponse.json();
-          // 各YouTubeストリーマーにプラットフォーム情報を追加
-          youtubeData = youtubeData.map((streamer) => ({
-            ...streamer,
-            platform: 'youtube',
-          }));
-        }
-
-        // TwitchとYouTubeのデータを統合
-        const combinedData = [...twitchData, ...youtubeData];
-
-        // viewer_count順に並び替え（数字のみ比較）
-        const sortedData = combinedData.sort((a, b) => {
-          const viewerA = typeof a.viewer_count === 'number' ? a.viewer_count : parseInt(a.viewer_count) || 0;
-          const viewerB = typeof b.viewer_count === 'number' ? b.viewer_count : parseInt(b.viewer_count) || 0;
-          return viewerB - viewerA;
-        });
-
-        setFilteredStreamerList(sortedData);
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }, 1000); // 1秒の遅延
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchStreamerQuery, nodes]);
-
   return (
    <div></div>
   );
