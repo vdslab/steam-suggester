@@ -120,14 +120,20 @@ const StreamedList = (props: Props) => {
 
         // ゲーム名でフィルタリング
         relevantStreamIds.forEach((gameName) => {
-          if (gameName === node.gameName) { // gameName と一致
+          if (gameName === node.title) { // gameName と一致
             const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
             if (existingGame) {
               if (!existingGame.streamId.includes(gameName)) {
                 existingGame.streamId.push(gameName);
               }
             } else {
-             
+              const newGame: StreamerListType = {
+                ...updatedData,
+                streamId: [gameName],
+                videoId: updatedData.videoId,
+                color: getRandomColor(),
+              };
+              acc.push(newGame);
             }
           }
         });
