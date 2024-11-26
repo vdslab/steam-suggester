@@ -118,7 +118,19 @@ const StreamedList = (props: Props) => {
         const relevantStreamIds = updatedData.streamId; // gameName を含む
         const relevantVideoIds = updatedData.videoId; // video titles
 
-     
+        // ゲーム名でフィルタリング
+        relevantStreamIds.forEach((gameName) => {
+          if (gameName === node.gameName) { // gameName と一致
+            const existingGame = acc.find((g) => g.name === updatedData.name && g.platform === updatedData.platform);
+            if (existingGame) {
+              if (!existingGame.streamId.includes(gameName)) {
+                existingGame.streamId.push(gameName);
+              }
+            } else {
+             
+            }
+          }
+        });
 
         // 過去のビデオタイトルとの関連性でフィルタリング
         relevantVideoIds.forEach((videoTitle) => {
