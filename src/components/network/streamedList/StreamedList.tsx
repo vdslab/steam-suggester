@@ -4,7 +4,7 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { NodeType, StreamerListType } from "@/types/NetworkType";
 import { useCallback, useEffect, useState } from "react";
-// import similarity from 'string-similarity';
+import similarity from 'string-similarity';
 import CircularProgress from '@mui/material/CircularProgress';
 // import debounce from 'lodash.debounce';
 import Alert from '@mui/material/Alert';
