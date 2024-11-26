@@ -3,41 +3,10 @@ import { Filter } from '@/types/api/FilterType';
 import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 import { calcAllMatchPercentage } from '@/components/common/CalcMatch';
 import { LinkType, NodeType } from '@/types/NetworkType';
-import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
+import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 import { SimilarGameType } from '@/types/NetworkType';
 
-const calcWeight = (game1: NodeType, game2: NodeType, tagCount: Map<string, number>) => {
-  let totalWeight = 1;
-
-  let genresWeight = 1;
-  const genres1: SteamGenreType[] = game1.genres;
-  const genres2: SteamGenreType[] = game2.genres;
-
-  genres1.forEach((genre1: SteamGenreType) => {
-    genres2.forEach((genre2: SteamGenreType) => {
-      if(genre1.id === genre2.id) {
-        genresWeight++;
-      }
-    });
-  });
-
-  let tagsWeight = 1;
-  const tags1: string[] = game1.tags;
-  const tags2: string[] = game2.tags;
-
-  tags1.forEach((tag1: string) => {
-    tags2.forEach((tag2: string) => {
-      if (tag1 === tag2) {
-        const tagFrequency = tagCount.get(tag1) || 1;
-        tagsWeight += tagFrequency;
-      }
-    });
-  });
-
-  totalWeight += (genresWeight + tagsWeight) * 10;
-
-  return totalWeight;
-}
+import calcWeight from '@/hooks/calcWeight';
 
 const createNetwork = async (filter: Filter, gameIds: string[]) => {
   const k = 4;
@@ -89,19 +58,12 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     return sourceIndex !== targetIndex && sourceConnections < k && targetConnections < k;
   }
 
-  const tagCount = new Map();
-  nodes.forEach((node) => {
-    node.tags.forEach((tag) => {
-      tagCount.set(tag, (tagCount.get(tag) || 0) + 1);
-    });
-  });
-
   nodes.forEach((sourceNode: NodeType) => {
     const weightedNodes = nodes
       .filter(targetNode => sourceNode !== targetNode)
       .map((targetNode) => ({
         node: targetNode,
-        weight: calcWeight(sourceNode, targetNode, tagCount)
+        weight: calcWeight(sourceNode, targetNode)
       }))
       .sort((a, b) => b.weight - a.weight);
 
@@ -136,7 +98,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
           const targetNode = item.target as NodeType;
           
           if(typeof sourceNode !== "number" && typeof targetNode !== "number") {
-            return 1 / calcWeight(sourceNode, targetNode, tagCount);
+            return 1 / calcWeight(sourceNode, targetNode);
           }
           return 0;
         })
