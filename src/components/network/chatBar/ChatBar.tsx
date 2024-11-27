@@ -63,22 +63,48 @@ const ChatBar = (props: Props) => {
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded shadow-lg">
-      <p className="text-white mb-2">ゲームに関する質問を入力してください。ネットワーク内の関連ノードが強調表示されます。</p>
-      <form onSubmit={handleSubmit} className="flex">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <form 
+        onSubmit={handleSubmit} 
+        style={{
+          display: 'flex', 
+          width: '80%', 
+          maxWidth: '600px', 
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.5)', 
+          padding: '10px', 
+          borderRadius: '30px',
+          backgroundColor: '#1E1E1E'
+        }}
+      >
         <input
           type="text"
           value={input}
           onChange={handleInputChange}
-          placeholder="例：おすすめのマルチプレイヤーゲームは？"
-          className="flex-grow p-2 rounded-l bg-gray-700 text-white"
+          placeholder="メッセージを送信"
+          style={{
+            flexGrow: 1, 
+            padding: '12px', 
+            fontSize: '16px', 
+            border: 'none', 
+            outline: 'none', 
+            borderRadius: '30px',
+            color: 'white',
+            backgroundColor: '#2C2C2C'
+          }}
         />
-        <button
-          type="submit"
-          disabled={!input}
-          className={`p-2 rounded-r ${input ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-600 cursor-not-allowed'}`}
+        <button 
+          type="submit" 
+          style={{
+            padding: '10px 15px', 
+            fontSize: '16px', 
+            border: 'none', 
+            backgroundColor: `${input ? 'white' : 'gray'}`, 
+            color: 'black', 
+            borderRadius: '30px',
+            marginLeft: '8px'
+          }}
         >
-          送信
+          ↑
         </button>
       </form>
     </div>
