@@ -1,4 +1,3 @@
-/* Network.tsx */
 "use client";  
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
@@ -6,13 +5,13 @@ import SelectParameter from './selectParameter/SelectParameter';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 import GameList from './gameList/GameList';
-import StreamedList from './streamedList/StreamedList'; // 配信者パネルのインポート
+import StreamedList from './streamedList/StreamedList';
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
 import { LinkType, NodeType, StreamerListType } from '@/types/NetworkType';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
-import Sidebar from './Sidebar'; // Sidebar をインポート
+import Sidebar from './Sidebar';
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -100,9 +99,19 @@ const Network = () => {
       {isEmphasisOpen && (
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
           <div className="p-4 bg-gray-800 rounded-lg space-y-4">
-            <h2 className="text-white mb-2">強調</h2>
-            <ChatBar nodes={nodes} setNodes={setNodes} />
-            <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
+            <h2 className="text-white mb-4 border-b pb-2">強調</h2>
+            {/* ChatBar セクション */}
+            <div className="flex flex-col space-y-2">
+              <h3 className="text-white">チャット</h3>
+              <ChatBar nodes={nodes} setNodes={setNodes} />
+            </div>
+            {/* 線で区切る */}
+            <hr className="border-gray-600" />
+            {/* StreamedList セクション */}
+            <div className="flex flex-col space-y-2">
+              <h3 className="text-white">配信者</h3>
+              <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
+            </div>
           </div>
         </div>
       )}
