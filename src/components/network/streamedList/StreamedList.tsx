@@ -1,9 +1,14 @@
+"use client";
+
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import LiveTvIcon from "@mui/icons-material/LiveTv";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonIcon from "@mui/icons-material/Person";
 import { NodeType, StreamerListType } from "@/types/NetworkType";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { stringSimilarity } from "string-similarity-js";
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
@@ -267,7 +272,7 @@ const StreamedList = (props: Props) => {
   }, [searchStreamerQuery, nodes]);
 
   return (
-    <div className="bg-gray-800 p-2 rounded-lg shadow-lg max-w-xl mx-auto">
+    <Panel title="配信者" icon={<LiveTvIcon className="mr-2" />}>
       {/* 制限アラートの表示 */}
       <Snackbar
         open={showLimitAlert}
@@ -316,18 +321,19 @@ const StreamedList = (props: Props) => {
         </Alert>
       </Snackbar>
 
-      <div className="mb-0">
+      {/* 配信者検索セクション */}
+      <Section title="配信者を追加" icon={<PersonAddIcon />}>
         <input
           type="text"
           placeholder="ここに配信者を入力"
           value={searchStreamerQuery}
           onChange={(e) => setSearchStreamerQuery(e.target.value)}
-          className="w-full px-3 py-1 mb-0 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
+          className="w-full px-3 py-1 mb-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
         {searchStreamerQuery && (
-          <div className="bg-gray-700 p-2 rounded-lg mt-0 relative">
+          <div className="bg-gray-700 p-2 rounded-lg mt-0 relative max-h-40 overflow-y-auto">
             <h2 className="text-gray-400 text-xs font-semibold mb-2">検索結果</h2>
-            <div className="max-h-40 overflow-y-auto">
+            <div>
               {filteredStreamerList.map((streamer) => (
                 <div
                   className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all"
@@ -353,7 +359,7 @@ const StreamedList = (props: Props) => {
                     <button
                       className="relative flex items-center"
                       onClick={() => handleSearchClick(streamer)}
-                      disabled={isLoading.includes(streamer.id) || streamerIds.length >= MAX_STREAMERS}  // ローディング中や制限時にボタンを無効化
+                      disabled={isLoading.includes(streamer.id) || streamerIds.length >= MAX_STREAMERS}
                       aria-disabled={isLoading.includes(streamer.id) || streamerIds.length >= MAX_STREAMERS}
                     >
                       {isLoading.includes(streamer.id) ? (
@@ -393,13 +399,12 @@ const StreamedList = (props: Props) => {
             )}
           </div>
         )}
-      </div>
+      </Section>
 
-      {/* 追加済みの配信者ブロック */}
-      <div className="bg-gray-700 p-2 rounded-lg shadow-lg mt-0">
-        <h2 className="text-white text-lg font-semibold mb-2">追加済みの配信者</h2>
+      {/* 追加済みの配信者セクション */}
+      <Section title="追加済みの配信者" icon={<PersonIcon />} hasDivider={false}>
         {streamerIds.length === 0 ? (
-          <p className="text-gray-400">配信者が追加されていません。追加すると配信者が配信したゲームのアイコンに枠が表示されます</p>
+          <p className="text-gray-400">配信者が追加されていません。追加すると配信者が配信したゲームのアイコンに枠が表示されます。</p>
         ) : (
           streamerIds.map((streamer) => (
             <div
@@ -441,8 +446,8 @@ const StreamedList = (props: Props) => {
             </div>
           ))
         )}
-      </div>
-    </div>
+      </Section>
+    </Panel>
   );
 };
 
