@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
 import SelectParameter from './selectParameter/SelectParameter';
@@ -24,8 +24,16 @@ const Network = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // パネルの表示状態を管理するステート
-  const [activePanel, setActivePanel] = useState<'filter' | 'chat' | 'gamelist' | null>('filter');
+  // New state variables for panel visibility
+  const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
+
+  // Function to determine center panel width
+  const getCenterPanelWidth = () => {
+    if (isLeftPanelOpen && isRightPanelOpen) return 'w-3/5';
+    if (isLeftPanelOpen || isRightPanelOpen) return 'w-4/5';
+    return 'w-full';
+  };
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -33,7 +41,7 @@ const Network = () => {
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
     buffNodes.sort((node1: NodeType, node2: NodeType) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0));
-    if (centerX === 0 && centerY === 0) {
+    if(centerX === 0 && centerY === 0) {
       setCenterX(buffNodes[0]?.x ?? 0);
       setCenterY(buffNodes[0]?.y ?? 0);
     }
@@ -42,10 +50,10 @@ const Network = () => {
   };
 
   useEffect(() => {
-    if (isLoading) {
+    if(isLoading) {
       (async () => {
-        const filter = (await getFilterData()) ?? DEFAULT_FILTER;
-        const gameIds = (await getGameIdData()) ?? [];
+        const filter = await getFilterData() ?? DEFAULT_FILTER;
+        const gameIds = await getGameIdData() ?? [];
         setFilter(filter);
         await initialNodes(filter, gameIds);
         setIsLoading(false);
@@ -54,97 +62,62 @@ const Network = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if(!isLoading) {
       (async () => {
-        const gameIds = (await getGameIdData()) ?? [];
+        const gameIds = await getGameIdData() ?? [];
         initialNodes(filter, gameIds);
       })();
     }
   }, [filter]);
 
-  // ノード選択時に右パネルを自動的に開く関数
+  // Function to handle node selection and open the right panel automatically
   const handleSetSelectedIndex = (index: number) => {
     setSelectedIndex(index);
-    if (index !== -1) {
-      setActivePanel('gamelist');
+    if (index !== -1 && !isRightPanelOpen) {
+      setIsRightPanelOpen(true);
     }
   };
 
   return (
-    <div className="flex h-screen">
-      {/* ナビゲーションサイドバー */}
-      <div className="w-32 bg-stone-900 flex flex-col items-center py-4">
-        <button
-          className={`mb-4 px-4 py-2 text-white ${activePanel === 'filter' ? 'bg-blue-600' : 'bg-gray-800'} rounded`}
-          onClick={() => setActivePanel(activePanel === 'filter' ? null : 'filter')}
-        >
-          フィルター
-        </button>
-        <button
-          className={`mb-4 px-4 py-2 text-white ${activePanel === 'chat' ? 'bg-blue-600' : 'bg-gray-800'} rounded`}
-          onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
-        >
-          チャット
-        </button>
-        <button
-          className={`px-4 py-2 text-white ${activePanel === 'gamelist' ? 'bg-blue-600' : 'bg-gray-800'} rounded`}
-          onClick={() => setActivePanel(activePanel === 'gamelist' ? null : 'gamelist')}
-        >
-          ゲームリスト
-        </button>
-      </div>
-
-      {/* メインコンテンツ */}
-      <div className="flex-1 flex">
-        {/* 左パネル */}
-        {activePanel === 'filter' && (
-          <div className="w-64 bg-stone-900 overflow-y-auto">
-            <SelectParameter filter={filter} setFilter={setFilter} />
+    <div>
+      {!isLoading ? 
+        <div className="flex h-[92dvh] overflow-hidden">
+          {/* Left Panel */}
+          <div className={`${isLeftPanelOpen ? 'w-1/5' : 'w-0'} bg-stone-950 overflow-y-auto overflow-x-hidden transition-all duration-300`}>
+            {isLeftPanelOpen && <SelectParameter filter={filter} setFilter={setFilter} />}
           </div>
-        )}
-
-        {/* 中央パネル */}
-        <div className="flex-1 bg-gray-900 relative">
-          {/* チャットバー（アクティブ時に表示） */}
-          {activePanel === 'chat' && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-2/3">
-              <ChatBar nodes={nodes} setNodes={setNodes} />
+          {/* Center Panel */}
+          <div className={`${getCenterPanelWidth()} bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden transition-all duration-300`}>
+            <div className="flex justify-between p-2">
+              <button 
+                onClick={() => setIsLeftPanelOpen(!isLeftPanelOpen)}
+                className="text-white bg-blue-600 hover:bg-blue-500 rounded px-4 py-2"
+              >
+                {isLeftPanelOpen ? 'フィルターを隠す' : 'フィルターを表示'}
+              </button>
+              <button 
+                onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
+                className="text-white bg-blue-600 hover:bg-blue-500 rounded px-4 py-2"
+              >
+                {isRightPanelOpen ? 'ゲームリストを隠す' : 'ゲームリストを表示'}
+              </button>
             </div>
-          )}
-
-          <NodeLink
-            nodes={nodes}
-            links={links}
-            centerX={centerX}
-            centerY={centerY}
-            setSelectedIndex={handleSetSelectedIndex}
-          />
-        </div>
-
-        {/* 右パネル */}
-        {activePanel === 'gamelist' && (
-          <div className="w-64 bg-stone-900 overflow-y-auto">
-            {selectedIndex !== -1 ? (
-              <Popup
-                nodes={nodes}
-                selectedIndex={selectedIndex}
-                setSelectedIndex={setSelectedIndex}
-              />
-            ) : (
-              <GameList
-                nodes={nodes}
-                setCenterX={setCenterX}
-                setCenterY={setCenterY}
-                setIsLoading={setIsLoading}
-              />
+            <ChatBar nodes={nodes} setNodes={setNodes} />
+            <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={handleSetSelectedIndex} />
+          </div>
+          {/* Right Panel */}
+          <div className={`${isRightPanelOpen ? 'w-1/5' : 'w-0'} bg-stone-950 overflow-y-auto overflow-x-hidden transition-all duration-300`}>
+            {isRightPanelOpen && (selectedIndex !== -1 ? 
+              <Popup nodes={nodes} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} /> 
+              : 
+              <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
             )}
           </div>
-        )}
-      </div>
-
-      {isLoading && <Loading />}
+        </div> 
+        : <Loading />
+      }
     </div>
   );
-};
+}
 
 export default Network;
