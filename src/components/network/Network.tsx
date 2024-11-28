@@ -1,4 +1,3 @@
-/* Network.tsx */
 "use client";
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
@@ -74,7 +73,7 @@ const Network = () => {
   return (
     <div className="flex h-screen">
       {/* ナビゲーションサイドバー */}
-      <div className="w-32 bg-stone-950 flex flex-col items-center py-4">
+      <div className="w-32 bg-stone-900 flex flex-col items-center py-4">
         <button
           className={`mb-4 px-4 py-2 text-white ${activePanel === 'filter' ? 'bg-blue-600' : 'bg-gray-800'} rounded`}
           onClick={() => setActivePanel(activePanel === 'filter' ? null : 'filter')}
@@ -99,7 +98,7 @@ const Network = () => {
       <div className="flex-1 flex">
         {/* 左パネル */}
         {activePanel === 'filter' && (
-          <div className="w-64 bg-stone-950 overflow-y-auto">
+          <div className="w-64 bg-stone-900 overflow-y-auto">
             <SelectParameter filter={filter} setFilter={setFilter} />
           </div>
         )}
@@ -124,7 +123,7 @@ const Network = () => {
 
         {/* 右パネル */}
         {activePanel === 'gamelist' && (
-          <div className="w-64 bg-stone-950 overflow-y-auto">
+          <div className="w-64 bg-stone-900 overflow-y-auto">
             {selectedIndex !== -1 ? (
               <Popup
                 nodes={nodes}
