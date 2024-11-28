@@ -25,50 +25,10 @@ const GameList = (props: Props) => {
 
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchSteamQuery, setSearchSteamQuery] = useState<string>('');
-  const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
+  const [searchListQuery, setSearchListQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
-
-  const selectColor = (index: number, flag: boolean) => {
-    const textColor = flag ? "text-yellow-300" : "text-slate-100";
-    const rankColor = index === 0 
-                    ? "text-yellow-500" 
-                    : index === 1 
-                    ? "text-gray-400" 
-                    : index === 2 
-                    ? "text-orange-500" 
-                    : "text-white";
-    return { textColor, rankColor };
-  }
-
-  const handleGameClick = (index: number) => {
-    setCenterX(nodes[index].x ?? 0);
-    setCenterY((nodes[index].y ?? 0) + 100);
-    setSelectedIndex(index);
-  };
-
-  const handleGameDelete = (steamGameId: string) => {
-    const newUserAddedGames = userAddedGames.filter((gameId: string) => gameId !== steamGameId);
-    setUserAddedGames(newUserAddedGames);
-    changeGameIdData(newUserAddedGames);
-    handleGameClick(0);
-    setIsLoading(true);
-  }
-
-  const handleSearchClick = (steamGameId: string) => {
-    if(!userAddedGames.includes(steamGameId)) {
-      const index = nodes.findIndex((node: NodeType) => node.steamGameId === steamGameId);
-      if(index !== -1) handleGameClick(index);
-      const newUserAddedGames = [...userAddedGames, steamGameId];
-      setUserAddedGames(newUserAddedGames);
-      changeGameIdData(newUserAddedGames);
-      setIsLoading(true);
-    }
-  };
-
-  const handleAddGame = () => {
-    // ゲーム追加機能の実装（例：モーダルを開く）
-    alert("ゲーム追加機能を実装してください。");
-  }
+  const [filteredNodeList, setFilteredNodeList] = useState<NodeType[]>(nodes);
+  const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -76,11 +36,11 @@ const GameList = (props: Props) => {
         `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`,
         { next: { revalidate: ISR_FETCH_INTERVAL } }
       );
-      if(!res1.ok) {
-        console.error("Failed to fetch Steam list:", res1.statusText);
+      if (!res1.ok) {
+        console.error("Failed to fetch Steam list");
         return;
       }
-      const data = await res1.json();
+      const data: SteamListType[] = await res1.json();
       const res2 = await getGameIdData();
 
       setSteamList(data);
@@ -90,7 +50,7 @@ const GameList = (props: Props) => {
   }, []);
 
   useEffect(() => {
-    if(searchSteamQuery === '') {
+    if (searchSteamQuery === '') {
       setFilteredSteamList(steamList);
     } else {
       const filteredList = steamList
@@ -102,131 +62,206 @@ const GameList = (props: Props) => {
     }
   }, [steamList, searchSteamQuery, userAddedGames]);
 
-  // ゲームリストをノードの順位順にソート
-  const sortedNodes = [...nodes].sort((a, b) => {
-    return (a.circleScale ?? 0) - (b.circleScale ?? 0);
-  });
+  useEffect(() => {
+    if (searchListQuery === '') {
+      setFilteredNodeList(nodes);
+    } else {
+      const filteredList = nodes.filter((game) =>
+        game.title.toLowerCase().includes(searchListQuery.toLowerCase())
+      );
+      setFilteredNodeList(filteredList);
+    }
+  }, [nodes, searchListQuery]);
+
+  const handleAddGame = async (steamGameId: string) => {
+    if (!userAddedGames.includes(steamGameId)) {
+      const newUserAddedGames = [...userAddedGames, steamGameId];
+      setUserAddedGames(newUserAddedGames);
+      await changeGameIdData(newUserAddedGames);
+      setIsLoading(true);
+    }
+  };
+
+  const handleDeleteGame = async (steamGameId: string) => {
+    const newUserAddedGames = userAddedGames.filter((gameId) => gameId !== steamGameId);
+    setUserAddedGames(newUserAddedGames);
+    await changeGameIdData(newUserAddedGames);
+    setIsLoading(true);
+  };
+
+  const handleGameClick = (index: number) => {
+    setCenterX(nodes[index].x ?? 0);
+    setCenterY((nodes[index].y ?? 0) + 100);
+    setSelectedIndex(index);
+  };
+
+  const selectColor = (index: number) => {
+    let rankColor = "text-white";
+    if (index === 0) rankColor = "text-yellow-500";
+    else if (index === 1) rankColor = "text-gray-400";
+    else if (index === 2) rankColor = "text-orange-500";
+    return { rankColor };
+  };
 
   return (
     <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px' }}>
-      
-      {/* ゲーム追加ボタンと検索フォーム */}
-      <div className="flex items-center justify-between mb-4">
-        <button
-          onClick={handleAddGame}
-          className="flex items-center bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          <PlaylistAddIcon className="mr-2" />
-          ゲーム追加
-        </button>
+      {/* ゲームタイトルから検索して追加する機能 */}
+      <div className="mb-4">
         <input
           type="text"
-          placeholder="ゲームを検索"
+          placeholder="ゲームタイトルで検索して追加"
           value={searchSteamQuery}
           onChange={(e) => setSearchSteamQuery(e.target.value)}
-          className="w-1/2 p-2 text-black rounded"
+          className="w-full p-2 mb-2 text-black rounded"
+        />
+        {searchSteamQuery !== '' && (
+          <div className="bg-gray-800 p-2 rounded-lg mb-4">
+            <h2 className="text-white mb-2">検索結果</h2>
+            {filteredSteamList.length > 0 ? (
+              filteredSteamList.map((game) => (
+                <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
+                  <div className="text-white p-2 rounded">
+                    {game.title}
+                  </div>
+                  <PlaylistAddIcon
+                    className='cursor-pointer hover:bg-gray-700 rounded p-1'
+                    onClick={() => handleAddGame(game.steamGameId)}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="text-gray-400">該当するゲームがありません。</div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ゲームリストから検索する機能 */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="ゲームリストから検索"
+          value={searchListQuery}
+          onChange={(e) => setSearchListQuery(e.target.value)}
+          className="w-full p-2 mb-2 text-black rounded"
         />
       </div>
 
-      {/* ユーザー追加ゲーム */}
+      {/* ユーザー追加ゲームリスト */}
       <div className="bg-gray-800 p-2 rounded-lg mb-4">
-        <h2 className="text-white mb-2">ユーザー追加ゲーム</h2>
+        <h2 className="text-white mb-2">追加されたゲームリスト</h2>
         {userAddedGames.slice().sort((gameId1: string, gameId2: string) => {
-            const index1 = nodes.findIndex((node: NodeType) => node.steamGameId === gameId1);
-            const index2 = nodes.findIndex((node: NodeType) => node.steamGameId === gameId2);
-            if(index1 === -1) return 1;
-            if(index2 === -1) return -1;
-            return index1 - index2;
-          }).map((gameId) => {
+          const index1 = nodes.findIndex((node: NodeType) => node.steamGameId === gameId1);
+          const index2 = nodes.findIndex((node: NodeType) => node.steamGameId === gameId2);
+          if (index1 === -1) return 1;
+          if (index2 === -1) return -1;
+          return index1 - index2;
+        }).map((gameId) => {
           const nodeIndex = nodes.findIndex((node: NodeType) => node.steamGameId === gameId);
-          const game = steamList.find(game => game.steamGameId === gameId);
+          const game = steamList.find(game => game.steamGameId === gameId) || nodes.find(node => node.steamGameId === gameId);
           const isInNodes = nodeIndex >= 0;
-          const { textColor, rankColor } = selectColor(nodeIndex, isInNodes);
+          const { rankColor } = selectColor(nodeIndex);
           return game ? (
             <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
               <div className='flex items-center'>
                 <div className={`${rankColor} pb-2 p-2`}>
-                  {nodeIndex >= 0 && nodeIndex + 1}位
+                  {nodeIndex >= 0 ? `${nodeIndex + 1}位` : '-'}
                 </div>
-                <div className={`${textColor} p-2 rounded`}>
-                  {isInNodes ? <div 
-                    className='cursor-pointer'
-                    onClick={() => handleGameClick(nodeIndex)}
-                  >
-                    {game.title}
-                  </div> : <div
-                    className='text-slate-400'
-                  >
-                    {game.title}
-                  </div>}
+                <div className={`${isInNodes ? 'text-white' : 'text-slate-400'} p-2 rounded`}>
+                  {isInNodes ? (
+                    <div 
+                      className='cursor-pointer'
+                      onClick={() => handleGameClick(nodeIndex)}
+                    >
+                      {game.title}
+                    </div>
+                  ) : (
+                    <div>{game.title}</div>
+                  )}
                 </div>
               </div>
               <DeleteIcon 
-                className='cursor-pointer hover:bg-gray-700 rounded'
-                onClick={() => handleGameDelete(game.steamGameId)}
+                className='cursor-pointer hover:bg-gray-700 rounded p-1'
+                onClick={() => handleDeleteGame(game.steamGameId)}
               />
             </div>
           ) : null;
         })}
       </div>
 
-      {/* ノードのネットワークからのゲームリスト */}
-      <h2 className="text-white mb-2">ネットワークノード</h2>
-      {sortedNodes.map((node: NodeType, index: number) => {
-        const isUserAdded = userAddedGames.includes(node.steamGameId);
-        const isSelected = selectedIndex === index;
-        const { textColor, rankColor } = selectColor(index, isUserAdded);
-        return (
-          <div key={node.index} className="mb-2">
-            <div
-              className={`flex items-center p-2 rounded-lg cursor-pointer ${isSelected ? 'bg-gray-700' : 'bg-gray-800 hover:bg-gray-700'}`}
-              onClick={() => handleGameClick(index)}
-            >
-              <div className={`${rankColor} pb-2 p-2`}>
-                {index + 1}位
-              </div>
-              <div className={`${textColor} p-2 rounded`}>
-                {node.title}
-              </div>
-            </div>
-            {isSelected && (
-              <div className="mt-2 p-2 bg-gray-700 rounded-lg">
-                <Image
-                  src={node.imgURL}
-                  alt={node.title}
-                  width={300}
-                  height={170}
-                  className="rounded"
-                />
-                <div className="text-white mt-2">
-                  <strong>タグ:</strong> {node.genres?.map((item: any) => item.description).join(", ") || "No tags"}
+      {/* ネットワークノードリスト */}
+      <div className="bg-gray-800 p-2 rounded-lg">
+        <h2 className="text-white mb-2">ネットワークノードリスト</h2>
+        {filteredNodeList.length > 0 ? (
+          filteredNodeList.map((node: NodeType, index: number) => {
+            const isUserAdded = userAddedGames.includes(node.steamGameId);
+            const { rankColor } = selectColor(index);
+            return (
+              <div
+                className='flex items-center mb-2 cursor-pointer hover:bg-gray-700 p-2 rounded-lg'
+                key={node.index}
+                onClick={() => handleGameClick(index)}
+              >
+                <div className={`${rankColor} pb-2 p-2`}>
+                  {index + 1}位
                 </div>
-                <div className="text-white mt-2">
-                  <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
+                <div className={`flex-1 ${isUserAdded ? 'text-yellow-300' : 'text-slate-100'} p-2 rounded`}>
+                  {node.title}
                 </div>
-                <div className="mt-4 flex space-x-2">
-                  <button
-                    className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
-                    onClick={() =>
-                      router.push(
-                        `/desktop/details?steam_id=${node.steamGameId}&twitch_id=${node.twitchGameId}`
-                      )
-                    }
-                  >
-                    詳細を確認する
-                  </button>
-                  <button
-                    className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
-                    onClick={() => setSelectedIndex(-1)}
-                  >
-                    閉じる
-                  </button>
-                </div>
+                {isUserAdded && (
+                  <DeleteIcon 
+                    className='cursor-pointer hover:bg-gray-700 rounded p-1'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteGame(node.steamGameId);
+                    }}
+                  />
+                )}
               </div>
-            )}
+            );
+          })
+        ) : (
+          <div className="text-gray-400">ゲームが見つかりません。</div>
+        )}
+      </div>
+
+      {/* 選択されたゲームの詳細表示 */}
+      {selectedIndex !== -1 && nodes[selectedIndex] && (
+        <div className="mt-4 bg-gray-700 p-4 rounded-lg">
+          <h3 className="text-white text-xl mb-2">{nodes[selectedIndex].title}</h3>
+          <Image
+            src={nodes[selectedIndex].imgURL}
+            alt={nodes[selectedIndex].title}
+            width={300}
+            height={170}
+            className="rounded"
+          />
+          <div className="text-white mt-2">
+            <strong>タグ:</strong> {nodes[selectedIndex].genres?.map((item: SteamGenreType) => item.description).join(", ") || "No tags"}
           </div>
-        );
-      })}
+          <div className="text-white mt-2">
+            <strong>価格:</strong> {nodes[selectedIndex].price ? `${nodes[selectedIndex].price}円` : "無料"}
+          </div>
+          <div className="mt-4 flex space-x-2">
+            <button
+              className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
+              onClick={() =>
+                router.push(
+                  `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
+                )
+              }
+            >
+              詳細を確認する
+            </button>
+            <button
+              className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
+              onClick={() => setSelectedIndex(-1)}
+            >
+              閉じる
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
