@@ -6,9 +6,6 @@ import { NodeType, StreamerListType } from "@/types/NetworkType";
 import { useCallback, useEffect, useState } from "react";
 import { stringSimilarity } from "string-similarity-js";
 import CircularProgress from '@mui/material/CircularProgress';
-import LiveTvIcon from "@mui/icons-material/LiveTv";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import PersonIcon from "@mui/icons-material/Person";
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import Image from 'next/image';
@@ -270,7 +267,7 @@ const StreamedList = (props: Props) => {
   }, [searchStreamerQuery, nodes]);
 
   return (
-    <Panel title="配信者" icon={<LiveTvIcon />}>
+    <div className="bg-gray-800 p-2 rounded-lg shadow-lg max-w-xl mx-auto">
       {/* 制限アラートの表示 */}
       <Snackbar
         open={showLimitAlert}
@@ -319,19 +316,18 @@ const StreamedList = (props: Props) => {
         </Alert>
       </Snackbar>
 
-      {/* 配信者検索セクション */}
-      <Section title="配信者を追加" icon={<PersonAddIcon />}>
+      <div className="mb-0">
         <input
           type="text"
           placeholder="ここに配信者を入力"
           value={searchStreamerQuery}
           onChange={(e) => setSearchStreamerQuery(e.target.value)}
-          className="w-full px-3 py-1 mb-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
+          className="w-full px-3 py-1 mb-0 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
         {searchStreamerQuery && (
-          <div className="bg-gray-700 p-2 rounded-lg mt-0 relative max-h-40 overflow-y-auto">
+          <div className="bg-gray-700 p-2 rounded-lg mt-0 relative">
             <h2 className="text-gray-400 text-xs font-semibold mb-2">検索結果</h2>
-            <div>
+            <div className="max-h-40 overflow-y-auto">
               {filteredStreamerList.map((streamer) => (
                 <div
                   className="flex justify-between items-center bg-gray-600 p-2 mb-1 rounded-lg shadow-md hover:bg-gray-500 transition-all"
@@ -357,7 +353,7 @@ const StreamedList = (props: Props) => {
                     <button
                       className="relative flex items-center"
                       onClick={() => handleSearchClick(streamer)}
-                      disabled={isLoading.includes(streamer.id) || streamerIds.length >= MAX_STREAMERS}
+                      disabled={isLoading.includes(streamer.id) || streamerIds.length >= MAX_STREAMERS}  // ローディング中や制限時にボタンを無効化
                       aria-disabled={isLoading.includes(streamer.id) || streamerIds.length >= MAX_STREAMERS}
                     >
                       {isLoading.includes(streamer.id) ? (
@@ -380,14 +376,30 @@ const StreamedList = (props: Props) => {
                 </div>
               ))}
             </div>
+
+            {/* 追加: ローディングオーバーレイ */}
+            {isLoading.length > 0 && (
+              <div
+                className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-lg transition-opacity duration-300"
+                role="alert"
+                aria-live="assertive"
+              >
+                <CircularProgress size={40} color="inherit" className="mb-4" />
+                <span className="text-white text-lg text-center">
+                  データを追加しています。<br />
+                  これには時間がかかることがあります。
+                </span>
+              </div>
+            )}
           </div>
         )}
-      </Section>
+      </div>
 
-      {/* 追加済みの配信者セクション */}
-      <Section title="追加済みの配信者" icon={<PersonIcon />} hasDivider={false}>
+      {/* 追加済みの配信者ブロック */}
+      <div className="bg-gray-700 p-2 rounded-lg shadow-lg mt-0">
+        <h2 className="text-white text-lg font-semibold mb-2">追加済みの配信者</h2>
         {streamerIds.length === 0 ? (
-          <p className="text-gray-400">配信者が追加されていません。追加すると配信者が配信したゲームのアイコンに枠が表示されます。</p>
+          <p className="text-gray-400">配信者が追加されていません。追加すると配信者が配信したゲームのアイコンに枠が表示されます</p>
         ) : (
           streamerIds.map((streamer) => (
             <div
@@ -429,8 +441,8 @@ const StreamedList = (props: Props) => {
             </div>
           ))
         )}
-      </Section>
-    </Panel>
+      </div>
+    </div>
   );
 };
 
