@@ -6,7 +6,7 @@ type Props = {
   title: string;
   icon: React.ReactNode;
   children: React.ReactNode;
-  hasDivider?: boolean; // 区切り線の表示
+  hasDivider?: boolean; // 区切り線
 };
 
 const Section: React.FC<Props> = ({ title, icon, children, hasDivider = true }) => {
@@ -17,7 +17,7 @@ const Section: React.FC<Props> = ({ title, icon, children, hasDivider = true }) 
         <span className="ml-2">{title}</span>
       </h3>
       {children}
-      {hasDivider && <hr className="border-t border-gray-600 my-4" />}
+      {hasDivider && <hr className="border-t border-gray-600 my-4 pb-6" />}
     </div>
   );
 };

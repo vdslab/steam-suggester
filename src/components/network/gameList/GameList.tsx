@@ -1,7 +1,6 @@
-/* GameList.tsx */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
@@ -35,6 +34,9 @@ const GameList = (props: Props) => {
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
   const [filteredNodeList, setFilteredNodeList] = useState<NodeType[]>(nodes);
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
+
+  // Ref for the selected game detail
+  const selectedDetailRef = useRef<HTMLDivElement | null>(null);
 
   // Steamゲームリストとユーザーが追加したゲームを取得
   useEffect(() => {
@@ -120,8 +122,15 @@ const GameList = (props: Props) => {
     return { rankColor };
   }
 
+  // 自動スクロール機能の追加
+  useEffect(() => {
+    if (selectedIndex !== -1 && selectedDetailRef.current) {
+      selectedDetailRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [selectedIndex]);
+
   return (
-    <Panel title="ゲームリスト" icon={<SportsEsportsIcon />}>
+    <Panel title="ゲームリスト" icon={<SportsEsportsIcon className="mr-2" />}>
       {/* ゲームタイトルから検索して追加する機能 */}
       <Section title="ゲームを追加" icon={<SearchIcon />}>
         <input
@@ -129,7 +138,7 @@ const GameList = (props: Props) => {
           placeholder="ゲームタイトルを検索して追加"
           value={searchSteamQuery}
           onChange={(e) => setSearchSteamQuery(e.target.value)}
-          className="w-full p-2 mb-2 text-black rounded"
+          className="w-full p-2 mb-2 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
         {searchSteamQuery !== '' && (
           <div className="bg-gray-700 p-2 rounded-lg mb-4 max-h-40 overflow-y-auto">
@@ -156,12 +165,12 @@ const GameList = (props: Props) => {
           placeholder="ゲームリストを検索"
           value={searchNodesQuery}
           onChange={(e) => setSearchNodesQuery(e.target.value)}
-          className="w-full p-2 mb-2 text-black rounded"
+          className="w-full p-2 mb-2 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
       </Section>
 
       {/* ゲームリスト */}
-      <Section title="ゲームタイトル" icon={<ListIcon />}>
+      <Section title="ゲームタイトル" icon={<ListIcon />} hasDivider={false}>
         {filteredNodeList.map((node: NodeType, index: number) => {
           const isSelected = selectedIndex === index;
           const { rankColor } = selectColor(index);
@@ -189,7 +198,7 @@ const GameList = (props: Props) => {
                 )}
               </div>
               {isSelected && (
-                <div className="mt-2 p-2">
+                <div className="mt-2 p-2" ref={selectedDetailRef}>
                   <Image
                     src={node.imgURL}
                     alt={node.title}
@@ -198,6 +207,7 @@ const GameList = (props: Props) => {
                     style={{
                       borderRadius: "4px",
                     }}
+                    className="object-cover"
                   />
                   <div className="text-white mt-2">
                     <strong>タグ:</strong> {node.genres?.map((item: SteamGenreType) => item.description).join(", ") || "No tags"}
@@ -205,7 +215,7 @@ const GameList = (props: Props) => {
                   <div className="text-white mt-2">
                     <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 flex space-x-2">
                     <button
                       className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
                       onClick={() =>
@@ -217,7 +227,7 @@ const GameList = (props: Props) => {
                       詳細を確認する
                     </button>
                     <button
-                      className="ml-2 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
+                      className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
                       onClick={() => setSelectedIndex(-1)}
                     >
                       閉じる

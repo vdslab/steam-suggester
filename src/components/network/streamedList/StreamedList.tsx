@@ -272,7 +272,7 @@ const StreamedList = (props: Props) => {
   }, [searchStreamerQuery, nodes]);
 
   return (
-    <Panel title="配信者" icon={<LiveTvIcon className="mr-2" />}>
+    <div>
       {/* 制限アラートの表示 */}
       <Snackbar
         open={showLimitAlert}
@@ -447,7 +447,7 @@ const StreamedList = (props: Props) => {
           ))
         )}
       </Section>
-    </Panel>
+    </div>
   );
 };
 
