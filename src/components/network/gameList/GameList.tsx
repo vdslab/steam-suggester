@@ -1,4 +1,3 @@
-/* GameList.tsx */
 "use client";
 
 import { useEffect, useState } from "react";
