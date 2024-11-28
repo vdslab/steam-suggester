@@ -1,3 +1,4 @@
+/* Network.tsx */
 "use client"; 
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
@@ -11,6 +12,7 @@ import { LinkType, NodeType } from '@/types/NetworkType';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
 import Popup from './Popup';
+import Sidebar from './Sidebar'; // 追加
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -24,16 +26,10 @@ const Network = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // New state variables for panel visibility
-  const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
-  const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
-
-  // Function to determine center panel width
-  const getCenterPanelWidth = () => {
-    if (isLeftPanelOpen && isRightPanelOpen) return 'w-3/5';
-    if (isLeftPanelOpen || isRightPanelOpen) return 'w-4/5';
-    return 'w-full';
-  };
+  // サイドバーで制御する各機能の表示状態
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isGameListOpen, setIsGameListOpen] = useState(true);
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -70,52 +66,53 @@ const Network = () => {
     }
   }, [filter]);
 
-  // Function to handle node selection and open the right panel automatically
-  const handleSetSelectedIndex = (index: number) => {
-    setSelectedIndex(index);
-    if (index !== -1 && !isRightPanelOpen) {
-      setIsRightPanelOpen(true);
-    }
-  };
+  // トグル関数
+  const toggleFilter = () => setIsFilterOpen(prev => !prev);
+  const toggleChat = () => setIsChatOpen(prev => !prev);
+  const toggleGameList = () => setIsGameListOpen(prev => !prev);
 
   return (
-    <div>
-      {!isLoading ? 
-        <div className="flex h-[92dvh] overflow-hidden">
-          {/* Left Panel */}
-          <div className={`${isLeftPanelOpen ? 'w-1/5' : 'w-0'} bg-stone-950 overflow-y-auto overflow-x-hidden transition-all duration-300`}>
-            {isLeftPanelOpen && <SelectParameter filter={filter} setFilter={setFilter} />}
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <Sidebar
+        isFilterOpen={isFilterOpen}
+        toggleFilter={toggleFilter}
+        isChatOpen={isChatOpen}
+        toggleChat={toggleChat}
+        isGameListOpen={isGameListOpen}
+        toggleGameList={toggleGameList}
+      />
+
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Filter Panel */}
+        {isFilterOpen && (
+          <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
+            <SelectParameter filter={filter} setFilter={setFilter} />
           </div>
-          {/* Center Panel */}
-          <div className={`${getCenterPanelWidth()} bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden transition-all duration-300`}>
-            <div className="flex justify-between p-2">
-              <button 
-                onClick={() => setIsLeftPanelOpen(!isLeftPanelOpen)}
-                className="text-white bg-blue-600 hover:bg-blue-500 rounded px-4 py-2"
-              >
-                {isLeftPanelOpen ? 'フィルターを隠す' : 'フィルターを表示'}
-              </button>
-              <button 
-                onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
-                className="text-white bg-blue-600 hover:bg-blue-500 rounded px-4 py-2"
-              >
-                {isRightPanelOpen ? 'ゲームリストを隠す' : 'ゲームリストを表示'}
-              </button>
-            </div>
-            <ChatBar nodes={nodes} setNodes={setNodes} />
-            <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={handleSetSelectedIndex} />
-          </div>
-          {/* Right Panel */}
-          <div className={`${isRightPanelOpen ? 'w-1/5' : 'w-0'} bg-stone-950 overflow-y-auto overflow-x-hidden transition-all duration-300`}>
-            {isRightPanelOpen && (selectedIndex !== -1 ? 
+        )}
+
+        {/* Center Panel */}
+        <div className={`${isFilterOpen ? 'w-4/5' : 'w-full'} bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden`}>
+          {/* ChatBar */}
+          {isChatOpen && <ChatBar nodes={nodes} setNodes={setNodes} />}
+          {/* NodeLink */}
+          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} />
+        </div>
+
+        {/* Game List / Popup Panel */}
+        <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
+          {isGameListOpen && (
+            selectedIndex !== -1 ? 
               <Popup nodes={nodes} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} /> 
               : 
               <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
-            )}
-          </div>
-        </div> 
-        : <Loading />
-      }
+          )}
+        </div>
+      </div>
+
+      {/* Loading Indicator */}
+      {isLoading && <Loading />}
     </div>
   );
 }
