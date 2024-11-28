@@ -1,4 +1,5 @@
 "use client";
+
 import { DEFAULT_FILTER, DEVICE_MAPPING, GENRE_MAPPING, MODE_MAPPING } from "@/constants/DEFAULT_FILTER";
 import { changeFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
@@ -7,31 +8,28 @@ import FilterHeadline from "./FilterHeadline";
 import FilterButtonGroup from "./FilterButtonGroup";
 import FilterSlider from "./FilterSlider";
 
-
 type Props = {
   filter: Filter;
   setFilter: React.Dispatch<React.SetStateAction<Filter>>;
 };
 
-const SelectParameter = (props: Props) => {
-  const { filter, setFilter } = props;
-
+const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
   const [localFilter, setLocalFilter] = useState<Filter>(filter);
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
 
   useEffect(() => {
-    if(filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {
+    if (filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {
       setIsFreeChecked(true);
     }
-  }, [])
+  }, [filter]);
 
   const handlePriceChange = (values: number[]) => {
     const newFilter = {
       ...localFilter,
       Price: {
         startPrice: values[0],
-        endPrice: values[1]
-      }
+        endPrice: values[1],
+      },
     };
     setLocalFilter(newFilter);
   };
@@ -39,19 +37,24 @@ const SelectParameter = (props: Props) => {
   const handleFreeCheckboxChange = () => {
     setIsFreeChecked(!isFreeChecked);
     const newFilter = { ...localFilter };
-    newFilter['Price'].startPrice = !isFreeChecked ? 0 : localFilter.Price.startPrice;
-    newFilter['Price'].endPrice = !isFreeChecked ? 0 : localFilter.Price.endPrice;
+    if (!isFreeChecked) {
+      newFilter.Price.startPrice = 0;
+      newFilter.Price.endPrice = 0;
+    } else {
+      newFilter.Price.startPrice = DEFAULT_FILTER.Price.startPrice;
+      newFilter.Price.endPrice = DEFAULT_FILTER.Price.endPrice;
+    }
     setLocalFilter(newFilter);
   };
 
   const handleClickFilter = (filter: Filter) => {
     changeFilterData(filter);
-    setFilter(filter)
-    setLocalFilter(filter)
-    if(filter === DEFAULT_FILTER) {
+    setFilter(filter);
+    setLocalFilter(filter);
+    if (filter === DEFAULT_FILTER) {
       setIsFreeChecked(false);
     }
-  }
+  };
 
   // カテゴリーの全選択解除
   const handleAllCategories = (isAll: boolean) => {
@@ -62,41 +65,41 @@ const SelectParameter = (props: Props) => {
 
     setLocalFilter({
       ...localFilter,
-      Categories: newFilter
+      Categories: newFilter,
     });
   };
 
-
   return (
-    <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px'}}>
-      <FilterHeadline title="ジャンル"/>
-      <div className="p-2">
-        <button
-          onClick={() => handleAllCategories(true)}
-          className="bg-green-700 hover:bg-green-600 text-white rounded px-4 py-2 mr-2"
-        >
-          全選択
-        </button>
-        <button
-          onClick={() => handleAllCategories(false)}
-          className="border border-green-600 text-green-600 hover:bg-sky-950 rounded px-4 py-2"
-        >
-          全解除
-        </button>
-      </div>
-      <FilterButtonGroup
-        title="Categories"
-        mapping={GENRE_MAPPING}
-        localFilter={localFilter}
-        setLocalFilter={setLocalFilter}
-        rowLevel={3}
-      />
-      <div className="relative mb-4">
-        <FilterHeadline title="価格"/>
+    <div className="flex flex-col h-full p-4">
+      <div className="flex-1 overflow-y-auto">
+        <FilterHeadline title="ジャンル" />
+        <div className="p-2 flex justify-between">
+          <button
+            onClick={() => handleAllCategories(true)}
+            className="bg-green-700 hover:bg-green-600 text-white rounded px-4 py-2 mr-2 flex-1"
+          >
+            全選択
+          </button>
+          <button
+            onClick={() => handleAllCategories(false)}
+            className="border border-green-600 text-green-600 hover:bg-sky-950 rounded px-4 py-2 flex-1 ml-2"
+          >
+            全解除
+          </button>
+        </div>
+        <FilterButtonGroup
+          title="Categories"
+          mapping={GENRE_MAPPING}
+          localFilter={localFilter}
+          setLocalFilter={setLocalFilter}
+          rowLevel={3}
+        />
+        <div className="relative mb-4">
+          <FilterHeadline title="価格" />
 
-        <div className="rounded mt-1 w-full z-10 overflow-hidden">
-          <div className="p-4 text-white">
-            <div className="mb-4">
+          <div className="rounded mt-1 w-full z-10 overflow-hidden">
+            <div className="p-4 text-white">
+              <div className="mb-4">
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -106,48 +109,50 @@ const SelectParameter = (props: Props) => {
                   />
                   <span className="ml-2 text-white">無料</span>
                 </label>
+              </div>
+              <FilterSlider
+                domain={[0, 10000]}
+                values={[localFilter.Price.startPrice, localFilter.Price.endPrice]}
+                onChange={handlePriceChange}
+                valueFormatter={(value) => (value === 1 ? "1円" : `${value}円`)}
+                disabled={isFreeChecked}
+              />
             </div>
-            <FilterSlider
-              domain={[0, 10000]}
-              values={[localFilter.Price.startPrice, localFilter.Price.endPrice]}
-              onChange={handlePriceChange}
-              valueFormatter={(value) => (value === 1 ? '1円' : `${(value)}円`)}
-              disabled={isFreeChecked}
-            />
           </div>
         </div>
-      </div>
-      <FilterHeadline title="モード"/>
-      <FilterButtonGroup
-        title="Mode"
-        mapping={MODE_MAPPING}
-        localFilter={localFilter}
-        setLocalFilter={setLocalFilter}
-        rowLevel={2}
-      />
+        <FilterHeadline title="モード" />
+        <FilterButtonGroup
+          title="Mode"
+          mapping={MODE_MAPPING}
+          localFilter={localFilter}
+          setLocalFilter={setLocalFilter}
+          rowLevel={2}
+        />
 
-      <FilterHeadline title="対応デバイス"/>
-      <FilterButtonGroup
-        title="Device"
-        mapping={DEVICE_MAPPING}
-        localFilter={localFilter}
-        setLocalFilter={setLocalFilter}
-        rowLevel={2}
-      />
-        
-      <div className="absolute bottom-0 left-0 p-4 w-[calc(20%-12px)] z-10" style={{ backgroundColor: 'rgba(0, 0, 0, 0.1)', backdropFilter: 'blur(10px)'}}>
+        <FilterHeadline title="対応デバイス" />
+        <FilterButtonGroup
+          title="Device"
+          mapping={DEVICE_MAPPING}
+          localFilter={localFilter}
+          setLocalFilter={setLocalFilter}
+          rowLevel={2}
+        />
+      </div>
+
+      {/* フィルターの適用と解除ボタン */}
+      <div className="mt-4">
         <button
-          className="text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500 w-full mb-2"
+          className="w-full text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500 mb-2"
           onClick={() => handleClickFilter(localFilter)}
         >
           フィルターを適用
         </button>
-        <button
+        {/* <button
           onClick={() => handleClickFilter(DEFAULT_FILTER)}
-          className="text-white rounded px-4 py-2 w-full"
+          className="w-full text-white rounded px-4 py-2 bg-red-800 hover:bg-red-600"
         >
-          フィルターを解除
-        </button>
+          リセット
+        </button> */}
       </div>
     </div>
   );
