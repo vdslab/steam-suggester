@@ -1,3 +1,4 @@
+/* Network.tsx */
 "use client"; 
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
@@ -10,7 +11,6 @@ import Loading from '@/app/desktop/loading';
 import { LinkType, NodeType } from '@/types/NetworkType';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
-import Popup from './Popup';
 import Sidebar from './Sidebar'; // Sidebar をインポート
 
 const Network = () => {
@@ -99,14 +99,17 @@ const Network = () => {
         <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} />
       </div>
 
-      {/* ゲームリスト または Popup */}
+      {/* ゲームリスト パネル */}
       {isGameListOpen && (
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          {selectedIndex !== -1 ? 
-            <Popup nodes={nodes} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} /> 
-            : 
-            <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
-          }
+          <GameList
+            nodes={nodes}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            setCenterX={setCenterX}
+            setCenterY={setCenterY}
+            setIsLoading={setIsLoading}
+          />
         </div>
       )}
     </div>
