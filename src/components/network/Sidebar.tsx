@@ -1,49 +1,55 @@
+/* Sidebar.tsx */
 "use client";
 
-import React from "react";
+import { useState } from "react";
 
 type Props = {
+  onToggleFilter: () => void;
+  onToggleChat: () => void;
+  onToggleGameList: () => void;
   isFilterOpen: boolean;
-  toggleFilter: () => void;
   isChatOpen: boolean;
-  toggleChat: () => void;
   isGameListOpen: boolean;
-  toggleGameList: () => void;
 };
 
-const Sidebar: React.FC<Props> = ({
+const Sidebar = ({
+  onToggleFilter,
+  onToggleChat,
+  onToggleGameList,
   isFilterOpen,
-  toggleFilter,
   isChatOpen,
-  toggleChat,
   isGameListOpen,
-  toggleGameList,
-}) => {
+}: Props) => {
   return (
-    <div className="w-16 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4">
+    <div className="w-16 bg-stone-800 flex flex-col items-center py-4 space-y-4">
+      {/* Filter Button */}
       <button
-        onClick={toggleFilter}
-        className={`w-full py-2 text-center ${
-          isFilterOpen ? "bg-gray-700" : "hover:bg-gray-700"
-        } rounded`}
+        onClick={onToggleFilter}
+        className={`w-full text-white py-2 px-4 rounded ${
+          isFilterOpen ? "bg-green-600" : "hover:bg-green-500"
+        }`}
       >
-        フィルター
+        Filter
       </button>
+
+      {/* Chat Button */}
       <button
-        onClick={toggleChat}
-        className={`w-full py-2 text-center ${
-          isChatOpen ? "bg-gray-700" : "hover:bg-gray-700"
-        } rounded`}
+        onClick={onToggleChat}
+        className={`w-full text-white py-2 px-4 rounded ${
+          isChatOpen ? "bg-blue-600" : "hover:bg-blue-500"
+        }`}
       >
-        チャット
+        Chat
       </button>
+
+      {/* Game List Button */}
       <button
-        onClick={toggleGameList}
-        className={`w-full py-2 text-center ${
-          isGameListOpen ? "bg-gray-700" : "hover:bg-gray-700"
-        } rounded`}
+        onClick={onToggleGameList}
+        className={`w-full text-white py-2 px-4 rounded ${
+          isGameListOpen ? "bg-purple-600" : "hover:bg-purple-500"
+        }`}
       >
-        ゲームリスト
+        Game List
       </button>
     </div>
   );
