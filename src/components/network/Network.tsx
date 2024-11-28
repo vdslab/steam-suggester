@@ -1,3 +1,4 @@
+/* Network.tsx */
 "use client";  
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
@@ -5,13 +6,14 @@ import SelectParameter from './selectParameter/SelectParameter';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 import GameList from './gameList/GameList';
-import StreamedList from './streamedList/StreamedList';
+import StreamedList from './streamedList/StreamedList'; // 配信者パネルのインポート
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
 import { LinkType, NodeType, StreamerListType } from '@/types/NetworkType';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
-import Sidebar from './Sidebar';
+import Sidebar from './Sidebar'; // Sidebar をインポート
+import EmphasisIcon from '@mui/icons-material/Highlight'; // 強調用アイコンのインポート
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -77,7 +79,7 @@ const Network = () => {
   }
 
   return (
-    <div className="flex h-[92dvh] overflow-hidden">
+    <div className="flex h-[92vh] overflow-hidden">
       {/* Sidebar を追加 */}
       <Sidebar
         isFilterOpen={isFilterOpen}
@@ -90,7 +92,7 @@ const Network = () => {
 
       {/* フィルター パネル */}
       {isFilterOpen && (
-        <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
+        <div className="w-1/5 text-white bg-stone-950 overflow-y-auto overflow-x-hidden">
           <SelectParameter filter={filter} setFilter={setFilter} />
         </div>
       )}
@@ -98,18 +100,30 @@ const Network = () => {
       {/* 強調パネル */}
       {isEmphasisOpen && (
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          <div className="p-4 bg-gray-800 rounded-lg space-y-4">
-            <h2 className="text-white mb-4 border-b pb-2">強調</h2>
+          <div className="p-4 bg-gray-800 rounded-lg space-y-6">
+            <h2 className="text-white mb-4 border-b pb-2 text-lg font-semibold flex items-center">
+              <EmphasisIcon className="mr-2" />
+              強調
+            </h2>
+            
             {/* ChatBar セクション */}
             <div className="flex flex-col space-y-2">
-              <h3 className="text-white">チャット</h3>
+              <h3 className="text-white text-md font-medium flex items-center">
+                <span className="material-icons mr-1">chat</span>
+                チャット
+              </h3>
               <ChatBar nodes={nodes} setNodes={setNodes} />
             </div>
+            
             {/* 線で区切る */}
             <hr className="border-gray-600" />
+            
             {/* StreamedList セクション */}
             <div className="flex flex-col space-y-2">
-              <h3 className="text-white">配信者</h3>
+              <h3 className="text-white text-md font-medium flex items-center">
+                <span className="material-icons mr-1">live_tv</span>
+                配信者
+              </h3>
               <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
             </div>
           </div>

@@ -1,3 +1,4 @@
+/* Sidebar.tsx */
 "use client";
 
 import React from "react";
@@ -22,36 +23,36 @@ const Sidebar: React.FC<Props> = ({
   isEmphasisOpen,
   toggleEmphasis,
 }) => {
+  // 共通のボタンクラス
+  const buttonClasses = (isActive: boolean) =>
+    `w-full py-2 text-center flex flex-col items-center ${
+      isActive ? "bg-gray-700" : "hover:bg-gray-700"
+    } rounded transition-colors duration-200`;
+
   return (
     <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4">
-      {/* フィルター ボタン */}
+      {/* フィルターボタン */}
       <button
         onClick={toggleFilter}
-        className={`w-full py-2 text-center flex flex-col items-center ${
-          isFilterOpen ? "bg-gray-700" : "hover:bg-gray-700"
-        } rounded`}
+        className={buttonClasses(isFilterOpen)}
       >
         <FilterListIcon />
         <span className="text-xs mt-1">フィルター</span>
       </button>
 
-      {/* ゲームリスト ボタン */}
+      {/* ゲームリストボタン */}
       <button
         onClick={toggleGameList}
-        className={`w-full py-2 text-center flex flex-col items-center ${
-          isGameListOpen ? "bg-gray-700" : "hover:bg-gray-700"
-        } rounded`}
+        className={buttonClasses(isGameListOpen)}
       >
         <SportsEsportsIcon />
         <span className="text-xs mt-1">ゲームリスト</span>
       </button>
 
-      {/* 強調 ボタン */}
+      {/* 強調ボタン */}
       <button
         onClick={toggleEmphasis}
-        className={`w-full py-2 text-center flex flex-col items-center ${
-          isEmphasisOpen ? "bg-gray-700" : "hover:bg-gray-700"
-        } rounded`}
+        className={buttonClasses(isEmphasisOpen)}
       >
         <HighlightIcon />
         <span className="text-xs mt-1">強調</span>
