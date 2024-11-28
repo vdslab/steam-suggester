@@ -1,4 +1,4 @@
-"use client"; 
+"use client";  
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
 import SelectParameter from './selectParameter/SelectParameter';
@@ -26,10 +26,12 @@ const Network = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]); 
+
   // 各機能の開閉状態を管理
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(true);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(true);
   const [isGameListOpen, setIsGameListOpen] = useState<boolean>(true);
+  const [isStreamerListOpen, setIsStreamerListOpen] = useState<boolean>(true); // 配信者パネルの状態管理
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -37,7 +39,7 @@ const Network = () => {
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
     buffNodes.sort((node1: NodeType, node2: NodeType) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0));
-    if(centerX === 0 && centerY === 0) {
+    if(centerX === 0 && centerY === 0 && buffNodes.length > 0) {
       setCenterX(buffNodes[0]?.x ?? 0);
       setCenterY(buffNodes[0]?.y ?? 0);
     }
@@ -70,6 +72,7 @@ const Network = () => {
   const toggleFilter = () => setIsFilterOpen(prev => !prev);
   const toggleChat = () => setIsChatOpen(prev => !prev);
   const toggleGameList = () => setIsGameListOpen(prev => !prev);
+  const toggleStreamerList = () => setIsStreamerListOpen(prev => !prev); // 配信者パネルのトグル関数
 
   if(isLoading) {
     return <Loading />;
@@ -85,6 +88,8 @@ const Network = () => {
         toggleChat={toggleChat}
         isGameListOpen={isGameListOpen}
         toggleGameList={toggleGameList}
+        isStreamerListOpen={isStreamerListOpen}
+        toggleStreamerList={toggleStreamerList} // 配信者パネルのトグル関数を渡す
       />
 
       {/* フィルター パネル */}
@@ -94,10 +99,28 @@ const Network = () => {
         </div>
       )}
 
+      {/* 配信者 パネル */}
+      {isStreamerListOpen && (
+        <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
+          <StreamedList
+            nodes={nodes}
+            streamerIds={streamerIds}
+            setStreamerIds={setStreamerIds}
+          />
+        </div>
+      )}
+
       {/* メイン コンテンツ エリア */}
       <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
         {isChatOpen && <ChatBar nodes={nodes} setNodes={setNodes} />}
-        <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} streamerIds={streamerIds} />
+        <NodeLink 
+          nodes={nodes} 
+          links={links} 
+          centerX={centerX} 
+          centerY={centerY} 
+          setSelectedIndex={setSelectedIndex} 
+          streamerIds={streamerIds}
+        />
       </div>
 
       {/* ゲームリスト パネル */}
@@ -111,7 +134,6 @@ const Network = () => {
             setCenterY={setCenterY}
             setIsLoading={setIsLoading}
           />
-          <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
         </div>
       )}
     </div>
