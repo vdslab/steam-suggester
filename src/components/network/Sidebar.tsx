@@ -47,6 +47,7 @@ const Sidebar: React.FC<Props> = ({
       >
         <SportsEsportsIcon />
         <span className="text-xs mt-1">ゲームリスト</span>
+        <span className="text-[10px] text-gray-400">（ゲーム一覧 & 検索）</span>
       </button>
 
       {/* 強調ボタン */}

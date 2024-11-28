@@ -24,8 +24,8 @@ const ChatBar = (props: Props) => {
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded shadow-lg">
-      <p className="text-white mb-2">ゲームに関する質問を入力してください。ネットワーク内の関連ノードが強調表示されます。</p>
+    <div className="bg-gray-800 px-2 pb-2 rounded shadow-lg">
+      <p className="text-gray-400 mb-2">ゲームに関する質問を入力してください。ネットワーク内の関連ノードが強調表示されます。</p>
       <form onSubmit={handleSubmit} className="flex">
         <input
           type="text"
