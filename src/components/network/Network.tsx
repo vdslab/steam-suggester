@@ -1,3 +1,4 @@
+/* Network.tsx */
 "use client";  
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
@@ -5,10 +6,10 @@ import SelectParameter from './selectParameter/SelectParameter';
 import { DEFAULT_FILTER } from '@/constants/DEFAULT_FILTER';
 import { Filter } from '@/types/api/FilterType';
 import GameList from './gameList/GameList';
+import StreamedList from './streamedList/StreamedList'; // 配信者パネルのインポート
 import createNetwork from '@/hooks/createNetwork';
 import Loading from '@/app/desktop/loading';
 import { LinkType, NodeType, StreamerListType } from '@/types/NetworkType';
-import StreamedList from './streamedList/StreamedList';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
 import Sidebar from './Sidebar'; // Sidebar をインポート
@@ -29,9 +30,8 @@ const Network = () => {
 
   // 各機能の開閉状態を管理
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(true);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(true);
   const [isGameListOpen, setIsGameListOpen] = useState<boolean>(true);
-  const [isStreamerListOpen, setIsStreamerListOpen] = useState<boolean>(true); // 配信者パネルの状態管理
+  const [isEmphasisOpen, setIsEmphasisOpen] = useState<boolean>(false); // 強調パネルの状態管理
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -70,9 +70,8 @@ const Network = () => {
 
   // Sidebar のトグル関数
   const toggleFilter = () => setIsFilterOpen(prev => !prev);
-  const toggleChat = () => setIsChatOpen(prev => !prev);
   const toggleGameList = () => setIsGameListOpen(prev => !prev);
-  const toggleStreamerList = () => setIsStreamerListOpen(prev => !prev); // 配信者パネルのトグル関数
+  const toggleEmphasis = () => setIsEmphasisOpen(prev => !prev); // 強調パネルのトグル関数
 
   if(isLoading) {
     return <Loading />;
@@ -84,12 +83,10 @@ const Network = () => {
       <Sidebar
         isFilterOpen={isFilterOpen}
         toggleFilter={toggleFilter}
-        isChatOpen={isChatOpen}
-        toggleChat={toggleChat}
         isGameListOpen={isGameListOpen}
         toggleGameList={toggleGameList}
-        isStreamerListOpen={isStreamerListOpen}
-        toggleStreamerList={toggleStreamerList} // 配信者パネルのトグル関数を渡す
+        isEmphasisOpen={isEmphasisOpen}
+        toggleEmphasis={toggleEmphasis}
       />
 
       {/* フィルター パネル */}
@@ -99,28 +96,20 @@ const Network = () => {
         </div>
       )}
 
-      {/* 配信者 パネル */}
-      {isStreamerListOpen && (
+      {/* 強調パネル */}
+      {isEmphasisOpen && (
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          <StreamedList
-            nodes={nodes}
-            streamerIds={streamerIds}
-            setStreamerIds={setStreamerIds}
-          />
+          <div className="p-4 bg-gray-800 rounded-lg space-y-4">
+            <h2 className="text-white mb-2">強調</h2>
+            <ChatBar nodes={nodes} setNodes={setNodes} />
+            <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
+          </div>
         </div>
       )}
 
       {/* メイン コンテンツ エリア */}
       <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
-        {isChatOpen && <ChatBar nodes={nodes} setNodes={setNodes} />}
-        <NodeLink 
-          nodes={nodes} 
-          links={links} 
-          centerX={centerX} 
-          centerY={centerY} 
-          setSelectedIndex={setSelectedIndex} 
-          streamerIds={streamerIds}
-        />
+        <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} streamerIds={streamerIds} />
       </div>
 
       {/* ゲームリスト パネル */}
