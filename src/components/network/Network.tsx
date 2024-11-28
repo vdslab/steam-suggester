@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
 import SelectParameter from './selectParameter/SelectParameter';
@@ -11,7 +11,7 @@ import { LinkType, NodeType, StreamerListType } from '@/types/NetworkType';
 import StreamedList from './streamedList/StreamedList';
 import { getFilterData, getGameIdData } from '@/hooks/indexedDB';
 import ChatBar from './chatBar/ChatBar';
-import Popup from './Popup';
+import Sidebar from './Sidebar'; // Sidebar をインポート
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -26,6 +26,10 @@ const Network = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]); 
+  // 各機能の開閉状態を管理
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(true);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(true);
+  const [isGameListOpen, setIsGameListOpen] = useState<boolean>(true);
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -62,28 +66,55 @@ const Network = () => {
     }
   }, [filter]);
 
+  // Sidebar のトグル関数
+  const toggleFilter = () => setIsFilterOpen(prev => !prev);
+  const toggleChat = () => setIsChatOpen(prev => !prev);
+  const toggleGameList = () => setIsGameListOpen(prev => !prev);
+
+  if(isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div>
-      {!isLoading ? <div className="flex h-[92dvh] overflow-hidden">
+    <div className="flex h-[92dvh] overflow-hidden">
+      {/* Sidebar を追加 */}
+      <Sidebar
+        isFilterOpen={isFilterOpen}
+        toggleFilter={toggleFilter}
+        isChatOpen={isChatOpen}
+        toggleChat={toggleChat}
+        isGameListOpen={isGameListOpen}
+        toggleGameList={toggleGameList}
+      />
+
+      {/* フィルター パネル */}
+      {isFilterOpen && (
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
           <SelectParameter filter={filter} setFilter={setFilter} />
         </div>
-        <div className="w-3/5 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
-          <ChatBar nodes={nodes} setNodes={setNodes} />
-          <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} />
-        </div>
+      )}
+
+      {/* メイン コンテンツ エリア */}
+      <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
+        {isChatOpen && <ChatBar nodes={nodes} setNodes={setNodes} />}
+        <NodeLink nodes={nodes} links={links} centerX={centerX} centerY={centerY} setSelectedIndex={setSelectedIndex} streamerIds={streamerIds} />
+      </div>
+
+      {/* ゲームリスト パネル */}
+      {isGameListOpen && (
         <div className="w-1/5 bg-stone-950 overflow-y-auto overflow-x-hidden">
-          {selectedIndex !== -1 ? 
-            <Popup nodes={nodes} selectedIndex={selectedIndex} setSelectedIndex={setSelectedIndex} /> 
-            : 
-            <GameList nodes={nodes} setCenterX={setCenterX} setCenterY={setCenterY} setIsLoading={setIsLoading} />
-          }
-            <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
+          <GameList
+            nodes={nodes}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            setCenterX={setCenterX}
+            setCenterY={setCenterY}
+            setIsLoading={setIsLoading}
+          />
+          <StreamedList nodes={nodes} streamerIds={streamerIds} setStreamerIds={setStreamerIds} />
         </div>
-      </div> : <Loading />
-      }
+      )}
     </div>
-    
   );
 }
 
