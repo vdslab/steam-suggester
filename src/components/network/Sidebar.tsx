@@ -1,55 +1,49 @@
-/* Sidebar.tsx */
 "use client";
 
-import { useState } from "react";
+import React from "react";
 
 type Props = {
-  onToggleFilter: () => void;
-  onToggleChat: () => void;
-  onToggleGameList: () => void;
   isFilterOpen: boolean;
+  toggleFilter: () => void;
   isChatOpen: boolean;
+  toggleChat: () => void;
   isGameListOpen: boolean;
+  toggleGameList: () => void;
 };
 
-const Sidebar = ({
-  onToggleFilter,
-  onToggleChat,
-  onToggleGameList,
+const Sidebar: React.FC<Props> = ({
   isFilterOpen,
+  toggleFilter,
   isChatOpen,
+  toggleChat,
   isGameListOpen,
-}: Props) => {
+  toggleGameList,
+}) => {
   return (
-    <div className="w-16 bg-stone-800 flex flex-col items-center py-4 space-y-4">
-      {/* Filter Button */}
+    <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4">
       <button
-        onClick={onToggleFilter}
-        className={`w-full text-white py-2 px-4 rounded ${
-          isFilterOpen ? "bg-green-600" : "hover:bg-green-500"
-        }`}
+        onClick={toggleFilter}
+        className={`w-full py-2 text-center ${
+          isFilterOpen ? "bg-gray-700" : "hover:bg-gray-700"
+        } rounded`}
       >
-        Filter
+        フィルター
       </button>
-
-      {/* Chat Button */}
       <button
-        onClick={onToggleChat}
-        className={`w-full text-white py-2 px-4 rounded ${
-          isChatOpen ? "bg-blue-600" : "hover:bg-blue-500"
-        }`}
+        onClick={toggleChat}
+        className={`w-full py-2 text-center ${
+          isChatOpen ? "bg-gray-700" : "hover:bg-gray-700"
+        } rounded`}
       >
-        Chat
+        チャット
       </button>
-
-      {/* Game List Button */}
       <button
-        onClick={onToggleGameList}
-        className={`w-full text-white py-2 px-4 rounded ${
-          isGameListOpen ? "bg-purple-600" : "hover:bg-purple-500"
-        }`}
+        onClick={toggleGameList}
+        className={`w-full py-2 text-center ${
+          isGameListOpen ? "bg-gray-700" : "hover:bg-gray-700"
+        } rounded`}
       >
-        Game List
+        ゲームリスト
       </button>
     </div>
   );
