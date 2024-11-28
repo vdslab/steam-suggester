@@ -1,4 +1,3 @@
-/* Network.tsx */
 "use client"; 
 import { useEffect, useState } from 'react';
 import NodeLink from "./NodeLink";
