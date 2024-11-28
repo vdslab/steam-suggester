@@ -16,6 +16,7 @@ type Props = {
 const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
   const [localFilter, setLocalFilter] = useState<Filter>(filter);
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
+  const [areAllCategoriesSelected, setAreAllCategoriesSelected] = useState<boolean>(false);
 
   useEffect(() => {
     if (filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {
@@ -69,11 +70,33 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
     });
   };
 
+  const handleMasterCheckboxChange = () => {
+    const newStatus = !areAllCategoriesSelected;
+    const newCategories: { [key: string]: boolean } = {};
+    for (const key in localFilter.Categories) {
+      newCategories[key] = newStatus;
+    }
+    setLocalFilter({
+      ...localFilter,
+      Categories: newCategories,
+    });
+    setAreAllCategoriesSelected(newStatus);
+  };
+
   return (
     <div className="flex flex-col h-full p-4">
       <div className="flex-1 overflow-y-auto">
         <FilterHeadline title="ジャンル" />
-        <div className="p-2 flex justify-between">
+        <label className="flex items-center m-2">
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-gray-600"
+            checked={areAllCategoriesSelected}
+            onChange={handleMasterCheckboxChange}
+          />
+          <span className="ml-2 text-white">全選択</span>
+        </label>
+        {/* <div className="p-2 flex justify-between">
           <button
             onClick={() => handleAllCategories(true)}
             className="bg-green-700 hover:bg-green-600 text-white rounded px-4 py-2 mr-2 flex-1"
@@ -86,7 +109,7 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
           >
             全解除
           </button>
-        </div>
+        </div> */}
         <FilterButtonGroup
           title="Categories"
           mapping={GENRE_MAPPING}
