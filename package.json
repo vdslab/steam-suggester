@@ -28,6 +28,7 @@
     "react-compound-slider": "^3.4.0",
     "react-dom": "^18.3.1",
     "react-range": "^1.8.14",
+    "string-similarity-js": "^2.1.4",
     "swr": "^2.2.5"
   },
   "devDependencies": {
