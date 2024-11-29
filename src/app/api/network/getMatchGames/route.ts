@@ -1,5 +1,4 @@
 import { PG_POOL } from "@/constants/PG_POOL";
-import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -9,17 +8,39 @@ export async function GET() {
     const dateString = today.toISOString().split('T')[0];
 
     const query = `
-      SELECT gv.get_date, gv.game_title, gv.twitch_id, gv.steam_id, gv.total_views,
-             sd.game_title as name, sd.webpage_url as url, sd.img_url as image, sd.price,
-             sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
-             array_agg(json_build_object('id', g.genre_id, 'description', g.genre_name)) as genres
-      FROM game_views gv
-      JOIN steam_data sd ON gv.steam_id = sd.steam_game_id
-      LEFT JOIN steam_data_genres sdg ON sd.steam_game_id = sdg.steam_game_id
-      LEFT JOIN genres g ON sdg.genre_id = g.genre_id
-      WHERE gv.get_date::date = $1
-      GROUP BY gv.get_date, gv.game_title, gv.twitch_id, gv.steam_id,
-               sd.game_title, sd.webpage_url, sd.img_url, sd.price, sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac
+      SELECT 
+          gv.get_date, 
+          gv.game_title, 
+          gv.twitch_id, 
+          gv.steam_id, 
+          gv.total_views,
+          sd.game_title AS name, 
+          sd.webpage_url AS url, 
+          sd.img_url AS image, 
+          sd.price,
+          sd.is_single_player, 
+          sd.is_multi_player, 
+          sd.is_device_windows, 
+          sd.is_device_mac,
+          sd.genres,
+          sd.tags,
+          sd.short_details,
+          sd.release_date,
+          sd.developer_name,
+          sd.sale_price,
+          sd.play_time,
+          sd.review_text,
+          sd.difficulty,
+          sd.graphics,
+          sd.story,
+          sd.music
+      FROM 
+          game_views gv
+      JOIN 
+          steam_game_data sd 
+          ON gv.steam_id = sd.steam_game_id
+      WHERE 
+          gv.get_date::date = $1;
     `;
 
     const { rows } = await PG_POOL.query(query, [dateString]);
@@ -33,32 +54,14 @@ export async function GET() {
         ))
       ));
 
-    const tagQuery = `
-      SELECT steam_game_id, tag_name
-      FROM steam_data_tags
-      WHERE steam_game_id = ANY($1::text[]);
-    `;
-
-    const steamIds = data.map(item => item.steam_id);
-    const tagsResult = await PG_POOL.query(tagQuery, [steamIds]);
-
-    const tagsMap: { [key: string]: string[] } = {};
-    tagsResult.rows.forEach(row => {
-      const { steam_game_id, tag_name } = row;
-      if (!tagsMap[steam_game_id]) {
-        tagsMap[steam_game_id] = [];
-      }
-      tagsMap[steam_game_id].push(tag_name);
-    });
-
-    const result: SteamDetailsDataType[] = data.map(item => ({
+    const result = data.map(item => ({
       twitchGameId: item.twitch_id,
       steamGameId: item.steam_id,
       title: item.name,
       imgURL: item.image,
       url: item.url,
       totalViews: item.total_views,
-      genres: item.genres,
+      genres: item.genres || [],
       price: item.price,
       isSinglePlayer: item.is_single_player,
       isMultiPlayer: item.is_multi_player,
@@ -66,13 +69,23 @@ export async function GET() {
         windows: item.is_device_windows,
         mac: item.is_device_mac,
       },
-      tags: tagsMap[item.steam_id] || []
+      tags: item.tags || [],
+      shortDetails: item.short_details,
+      releaseDate: item.release_date,
+      developerName: item.developer_name,
+      salePrice: item.sale_price,
+      playTime: item.play_time,
+      review: item.review_text,
+      difficulty: item.difficulty,
+      graphics: item.graphics,
+      story: item.story,
+      music: item.music
     }));
 
     return NextResponse.json(result);
 
   } catch (error) {
     console.error("Error fetching top games:", error);
-    return NextResponse.error();
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
