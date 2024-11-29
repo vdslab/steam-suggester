@@ -179,7 +179,7 @@ const GameList = (props: Props) => {
             return (
               <div
                 key={node.index}
-                className={`cursor-pointer p-2 mb-2 ${isSelected ? 'bg-gray-700' : 'bg-gray-800'} rounded-lg`}
+                className={`cursor-pointer p-2 mb-2 ${isSelected ? 'bg-gray-800' : 'bg-gray-900'} rounded-lg`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center" onClick={() => handleGameClick(index)}>
@@ -224,7 +224,7 @@ const GameList = (props: Props) => {
                           )
                         }
                       >
-                        詳細を確認する
+                        詳細を確認
                       </button>
                       <button
                         className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"

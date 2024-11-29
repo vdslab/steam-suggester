@@ -105,7 +105,7 @@ const NodeLink = (props: any) => {
                       circleScale={node.circleScale ?? 1}
                       suggestValue={node.suggestValue}
                     />
-                  {/* 色付きセグメントを描画 */}
+                  {/* 色付きセグメントを描画 配信者による強調 */}
                   {streamerColors.length > 0 &&
                       streamerColors.map((color: string, index: number) => {
                         const angleStart = -90 + angleStep * index; // -90は真上

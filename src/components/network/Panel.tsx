@@ -11,7 +11,7 @@ type PanelProps = {
 
 const Panel: React.FC<PanelProps> = ({ title, icon, children }) => {
   return (
-    <div className="bg-gray-800 rounded-lg p-4 shadow-md flex flex-col space-y-2">
+    <div className="bg-gray-800 rounded-r-lg p-4 shadow-md flex flex-col space-y-2">
       <div className="flex items-center space-x-2">
         {icon}
         <h2 className="text-white text-lg font-semibold">{title}</h2>
