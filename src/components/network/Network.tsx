@@ -106,8 +106,8 @@ const Network = () => {
 
       {/* 強調パネル */}
       {isEmphasisOpen && (
-        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <Panel title="強調" icon={<EmphasisIcon className="mr-2" />}>
+        <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
+          <Panel title="強調" icon={<EmphasisIcon className="mr-2 text-white" />}>
             {/* ChatBar セクション */}
             <Section title="チャット" icon={<ChatIcon />}>
               <ChatBar nodes={nodes} setNodes={setNodes} />

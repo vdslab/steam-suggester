@@ -130,7 +130,7 @@ const GameList = (props: Props) => {
   }, [selectedIndex]);
 
   return (
-    <Panel title="ゲームリスト" icon={<SportsEsportsIcon className="mr-2" />}>
+    <Panel title="ゲームリスト" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
       
       {/* ゲームを追加セクション */}
       <Section title="ゲームを追加" icon={<PlaylistAddIcon />}>

@@ -12,7 +12,7 @@ type Props = {
 const Section: React.FC<Props> = ({ title, icon, children, hasDivider = true }) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-white text-md font-medium flex items-center">
+      <h3 className="text-gray-200 text-md font-medium flex items-center">
         {icon}
         <span className="ml-2">{title}</span>
       </h3>

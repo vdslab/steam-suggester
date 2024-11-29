@@ -86,7 +86,7 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
   };
 
   return (
-    <Panel title="フィルター" icon={<FilterListIcon className="mr-2" />}>
+    <Panel title="フィルター" icon={<FilterListIcon className="mr-2 text-white" />}>
           <p className="text-gray-400 mb-2">フィルターを適用することでゲームの絞り込みができます。</p>
         {/* ジャンルフィルター */}
       <Section title="ジャンル" icon={<CategoryIcon />}>
