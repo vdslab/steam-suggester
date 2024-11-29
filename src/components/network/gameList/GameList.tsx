@@ -6,6 +6,8 @@ import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
 import { useEffect, useState } from "react";
+import OwnedGames from '../ownedGames/OwnedGames';
+import { SessionProvider } from 'next-auth/react';
 
 type Props = {
   nodes: NodeType[];
@@ -105,6 +107,7 @@ const GameList = (props: Props) => {
 
   return (
     <div style={{ maxHeight: '92vh', overflowY: 'auto', paddingBottom: '120px' }}>
+      <SessionProvider><OwnedGames /></SessionProvider>
       <input
         type="text"
         placeholder="Search for a game title"
