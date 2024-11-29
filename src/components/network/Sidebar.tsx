@@ -13,6 +13,8 @@ type Props = {
   toggleGameList: () => void;
   isEmphasisOpen: boolean;
   toggleEmphasis: () => void;
+  isSteamListOpen: boolean;
+  toggleSteamList: () => void;
 };
 
 const Sidebar: React.FC<Props> = ({
@@ -22,6 +24,8 @@ const Sidebar: React.FC<Props> = ({
   toggleGameList,
   isEmphasisOpen,
   toggleEmphasis,
+  isSteamListOpen,
+  toggleSteamList
 }) => {
   // 共通のボタンクラス
   const buttonClasses = (isActive: boolean) =>
@@ -58,6 +62,16 @@ const Sidebar: React.FC<Props> = ({
         <HighlightIcon />
         <span className="text-xs mt-1">強調</span>
         <span className="text-[10px] text-gray-400">（チャット & 配信者）</span>
+      </button>
+
+      {/* Steamリストボタン */}
+      <button
+        onClick={toggleSteamList}
+        className={buttonClasses(isSteamListOpen)}
+      >
+        <SportsEsportsIcon />
+        <span className="text-xs mt-1">Steam連携</span>
+        <span className="text-[10px] text-gray-400">（ログイン & フレンド）</span>
       </button>
     </div>
   );

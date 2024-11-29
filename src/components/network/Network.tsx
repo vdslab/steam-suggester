@@ -18,6 +18,7 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
 import Section from "./Section";
 import ChatBar from "./chatBar/ChatBar"; // ChatBar コンポーネントのインポート
+import SteamList from "./steamList/SteamList";
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -36,7 +37,8 @@ const Network = () => {
   // 各機能の開閉状態を管理
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(true);
   const [isGameListOpen, setIsGameListOpen] = useState<boolean>(true);
-  const [isEmphasisOpen, setIsEmphasisOpen] = useState<boolean>(false); // 強調パネルの状態管理
+  const [isEmphasisOpen, setIsEmphasisOpen] = useState<boolean>(false);
+  const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -79,7 +81,8 @@ const Network = () => {
   // Sidebar のトグル関数
   const toggleFilter = () => setIsFilterOpen((prev) => !prev);
   const toggleGameList = () => setIsGameListOpen((prev) => !prev);
-  const toggleEmphasis = () => setIsEmphasisOpen((prev) => !prev); // 強調パネルのトグル関数
+  const toggleEmphasis = () => setIsEmphasisOpen((prev) => !prev);
+  const toggleSteamList = () => setIsSteamListOpen((prev) => !prev);
 
   if (isLoading) {
     return <Loading />;
@@ -95,6 +98,8 @@ const Network = () => {
         toggleGameList={toggleGameList}
         isEmphasisOpen={isEmphasisOpen}
         toggleEmphasis={toggleEmphasis}
+        isSteamListOpen={isSteamListOpen}
+        toggleSteamList={toggleSteamList}
       />
 
       {/* フィルターパネル */}
@@ -122,6 +127,13 @@ const Network = () => {
               />
             </Section>
           </Panel>
+        </div>
+      )}
+
+      {/* Steam連携パネル */}
+      {isSteamListOpen && (
+        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
+          <SteamList />
         </div>
       )}
 
