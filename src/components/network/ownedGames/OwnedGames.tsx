@@ -63,7 +63,7 @@ const OwnedGames = () => {
         <div>
           {/* 自分の所有ゲーム */}
           <div className="p-2">
-            <h2 className="text-white">My Owned Games</h2>
+            <h2 className="text-white">自分の所持してるゲーム</h2>
           </div>
           <div className="p-2">
             {myOwnGames.map((game: string) => (
@@ -75,7 +75,7 @@ const OwnedGames = () => {
 
           {/* フレンドの所有ゲーム */}
           <div className="p-2">
-            <h2 className="text-white">Friends' Owned Games</h2>
+            <h2 className="text-white">フレンドの所持しているゲーム</h2>
           </div>
           <div className="p-2">
             {friendsOwnGames.map((game, index) => (

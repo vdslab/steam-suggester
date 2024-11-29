@@ -5,6 +5,7 @@ export async function GET(req: NextRequest) {
 
   const searchParams = req.nextUrl.searchParams;
   const steamId = searchParams.get('steamId');
+  // TODO: 環境変数から取得するように変更
   // const apiKey = process.env.STEAM_API_KEY;
   const apiKey = '970E6032D117FC823447B2036CD34E54';
 
