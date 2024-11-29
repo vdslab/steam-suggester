@@ -210,7 +210,7 @@ const GameList = (props: Props) => {
                       className="object-cover"
                     />
                     <div className="text-white mt-2">
-                      <strong>タグ:</strong> {node.genres?.map((item: SteamGenreType) => item.description).join(", ") || "No tags"}
+                    <strong>タグ:</strong> {node.tags?.map((item: string) => item).join(", ") || "No tags"}
                     </div>
                     <div className="text-white mt-2">
                       <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
