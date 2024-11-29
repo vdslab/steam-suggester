@@ -78,9 +78,38 @@ const Network = () => {
   }, [filter]);
 
   // Sidebar のトグル関数
-  const toggleFilter = () => setIsFilterOpen((prev) => !prev);
-  const toggleEmphasis = () => setIsEmphasisOpen((prev) => !prev);
-  const toggleSteamList = () => setIsSteamListOpen((prev) => !prev);
+  const toggleFilter = () => {
+    setIsFilterOpen((prev) => {
+      const newState = !prev;
+      if (newState) {
+        setIsEmphasisOpen(false);
+        setIsSteamListOpen(false);
+      }
+      return newState;
+    });
+  };
+
+  const toggleEmphasis = () => {
+    setIsEmphasisOpen((prev) => {
+      const newState = !prev;
+      if (newState) {
+        setIsFilterOpen(false);
+        setIsSteamListOpen(false);
+      }
+      return newState;
+    });
+  };
+
+  const toggleSteamList = () => {
+    setIsSteamListOpen((prev) => {
+      const newState = !prev;
+      if (newState) {
+        setIsFilterOpen(false);
+        setIsEmphasisOpen(false);
+      }
+      return newState;
+    });
+  };
 
   if (isLoading) {
     return <Loading />;
