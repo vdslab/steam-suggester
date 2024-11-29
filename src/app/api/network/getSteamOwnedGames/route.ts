@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const steamId = searchParams.get('steamId');
   // TODO: 環境変数から取得するように変更
   // const apiKey = process.env.STEAM_API_KEY;
-  const apiKey = '970E6032D117FC823447B2036CD34E54';
+  const apiKey = '835F4070BDF4C82BEAF49B3EBB06B093';
 
 
   if (!apiKey) {
@@ -31,7 +31,10 @@ export async function GET(req: NextRequest) {
         'SELECT game_title FROM steam_game_data WHERE steam_game_id = $1',
         [appId]
       );
-      result.push(queryResult.rows[0].game_title);
+
+      if (queryResult.rows.length > 0 && queryResult.rows[0].game_title) {
+        result.push(queryResult.rows[0].game_title);
+      }
     }
     await client.release(true);
 

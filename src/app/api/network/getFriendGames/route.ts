@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   const steamId = searchParams.get('steamId');
   // TODO: 環境変数から取得するように変更
   // const apiKey = process.env.STEAM_API_KEY;
-  const apiKey = '970E6032D117FC823447B2036CD34E54';
+  const apiKey = '835F4070BDF4C82BEAF49B3EBB06B093';
 
   if (!steamId) {
     return new Response(JSON.stringify({ error: 'Steam ID is required' }), { status: 400 });

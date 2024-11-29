@@ -8,7 +8,7 @@ export function getAuthOptions(req?: NextRequest): AuthOptions {
     providers: req
       ? [
           SteamProvider(req, {
-            clientSecret: "970E6032D117FC823447B2036CD34E54",
+            clientSecret: "835F4070BDF4C82BEAF49B3EBB06B093",
             callbackUrl: 'http://localhost:3000/api/auth/callback'
           })
         ]
