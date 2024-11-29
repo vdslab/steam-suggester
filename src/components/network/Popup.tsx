@@ -3,13 +3,13 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import { SteamGenreType } from "@/types/api/getSteamDetailType";
 import { NodeType } from "@/types/NetworkType";
-
+ 
 interface PopupProps {
   nodes: NodeType[];
   selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }
-
+ 
 const Popup = (props: PopupProps) => {
   const { nodes, selectedIndex, setSelectedIndex } = props;
   const router = useRouter();

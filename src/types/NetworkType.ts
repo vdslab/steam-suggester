@@ -15,6 +15,17 @@ export type SteamListType = {
   title: string;
 }
 
+export type StreamerListType = {
+  name: string;
+  id: string;
+  platform: 'twitch' | 'youtube';
+  color: string;
+  thumbnail: string;
+  viewer_count: number | 'default';
+  streamId: string[];
+  videoId: string[];
+};
+
 export type NodeType = {
   steamGameId: string;
   twitchGameId: string;
