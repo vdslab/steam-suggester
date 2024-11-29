@@ -36,7 +36,6 @@ const Network = () => {
 
   // 各機能の開閉状態を管理
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(true);
-  const [isGameListOpen, setIsGameListOpen] = useState<boolean>(true);
   const [isEmphasisOpen, setIsEmphasisOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
 
@@ -80,7 +79,6 @@ const Network = () => {
 
   // Sidebar のトグル関数
   const toggleFilter = () => setIsFilterOpen((prev) => !prev);
-  const toggleGameList = () => setIsGameListOpen((prev) => !prev);
   const toggleEmphasis = () => setIsEmphasisOpen((prev) => !prev);
   const toggleSteamList = () => setIsSteamListOpen((prev) => !prev);
 
@@ -94,8 +92,6 @@ const Network = () => {
       <Sidebar
         isFilterOpen={isFilterOpen}
         toggleFilter={toggleFilter}
-        isGameListOpen={isGameListOpen}
-        toggleGameList={toggleGameList}
         isEmphasisOpen={isEmphasisOpen}
         toggleEmphasis={toggleEmphasis}
         isSteamListOpen={isSteamListOpen}
@@ -150,18 +146,16 @@ const Network = () => {
       </div>
 
       {/* ゲームリストパネル */}
-      {isGameListOpen && (
-        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <GameList
-            nodes={nodes}
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-            setCenterX={setCenterX}
-            setCenterY={setCenterY}
-            setIsLoading={setIsLoading}
-          />
-        </div>
-      )}
+      <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
+        <GameList
+          nodes={nodes}
+          selectedIndex={selectedIndex}
+          setSelectedIndex={setSelectedIndex}
+          setCenterX={setCenterX}
+          setCenterY={setCenterY}
+          setIsLoading={setIsLoading}
+        />
+      </div>
     </div>
   );
 };

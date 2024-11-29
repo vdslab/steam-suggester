@@ -9,8 +9,6 @@ import HighlightIcon from '@mui/icons-material/Highlight';
 type Props = {
   isFilterOpen: boolean;
   toggleFilter: () => void;
-  isGameListOpen: boolean;
-  toggleGameList: () => void;
   isEmphasisOpen: boolean;
   toggleEmphasis: () => void;
   isSteamListOpen: boolean;
@@ -20,8 +18,6 @@ type Props = {
 const Sidebar: React.FC<Props> = ({
   isFilterOpen,
   toggleFilter,
-  isGameListOpen,
-  toggleGameList,
   isEmphasisOpen,
   toggleEmphasis,
   isSteamListOpen,
@@ -42,16 +38,6 @@ const Sidebar: React.FC<Props> = ({
       >
         <FilterListIcon />
         <span className="text-xs mt-1">フィルター</span>
-      </button>
-
-      {/* ゲームリストボタン */}
-      <button
-        onClick={toggleGameList}
-        className={buttonClasses(isGameListOpen)}
-      >
-        <SportsEsportsIcon />
-        <span className="text-xs mt-1">ゲームリスト</span>
-        <span className="text-[10px] text-gray-400">（ゲーム一覧 & 検索）</span>
       </button>
 
       {/* 強調ボタン */}
