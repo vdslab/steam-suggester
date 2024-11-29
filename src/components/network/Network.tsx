@@ -12,12 +12,10 @@ import Loading from "@/app/desktop/loading";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
 import { getFilterData, getGameIdData } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
-import EmphasisIcon from "@mui/icons-material/Highlight";
 import ChatIcon from "@mui/icons-material/Chat";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
-import Section from "./Section";
-import ChatBar from "./chatBar/ChatBar"; // ChatBar コンポーネントのインポート
+import ChatBar from "./chatBar/ChatBar";
 import SteamList from "./steamList/SteamList";
 
 const Network = () => {
@@ -35,9 +33,9 @@ const Network = () => {
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
   // 各機能の開閉状態を管理
-  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(true);
-  const [isGameListOpen, setIsGameListOpen] = useState<boolean>(true);
-  const [isEmphasisOpen, setIsEmphasisOpen] = useState<boolean>(false);
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+  const [isStreamerOpen, setIsStreamerOpen] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
@@ -79,10 +77,53 @@ const Network = () => {
   }, [filter]);
 
   // Sidebar のトグル関数
-  const toggleFilter = () => setIsFilterOpen((prev) => !prev);
-  const toggleGameList = () => setIsGameListOpen((prev) => !prev);
-  const toggleEmphasis = () => setIsEmphasisOpen((prev) => !prev);
-  const toggleSteamList = () => setIsSteamListOpen((prev) => !prev);
+  const toggleFilter = () => {
+    setIsFilterOpen((prev) => {
+      const newState = !prev;
+      if (newState) {
+        setIsStreamerOpen(false);
+        setIsChatOpen(false);
+        setIsSteamListOpen(false);
+      }
+      return newState;
+    });
+  };
+
+  const toggleStreamer = () => {
+    setIsStreamerOpen((prev) => {
+      const newState = !prev;
+      if (newState) {
+        setIsFilterOpen(false);
+        setIsChatOpen(false);
+        setIsSteamListOpen(false);
+      }
+      return newState;
+    });
+  };
+
+  const toggleChat = () => {
+    setIsChatOpen((prev) => {
+      const newState = !prev;
+      if (newState) {
+        setIsFilterOpen(false);
+        setIsStreamerOpen(false);
+        setIsSteamListOpen(false);
+      }
+      return newState;
+    });
+  };
+
+  const toggleSteamList = () => {
+    setIsSteamListOpen((prev) => {
+      const newState = !prev;
+      if (newState) {
+        setIsFilterOpen(false);
+        setIsStreamerOpen(false);
+        setIsChatOpen(false);
+      }
+      return newState;
+    });
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -94,10 +135,10 @@ const Network = () => {
       <Sidebar
         isFilterOpen={isFilterOpen}
         toggleFilter={toggleFilter}
-        isGameListOpen={isGameListOpen}
-        toggleGameList={toggleGameList}
-        isEmphasisOpen={isEmphasisOpen}
-        toggleEmphasis={toggleEmphasis}
+        isStreamerOpen={isStreamerOpen}
+        toggleStreamer={toggleStreamer}
+        isChatOpen={isChatOpen}
+        toggleChat={toggleChat}
         isSteamListOpen={isSteamListOpen}
         toggleSteamList={toggleSteamList}
       />
@@ -109,23 +150,24 @@ const Network = () => {
         </div>
       )}
 
-      {/* 強調パネル */}
-      {isEmphasisOpen && (
+      {/* StreamerListパネル */}
+      {isStreamerOpen && (
         <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
-          <Panel title="強調" icon={<EmphasisIcon className="mr-2 text-white" />}>
-            {/* ChatBar セクション */}
-            <Section title="チャット" icon={<ChatIcon />}>
-              <ChatBar nodes={nodes} setNodes={setNodes} />
-            </Section>
+          <Panel title="配信者" icon={<LiveTvIcon className="mr-2 text-white" />}>
+            <StreamedList
+              nodes={nodes}
+              streamerIds={streamerIds}
+              setStreamerIds={setStreamerIds}
+            />
+          </Panel>
+        </div>
+      )}
 
-            {/* StreamedList セクション */}
-            <Section title="配信者" icon={<LiveTvIcon />} hasDivider={false}>
-              <StreamedList
-                nodes={nodes}
-                streamerIds={streamerIds}
-                setStreamerIds={setStreamerIds}
-              />
-            </Section>
+      {/* ChatBarパネル*/}
+      {isChatOpen && (
+        <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
+          <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
+            <ChatBar nodes={nodes} setNodes={setNodes} />
           </Panel>
         </div>
       )}
@@ -150,18 +192,16 @@ const Network = () => {
       </div>
 
       {/* ゲームリストパネル */}
-      {isGameListOpen && (
-        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <GameList
-            nodes={nodes}
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-            setCenterX={setCenterX}
-            setCenterY={setCenterY}
-            setIsLoading={setIsLoading}
-          />
-        </div>
-      )}
+      <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
+        <GameList
+          nodes={nodes}
+          selectedIndex={selectedIndex}
+          setSelectedIndex={setSelectedIndex}
+          setCenterX={setCenterX}
+          setCenterY={setCenterY}
+          setIsLoading={setIsLoading}
+        />
+      </div>
     </div>
   );
 };

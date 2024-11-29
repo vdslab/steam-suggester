@@ -4,26 +4,28 @@
 import React from "react";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
-import HighlightIcon from '@mui/icons-material/Highlight';
+import ChatIcon from "@mui/icons-material/Chat";
+import LiveTvIcon from "@mui/icons-material/LiveTv";
 
 type Props = {
   isFilterOpen: boolean;
   toggleFilter: () => void;
-  isGameListOpen: boolean;
-  toggleGameList: () => void;
-  isEmphasisOpen: boolean;
-  toggleEmphasis: () => void;
+  isStreamerOpen: boolean;
+  toggleStreamer: () => void;
+  isChatOpen: boolean;
+  toggleChat: () => void;
   isSteamListOpen: boolean;
   toggleSteamList: () => void;
 };
 
+
 const Sidebar: React.FC<Props> = ({
   isFilterOpen,
   toggleFilter,
-  isGameListOpen,
-  toggleGameList,
-  isEmphasisOpen,
-  toggleEmphasis,
+  isStreamerOpen,
+  toggleStreamer,
+  isChatOpen,
+  toggleChat,
   isSteamListOpen,
   toggleSteamList
 }) => {
@@ -44,24 +46,22 @@ const Sidebar: React.FC<Props> = ({
         <span className="text-xs mt-1">フィルター</span>
       </button>
 
-      {/* ゲームリストボタン */}
+      {/* Streamerボタン */}
       <button
-        onClick={toggleGameList}
-        className={buttonClasses(isGameListOpen)}
+        onClick={toggleStreamer}
+        className={buttonClasses(isStreamerOpen)}
       >
-        <SportsEsportsIcon />
-        <span className="text-xs mt-1">ゲームリスト</span>
-        <span className="text-[10px] text-gray-400">（ゲーム一覧 & 検索）</span>
+        <LiveTvIcon />
+        <span className="text-xs mt-1">配信者</span>
       </button>
 
-      {/* 強調ボタン */}
+      {/* ChatBarボタン */}
       <button
-        onClick={toggleEmphasis}
-        className={buttonClasses(isEmphasisOpen)}
+        onClick={toggleChat}
+        className={buttonClasses(isChatOpen)}
       >
-        <HighlightIcon />
-        <span className="text-xs mt-1">強調</span>
-        <span className="text-[10px] text-gray-400">（チャット & 配信者）</span>
+        <ChatIcon />
+        <span className="text-xs mt-1">チャット</span>
       </button>
 
       {/* Steamリストボタン */}
