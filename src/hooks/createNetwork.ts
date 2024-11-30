@@ -10,6 +10,8 @@ import calcWeight from '@/hooks/calcWeight';
 
 const createNetwork = async (filter: Filter, gameIds: string[]) => {
   const k = 4;
+  const minDistance = 50;
+  const maxDistance = 300;
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
@@ -50,6 +52,23 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     if(!((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))) return false;
     return true;
   }).map((item: SteamDetailsDataType, i: number) => {return {...item, index: i, suggestValue: 0}}))];
+
+  let minWeight = Infinity;
+  let maxWeight = -Infinity;
+
+  nodes.forEach((sourceNode: NodeType) => {
+    nodes
+      .filter(targetNode => sourceNode !== targetNode)
+      .forEach((targetNode) => {
+        const weight = calcWeight(sourceNode, targetNode);
+        if(weight < minWeight) minWeight = weight;
+        if(weight > maxWeight) maxWeight = weight;
+      });
+  });
+
+  const distanceScale = d3.scaleLinear()
+                          .domain([minWeight, maxWeight])
+                          .range([maxDistance, minDistance]);
 
   const canAddLink = (links: LinkType[], sourceIndex: number, targetIndex: number): boolean => {
     const sourceConnections = links.filter(item => item.source === sourceIndex || item.target === sourceIndex).length;
@@ -98,13 +117,15 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
           const targetNode = item.target as NodeType;
           
           if(typeof sourceNode !== "number" && typeof targetNode !== "number") {
-            return 1 / calcWeight(sourceNode, targetNode);
+            const weight = calcWeight(sourceNode, targetNode);
+            return weight > 0 ? distanceScale(weight) : maxDistance;
           }
-          return 0;
+          return maxDistance;
         })
     )
-    .force("charge", d3.forceManyBody<NodeType>().strength(-1000))
-    .force("collide", d3.forceCollide<NodeType>().radius((d: NodeType) => (d.circleScale ?? 1) * 20));
+    .force("charge", d3.forceManyBody<NodeType>().strength(-1000))  // 強度調整
+    .force("collide", d3.forceCollide<NodeType>().radius((d: NodeType) => (d.circleScale ?? 1) * 20)) // 衝突防止
+    .force("radial", d3.forceRadial(1000)); // 半径dの円形
 
   simulation.tick(300).stop();
 
