@@ -37,7 +37,7 @@ const FilterButtonGroup = (props:Props) => {
                 <button
                   onClick={() => handleChangeFilter(key)}
                   className={`
-                    ${flag ? 'bg-blue-900 hover:bg-blue-800' : 'bg-gray-700 hover:bg-gray-600'}
+                    ${flag ? 'bg-blue-800 hover:bg-blue-900' : 'bg-gray-700 hover:bg-gray-600'}
                      text-white rounded px-2 py-2 w-full h-10 overflow-hidden text-sm drop-shadow-xl`}
                 >
                   <span className="block truncate">{mapping[key]}</span>
