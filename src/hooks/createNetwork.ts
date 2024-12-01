@@ -53,6 +53,8 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     return true;
   }).map((item: SteamDetailsDataType, i: number) => {return {...item, index: i, suggestValue: 0}}))];
 
+  console.log(nodes);
+
   let minWeight = Infinity;
   let maxWeight = -Infinity;
 

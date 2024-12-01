@@ -1,4 +1,4 @@
-import { SteamDeviceType, SteamGenreType } from "./api/getSteamDetailType";
+import { SteamDeviceType } from "./api/getSteamDetailType";
 
 export type IconType = {
   title: string;
@@ -31,7 +31,7 @@ export type NodeType = {
   twitchGameId: string;
   totalViews?: number;
   title: string;
-  genres : SteamGenreType[];
+  genres : string[];
   tags: string[];
   price: number;
   isSinglePlayer: boolean;
