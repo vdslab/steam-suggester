@@ -1,4 +1,3 @@
-/* GameList.tsx */
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
@@ -7,12 +6,10 @@ import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
-import { SteamGenreType } from "@/types/api/getSteamDetailType";
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
-import ListIcon from "@mui/icons-material/List";
 import Panel from "../Panel";
 import Section from "../Section";
 
@@ -24,6 +21,8 @@ type Props = {
   setCenterY: React.Dispatch<React.SetStateAction<number>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 
 const GameList = (props: Props) => {
   const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading } = props;
@@ -39,6 +38,9 @@ const GameList = (props: Props) => {
   // Ref for the selected game detail
   const selectedDetailRef = useRef<HTMLDivElement | null>(null);
 
+  // タグの展開状態を管理
+  const [isTagsExpanded, setIsTagsExpanded] = useState<boolean>(false);
+
   // Steamゲームリストとユーザーが追加したゲームを取得
   useEffect(() => {
     (async () => {
@@ -48,6 +50,7 @@ const GameList = (props: Props) => {
         { next: { revalidate: ISR_FETCH_INTERVAL } }
       );
       if(!res1.ok) {
+        console.error("Failed to fetch Steam list");
         return;
       }
       const data = await res1.json();
@@ -100,6 +103,7 @@ const GameList = (props: Props) => {
     setCenterX(nodes[index].x ?? 0);
     setCenterY((nodes[index].y ?? 0) + 100);
     setSelectedIndex(index);
+    setIsTagsExpanded(false); // 新しいゲームを選択したらタグを折りたたむ
   };
 
   // ゲームを追加する処理
@@ -138,6 +142,11 @@ const GameList = (props: Props) => {
       selectedDetailRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [selectedIndex]);
+
+  // タグの表示切替関数
+  const toggleTags = () => {
+    setIsTagsExpanded((prev) => !prev);
+  };
 
   return (
     <Panel title="ゲームリスト" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
@@ -189,7 +198,7 @@ const GameList = (props: Props) => {
 
             return (
               <div
-                key={node.index}
+                key={node.steamGameId} // 一意のキーを使用
                 className={`cursor-pointer p-2 mb-2 ${isSelected ? 'bg-gray-800' : 'bg-gray-900'} rounded-lg`}
               >
                 <div className="flex items-center justify-between">
@@ -220,12 +229,32 @@ const GameList = (props: Props) => {
                       }}
                       className="object-cover"
                     />
+                    {/* タグ表示部分 */}
+                    
                     <div className="text-white mt-2">
-                      <strong>タグ:</strong> {node.tags?.map((item: string) => item).join(", ") || "No tags"}
+                      <strong>タグ:</strong> 
+                      {/*<strong>タグ:</strong> {node.tags?.map((item: string) => item).join(", ") || "No tags"}*/}
+                      {node.tags && node.tags.length > MAX_VISIBLE_TAGS ? (
+                        <>
+                          {isTagsExpanded 
+                            ? node.tags.join(", ") 
+                            : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ") + ", ..."}
+                          <button 
+                            className="ml-2 text-blue-400 hover:underline focus:outline-none"
+                            onClick={toggleTags}
+                          >
+                            {isTagsExpanded ? "閉じる" : "さらに見る"}
+                          </button>
+                        </>
+                      ) : (
+                        node.tags?.join(", ") || "No tags"
+                      )}
                     </div>
+                    {/* 価格表示 */}
                     <div className="text-white mt-2">
                       <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
                     </div>
+                    {/* アクションボタン */}
                     <div className="mt-4 flex space-x-2">
                       <button
                         className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
