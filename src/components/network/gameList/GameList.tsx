@@ -238,12 +238,12 @@ const GameList = (props: Props) => {
                         <>
                           {isTagsExpanded 
                             ? node.tags.join(", ") 
-                            : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ") + ", ..."}
+                            : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ")}
                           <button 
                             className="ml-2 text-blue-400 hover:underline focus:outline-none"
                             onClick={toggleTags}
                           >
-                            {isTagsExpanded ? "閉じる" : "さらに見る"}
+                            {isTagsExpanded ? "一部のタグのみ表示" : "..."}
                           </button>
                         </>
                       ) : (
