@@ -143,64 +143,67 @@ const Network = () => {
         toggleSteamList={toggleSteamList}
       />
 
-      {/* フィルターパネル */}
-      {isFilterOpen && (
-        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <SelectParameter filter={filter} setFilter={setFilter} />
+      {/* メインコンテンツエリアを relative に設定 */}
+      <div className="flex-1 relative bg-gray-900 overflow-hidden">
+        {/* メインコンテンツ */}
+        <div className="absolute inset-0">
+          <NodeLink
+            nodes={nodes}
+            links={links}
+            centerX={centerX}
+            centerY={centerY}
+            setSelectedIndex={setSelectedIndex}
+            streamerIds={streamerIds}
+          />
         </div>
-      )}
 
-      {/* StreamerListパネル */}
-      {isStreamerOpen && (
-        <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
-          <Panel title="配信者" icon={<LiveTvIcon className="mr-2 text-white" />}>
-            <StreamedList
-              nodes={nodes}
-              streamerIds={streamerIds}
-              setStreamerIds={setStreamerIds}
-            />
-          </Panel>
+        {/* フィルターパネル */}
+        {isFilterOpen && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <SelectParameter filter={filter} setFilter={setFilter} />
+          </div>
+        )}
+
+        {/* StreamerListパネル */}
+        {isStreamerOpen && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <Panel title="配信者" icon={<LiveTvIcon className="mr-2 text-white" />}>
+              <StreamedList
+                nodes={nodes}
+                streamerIds={streamerIds}
+                setStreamerIds={setStreamerIds}
+              />
+            </Panel>
+          </div>
+        )}
+
+        {/* ChatBarパネル */}
+        {isChatOpen && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
+              <ChatBar nodes={nodes} setNodes={setNodes} />
+            </Panel>
+          </div>
+        )}
+
+        {/* Steam連携パネル */}
+        {isSteamListOpen && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <SteamList />
+          </div>
+        )}
+
+        {/* ゲームリストパネル */}
+        <div className="absolute top-0 right-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10">
+          <GameList
+            nodes={nodes}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            setCenterX={setCenterX}
+            setCenterY={setCenterY}
+            setIsLoading={setIsLoading}
+          />
         </div>
-      )}
-
-      {/* ChatBarパネル*/}
-      {isChatOpen && (
-        <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
-          <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
-            <ChatBar nodes={nodes} setNodes={setNodes} />
-          </Panel>
-        </div>
-      )}
-
-      {/* Steam連携パネル */}
-      {isSteamListOpen && (
-        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <SteamList />
-        </div>
-      )}
-
-      {/* メインコンテンツエリア */}
-      <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
-        <NodeLink
-          nodes={nodes}
-          links={links}
-          centerX={centerX}
-          centerY={centerY}
-          setSelectedIndex={setSelectedIndex}
-          streamerIds={streamerIds}
-        />
-      </div>
-
-      {/* ゲームリストパネル */}
-      <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-        <GameList
-          nodes={nodes}
-          selectedIndex={selectedIndex}
-          setSelectedIndex={setSelectedIndex}
-          setCenterX={setCenterX}
-          setCenterY={setCenterY}
-          setIsLoading={setIsLoading}
-        />
       </div>
     </div>
   );
