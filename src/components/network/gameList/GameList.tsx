@@ -201,8 +201,8 @@ const GameList = (props: Props) => {
                 key={node.steamGameId} // 一意のキーを使用
                 className={`cursor-pointer p-2 mb-2 ${isSelected ? 'bg-gray-800' : 'bg-gray-900'} rounded-lg`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center" onClick={() => handleGameClick(nodes.findIndex(n => n.steamGameId === node.steamGameId))}>
+                <div className="flex items-center justify-between"  onClick={() => handleGameClick(nodes.findIndex(n => n.steamGameId === node.steamGameId))}>
+                  <div className="flex items-center">
                     <div className={`${rankColor} pb-2 p-2`}>
                       {originalRank}位
                     </div>
