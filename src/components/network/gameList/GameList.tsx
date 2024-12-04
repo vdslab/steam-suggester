@@ -1,6 +1,7 @@
+/* GameList.tsx */
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
@@ -85,6 +86,15 @@ const GameList = (props: Props) => {
     }
   }, [nodes, searchNodesQuery]);
 
+  // 元の順位を保持するマッピングを作成
+  const rankMap = useMemo(() => {
+    const map: { [steamGameId: string]: number } = {};
+    nodes.forEach((node, idx) => {
+      map[node.steamGameId] = idx + 1; // 1位から始まる
+    });
+    return map;
+  }, [nodes]);
+
   // ゲームをクリックしたときの処理
   const handleGameClick = (index: number) => {
     setCenterX(nodes[index].x ?? 0);
@@ -111,12 +121,12 @@ const GameList = (props: Props) => {
   };
 
   // ランクカラーの選択
-  const selectColor = (index: number) => {
-    const rankColor = index === 0 
+  const selectColor = (rank: number) => {
+    const rankColor = rank === 1 
                     ? "text-yellow-500" 
-                    : index === 1 
+                    : rank === 2 
                     ? "text-gray-400" 
-                    : index === 2 
+                    : rank === 3 
                     ? "text-orange-500" 
                     : "text-white";
     return { rankColor };
@@ -171,9 +181,10 @@ const GameList = (props: Props) => {
           className="w-full p-2 mb-2 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
         <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
-          {filteredNodeList.map((node: NodeType, index: number) => {
-            const isSelected = selectedIndex === index;
-            const { rankColor } = selectColor(index);
+          {filteredNodeList.map((node: NodeType) => {
+            const originalRank = rankMap[node.steamGameId] || 0; // 元の順位を取得
+            const isSelected = selectedIndex === nodes.findIndex(n => n.steamGameId === node.steamGameId);
+            const { rankColor } = selectColor(originalRank);
             const isUserAdded = userAddedGames.includes(node.steamGameId);
 
             return (
@@ -182,9 +193,9 @@ const GameList = (props: Props) => {
                 className={`cursor-pointer p-2 mb-2 ${isSelected ? 'bg-gray-800' : 'bg-gray-900'} rounded-lg`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center" onClick={() => handleGameClick(index)}>
+                  <div className="flex items-center" onClick={() => handleGameClick(nodes.findIndex(n => n.steamGameId === node.steamGameId))}>
                     <div className={`${rankColor} pb-2 p-2`}>
-                      {index + 1}位
+                      {originalRank}位
                     </div>
                     <div className="text-white p-2">
                       {node.title}
@@ -210,7 +221,7 @@ const GameList = (props: Props) => {
                       className="object-cover"
                     />
                     <div className="text-white mt-2">
-                    <strong>タグ:</strong> {node.tags?.map((item: string) => item).join(", ") || "No tags"}
+                      <strong>タグ:</strong> {node.tags?.map((item: string) => item).join(", ") || "No tags"}
                     </div>
                     <div className="text-white mt-2">
                       <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}

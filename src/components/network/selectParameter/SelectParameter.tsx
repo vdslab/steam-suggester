@@ -112,7 +112,7 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
             mapping={GENRE_MAPPING}
             localFilter={localFilter}
             setLocalFilter={setLocalFilter}
-            rowLevel={3}
+            rowLevel={2}
           />
         </Section>
 
