@@ -4,7 +4,7 @@
 import React from "react";
 
 type PanelProps = {
-  title: string;
+  title: React.ReactNode;
   icon: React.ReactElement;
   children: React.ReactNode;
 };
