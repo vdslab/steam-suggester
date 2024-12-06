@@ -29,8 +29,7 @@ const GameList = (props: Props) => {
   const router = useRouter();
 
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
-  const [searchSteamQuery, setSearchSteamQuery] = useState<string>('');
-  const [searchNodesQuery, setSearchNodesQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
   const [filteredNodeList, setFilteredNodeList] = useState<NodeType[]>(nodes);
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
@@ -62,32 +61,34 @@ const GameList = (props: Props) => {
     })();
   }, []);
 
-  // Steamゲームの検索結果をフィルタリング
+  // 検索クエリに基づいてSteamリストとノードリストをフィルタリング
   useEffect(() => {
-    if(searchSteamQuery === '') {
-      setFilteredSteamList(steamList);
-    } else {
-      const filteredList = steamList
-        .filter((game) =>
-          game.title.toLowerCase().includes(searchSteamQuery.toLowerCase())
-        )
-        .filter((game) => !userAddedGames.includes(game.steamGameId));
-      setFilteredSteamList(filteredList);
-    }
-  }, [steamList, searchSteamQuery, userAddedGames]);
+    const lowerCaseQuery = searchQuery.toLowerCase();
 
-  // ゲームリスト内の検索結果をフィルタリング
-  useEffect(() => {
-    if(searchNodesQuery === '') {
+    // Steamリストのフィルタリング（ユーザーが追加していないゲームのみ）
+    if(searchQuery === '') {
+      setFilteredSteamList(steamList.slice(0, 20));
+    } else {
+      const filteredSteam = steamList
+        .filter((game) =>
+          game.title.toLowerCase().includes(lowerCaseQuery)
+        )
+        .filter((game) => !userAddedGames.includes(game.steamGameId))
+        .slice(0, 20); // 20件に制限
+      setFilteredSteamList(filteredSteam);
+    }
+
+    // ノードリストのフィルタリング
+    if(searchQuery === '') {
       setFilteredNodeList(nodes);
     } else {
-      const filteredList = nodes
+      const filteredNodes = nodes
         .filter((game) =>
-          game.title.toLowerCase().includes(searchNodesQuery.toLowerCase())
-        )
-      setFilteredNodeList(filteredList);
+          game.title.toLowerCase().includes(lowerCaseQuery)
+        );
+      setFilteredNodeList(filteredNodes);
     }
-  }, [nodes, searchNodesQuery]);
+  }, [steamList, searchQuery, userAddedGames, nodes]);
 
   // 元の順位を保持するマッピングを作成
   const rankMap = useMemo(() => {
@@ -150,134 +151,135 @@ const GameList = (props: Props) => {
 
   return (
     <Panel title="ゲームリスト" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
-      
-      {/* ゲームを追加セクション */}
-      <Section title="ゲームを追加" icon={<PlaylistAddIcon />}>
-        <p className="text-gray-400 mb-2">好きなゲームを追加して、グラフに表示することができます。</p>
+
+      {/* 全ゲームから検索セクション */}
+      <Section title="全ゲームから検索" icon={<SearchIcon />}>
+        <p className="text-gray-400 mb-2">ゲームの人気順に並んでいます。検索フォームを使ってゲームを追加したり、リストを絞り込むことができます。</p>
         <input
           type="text"
-          placeholder="ゲームタイトルを検索して追加"
-          value={searchSteamQuery}
-          onChange={(e) => setSearchSteamQuery(e.target.value)}
+          placeholder="ゲームタイトルを検索"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full p-2 mb-2 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
-        {searchSteamQuery !== '' && (
+        
+        {/* ゲーム追加候補表示 */}
+        {searchQuery !== '' && (
           <div className="bg-gray-700 p-2 rounded-lg mb-4 max-h-40 overflow-y-auto">
-            <h2 className="text-white mb-2">検索結果</h2>
-            {filteredSteamList.map((game) => (
-              <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
-                <div className="text-white p-2 rounded">
-                  {game.title}
+            <h2 className="text-white mb-2">検索結果（追加候補）</h2>
+            {filteredSteamList.length > 0 ? (
+              filteredSteamList.map((game) => (
+                <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
+                  <div className="text-white p-2 rounded">
+                    {game.title}
+                  </div>
+                  <PlaylistAddIcon
+                    className='cursor-pointer hover:bg-gray-600 rounded'
+                    onClick={() => handleSearchClick(game.steamGameId)}
+                  />
                 </div>
-                <PlaylistAddIcon
-                  className='cursor-pointer hover:bg-gray-600 rounded'
-                  onClick={() => handleSearchClick(game.steamGameId)}
-                />
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-gray-300">該当するゲームが見つかりません。</p>
+            )}
           </div>
         )}
-      </Section>
 
-      {/* ゲーム検索＆リストセクション */}
-      <Section title="ゲーム検索＆リスト" icon={<SearchIcon />}>
-        <p className="text-gray-400 mb-2">ゲームの人気順に並んでいます。また、グラフ上のゲームアイコンを押すと、そのゲームの詳細が表示されます。</p>
-        <input
-          type="text"
-          placeholder="ゲームリストを検索"
-          value={searchNodesQuery}
-          onChange={(e) => setSearchNodesQuery(e.target.value)}
-          className="w-full p-2 mb-2 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
-        />
+        {/* ゲームリスト表示 */}
         <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
-          {filteredNodeList.map((node: NodeType) => {
-            const originalRank = rankMap[node.steamGameId] || 0; // 元の順位を取得
-            const isSelected = selectedIndex === nodes.findIndex(n => n.steamGameId === node.steamGameId);
-            const { rankColor } = selectColor(originalRank);
-            const isUserAdded = userAddedGames.includes(node.steamGameId);
+          {filteredNodeList.length > 0 ? (
+            filteredNodeList.map((node: NodeType) => {
+              const originalRank = rankMap[node.steamGameId] || 0; // 元の順位を取得
+              const isSelected = selectedIndex === nodes.findIndex(n => n.steamGameId === node.steamGameId);
+              const { rankColor } = selectColor(originalRank);
+              const isUserAdded = userAddedGames.includes(node.steamGameId);
 
-            return (
-              <div
-                key={node.steamGameId} // 一意のキーを使用
-                className={`cursor-pointer p-2 mb-2 ${isSelected ? 'bg-gray-800' : 'bg-gray-900'} rounded-lg`}
-              >
-                <div className="flex items-center justify-between"  onClick={() => handleGameClick(nodes.findIndex(n => n.steamGameId === node.steamGameId))}>
-                  <div className="flex items-center">
-                    <div className={`${rankColor} pb-2 p-2`}>
-                      {originalRank}位
+              return (
+                <div
+                  key={node.steamGameId} // 一意のキーを使用
+                  className={`cursor-pointer p-2 mb-2 ${isSelected ? 'bg-gray-800' : 'bg-gray-900'} rounded-lg`}
+                >
+                  <div className="flex items-center justify-between"  onClick={() => handleGameClick(nodes.findIndex(n => n.steamGameId === node.steamGameId))}>
+                    <div className="flex items-center">
+                      <div className={`${rankColor} pb-2 p-2`}>
+                        {originalRank}位
+                      </div>
+                      <div className="text-white p-2">
+                        {node.title}
+                      </div>
                     </div>
-                    <div className="text-white p-2">
-                      {node.title}
-                    </div>
+                    {isUserAdded && (
+                      <DeleteIcon 
+                        className='cursor-pointer hover:bg-gray-600 rounded'
+                        onClick={(e) => {
+                          e.stopPropagation(); // 親のクリックイベントを防止
+                          handleGameDelete(node.steamGameId);
+                        }}
+                      />
+                    )}
                   </div>
-                  {isUserAdded && (
-                    <DeleteIcon 
-                      className='cursor-pointer hover:bg-gray-600 rounded'
-                      onClick={() => handleGameDelete(node.steamGameId)}
-                    />
+                  {isSelected && (
+                    <div className="mt-2" ref={selectedDetailRef}>
+                      <Image
+                        src={node.imgURL}
+                        alt={node.title}
+                        width={300}
+                        height={170}
+                        style={{
+                          borderRadius: "4px",
+                        }}
+                        className="object-cover"
+                      />
+                      {/* タグ表示部分 */}
+                      <div className="text-white mt-2">
+                        <strong>タグ:</strong> 
+                        {node.tags && node.tags.length > MAX_VISIBLE_TAGS ? (
+                          <>
+                            {isTagsExpanded 
+                              ? node.tags.join(", ") 
+                              : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ")}
+                            <button 
+                              className="ml-2 text-blue-400 hover:underline focus:outline-none"
+                              onClick={toggleTags}
+                            >
+                              {isTagsExpanded ? "一部のタグのみ表示" : "..."}
+                            </button>
+                          </>
+                        ) : (
+                          node.tags?.join(", ") || "No tags"
+                        )}
+                      </div>
+                      {/* 価格表示 */}
+                      <div className="text-white mt-2">
+                        <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
+                      </div>
+                      {/* アクションボタン */}
+                      <div className="mt-4 flex space-x-2">
+                        <button
+                          className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
+                          onClick={() =>
+                            router.push(
+                              `/desktop/details?steam_id=${node.steamGameId}&twitch_id=${node.twitchGameId}`
+                            )
+                          }
+                        >
+                          詳細を確認
+                        </button>
+                        <button
+                          className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
+                          onClick={() => setSelectedIndex(-1)}
+                        >
+                          閉じる
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
-                {isSelected && (
-                  <div className="mt-2" ref={selectedDetailRef}>
-                    <Image
-                      src={node.imgURL}
-                      alt={node.title}
-                      width={300}
-                      height={170}
-                      style={{
-                        borderRadius: "4px",
-                      }}
-                      className="object-cover"
-                    />
-                    {/* タグ表示部分 */}
-                    
-                    <div className="text-white mt-2">
-                      <strong>タグ:</strong> 
-                      {/*<strong>タグ:</strong> {node.tags?.map((item: string) => item).join(", ") || "No tags"}*/}
-                      {node.tags && node.tags.length > MAX_VISIBLE_TAGS ? (
-                        <>
-                          {isTagsExpanded 
-                            ? node.tags.join(", ") 
-                            : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ")}
-                          <button 
-                            className="ml-2 text-blue-400 hover:underline focus:outline-none"
-                            onClick={toggleTags}
-                          >
-                            {isTagsExpanded ? "一部のタグのみ表示" : "..."}
-                          </button>
-                        </>
-                      ) : (
-                        node.tags?.join(", ") || "No tags"
-                      )}
-                    </div>
-                    {/* 価格表示 */}
-                    <div className="text-white mt-2">
-                      <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
-                    </div>
-                    {/* アクションボタン */}
-                    <div className="mt-4 flex space-x-2">
-                      <button
-                        className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
-                        onClick={() =>
-                          router.push(
-                            `/desktop/details?steam_id=${node.steamGameId}&twitch_id=${node.twitchGameId}`
-                          )
-                        }
-                      >
-                        詳細を確認
-                      </button>
-                      <button
-                        className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
-                        onClick={() => setSelectedIndex(-1)}
-                      >
-                        閉じる
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <p className="text-gray-300">該当するゲームが見つかりません。</p>
+          )}
         </div>
       </Section>
     </Panel>
