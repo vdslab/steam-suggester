@@ -404,7 +404,7 @@ const StreamedList = (props: Props) => {
       {/* 追加済みの配信者セクション */}
       <Section title="追加済みの配信者" icon={<PersonIcon />} hasDivider={false}>
         {streamerIds.length === 0 ? (
-          <p className="text-gray-400">配信者が追加されていません。追加すると配信者が配信したゲームのアイコンに枠が表示されます。</p>
+          <p className="text-gray-400">配信者が追加されていません。</p>
         ) : (
           streamerIds.map((streamer) => (
             <div

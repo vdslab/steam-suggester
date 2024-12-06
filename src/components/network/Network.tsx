@@ -17,6 +17,7 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
 import ChatBar from "./chatBar/ChatBar";
 import SteamList from "./steamList/SteamList";
+import HelpTooltip from "./HelpTooltip";
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -167,7 +168,15 @@ const Network = () => {
         {/* StreamerListパネル */}
         {isStreamerOpen && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <Panel title="配信者" icon={<LiveTvIcon className="mr-2 text-white" />}>
+            <Panel
+                title={
+                  <div className="flex items-center">
+                    <span>配信者</span>
+                    <HelpTooltip title="配信者を追加すると配信者が配信したゲームのアイコンに枠が表示されます。" />
+                  </div>
+                }
+                icon={<LiveTvIcon className="mr-2 text-white" />}
+              >
               <StreamedList
                 nodes={nodes}
                 streamerIds={streamerIds}
@@ -180,7 +189,15 @@ const Network = () => {
         {/* ChatBarパネル */}
         {isChatOpen && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
+            <Panel
+                title={
+                  <div className="flex items-center">
+                    <span>チャット</span>
+                    <HelpTooltip title="ゲームに関する質問を入力してください。ネットワーク内の関連ノードが強調表示されます。" />
+                  </div>
+                }
+                icon={<ChatIcon className="mr-2 text-white" />}
+              >
               <ChatBar nodes={nodes} setNodes={setNodes} />
             </Panel>
           </div>

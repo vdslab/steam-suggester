@@ -12,6 +12,7 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Panel from "../Panel";
 import Section from "../Section";
+import HelpTooltip from "../HelpTooltip";
 
 type Props = {
   nodes: NodeType[];
@@ -157,10 +158,18 @@ const GameList = (props: Props) => {
   const showNoGameFoundMessage = showNoResultsMessage && filteredSteamList.length === 0;
 
   return (
-    <Panel title="ゲームリスト" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
+    <Panel
+        title={
+          <div className="flex items-center">
+            <span>ゲームリスト</span>
+            <HelpTooltip title="ゲームの人気順に並んでいます。検索フォームを使ってゲームを追加したり、リストを絞り込むことができます。" />
+          </div>
+        }
+        icon={<SportsEsportsIcon className="mr-2 text-white" />}
+      >
       {/* 全ゲームから検索セクション */}
       <Section title="全ゲームから検索" icon={<SearchIcon />}>
-        <p className="text-gray-400 mb-2">ゲームの人気順に並んでいます。検索フォームを使ってゲームを追加したり、リストを絞り込むことができます。</p>
+        {/* <p className="text-gray-400 mb-2">ゲームの人気順に並んでいます。検索フォームを使ってゲームを追加したり、リストを絞り込むことができます。</p> */}
         <input
           type="text"
           placeholder="ゲームタイトルを検索"

@@ -25,14 +25,13 @@ const ChatBar = (props: Props) => {
 
   return (
     <div className="bg-gray-800 px-2 pb-2 rounded shadow-lg">
-      <p className="text-gray-400 mb-2">ゲームに関する質問を入力してください。ネットワーク内の関連ノードが強調表示されます。</p>
       <form onSubmit={handleSubmit} className="flex">
         <input
           type="text"
           value={input}
           onChange={handleInputChange}
           placeholder="例：おすすめのマルチプレイヤーゲームは？"
-          className="flex-grow p-2 rounded-l bg-gray-700 text-white"
+          className="flex-grow p-2 rounded-l bg-gray-700 text-white w-2"
         />
         <button
           type="submit"
