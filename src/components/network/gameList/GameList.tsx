@@ -40,6 +40,9 @@ const GameList = (props: Props) => {
   // タグの展開状態を管理
   const [isTagsExpanded, setIsTagsExpanded] = useState<boolean>(false);
 
+  // 固定のゲームIDリストを取得
+  const fixedGameIds = useMemo(() => nodes.map(node => node.steamGameId), [nodes]);
+
   // Steamゲームリストとユーザーが追加したゲームを取得
   useEffect(() => {
     (async () => {
@@ -56,27 +59,26 @@ const GameList = (props: Props) => {
       const res2 = await getGameIdData();
 
       setSteamList(data);
-      setFilteredSteamList(data);
       setUserAddedGames(res2 ?? []);
     })();
   }, []);
 
-  // 検索クエリに基づいてSteamリストとノードリストをフィルタリング
+  // Steamリストとユーザー追加ゲームがロードされた後にフィルタリングを行う
   useEffect(() => {
     const lowerCaseQuery = searchQuery.toLowerCase();
 
-    // Steamリストのフィルタリング（ユーザーが追加していないゲームのみ）
-    if(searchQuery === '') {
-      setFilteredSteamList(steamList.slice(0, 20));
-    } else {
-      const filteredSteam = steamList
-        .filter((game) =>
-          game.title.toLowerCase().includes(lowerCaseQuery)
-        )
-        .filter((game) => !userAddedGames.includes(game.steamGameId))
-        .slice(0, 20); // 20件に制限
-      setFilteredSteamList(filteredSteam);
-    }
+    // Steamリストのフィルタリング（ユーザーが追加していないゲームかつ固定ゲームではないもの）
+    const filteredSteam = steamList
+      .filter((game) =>
+        game.title.toLowerCase().includes(lowerCaseQuery)
+      )
+      .filter((game) => 
+        !userAddedGames.includes(game.steamGameId) && 
+        !fixedGameIds.includes(game.steamGameId)
+      )
+      .slice(0, 20); // 20件に制限
+
+    setFilteredSteamList(filteredSteam);
 
     // ノードリストのフィルタリング
     if(searchQuery === '') {
@@ -88,7 +90,7 @@ const GameList = (props: Props) => {
         );
       setFilteredNodeList(filteredNodes);
     }
-  }, [steamList, searchQuery, userAddedGames, nodes]);
+  }, [steamList, searchQuery, userAddedGames, nodes, fixedGameIds]);
 
   // 元の順位を保持するマッピングを作成
   const rankMap = useMemo(() => {
@@ -109,7 +111,7 @@ const GameList = (props: Props) => {
 
   // ゲームを追加する処理
   const handleSearchClick = (steamGameId: string) => {
-    if(!userAddedGames.includes(steamGameId)) {
+    if(!userAddedGames.includes(steamGameId) && !fixedGameIds.includes(steamGameId)) {
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
       changeGameIdData(newUserAddedGames);
@@ -151,7 +153,6 @@ const GameList = (props: Props) => {
 
   return (
     <Panel title="ゲームリスト" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
-
       {/* 全ゲームから検索セクション */}
       <Section title="全ゲームから検索" icon={<SearchIcon />}>
         <p className="text-gray-400 mb-2">ゲームの人気順に並んでいます。検索フォームを使ってゲームを追加したり、リストを絞り込むことができます。</p>
