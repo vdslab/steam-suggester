@@ -9,7 +9,6 @@ import {
 import { changeFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
 import { useState, useEffect } from "react";
-import FilterHeadline from "./FilterHeadline";
 import FilterButtonGroup from "./FilterButtonGroup";
 import FilterSlider from "./FilterSlider";
 import Panel from "../Panel";

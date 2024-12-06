@@ -6,12 +6,10 @@ import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
-import { SteamGenreType } from "@/types/api/getSteamDetailType";
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
-import ListIcon from "@mui/icons-material/List";
 import Panel from "../Panel";
 import Section from "../Section";
 
