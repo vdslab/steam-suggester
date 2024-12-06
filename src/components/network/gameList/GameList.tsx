@@ -151,6 +151,11 @@ const GameList = (props: Props) => {
     setIsTagsExpanded((prev) => !prev);
   };
 
+  // メッセージ表示の条件判定
+  const showNoResultsMessage = searchQuery !== '' && filteredNodeList.length === 0;
+  const showAddGameMessage = showNoResultsMessage && filteredSteamList.length > 0;
+  const showNoGameFoundMessage = showNoResultsMessage && filteredSteamList.length === 0;
+
   return (
     <Panel title="ゲームリスト" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
       {/* 全ゲームから検索セクション */}
@@ -164,8 +169,17 @@ const GameList = (props: Props) => {
           className="w-full p-2 mb-2 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
         />
         
+        {/* メッセージ表示エリア */}
+        {showNoResultsMessage && (
+          <p className="text-gray-300 mb-4">
+            {showAddGameMessage
+              ? "該当するゲームが見つかりません。ゲームを追加してください。"
+              : "該当するゲームが見つかりません。別のゲームをお探しください。"}
+          </p>
+        )}
+
         {/* ゲーム追加候補表示 */}
-        {searchQuery !== '' && (
+        {searchQuery !== '' && filteredSteamList.length > 0 && (
           <div className="bg-gray-700 p-2 rounded-lg mb-4 max-h-40 overflow-y-auto">
             <h2 className="text-white mb-2">検索結果（追加候補）</h2>
             {filteredSteamList.length > 0 ? (
@@ -180,9 +194,7 @@ const GameList = (props: Props) => {
                   />
                 </div>
               ))
-            ) : (
-              <p className="text-gray-300">該当するゲームが見つかりません。</p>
-            )}
+            ) : null /* メッセージは上部に移動したためここでは何も表示しない */}
           </div>
         )}
 
@@ -279,7 +291,8 @@ const GameList = (props: Props) => {
               );
             })
           ) : (
-            <p className="text-gray-300">該当するゲームが見つかりません。</p>
+            /* ゲームリストが空の場合、メッセージは上部に表示されるためここでは何も表示しない */
+            null
           )}
         </div>
       </Section>
