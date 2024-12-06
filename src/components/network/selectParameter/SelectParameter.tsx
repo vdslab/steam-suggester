@@ -18,6 +18,7 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DevicesIcon from "@mui/icons-material/Devices";
 import Section from "../Section";
+import HelpTooltip from "../HelpTooltip"; // 追加
 
 type Props = {
   filter: Filter;
@@ -90,11 +91,17 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
   };
 
   return (
-    <Panel title="フィルター" icon={<FilterListIcon className="mr-2 text-white" />}>
+    <Panel
+      title={
+        <div className="flex items-center">
+          <span>フィルター</span>
+          <HelpTooltip title="フィルターを適用することでゲームの絞り込みができます。" />
+        </div>
+      }
+      icon={<FilterListIcon className="mr-2 text-white" />}
+    >
       <div className="flex flex-col h-full">
-        <p className="text-gray-400 mb-4">
-          フィルターを適用することでゲームの絞り込みができます。
-        </p>
+        {/* 既存の説明テキストを削除 */}
         
         {/* ジャンルフィルター */}
         <Section title="ジャンル" icon={<CategoryIcon />}>
