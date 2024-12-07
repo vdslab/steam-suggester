@@ -211,7 +211,7 @@ const Network = () => {
         )}
 
         {/* ゲームリストパネル */}
-        <div className="absolute top-0 right-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10">
+        <div className="fixed top-15 right-0 w-1/5 min-h-[100vh] bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10">
           <GameList
             nodes={nodes}
             selectedIndex={selectedIndex}

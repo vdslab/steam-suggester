@@ -168,7 +168,7 @@ const GameList = (props: Props) => {
         icon={<SportsEsportsIcon className="mr-2 text-white" />}
       >
       {/* 全ゲームから検索セクション */}
-      <Section title="全ゲームから検索" icon={<SearchIcon />}>
+      <Section title="全ゲームから検索" icon={<SearchIcon />} hasDivider={false}>
         {/* <p className="text-gray-400 mb-2">ゲームの人気順に並んでいます。検索フォームを使ってゲームを追加したり、リストを絞り込むことができます。</p> */}
         <input
           type="text"
