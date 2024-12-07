@@ -17,7 +17,7 @@ export type SteamDetailsDataType = {
   developerName: string;
   salePrice: string;
   playTime: string;
-  review: object;
+  review: { [word: string]: number };
   difficulty: number;
   graphics: number;
   story: number;

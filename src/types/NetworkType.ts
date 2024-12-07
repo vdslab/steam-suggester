@@ -44,7 +44,7 @@ export type NodeType = {
   developerName: string;
   salePrice: string;
   playTime: string;
-  review: object;
+  review: { [word: string]: number };
   difficulty: number;
   graphics: number;
   story: number;
@@ -60,9 +60,10 @@ export type NodeType = {
 }
 
 export type LinkType = {
-  source: NodeType | number;
-  target: NodeType | number;
+  source: number;
+  target: number;
   index?: number;
+  distance?: number;
 }
 
 export type SimilarGameType = {
