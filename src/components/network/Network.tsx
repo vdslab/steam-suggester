@@ -17,6 +17,7 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
 import ChatBar from "./chatBar/ChatBar";
 import SteamList from "./steamList/SteamList";
+import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -167,7 +168,8 @@ const Network = () => {
       {isChatOpen && (
         <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
           <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
-            <ChatBar nodes={nodes} setNodes={setNodes} />
+            {/* <ChatBar nodes={nodes} setNodes={setNodes} /> */}
+            <SimilaritySettings />
           </Panel>
         </div>
       )}
