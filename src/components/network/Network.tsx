@@ -10,7 +10,7 @@ import StreamedList from "./streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/desktop/loading";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
-import { getFilterData, getGameIdData } from "@/hooks/indexedDB";
+import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
 import ChatIcon from "@mui/icons-material/Chat";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
@@ -39,8 +39,8 @@ const Network = () => {
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
 
-  const initialNodes = async (filter: Filter, gameIds: string[]) => {
-    const result = await createNetwork(filter, gameIds);
+  const initialNodes = async (filter: Filter, gameIds: string[], slider: object) => {
+    const result = await createNetwork(filter, gameIds, slider);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -61,8 +61,9 @@ const Network = () => {
       (async () => {
         const filter = (await getFilterData()) ?? DEFAULT_FILTER;
         const gameIds = (await getGameIdData()) ?? [];
+        const slider = (await getSliderData()) ?? {};
         setFilter(filter);
-        await initialNodes(filter, gameIds);
+        await initialNodes(filter, gameIds, slider);
         setIsLoading(false);
       })();
     }
@@ -72,7 +73,8 @@ const Network = () => {
     if (!isLoading) {
       (async () => {
         const gameIds = (await getGameIdData()) ?? [];
-        initialNodes(filter, gameIds);
+        const slider = (await getSliderData()) ?? {};
+        initialNodes(filter, gameIds, slider);
       })();
     }
   }, [filter]);

@@ -8,19 +8,10 @@ import { SimilarGameType } from '@/types/NetworkType';
 
 import calcWeight from '@/hooks/calcWeight';
 
-const createNetwork = async (filter: Filter, gameIds: string[]) => {
+const createNetwork = async (filter: Filter, gameIds: string[], slider: object) => {
   const k = 4;
   const minDistance = 50;
   const maxDistance = 300;
-
-  const userFocusElements = {
-    genre: 0.16,
-    review: 0.16,
-    system: 0.16,
-    graphic: 0.16,
-    worldview: 0.16,
-    playstyle: 0.16,
-  }
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
@@ -89,7 +80,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     for (let j = i + 1; j < nodes.length; j++) {
       const sourceNode = nodes[i];
       const targetNode = nodes[j];
-      const weight = calcWeight(sourceNode, targetNode, userFocusElements);
+      const weight = calcWeight(sourceNode, targetNode, slider);
       allEdges.push({ source: sourceNode.index, target: targetNode.index, weight });
       if (weight < minWeight) minWeight = weight;
       if (weight > maxWeight) maxWeight = weight;

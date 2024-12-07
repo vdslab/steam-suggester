@@ -4,7 +4,7 @@ import Headline from "../common/Headline";
 import DisplayGame from "./DisplayGame";
 import { DetailsPropsType, SimilarGamePropsType } from "@/types/DetailsType";
 import { DEFAULT_FILTER } from "@/constants/DEFAULT_FILTER";
-import { getFilterData, getGameIdData } from "@/hooks/indexedDB";
+import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import { useEffect, useState } from "react";
 
 type GameType = {
@@ -33,7 +33,8 @@ const SimilarGames = (props: DetailsPropsType) => {
     (async () => {
       const filter = await getFilterData() ?? DEFAULT_FILTER;
       const gameIds = await getGameIdData() ?? [];
-      const { similarGames } = await createNetwork(filter, gameIds);
+      const slider = await getSliderData() ?? {};
+      const { similarGames } = await createNetwork(filter, gameIds, slider);
   
       if (similarGames && similarGames[currentSteamGameId]) {
         const promises = similarGames[currentSteamGameId].map(async (game: GameType) => {

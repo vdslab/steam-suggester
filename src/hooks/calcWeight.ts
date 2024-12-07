@@ -34,7 +34,8 @@ const getTagWeight = (tags: string[], index: number): number => {
   return tags.length - index;
 };
 
-const calcWeight = (node1: NodeType, node2: NodeType, userFocusElements: object): number => {
+const calcWeight = (node1: NodeType, node2: NodeType, slider: object): number => {
+  console.log(slider);
   let genresWeight = 0;
   const genres1: string[] = node1.genres;
   const genres2: string[] = node2.genres;
