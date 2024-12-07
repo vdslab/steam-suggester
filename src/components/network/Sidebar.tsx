@@ -6,6 +6,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import ChatIcon from "@mui/icons-material/Chat";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
+import TourIcon from '@mui/icons-material/Tour';
 
 type Props = {
   isFilterOpen: boolean;
@@ -16,6 +17,8 @@ type Props = {
   toggleChat: () => void;
   isSteamListOpen: boolean;
   toggleSteamList: () => void;
+  tourRun: boolean;
+  toggleTourRun: () => void;
 };
 
 
@@ -27,7 +30,10 @@ const Sidebar: React.FC<Props> = ({
   isChatOpen,
   toggleChat,
   isSteamListOpen,
-  toggleSteamList
+  toggleSteamList,
+  tourRun,
+  toggleTourRun
+
 }) => {
   // 共通のボタンクラス
   const buttonClasses = (isActive: boolean) =>
@@ -40,7 +46,7 @@ const Sidebar: React.FC<Props> = ({
       {/* フィルターボタン */}
       <button
         onClick={toggleFilter}
-        className={buttonClasses(isFilterOpen)}
+        className={`${buttonClasses(isFilterOpen)} step1`}
       >
         <FilterListIcon />
         <span className="text-xs mt-1">フィルター</span>
@@ -49,7 +55,7 @@ const Sidebar: React.FC<Props> = ({
       {/* Streamerボタン */}
       <button
         onClick={toggleStreamer}
-        className={buttonClasses(isStreamerOpen)}
+        className={`${buttonClasses(isStreamerOpen)} step2`}
       >
         <LiveTvIcon />
         <span className="text-xs mt-1">配信者</span>
@@ -58,7 +64,7 @@ const Sidebar: React.FC<Props> = ({
       {/* ChatBarボタン */}
       <button
         onClick={toggleChat}
-        className={buttonClasses(isChatOpen)}
+        className={`${buttonClasses(isChatOpen)} step3`}
       >
         <ChatIcon />
         <span className="text-xs mt-1">チャット</span>
@@ -67,12 +73,23 @@ const Sidebar: React.FC<Props> = ({
       {/* Steamリストボタン */}
       <button
         onClick={toggleSteamList}
-        className={buttonClasses(isSteamListOpen)}
+        className={`${buttonClasses(isSteamListOpen)} step4`}
       >
         <SportsEsportsIcon />
         <span className="text-xs mt-1">Steam連携</span>
         <span className="text-[10px] text-gray-400">（ログイン & フレンド）</span>
       </button>
+
+      {/* ツアーボタン */}
+      <button
+        onClick={toggleTourRun}
+        className={`${buttonClasses(tourRun)}`}
+      >
+        <TourIcon />
+        <span className="text-xs mt-1">ツアー開始</span>
+      </button>
+
+
     </div>
   );
 };

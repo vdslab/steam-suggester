@@ -160,7 +160,7 @@ const GameList = (props: Props) => {
   return (
     <Panel
         title={
-          <div className="flex items-center">
+          <div className="flex items-center step5">
             <span>ゲームリスト</span>
             <HelpTooltip title="ゲームの人気順に並んでいます。検索フォームを使ってゲームを追加したり、リストを絞り込むことができます。" />
           </div>
@@ -208,7 +208,7 @@ const GameList = (props: Props) => {
         )}
 
         {/* ゲームリスト表示 */}
-        <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
+        <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto step6">
           {filteredNodeList.length > 0 ? (
             filteredNodeList.map((node: NodeType) => {
               const originalRank = rankMap[node.steamGameId] || 0; // 元の順位を取得

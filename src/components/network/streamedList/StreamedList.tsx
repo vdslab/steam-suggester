@@ -25,7 +25,6 @@ type Props = {
 
 const StreamedList = (props: Props) => {
   const { nodes, streamerIds, setStreamerIds } = props;
-  console.log(streamerIds);
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
   const [isLoading, setIsLoading] = useState<string[]>([]);
