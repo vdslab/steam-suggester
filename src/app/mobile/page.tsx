@@ -1,5 +1,12 @@
-export default function Page() {
+import { HomeHeaderMobile } from "@/components/common/Headers";
+import NetworkMobile from "@/components/mobile/network/NetworkMobile";
+
+export default async function Page() {
+
   return (
-    <div>開発中</div>
-  )
+    <>
+      <HomeHeaderMobile />
+      <NetworkMobile />
+    </>
+  );
 }

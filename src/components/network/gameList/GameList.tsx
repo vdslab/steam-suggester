@@ -6,12 +6,10 @@ import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
-import { SteamGenreType } from "@/types/api/getSteamDetailType";
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
-import ListIcon from "@mui/icons-material/List";
 import Panel from "../Panel";
 import Section from "../Section";
 
@@ -134,7 +132,7 @@ const GameList = (props: Props) => {
       
       {/* ゲームを追加セクション */}
       <Section title="ゲームを追加" icon={<PlaylistAddIcon />}>
-        <p className="text-gray-400 mb-2">好きなゲームを追加して、グラフに表示することができます。</p>
+        <p className="text-gray-400 mb-2 step5">好きなゲームを追加して、グラフに表示することができます。</p>
         <input
           type="text"
           placeholder="ゲームタイトルを検索して追加"
@@ -162,7 +160,7 @@ const GameList = (props: Props) => {
 
       {/* ゲーム検索＆リストセクション */}
       <Section title="ゲーム検索＆リスト" icon={<SearchIcon />}>
-        <p className="text-gray-400 mb-2">ゲームの人気順に並んでいます。また、グラフ上のゲームアイコンを押すと、そのゲームの詳細が表示されます。</p>
+        <p className="text-gray-400 mb-2 step6">ゲームの人気順に並んでいます。また、グラフ上のゲームアイコンを押すと、そのゲームの詳細が表示されます。</p>
         <input
           type="text"
           placeholder="ゲームリストを検索"

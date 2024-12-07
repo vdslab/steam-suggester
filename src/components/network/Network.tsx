@@ -18,6 +18,11 @@ import Panel from "./Panel";
 import ChatBar from "./chatBar/ChatBar";
 import SteamList from "./steamList/SteamList";
 
+import Joyride from 'react-joyride';
+import Tour from "./Tour";
+
+
+
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
 
@@ -37,6 +42,7 @@ const Network = () => {
   const [isStreamerOpen, setIsStreamerOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
+  const [tourRun, setTourRun] = useState<boolean>(true);
 
   const initialNodes = async (filter: Filter, gameIds: string[]) => {
     const result = await createNetwork(filter, gameIds);
@@ -84,6 +90,7 @@ const Network = () => {
         setIsStreamerOpen(false);
         setIsChatOpen(false);
         setIsSteamListOpen(false);
+        setTourRun(false);
       }
       return newState;
     });
@@ -96,6 +103,7 @@ const Network = () => {
         setIsFilterOpen(false);
         setIsChatOpen(false);
         setIsSteamListOpen(false);
+        setTourRun(false);
       }
       return newState;
     });
@@ -108,6 +116,7 @@ const Network = () => {
         setIsFilterOpen(false);
         setIsStreamerOpen(false);
         setIsSteamListOpen(false);
+        setTourRun(false);
       }
       return newState;
     });
@@ -120,6 +129,20 @@ const Network = () => {
         setIsFilterOpen(false);
         setIsStreamerOpen(false);
         setIsChatOpen(false);
+        setTourRun(false);
+      }
+      return newState;
+    });
+  };
+
+  const toggleTourRun = () => {
+    setTourRun((prev) => {
+      const newState = !prev;
+      if (newState) {
+        setIsFilterOpen(false);
+        setIsStreamerOpen(false);
+        setIsChatOpen(false);
+        setIsSteamListOpen(false);
       }
       return newState;
     });
@@ -141,6 +164,8 @@ const Network = () => {
         toggleChat={toggleChat}
         isSteamListOpen={isSteamListOpen}
         toggleSteamList={toggleSteamList}
+        tourRun={tourRun}
+        toggleTourRun={toggleTourRun}
       />
 
       {/* フィルターパネル */}
@@ -180,7 +205,7 @@ const Network = () => {
       )}
 
       {/* メインコンテンツエリア */}
-      <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
+      <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden step0">
         <NodeLink
           nodes={nodes}
           links={links}
@@ -202,6 +227,9 @@ const Network = () => {
           setIsLoading={setIsLoading}
         />
       </div>
+
+      <Tour run={tourRun} setRun={setTourRun}/>
+
     </div>
   );
 };
