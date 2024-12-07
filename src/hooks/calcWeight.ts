@@ -34,7 +34,7 @@ const getTagWeight = (tags: string[], index: number): number => {
   return tags.length - index;
 };
 
-const calcWeight = (node1: NodeType, node2: NodeType): number => {
+const calcWeight = (node1: NodeType, node2: NodeType, userFocusElements: object): number => {
   let genresWeight = 0;
   const genres1: string[] = node1.genres;
   const genres2: string[] = node2.genres;
@@ -69,7 +69,7 @@ const calcWeight = (node1: NodeType, node2: NodeType): number => {
 
   const genreTagWeight = (genresWeight + tagsWeight) * 10;
 
-  const review1 = node1.review;
+  /* const review1 = node1.review;
   const review2 = node2.review;
 
   let cosineSimilarity = 0;
@@ -80,9 +80,9 @@ const calcWeight = (node1: NodeType, node2: NodeType): number => {
     console.warn('Invalid review format. Setting cosineSimilarity to 0.');
   }
 
-  const similarityWeight = cosineSimilarity * 100;
+  const similarityWeight = cosineSimilarity * 100; */
 
-  const totalWeightCalculated = 0.7 * genreTagWeight + 0.3 * similarityWeight;
+  const totalWeightCalculated = 0.7 * genreTagWeight;
 
   return totalWeightCalculated;
 };

@@ -13,6 +13,15 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
   const minDistance = 50;
   const maxDistance = 300;
 
+  const userFocusElements = {
+    genre: 0.16,
+    review: 0.16,
+    system: 0.16,
+    graphic: 0.16,
+    worldview: 0.16,
+    playstyle: 0.16,
+  }
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     { next: { revalidate: ISR_FETCH_INTERVAL } }
@@ -81,7 +90,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     for (let j = i + 1; j < nodes.length; j++) {
       const sourceNode = nodes[i];
       const targetNode = nodes[j];
-      const weight = calcWeight(sourceNode, targetNode);
+      const weight = calcWeight(sourceNode, targetNode, userFocusElements);
       allEdges.push({ source: sourceNode.index, target: targetNode.index, weight });
       if (weight < minWeight) minWeight = weight;
       if (weight > maxWeight) maxWeight = weight;
