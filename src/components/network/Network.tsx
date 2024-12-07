@@ -275,18 +275,6 @@ const Network = () => {
           />
         </div>
 
-        {/* ゲームリストパネル */}
-        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <GameList
-            nodes={nodes}
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-            setCenterX={setCenterX}
-            setCenterY={setCenterY}
-            setIsLoading={setIsLoading}
-          />
-        </div>
-
         <Tour run={tourRun} setRun={setTourRun}/>
 
       </div>
