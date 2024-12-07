@@ -1,5 +1,5 @@
 export type Filter = {
-  Categories: { [key: string]: boolean };
+  Genres: { [key: string]: boolean};
   Price: { startPrice: number, endPrice: number };
   Mode: {
     isSinglePlayer: boolean,

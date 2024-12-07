@@ -55,8 +55,7 @@ const createNetwork = async (filter: Filter, gameIds: string[]) => {
     ...new Set(
       data
         .filter((item: SteamDetailsDataType) => {
-          // ジャンルid廃止のため一時的にフィルター解除
-          // if(!item.genres.find((value: SteamGenreType) => filter["Categories"][value.id])) return false;
+          if(!item.genres.find((value: string) => filter["Genres"][value])) return false;
           if (!(filter.Price.startPrice <= item.price && item.price <= filter.Price.endPrice))
             return false;
           if (

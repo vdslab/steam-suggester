@@ -4,29 +4,29 @@ let db: IDBDatabase;
 let dbInitialized: Promise<IDBDatabase>;
 
 if (typeof window !== 'undefined') {
-  const request: IDBOpenDBRequest = indexedDB.open('steamNetwork', 2); // バージョン2にアップ
+  const request: IDBOpenDBRequest = indexedDB.open('steamNetwork', 3); // バージョン3にアップ
 
   request.onupgradeneeded = function (event: IDBVersionChangeEvent) {
     db = (event.target as IDBOpenDBRequest).result;
 
-    // すでに存在するストアがない場合は作成、存在する場合はそのまま
-    if (!db.objectStoreNames.contains('networkFilter')) {
-      const networkFilterStore: IDBObjectStore = db.createObjectStore('networkFilter', { keyPath: 'id' });
-      networkFilterStore.createIndex('Categories', 'Categories', { unique: false });
-      networkFilterStore.createIndex('Price', 'Price', { unique: false });
-      networkFilterStore.createIndex('Mode', 'Mode', { unique: false });
-      networkFilterStore.createIndex('Device', 'Device', { unique: false });
-      networkFilterStore.createIndex('Playtime', 'Playtime', { unique: false });
+    if (db.objectStoreNames.contains('networkFilter')) {
+      db.deleteObjectStore('networkFilter');
     }
+    const networkFilterStore: IDBObjectStore = db.createObjectStore('networkFilter', { keyPath: 'id' });
+    networkFilterStore.createIndex('Genres', 'Genres', { unique: false });
+    networkFilterStore.createIndex('Price', 'Price', { unique: false });
+    networkFilterStore.createIndex('Mode', 'Mode', { unique: false });
+    networkFilterStore.createIndex('Device', 'Device', { unique: false });
+    networkFilterStore.createIndex('Playtime', 'Playtime', { unique: false });
 
     if (!db.objectStoreNames.contains('userAddedGames')) {
       const userAddedGamesStore: IDBObjectStore = db.createObjectStore('userAddedGames', {keyPath: 'id'});
       userAddedGamesStore.createIndex('steamGameId', 'steamGameId', { unique: false });
     }
 
-    // スライダー設定用のストアを追加
+    // スライダー設定用のストア(すでにあるか確認)
     if (!db.objectStoreNames.contains('sliderSettings')) {
-      const sliderSettingsStore: IDBObjectStore = db.createObjectStore('sliderSettings', { keyPath: 'id' });
+      db.createObjectStore('sliderSettings', { keyPath: 'id' });
     }
   };
 
@@ -67,7 +67,7 @@ export async function getFilterData(): Promise<Filter | null> {
       if (result) {
         console.log('Data retrieved successfully:', result);
         const filterResult: Filter = {
-          Categories: result.Categories,
+          Genres: result.Genres,
           Price: result.Price,
           Mode: result.Mode,
           Device: result.Device,
@@ -147,7 +147,6 @@ export async function changeGameIdData(steamGameId: string[]) {
   };
 }
 
-// スライダー設定を取得する関数
 export async function getSliderData(): Promise<SliderSettings | null> {
   if (typeof window === 'undefined') return null;
   const db = await dbInitialized;
@@ -174,7 +173,6 @@ export async function getSliderData(): Promise<SliderSettings | null> {
   });
 }
 
-// スライダー設定を更新する関数
 export async function changeSliderData(sliderData: SliderSettings) {
   if (typeof window === 'undefined') return;
 
