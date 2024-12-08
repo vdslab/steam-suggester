@@ -17,8 +17,6 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
 import ChatBar from "./chatBar/ChatBar";
 import SteamList from "./steamList/SteamList";
-
-import Joyride from 'react-joyride';
 import Tour from "./Tour";
 
 

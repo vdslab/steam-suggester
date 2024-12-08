@@ -12,17 +12,18 @@ import ChatBar from "@/components/network/chatBar/ChatBar";
 import GameList from "@/components/network/gameList/GameList";
 import NodeLink from "@/components/network/NodeLink";
 import Panel from "@/components/network/Panel";
-import Sidebar from "@/components/network/Sidebar";
-import SteamList from "@/components/network/steamList/SteamList";
+
 import StreamedList from "@/components/network/streamedList/StreamedList";
 
-import FilterListIcon from '@mui/icons-material/FilterList';
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import SearchBar from "./SearchBar";
+import IconButton from "@mui/material/IconButton";
+
 import ChatIcon from "@mui/icons-material/Chat";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
-
 import ListIcon from '@mui/icons-material/List';
-import SearchBar from "./SearchBar";
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import CloseIcon from '@mui/icons-material/Close';
+import { useRouter } from "next/navigation";
 
 const buttonClasses = (isActive: boolean) =>
   `w-full py-2 text-center flex flex-col items-center ${
@@ -30,6 +31,8 @@ const buttonClasses = (isActive: boolean) =>
   } rounded transition-colors duration-200`;
 
 const NetworkMobile = () => {
+  const router = useRouter();
+
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
 
   const [nodes, setNodes] = useState<NodeType[]>([]);
@@ -87,6 +90,18 @@ const NetworkMobile = () => {
     }
   }, [filter]);
 
+  useEffect(() => {
+    if (selectedIndex !== -1) {
+      setIsStreamerOpen(false);
+      setIsChatOpen(false);
+      setIsSteamListOpen(false);
+      if (nodes[selectedIndex]) {
+        setCenterX((nodes[selectedIndex].x ?? 0) - 70);
+        setCenterY((nodes[selectedIndex].y ?? 0) + 150);
+      }
+    }
+  }, [selectedIndex]);
+
   // Sidebar のトグル関数
   const toggleStreamer = () => {
     setIsStreamerOpen((prev) => {
@@ -128,7 +143,7 @@ const NetworkMobile = () => {
   return (
     <div>
       {isStreamerOpen && (
-        <div className="w-2/3 h-[93vh] bg-transparent overflow-y-auto overflow-x-hidden fixed">
+        <div className="w-2/3 bg-transparent overflow-y-auto overflow-x-hidden fixed">
           <Panel title="配信者" icon={<LiveTvIcon className="mr-2 text-white" />}>
             <StreamedList
               nodes={nodes}
@@ -172,11 +187,51 @@ const NetworkMobile = () => {
 
         
         {isChatOpen && (
-          <div className="w-2/3 bg-transparent overflow-y-auto overflow-x-hidden">
-            <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
-              <ChatBar nodes={nodes} setNodes={setNodes} />
+          <div className="w-2/3 h-1/3 fixed bottom-0 right-0 bg-transparent overflow-hidden z-50">
+            <div className="bg-gray-800 rounded-r-lg p-4 shadow-md flex flex-col space-y-2 h-[93vh]">
+              <div className="flex items-center space-x-2">
+                <ChatIcon className="mr-2 text-white" />
+                <h2 className="text-white text-lg font-semibold">チャット</h2>
+              </div>
+              <div className="border-t border-gray-700 pt-2">
+                <ChatBar nodes={nodes} setNodes={setNodes} />
+              </div>
+              <IconButton onClick={toggleChat} sx={{ color: "white" }}>
+                <CloseIcon />
+              </IconButton>
+            </div>
+          </div>
+        )}
+
+        {selectedIndex !== -1 && (
+          <div className="w-full h-2/6 fixed bottom-0 right-0 bg-transparent overflow-y-auto z-30">
+            <Panel title={nodes[selectedIndex].title} icon={<MenuBookIcon className="mr-2 text-white" />}>
+            <div className="text-gray-300 overflow-y-auto">
+              {nodes[selectedIndex].shortDetails}
+              <div className="mt-4 flex space-x-2">
+                <button
+                  className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
+                  onClick={() =>
+                    router.push(
+                      `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
+                    )
+                  }
+                >
+                  詳細を確認
+                </button>
+                <button
+                  className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
+                  onClick={() => setSelectedIndex(-1)}
+                >
+                  閉じる
+                </button>
+              </div>
+            </div>
             </Panel>
           </div>
+
+
+
         )}
 
         <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden">
@@ -195,38 +250,27 @@ const NetworkMobile = () => {
             onClick={toggleStreamer}
             className={buttonClasses(isStreamerOpen)}
           >
-            <LiveTvIcon />
+            <LiveTvIcon fontSize="large"/>
           </button>
           <button
             onClick={toggleSteamList}
             className={buttonClasses(isSteamListOpen)}
           >
-            <ListIcon />
+            <ListIcon fontSize="large"/>
           </button>
         </div>
 
 
-        <div className="fixed bottom-2 right-2 z-10 bg-transparent text-white">
-          <button
+        <div className="fixed bottom-2 right-2 z-10 bg-transparent">
+          <IconButton
             onClick={toggleChat}
-            className={buttonClasses(isChatOpen)}
+            sx={{ color: "white", borderWidth: 2, borderColor: "white", borderStyle: "solid", borderRadius: 9999, flexDirection: "column", bgcolor:"#08082e" }}
           >
             <ChatIcon />
-          </button>
+            <div className="text-sm">AIChat</div>
+          </IconButton>
         </div>
 
-
-        {/* ゲームリストパネル */}
-        {/* <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <GameList
-            nodes={nodes}
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-            setCenterX={setCenterX}
-            setCenterY={setCenterY}
-            setIsLoading={setIsLoading}
-          />
-        </div> */}
       </div>
     </div>
   );
