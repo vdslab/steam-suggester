@@ -9,6 +9,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import Panel from "../Panel";
 import Section from "../Section";
 
+import { signIn, signOut } from 'next-auth/react';
+
 type GetFriendGamesResponse = {
   friendsName: string[];
   gameName: string;
@@ -101,7 +103,13 @@ const OwnedGames = () => {
             </div>
           </Section>
         </div>
-      ) : null}
+      ) : (
+        <div>
+          <div>
+            <button onClick={() => signIn('steam')}>Steamでログイン</button>
+          </div>
+        </div>
+      )}
     </Panel>
   );
 };

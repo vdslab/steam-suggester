@@ -3,7 +3,7 @@ export type SteamDetailsDataType = {
   steamGameId: string;
   totalViews?: number;
   title: string;
-  genres: SteamGenreType[];
+  genres: string[];
   price: number;
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
@@ -17,7 +17,7 @@ export type SteamDetailsDataType = {
   developerName: string;
   salePrice: string;
   playTime: string;
-  review: object;
+  review: { [word: string]: number };
   difficulty: number;
   graphics: number;
   story: number;
@@ -51,7 +51,7 @@ export type SteamDetailApiType = {
   platforms: SteamDeviceType;
   metacritic: SteamMetacriticType;
   categories: SteamCategoryType[];
-  genres: SteamGenreType[];
+  genres: string[];
   screenshots: SteamScreenshotType[];
   movies: SteamMoviesType[];
   recommendations: {
@@ -68,11 +68,6 @@ export type SteamDetailApiType = {
 
 export type SteamCategoryType = {
   id: number,
-  description: string
-}
-
-export type SteamGenreType = {
-  id: string,
   description: string
 }
 

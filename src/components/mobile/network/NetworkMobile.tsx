@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { DEFAULT_FILTER } from "@/constants/DEFAULT_FILTER";
-import { Filter } from "@/types/api/FilterType";
+import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
+import { Filter, SliderSettings } from "@/types/api/FilterType";
 import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/desktop/loading";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
-import { getFilterData, getGameIdData } from "@/hooks/indexedDB";
+import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 
 import SelectParameter from "@/components/network/selectParameter/SelectParameter";
 import ChatBar from "@/components/network/chatBar/ChatBar";
@@ -52,8 +52,8 @@ const NetworkMobile = () => {
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
 
-  const initialNodes = async (filter: Filter, gameIds: string[]) => {
-    const result = await createNetwork(filter, gameIds);
+  const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
+    const result = await createNetwork(filter, gameIds, slider);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -73,9 +73,10 @@ const NetworkMobile = () => {
     if (isLoading) {
       (async () => {
         const filter = (await getFilterData()) ?? DEFAULT_FILTER;
+        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
         const gameIds = (await getGameIdData()) ?? [];
         setFilter(filter);
-        await initialNodes(filter, gameIds);
+        await initialNodes(filter, gameIds, slider);
         setIsLoading(false);
       })();
     }
@@ -85,7 +86,8 @@ const NetworkMobile = () => {
     if (!isLoading) {
       (async () => {
         const gameIds = (await getGameIdData()) ?? [];
-        initialNodes(filter, gameIds);
+        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
+        initialNodes(filter, gameIds, slider);
       })();
     }
   }, [filter]);
