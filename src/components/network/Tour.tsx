@@ -1,5 +1,4 @@
 'use client';
-import React from 'react'
 import Joyride, { CallBackProps, STATUS } from 'react-joyride'
 
 const steps = [
@@ -9,16 +8,16 @@ const steps = [
     disableBeacon: true,
   },
   {
+    target: '.step3',
+    content: 'グラフのゲーム配置を変更できます。',
+  },
+  {
     target: '.step1',
     content: '表示するゲームの絞りこみができます。',
   },
   {
     target: '.step2',
-    content: '配信者の配信者のゲームを強調表示できます。',
-  },
-  {
-    target: '.step3',
-    content: 'AIチャットを表示できます。',
+    content: '配信者が過去に配信したゲームを強調表示できます。',
   },
   {
     target: '.step4',

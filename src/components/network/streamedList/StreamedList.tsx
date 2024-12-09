@@ -327,7 +327,7 @@ const StreamedList = (props: Props) => {
           placeholder="ここに配信者を入力"
           value={searchStreamerQuery}
           onChange={(e) => setSearchStreamerQuery(e.target.value)}
-          className="w-full px-3 py-1 mb-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
+          className="w-full px-3 py-1 mb-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out text-black"
         />
         {searchStreamerQuery && (
           <div className="bg-gray-700 p-2 rounded-lg mt-0 relative max-h-40 overflow-y-auto">

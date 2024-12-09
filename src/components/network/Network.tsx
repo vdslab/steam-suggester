@@ -12,13 +12,13 @@ import Loading from "@/app/desktop/loading";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
-import ChatIcon from "@mui/icons-material/Chat";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
-import ChatBar from "./chatBar/ChatBar";
 import SteamList from "./steamList/SteamList";
 import HelpTooltip from "./HelpTooltip";
 import Tour from "./Tour";
+import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
+import TuneIcon from "@mui/icons-material/Tune";
 
 
 
@@ -154,7 +154,7 @@ const Network = () => {
   }
 
   return (
-    <div className="flex h-[92vh] overflow-hidden">
+    <div className="flex h-[92vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
         isFilterOpen={isFilterOpen}
@@ -217,13 +217,13 @@ const Network = () => {
               <Panel
                   title={
                     <div className="flex items-center">
-                      <span>チャット</span>
-                      <HelpTooltip title="ゲームに関する質問を入力してください。ネットワーク内の関連ノードが強調表示されます。" />
+                      <span>類似度設定</span>
+                      <HelpTooltip title="ゲーム間の類似度計算における重みを調整できます。プリセットは4軸で構成されていますが、詳細設定を有効にするとさらに細かい調整が可能です。" />
                     </div>
                   }
-                  icon={<ChatIcon className="mr-2 text-white" />}
+                  icon={<TuneIcon className="mr-2 text-white" />}
                 >
-                <ChatBar nodes={nodes} setNodes={setNodes} />
+                <SimilaritySettings />
               </Panel>
             </div>
           )}
@@ -246,22 +246,6 @@ const Network = () => {
               setIsLoading={setIsLoading}
             />
           </div>
-
-        {/* ChatBarパネル*/}
-        {isChatOpen && (
-          <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
-            <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
-              <ChatBar nodes={nodes} setNodes={setNodes} />
-            </Panel>
-          </div>
-        )}
-
-        {/* Steam連携パネル */}
-        {isSteamListOpen && (
-          <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-            <SteamList />
-          </div>
-        )}
 
         <Tour run={tourRun} setRun={setTourRun}/>
 

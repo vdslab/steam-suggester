@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Panel from "../Panel";
 import Section from "../Section";
-import SettingsIcon from "@mui/icons-material/Settings";
 import TuneIcon from "@mui/icons-material/Tune";
 import InfoIcon from "@mui/icons-material/Info";
 
@@ -122,11 +120,7 @@ const SimilaritySettings = () => {
   }, []);
 
   return (
-    <Panel title="類似度設定" icon={<SettingsIcon className="mr-2 text-white" />}>
-      <p className="text-gray-400 mb-4">
-        ゲーム間の類似度計算における重みを調整できます。プリセットは4軸で構成されていますが、詳細設定を有効にするとさらに細かい調整が可能です。
-      </p>
-
+    <>
       <Section title="メイン指標" icon={<TuneIcon />}>
         {!isDetailMode ? (
           <div className="mb-4">
@@ -271,7 +265,7 @@ const SimilaritySettings = () => {
           類似度設定を適用
         </button>
       </div>
-    </Panel>
+    </>
   );
 };
 

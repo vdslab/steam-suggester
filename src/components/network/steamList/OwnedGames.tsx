@@ -8,8 +8,11 @@ import GroupIcon from '@mui/icons-material/Group';
 import PersonIcon from '@mui/icons-material/Person';
 import Panel from "../Panel";
 import Section from "../Section";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import { signIn, signOut } from 'next-auth/react';
+import Image from 'next/image';
+import { IconButton } from "@mui/material";
 
 type GetFriendGamesResponse = {
   friendsName: string[];
@@ -58,6 +61,25 @@ const OwnedGames = () => {
     <Panel title="Steamゲーム一覧" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
       {status === 'authenticated' ? (
         <div>
+          <div className="flex items-center justify-between m-3" >
+            <div className="flex items-center">
+              {session?.user && session.user.image ? (
+                <Image
+                  src={session.user.image}
+                  alt="user"
+                  width={30}
+                  height={30}
+                  style={{ borderRadius: '50%' }}
+                />
+              ) : (
+                <PersonIcon />
+              )}
+              <div className="ml-3">{session.user?.name}</div>
+            </div>
+            <IconButton onClick={() => signOut()} sx={{ color: 'white' }}>
+              <LogoutIcon sx={{ color:'white', }}/>
+            </IconButton>
+          </div>
           {/* 自分の所有ゲーム */}
           <Section title="自分の所有ゲーム" icon={<PersonIcon />}>
             <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
@@ -104,9 +126,22 @@ const OwnedGames = () => {
           </Section>
         </div>
       ) : (
-        <div>
-          <div>
-            <button onClick={() => signIn('steam')}>Steamでログイン</button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+          <div style={{ textAlign: 'center' }}>
+            <h2>Steamでログインしてゲームを表示</h2>
+            <button
+              onClick={() => signIn('steam')}
+              style={{
+                padding: '10px 20px',
+                fontSize: '16px',
+                borderRadius: '5px',
+                color: '#0066c0',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Steamでログイン
+            </button>
           </div>
         </div>
       )}
