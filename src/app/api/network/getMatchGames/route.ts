@@ -2,7 +2,7 @@ import { PG_POOL } from "@/constants/PG_POOL";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const GAME_COUNT = 300;
+  const GAME_COUNT = 200;
   try {
     const today = new Date();
     today.setDate(today.getDate() - 1);

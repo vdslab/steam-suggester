@@ -1,194 +1,210 @@
 import * as d3 from 'd3';
-import { Filter } from '@/types/api/FilterType';
+import { Filter, SliderSettings } from '@/types/api/FilterType';
 import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
-import { calcAllMatchPercentage } from '@/components/common/CalcMatch';
-import { LinkType, NodeType } from '@/types/NetworkType';
 import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
-import { SimilarGameType } from '@/types/NetworkType';
+import { SimilarGameType, NodeType, LinkType } from '@/types/NetworkType';
+import { calculateSimilarityMatrix } from '@/hooks/calcWeight';
 
-import calcWeight from '@/hooks/calcWeight';
+const k = 4;
 
-const createNetwork = async (filter: Filter, gameIds: string[], slider: object) => {
-  const k = 4;
-  const minDistance = 50;
-  const maxDistance = 300;
+const hashString = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return hash;
+};
 
+const getFixedCoordinates = (id: string, range: number): { x: number; y: number } => {
+  const hash = hashString(id);
+  const x = ((hash % range) - range / 2) / 2;
+  const y = (((hash >> 16) % range) - range / 2) / 2;
+  return { x, y };
+};
+
+const createNetwork = async (
+  filter: Filter,
+  gameIds: string[],
+  slider: SliderSettings
+): Promise<{ nodes: NodeType[]; links: LinkType[]; similarGames: SimilarGameType }> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     { next: { revalidate: ISR_FETCH_INTERVAL } }
   );
-  if (!response) {
-    return {};
+
+  if (!response.ok) {
+    return { nodes: [], links: [], similarGames: {} };
   }
+
   const data: SteamDetailsDataType[] = await response.json();
 
   const promises = gameIds
-    .filter((gameId: string) =>
-      !data.find((d: SteamDetailsDataType) => d.steamGameId === gameId)
-    )
-    .map(async (gameId: string) => {
+    .filter(gameId => !data.find(d => d.steamGameId === gameId))
+    .map(async gameId => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`,
         { next: { revalidate: ISR_FETCH_INTERVAL } }
       );
-      const d = await res.json();
-      data.push(d);
+      if (res.ok) {
+        const d: SteamDetailsDataType = await res.json();
+        data.push(d);
+      }
     });
 
   await Promise.all(promises);
 
-  const links: LinkType[] = [];
-  const similarGames: SimilarGameType = {};
-
-  const matchScale = d3.scaleLinear().domain([0, 100]).range([1, 3]);
-
-  const nodes: NodeType[] = [
-    ...new Set(
-      data
-        .filter((item: SteamDetailsDataType) => {
-          if(!item.genres.find((value: string) => filter["Genres"][value])) return false;
-          if (!(filter.Price.startPrice <= item.price && item.price <= filter.Price.endPrice))
-            return false;
-          if (
-            !(
-              (item.isSinglePlayer && filter.Mode.isSinglePlayer) ||
-              (item.isMultiPlayer && filter.Mode.isMultiPlayer)
-            )
-          )
-            return false;
-          if (
-            !(
-              (item.device.windows && filter.Device.windows) ||
-              (item.device.mac && filter.Device.mac)
-            )
-          )
-            return false;
-          return true;
-        })
-        .map((item: SteamDetailsDataType, i: number) => {
-          return { ...item, index: i, suggestValue: 0 };
-        })
-    ),
-  ];
-
-  let minWeight = Infinity;
-  let maxWeight = -Infinity;
-
-  // 全ノードペアの重みを計算し、minWeightとmaxWeightを更新
-  const allEdges: { source: number; target: number; weight: number }[] = [];
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = i + 1; j < nodes.length; j++) {
-      const sourceNode = nodes[i];
-      const targetNode = nodes[j];
-      const weight = calcWeight(sourceNode, targetNode, slider);
-      allEdges.push({ source: sourceNode.index, target: targetNode.index, weight });
-      if (weight < minWeight) minWeight = weight;
-      if (weight > maxWeight) maxWeight = weight;
-    }
-  }
-
-  const distanceScale = d3
-    .scaleLinear()
-    .domain([minWeight, maxWeight])
-    .range([maxDistance, minDistance]);
-
-  // エッジ候補を類似度（重み）が高い順にソート
-  allEdges.sort((a, b) => b.weight - a.weight);
-
-  // 各ノードの現在の接続数をカウントするMap
-  const connectionCount: Map<number, number> = new Map();
-  nodes.forEach((node) => connectionCount.set(node.index, 0));
-
-  // エッジ追加時の重複防止のためのSet
-  const edgeSet: Set<string> = new Set();
-
-  // エッジを順に追加し、各ノードがk個のエッジを持つように制限
-  for (const edge of allEdges) {
-    const { source, target, weight } = edge;
-
-    // 既にk個のエッジを持つ場合はスキップ
-    if ((connectionCount.get(source) || 0) >= k) continue;
-    if ((connectionCount.get(target) || 0) >= k) continue;
-
-    // エッジの重複を防止（無向グラフとして扱う）
-    const edgeKey =
-      source < target ? `${source}-${target}` : `${target}-${source}`;
-    if (edgeSet.has(edgeKey)) continue;
-
-    // エッジを追加
-    links.push({ source, target, distance: weight > 0 ? distanceScale(weight) : maxDistance });
-    edgeSet.add(edgeKey);
-
-    // 接続数を更新
-    connectionCount.set(source, (connectionCount.get(source) || 0) + 1);
-    connectionCount.set(target, (connectionCount.get(target) || 0) + 1);
-  }
-
-  nodes.forEach((node: NodeType) => {
-    const overallMatchPercent = calcAllMatchPercentage(filter, node);
-    node.circleScale = matchScale(overallMatchPercent);
+  const rawNodes = data.filter(item => {
+    return (
+      filter.Price.startPrice <= item.price &&
+      item.price <= filter.Price.endPrice &&
+      ((item.isSinglePlayer && filter.Mode.isSinglePlayer) ||
+        (item.isMultiPlayer && filter.Mode.isMultiPlayer)) &&
+      ((item.device.windows && filter.Device.windows) ||
+        (item.device.mac && filter.Device.mac))
+    );
   });
 
-  nodes.sort((node1: NodeType, node2: NodeType) => (node2?.circleScale ?? 0) - (node1?.circleScale ?? 0));
+  const nodes: NodeType[] = rawNodes.map((item, i) => {
+    const { x, y } = getFixedCoordinates(item.steamGameId, 800);
+    return {
+      ...item,
+      index: i,
+      suggestValue: 0,
+      x,
+      y,
+      vx: 0,
+      vy: 0
+    };
+  });
 
-  const simulation = d3
-    .forceSimulation<NodeType>(nodes)
-    .force(
-      'link',
-      d3
-        .forceLink<NodeType, LinkType>(links)
-        .id((d: NodeType) => d.index)
-        .distance((item: LinkType) => {
-          return item.distance || maxDistance;
-        })
-    )
-    .force('charge', d3.forceManyBody<NodeType>().strength(-1000)) // 強度調整
+  if (nodes.length === 0) {
+    return { nodes, links: [], similarGames: {} };
+  }
+
+  // 各ノード間の類似性スコアを計算
+  const similarityMatrix = calculateSimilarityMatrix(nodes);
+
+  // クラスタ中心も固定座標に基づいて設定
+  const clusterCenters = new Map<number, { x: number; y: number }>();
+  nodes.forEach((node, i) => {
+    if (!clusterCenters.has(i)) {
+      clusterCenters.set(i, getFixedCoordinates(node.steamGameId, 1000));
+    }
+  });
+
+  // ノードを類似性スコアに基づいてクラスタ中心に引き寄せる
+  const clusterForce = (alpha: number) => {
+    const strength = 0.1;
+    nodes.forEach((sourceNode, i) => {
+      const targetIndex = similarityMatrix[i].reduce(
+        (bestIndex, score, index) =>
+          score > similarityMatrix[i][bestIndex] ? index : bestIndex,
+        0
+      );
+
+      const clusterCenter = clusterCenters.get(targetIndex);
+      if (clusterCenter) {
+        const dx = clusterCenter.x - (sourceNode.x ?? 0);
+        const dy = clusterCenter.y - (sourceNode.y ?? 0);
+        sourceNode.vx = (sourceNode.vx ?? 0) + dx * strength * alpha;
+        sourceNode.vy = (sourceNode.vy ?? 0) + dy * strength * alpha;
+      }
+    });
+  };
+
+  const sizeScale = d3.scaleSqrt()
+    .domain(d3.extent(nodes, d => d.totalViews) as [number, number])
+    .range([1, 4]);
+
+  nodes.forEach((node: NodeType) => {
+    node.circleScale = sizeScale(node.totalViews ?? 0);
+  });
+
+  const simulation = d3.forceSimulation(nodes)
+    .force('charge', d3.forceManyBody<NodeType>().strength(-50))
+    .force('center', d3.forceCenter(0, 0))
     .force(
       'collide',
-      d3.forceCollide<NodeType>().radius((d: NodeType) => (d.circleScale ?? 1) * 20)
-    ) // 衝突防止
-    .force('radial', d3.forceRadial(1000)); // 半径dの円形
+      d3.forceCollide<NodeType>().radius(d => (d.circleScale ?? 1) * 20)
+    )
+    .on('tick', () => {
+      clusterForce(simulation.alpha());
+    });
 
-  simulation.tick(300).stop();
-
-  nodes.forEach((node: NodeType) => {
-    similarGames[node.steamGameId] = [] as { steamGameId: string; twitchGameId: string }[];
- });
-
-  links.forEach((link: LinkType) => {
-    type GameType = {
-      steamGameId: string;
-      twitchGameId: string;
-    };
-    const sourceGame = nodes.find((n) => n.index === link.source);
-    const targetGame = nodes.find((n) => n.index === link.target);
-
-    if (sourceGame && targetGame) {
-      const isSourceGameIncluded = similarGames[sourceGame.steamGameId].some(
-        (game: GameType) =>
-          game.steamGameId === targetGame.steamGameId &&
-          game.twitchGameId === targetGame.twitchGameId
-      );
-      if (!isSourceGameIncluded) {
-        similarGames[sourceGame.steamGameId].push({
-          steamGameId: targetGame.steamGameId,
-          twitchGameId: targetGame.twitchGameId,
-        });
-      }
-
-      const isTargetGameIncluded = similarGames[targetGame.steamGameId].some(
-        (game: GameType) =>
-          game.steamGameId === sourceGame.steamGameId &&
-          game.twitchGameId === sourceGame.twitchGameId
-      );
-      if (!isTargetGameIncluded) {
-        similarGames[targetGame.steamGameId].push({
-          steamGameId: sourceGame.steamGameId,
-          twitchGameId: sourceGame.twitchGameId,
-        });
-      }
-    }
+  await new Promise<void>(resolve => {
+    simulation.on('end', function () {
+      resolve();
+    });
   });
+
+  simulation.stop();
+
+  const links: LinkType[] = [];
+
+  const connectionCount = new Map<number, number>();
+
+  nodes.forEach((sourceNode) => {
+    const sourceIndex = sourceNode.index;
+
+    const distances = nodes
+      .filter(targetNode => targetNode !== sourceNode)
+      .map(targetNode => ({
+        targetNode,
+        distance: Math.sqrt(
+          Math.pow((sourceNode.x ?? 0) - (targetNode.x ?? 0), 2) +
+          Math.pow((sourceNode.y ?? 0) - (targetNode.y ?? 0), 2)
+        )
+      }))
+      .sort((a, b) => a.distance - b.distance);
+
+    let addedLinks = 0;
+    distances.forEach(({ targetNode }) => {
+      const targetIndex = targetNode.index;
+
+      const sourceConnections = connectionCount.get(sourceIndex) ?? 0;
+      const targetConnections = connectionCount.get(targetIndex) ?? 0;
+
+      if (sourceConnections < k && targetConnections < k) {
+        links.push({
+          source: sourceIndex,
+          target: targetIndex
+        });
+
+        connectionCount.set(sourceIndex, sourceConnections + 1);
+        connectionCount.set(targetIndex, targetConnections + 1);
+
+        addedLinks++;
+
+        if (addedLinks >= k) return;
+      }
+    });
+  });
+
+  const similarGames: SimilarGameType = {};
+  nodes.forEach((sourceNode) => {
+    const sourceId = sourceNode.steamGameId;
+    similarGames[sourceId] = [];
+
+    links.forEach((link) => {
+      const targetNode =
+        link.source === sourceNode.index
+          ? nodes[link.target as number]
+          : link.target === sourceNode.index
+          ? nodes[link.source as number]
+          : null;
+
+      if (targetNode) {
+        similarGames[sourceId].push({
+          steamGameId: targetNode.steamGameId,
+          twitchGameId: targetNode.twitchGameId,
+        });
+      }
+    });
+  });
+
+  
 
   return { nodes, links, similarGames };
 };

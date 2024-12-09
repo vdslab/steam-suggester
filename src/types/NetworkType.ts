@@ -27,16 +27,25 @@ export type StreamerListType = {
 };
 
 export type NodeType = {
+  index: number;
+  suggestValue: number;
   steamGameId: string;
-  twitchGameId: string;
-  totalViews?: number;
-  title: string;
-  genres : string[];
-  tags: string[];
+  circleScale?: number;
   price: number;
   isSinglePlayer: boolean;
   isMultiPlayer: boolean;
-  device: SteamDeviceType;
+  device: {
+    windows: boolean;
+    mac: boolean;
+  };
+  twitchGameId: string;
+  title: string;
+  genres: string[];
+  tags: string[];
+  x?: number;
+  y?: number;
+  vx?: number;
+  vy?: number;
   imgURL: string;
   url: string;
   shortDetails: string;
@@ -49,14 +58,8 @@ export type NodeType = {
   graphics: number;
   story: number;
   music: number;
-  suggestValue: number;
-
-  index: number;
-  x?: number;
-  y?: number;
-  vx?: number;
-  vy?: number;
-  circleScale?: number;
+  primaryGenre?: string;
+  totalViews?: number;
 }
 
 export type LinkType = {

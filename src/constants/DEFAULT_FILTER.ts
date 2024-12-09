@@ -49,6 +49,25 @@ export const DEFAULT_FILTER = {
   }
 }
 
+export const DEFAULT_SLIDER = {
+  id: "unique_id",
+  genreWeight: 50,
+  graphicWeight: 50,
+  playstyleWeight: 50,
+  reviewWeight: 50,
+  isDetailMode: false,
+  subGenreWeight: 50,
+  systemWeight: 50,
+  visualWeight: 50,
+  worldviewWeight: 50,
+  difficultyWeight: 0,
+  playtimeWeight: 0,
+  priceWeight: 0,
+  developerWeight: 0,
+  deviceWeight: 0,
+  releaseDateWeight: 0
+}
+
 // マッピングデータ
 export const GENRE_MAPPING = {
   "アクション": "アクション",

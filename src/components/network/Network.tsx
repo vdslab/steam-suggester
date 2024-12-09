@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import NodeLink from "./NodeLink";
 import SelectParameter from "./selectParameter/SelectParameter";
-import { DEFAULT_FILTER } from "@/constants/DEFAULT_FILTER";
-import { Filter } from "@/types/api/FilterType";
+import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
+import { Filter, SliderSettings } from "@/types/api/FilterType";
 import GameList from "./gameList/GameList";
 import StreamedList from "./streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
@@ -39,7 +39,7 @@ const Network = () => {
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
 
-  const initialNodes = async (filter: Filter, gameIds: string[], slider: object) => {
+  const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
     const result = await createNetwork(filter, gameIds, slider);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
@@ -61,7 +61,7 @@ const Network = () => {
       (async () => {
         const filter = (await getFilterData()) ?? DEFAULT_FILTER;
         const gameIds = (await getGameIdData()) ?? [];
-        const slider = (await getSliderData()) ?? {};
+        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
         setFilter(filter);
         await initialNodes(filter, gameIds, slider);
         setIsLoading(false);
@@ -73,7 +73,7 @@ const Network = () => {
     if (!isLoading) {
       (async () => {
         const gameIds = (await getGameIdData()) ?? [];
-        const slider = (await getSliderData()) ?? {};
+        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
         initialNodes(filter, gameIds, slider);
       })();
     }
