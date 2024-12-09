@@ -229,7 +229,7 @@ const GameList = (props: Props) => {
                     key={node.steamGameId} // 一意のキーを使用
                     className={`cursor-pointer rounded-lg transform transition-all duration-300 ${
                       isSelected 
-                        ? 'bg-gray-800 shadow-xl p-4 mb-4' 
+                        ? 'bg-gray-800 border-2 shadow-xl p-2 mb-4 scale-x-105 scale-y-102' 
                         : 'bg-gray-900 p-2'
                     } ${dimmed ? 'opacity-50' : 'opacity-100'} space-y-2`}
                   >
