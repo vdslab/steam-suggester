@@ -213,7 +213,7 @@ const NetworkMobile = () => {
                   className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
                   onClick={() =>
                     router.push(
-                      `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
+                      `/mobile/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
                     )
                   }
                 >

@@ -34,3 +34,11 @@ export const HomeHeaderMobile = () => {
     </div>
   )
 }
+
+export const DetailsHeaderMobile = () => {
+  return (
+    <div className="h-[7dvh] leading-[7dvh] bg-stone-950 border-b-2 border-gray-700 text-2xl text-white space-x-5 pl-8 flex justify-between">
+      <Link href="/" className="font-semibold">Steam Suggester</Link>
+    </div>
+  );
+}
