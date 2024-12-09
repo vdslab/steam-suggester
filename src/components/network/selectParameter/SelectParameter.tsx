@@ -39,7 +39,7 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
     }
 
     // カテゴリーの全選択状態を更新
-    const allSelected = Object.values(filter.Categories).every((value) => value);
+    const allSelected = Object.values(filter.Genres).every((value) => value);
     setAreAllCategoriesSelected(allSelected);
   }, [filter]);
 
@@ -79,12 +79,12 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
   const handleMasterCheckboxChange = () => {
     const newStatus = !areAllCategoriesSelected;
     const newCategories: { [key: string]: boolean } = {};
-    for (const key in localFilter.Categories) {
+    for (const key in localFilter.Genres) {
       newCategories[key] = newStatus;
     }
     setLocalFilter({
       ...localFilter,
-      Categories: newCategories,
+      Genres: newCategories,
     });
     setAreAllCategoriesSelected(newStatus);
   };
@@ -103,24 +103,24 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
         {/* 既存の説明テキストを削除 */}
         
         {/* ジャンルフィルター */}
-        <Section title="ジャンル" icon={<CategoryIcon />}>
-          <label className="flex items-center mb-2">
-            <input
-              type="checkbox"
-              className="form-checkbox h-5 w-5 text-gray-600"
-              checked={areAllCategoriesSelected}
-              onChange={handleMasterCheckboxChange}
-            />
-            <span className="ml-2 text-white">全選択</span>
-          </label>
-          <FilterButtonGroup
-            title="Categories"
-            mapping={GENRE_MAPPING}
-            localFilter={localFilter}
-            setLocalFilter={setLocalFilter}
-            rowLevel={2}
+      <Section title="ジャンル" icon={<CategoryIcon />}>
+        <label className="flex items-center mb-2">
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-gray-600"
+            checked={areAllCategoriesSelected}
+            onChange={handleMasterCheckboxChange}
           />
-        </Section>
+          <span className="ml-2 text-white">全選択</span>
+        </label>
+        <FilterButtonGroup
+          title="Genres"
+          mapping={GENRE_MAPPING}
+          localFilter={localFilter}
+          setLocalFilter={setLocalFilter}
+          rowLevel={3}
+        />
+      </Section>
 
         {/* 価格フィルター */}
         <Section title="価格" icon={<AttachMoneyIcon />}>
