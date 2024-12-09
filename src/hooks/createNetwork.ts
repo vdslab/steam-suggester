@@ -67,7 +67,7 @@ const createNetwork = async (
   });
 
   const nodes: NodeType[] = rawNodes.map((item, i) => {
-    const { x, y } = getFixedCoordinates(item.steamGameId, 800);
+    const { x, y } = getFixedCoordinates(item.steamGameId, 1200);
     return {
       ...item,
       index: i,
@@ -96,7 +96,7 @@ const createNetwork = async (
 
   // ノードを類似性スコアに基づいてクラスタ中心に引き寄せる
   const clusterForce = (alpha: number) => {
-    const strength = 0.1;
+    const strength = 0.05;
     nodes.forEach((sourceNode, i) => {
       const targetIndex = similarityMatrix[i].reduce(
         (bestIndex, score, index) =>
@@ -123,7 +123,7 @@ const createNetwork = async (
   });
 
   const simulation = d3.forceSimulation(nodes)
-    .force('charge', d3.forceManyBody<NodeType>().strength(-50))
+    .force('charge', d3.forceManyBody<NodeType>().strength(-80))
     .force('center', d3.forceCenter(0, 0))
     .force(
       'collide',
@@ -203,8 +203,6 @@ const createNetwork = async (
       }
     });
   });
-
-  
 
   return { nodes, links, similarGames };
 };
