@@ -104,9 +104,22 @@ const OwnedGames = () => {
           </Section>
         </div>
       ) : (
-        <div>
-          <div>
-            <button onClick={() => signIn('steam')}>Steamでログイン</button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+          <div style={{ textAlign: 'center' }}>
+            <h2>Steamでログインしてゲームを表示</h2>
+            <button
+              onClick={() => signIn('steam')}
+              style={{
+                padding: '10px 20px',
+                fontSize: '16px',
+                borderRadius: '5px',
+                color: '#0066c0',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Steamでログイン
+            </button>
           </div>
         </div>
       )}

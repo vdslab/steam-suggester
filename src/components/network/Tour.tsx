@@ -1,5 +1,4 @@
 'use client';
-import React from 'react'
 import Joyride, { CallBackProps, STATUS } from 'react-joyride'
 
 const steps = [
@@ -14,7 +13,7 @@ const steps = [
   },
   {
     target: '.step2',
-    content: '配信者の配信者のゲームを強調表示できます。',
+    content: '配信者のゲームを強調表示できます。',
   },
   {
     target: '.step3',

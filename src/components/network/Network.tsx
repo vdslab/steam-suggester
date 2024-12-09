@@ -154,7 +154,7 @@ const Network = () => {
   }
 
   return (
-    <div className="flex h-[92vh] overflow-hidden">
+    <div className="flex h-[92vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
         isFilterOpen={isFilterOpen}

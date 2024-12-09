@@ -44,6 +44,15 @@ const Sidebar: React.FC<Props> = ({
 
   return (
     <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4">
+      {/* 類似度ボタン */}
+      <button
+        onClick={toggleChat}
+        className={`${buttonClasses(isChatOpen)} step3`}
+      >
+        <TuneIcon />
+        <span className="text-xs mt-1">類似度設定</span>
+      </button>
+
       {/* フィルターボタン */}
       <button
         onClick={toggleFilter}
@@ -62,15 +71,6 @@ const Sidebar: React.FC<Props> = ({
         <span className="text-xs mt-1">配信者</span>
       </button>
 
-      {/* 類似度ボタン */}
-      <button
-        onClick={toggleChat}
-        className={`${buttonClasses(isChatOpen)} step3`}
-      >
-        <TuneIcon />
-        <span className="text-xs mt-1">チャット</span>
-      </button>
-
       {/* Steamリストボタン */}
       <button
         onClick={toggleSteamList}
@@ -78,7 +78,6 @@ const Sidebar: React.FC<Props> = ({
       >
         <SportsEsportsIcon />
         <span className="text-xs mt-1">Steam連携</span>
-        <span className="text-[10px] text-gray-400">（ログイン & フレンド）</span>
       </button>
 
       {/* ツアーボタン */}
