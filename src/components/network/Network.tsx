@@ -17,9 +17,7 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
 import ChatBar from "./chatBar/ChatBar";
 import SteamList from "./steamList/SteamList";
-import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
-
-import Joyride from 'react-joyride';
+import HelpTooltip from "./HelpTooltip";
 import Tour from "./Tour";
 
 
@@ -171,69 +169,103 @@ const Network = () => {
         toggleTourRun={toggleTourRun}
       />
 
-      {/* フィルターパネル */}
-      {isFilterOpen && (
-        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <SelectParameter filter={filter} setFilter={setFilter} />
-        </div>
-      )}
-
-      {/* StreamerListパネル */}
-      {isStreamerOpen && (
-        <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
-          <Panel title="配信者" icon={<LiveTvIcon className="mr-2 text-white" />}>
-            <StreamedList
+      {/* メインコンテンツエリアを relative に設定 */}
+      <div className="test1 flex-1 relative bg-gray-900 overflow-hidden">
+          {/* メインコンテンツ */}
+          <div className="absolute inset-0">
+            <NodeLink
               nodes={nodes}
+              links={links}
+              centerX={centerX}
+              centerY={centerY}
+              setSelectedIndex={setSelectedIndex}
               streamerIds={streamerIds}
-              setStreamerIds={setStreamerIds}
             />
-          </Panel>
-        </div>
-      )}
+          </div>
 
-      {/* ChatBarパネル*/}
-      {isChatOpen && (
-        <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
-          <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
-            {/* <ChatBar nodes={nodes} setNodes={setNodes} /> */}
-            <SimilaritySettings />
-          </Panel>
-        </div>
-      )}
+          {/* フィルターパネル */}
+          {isFilterOpen && (
+            <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+              <SelectParameter filter={filter} setFilter={setFilter} />
+            </div>
+          )}
 
-      {/* Steam連携パネル */}
-      {isSteamListOpen && (
-        <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-          <SteamList />
-        </div>
-      )}
+          {/* StreamerListパネル */}
+          {isStreamerOpen && (
+            <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+              <Panel
+                  title={
+                    <div className="flex items-center">
+                      <span>配信者</span>
+                      <HelpTooltip title="配信者を追加すると配信者が配信したゲームのアイコンに枠が表示されます。" />
+                    </div>
+                  }
+                  icon={<LiveTvIcon className="mr-2 text-white" />}
+                >
+                <StreamedList
+                  nodes={nodes}
+                  streamerIds={streamerIds}
+                  setStreamerIds={setStreamerIds}
+                />
+              </Panel>
+            </div>
+          )}
 
-      {/* メインコンテンツエリア */}
-      <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden step0">
-        <NodeLink
-          nodes={nodes}
-          links={links}
-          centerX={centerX}
-          centerY={centerY}
-          setSelectedIndex={setSelectedIndex}
-          streamerIds={streamerIds}
-        />
+          {/* ChatBarパネル */}
+          {isChatOpen && (
+            <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+              <Panel
+                  title={
+                    <div className="flex items-center">
+                      <span>チャット</span>
+                      <HelpTooltip title="ゲームに関する質問を入力してください。ネットワーク内の関連ノードが強調表示されます。" />
+                    </div>
+                  }
+                  icon={<ChatIcon className="mr-2 text-white" />}
+                >
+                <ChatBar nodes={nodes} setNodes={setNodes} />
+              </Panel>
+            </div>
+          )}
+
+          {/* Steam連携パネル */}
+          {isSteamListOpen && (
+            <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+              <SteamList />
+            </div>
+          )}
+
+          {/* ゲームリストパネル */}
+          <div className="absolute top-0 right-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <GameList
+              nodes={nodes}
+              selectedIndex={selectedIndex}
+              setSelectedIndex={setSelectedIndex}
+              setCenterX={setCenterX}
+              setCenterY={setCenterY}
+              setIsLoading={setIsLoading}
+            />
+          </div>
+
+        {/* ChatBarパネル*/}
+        {isChatOpen && (
+          <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
+            <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
+              <ChatBar nodes={nodes} setNodes={setNodes} />
+            </Panel>
+          </div>
+        )}
+
+        {/* Steam連携パネル */}
+        {isSteamListOpen && (
+          <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
+            <SteamList />
+          </div>
+        )}
+
+        <Tour run={tourRun} setRun={setTourRun}/>
+
       </div>
-
-      {/* ゲームリストパネル */}
-      <div className="w-1/5 bg-gray-900 overflow-y-auto overflow-x-hidden">
-        <GameList
-          nodes={nodes}
-          selectedIndex={selectedIndex}
-          setSelectedIndex={setSelectedIndex}
-          setCenterX={setCenterX}
-          setCenterY={setCenterY}
-          setIsLoading={setIsLoading}
-        />
-      </div>
-
-      <Tour run={tourRun} setRun={setTourRun}/>
-
     </div>
   );
 };
