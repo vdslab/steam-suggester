@@ -263,18 +263,6 @@ const Network = () => {
           </div>
         )}
 
-        {/* メインコンテンツエリア */}
-        <div className="flex-1 bg-gray-900 flex flex-col overflow-y-hidden overflow-x-hidden step0">
-          <NodeLink
-            nodes={nodes}
-            links={links}
-            centerX={centerX}
-            centerY={centerY}
-            setSelectedIndex={setSelectedIndex}
-            streamerIds={streamerIds}
-          />
-        </div>
-
         <Tour run={tourRun} setRun={setTourRun}/>
 
       </div>
