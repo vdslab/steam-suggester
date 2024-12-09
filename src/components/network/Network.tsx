@@ -170,7 +170,7 @@ const Network = () => {
       />
 
       {/* メインコンテンツエリアを relative に設定 */}
-      <div className="flex-1 relative bg-gray-900 overflow-hidden">
+      <div className="test1 flex-1 relative bg-gray-900 overflow-hidden">
           {/* メインコンテンツ */}
           <div className="absolute inset-0">
             <NodeLink
