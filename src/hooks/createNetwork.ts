@@ -7,20 +7,9 @@ import { calculateSimilarityMatrix } from "@/hooks/calcWeight";
 
 const k = 4;
 
-const hashString = (str: string): number => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0;
-  }
-  return hash;
-};
-
-const getFixedCoordinates = (id: string, range: number): { x: number; y: number } => {
-  const hash = hashString(id);
-  const x = ((hash % range) - range / 2) / 2;
-  const y = (((hash >> 16) % range) - range / 2) / 2;
+const getRandomCoordinates = (range: number): { x: number; y: number } => {
+  const x = Math.random() * range - range / 2;
+  const y = Math.random() * range - range / 2;
   return { x, y };
 };
 
@@ -66,7 +55,7 @@ const createNetwork = async (
   });
 
   const nodes: NodeType[] = rawNodes.map((item, i) => {
-    const { x, y } = getFixedCoordinates(item.steamGameId, 1200);
+    const { x, y } = getRandomCoordinates(1000); // ランダムな初期座標を設定
     return {
       ...item,
       index: i,
@@ -74,7 +63,7 @@ const createNetwork = async (
       x,
       y,
       vx: 0,
-      vy: 0
+      vy: 0,
     };
   });
 
@@ -82,19 +71,17 @@ const createNetwork = async (
     return { nodes, links: [], similarGames: {} };
   }
 
-  // 各ノード間の類似性スコアを計算（スライダー情報を渡す）
   const similarityMatrix = calculateSimilarityMatrix(nodes, slider);
 
-  // クラスタ中心を固定座標に基づいて設定
   const clusterCenters = new Map<number, { x: number; y: number }>();
   nodes.forEach((node, i) => {
     if (!clusterCenters.has(i)) {
-      clusterCenters.set(i, getFixedCoordinates(node.steamGameId, 1000));
+      clusterCenters.set(i, getRandomCoordinates(2000)); // クラスタ中心を分散
     }
   });
 
   const clusterForce = (alpha: number) => {
-    const strength = 0.05;
+    const strength = 0.1;
     nodes.forEach((sourceNode, i) => {
       const targetIndex = similarityMatrix[i].reduce(
         (bestIndex, score, index) =>
@@ -121,9 +108,9 @@ const createNetwork = async (
   });
 
   const simulation = d3.forceSimulation(nodes)
-    .force("charge", d3.forceManyBody<NodeType>().strength(-80))
-    .force("center", d3.forceCenter(0, 0))
-    .force("collide", d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 20))
+    .force("charge", d3.forceManyBody<NodeType>().strength(-200)) // 強い引力でノード間を広げる
+    .force("center", d3.forceCenter(0, 0)) // 中心に配置
+    .force("collide", d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 30)) // 衝突半径を拡大
     .on("tick", () => {
       clusterForce(simulation.alpha());
     });
@@ -150,7 +137,7 @@ const createNetwork = async (
         distance: Math.sqrt(
           Math.pow((sourceNode.x ?? 0) - (targetNode.x ?? 0), 2) +
           Math.pow((sourceNode.y ?? 0) - (targetNode.y ?? 0), 2)
-        )
+        ),
       }))
       .sort((a, b) => a.distance - b.distance);
 
@@ -164,7 +151,7 @@ const createNetwork = async (
       if (sourceConnections < k && targetConnections < k) {
         links.push({
           source: sourceIndex,
-          target: targetIndex
+          target: targetIndex,
         });
 
         connectionCount.set(sourceIndex, sourceConnections + 1);
@@ -193,7 +180,7 @@ const createNetwork = async (
       if (targetNode) {
         similarGames[sourceId].push({
           steamGameId: targetNode.steamGameId,
-          twitchGameId: targetNode.twitchGameId
+          twitchGameId: targetNode.twitchGameId,
         });
       }
     });

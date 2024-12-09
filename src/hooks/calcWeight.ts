@@ -2,20 +2,26 @@ import { NodeType } from "@/types/NetworkType";
 import { SliderSettings } from "@/types/api/FilterType";
 import { TAG_LIST } from "@/constants/TAG_LIST";
 
+// 特定のジャンルに重みを追加
+const SPECIAL_GENRES = ["レース"];
+const SPECIAL_GENRE_WEIGHT = 10.0;
+
 // スライダーの値に基づいた重み計算
 export const calculateTagWeights = (slider: SliderSettings): Map<string, number> => {
   const tagWeights = new Map<string, number>();
 
-  const genreWeight = slider.genreWeight / 100; // スライダーの値を 0～1 に正規化
+  const genreWeight = slider.genreWeight / 100;
   const graphicWeight = slider.graphicWeight / 100;
   const playstyleWeight = slider.playstyleWeight / 100;
 
-  const genreTags = [...(TAG_LIST["ジャンル"] || []), ...(TAG_LIST["サブジャンル"] || []), ...(TAG_LIST["特徴"] || []), ...(TAG_LIST["その他のタグ"] || [])];
+  const genreTags = [...(TAG_LIST["ジャンル"] || []), ...(TAG_LIST["サブジャンル"] || [])];
   const graphicTags = [...(TAG_LIST["ビジュアルと視点"] || []), ...(TAG_LIST["テーマと雰囲気"] || [])];
-  const playstyleTags = [...(TAG_LIST["プレイスタイル"] || []), ...(TAG_LIST["プレイヤー"] || [])];
+  const playstyleTags = [...(TAG_LIST["プレイヤー"] || []), ...(TAG_LIST["プレイスタイル"] || [])];
 
-  // 各タグに重みを設定
-  genreTags.forEach(tag => tagWeights.set(tag, genreWeight));
+  genreTags.forEach(tag => {
+    const weight = SPECIAL_GENRES.includes(tag) ? genreWeight * SPECIAL_GENRE_WEIGHT : genreWeight;
+    tagWeights.set(tag, weight);
+  });
   graphicTags.forEach(tag => tagWeights.set(tag, graphicWeight));
   playstyleTags.forEach(tag => tagWeights.set(tag, playstyleWeight));
 
@@ -34,27 +40,9 @@ export const tagSimilarity = (
   let similarity = 0;
   setSource.forEach(tag => {
     if (setTarget.has(tag)) {
-      similarity += tagWeights.get(tag) || 0; // タグが一致している場合に重みを加算
+      similarity += tagWeights.get(tag) || 0;
     }
   });
-
-  return similarity;
-};
-
-// シングルプレイヤー・マルチプレイヤーの一致度を計算
-const playerStyleSimilarity = (
-  sourceNode: NodeType,
-  targetNode: NodeType,
-  playstyleWeight: number
-): number => {
-  let similarity = 0;
-
-  if (sourceNode.isSinglePlayer && targetNode.isSinglePlayer) {
-    similarity += 0.5 * playstyleWeight; // シングルプレイヤーが一致している場合
-  }
-  if (sourceNode.isMultiPlayer && targetNode.isMultiPlayer) {
-    similarity += 0.5 * playstyleWeight; // マルチプレイヤーが一致している場合
-  }
 
   return similarity;
 };
@@ -64,18 +52,19 @@ export const calculateSimilarityMatrix = (
   nodes: NodeType[],
   slider: SliderSettings
 ): number[][] => {
-  const tagWeights = calculateTagWeights(slider); // スライダーに基づいて重みを取得
-  const playstyleWeight = slider.playstyleWeight / 100;
+  const tagWeights = calculateTagWeights(slider);
 
   return nodes.map(sourceNode =>
     nodes.map(targetNode => {
       if (sourceNode === targetNode) return 0;
 
-      // タグの類似性
+      // タグの類似性を計算
       const tagSim = tagSimilarity(sourceNode.tags, targetNode.tags, tagWeights);
 
-      // シングル・マルチプレイヤーの一致度
-      const playerSim = playerStyleSimilarity(sourceNode, targetNode, playstyleWeight);
+      // シングルプレイヤーとマルチプレイヤーの一致度を加味
+      const playerSim =
+        (sourceNode.isSinglePlayer === targetNode.isSinglePlayer ? 0.5 : 0) +
+        (sourceNode.isMultiPlayer === targetNode.isMultiPlayer ? 0.5 : 0);
 
       return tagSim + playerSim;
     })
