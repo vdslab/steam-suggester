@@ -1,9 +1,9 @@
-import * as d3 from 'd3';
-import { Filter, SliderSettings } from '@/types/api/FilterType';
-import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
-import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
-import { SimilarGameType, NodeType, LinkType } from '@/types/NetworkType';
-import { calculateSimilarityMatrix } from '@/hooks/calcWeight';
+import * as d3 from "d3";
+import { Filter, SliderSettings } from "@/types/api/FilterType";
+import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
+import { calculateSimilarityMatrix } from "@/hooks/calcWeight";
 
 const k = 4;
 
@@ -41,8 +41,8 @@ const createNetwork = async (
   const data: SteamDetailsDataType[] = await response.json();
 
   const promises = gameIds
-    .filter(gameId => !data.find(d => d.steamGameId === gameId))
-    .map(async gameId => {
+    .filter((gameId) => !data.find((d) => d.steamGameId === gameId))
+    .map(async (gameId) => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`,
         { next: { revalidate: ISR_FETCH_INTERVAL } }
@@ -55,14 +55,13 @@ const createNetwork = async (
 
   await Promise.all(promises);
 
-  const rawNodes = data.filter(item => {
+  const rawNodes = data.filter((item) => {
     return (
       filter.Price.startPrice <= item.price &&
       item.price <= filter.Price.endPrice &&
       ((item.isSinglePlayer && filter.Mode.isSinglePlayer) ||
         (item.isMultiPlayer && filter.Mode.isMultiPlayer)) &&
-      ((item.device.windows && filter.Device.windows) ||
-        (item.device.mac && filter.Device.mac))
+      ((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))
     );
   });
 
@@ -83,10 +82,10 @@ const createNetwork = async (
     return { nodes, links: [], similarGames: {} };
   }
 
-  // 各ノード間の類似性スコアを計算
-  const similarityMatrix = calculateSimilarityMatrix(nodes);
+  // 各ノード間の類似性スコアを計算（スライダー情報を渡す）
+  const similarityMatrix = calculateSimilarityMatrix(nodes, slider);
 
-  // クラスタ中心も固定座標に基づいて設定
+  // クラスタ中心を固定座標に基づいて設定
   const clusterCenters = new Map<number, { x: number; y: number }>();
   nodes.forEach((node, i) => {
     if (!clusterCenters.has(i)) {
@@ -94,7 +93,6 @@ const createNetwork = async (
     }
   });
 
-  // ノードを類似性スコアに基づいてクラスタ中心に引き寄せる
   const clusterForce = (alpha: number) => {
     const strength = 0.05;
     nodes.forEach((sourceNode, i) => {
@@ -115,7 +113,7 @@ const createNetwork = async (
   };
 
   const sizeScale = d3.scaleSqrt()
-    .domain(d3.extent(nodes, d => d.totalViews) as [number, number])
+    .domain(d3.extent(nodes, (d) => d.totalViews) as [number, number])
     .range([1, 4]);
 
   nodes.forEach((node: NodeType) => {
@@ -123,18 +121,15 @@ const createNetwork = async (
   });
 
   const simulation = d3.forceSimulation(nodes)
-    .force('charge', d3.forceManyBody<NodeType>().strength(-80))
-    .force('center', d3.forceCenter(0, 0))
-    .force(
-      'collide',
-      d3.forceCollide<NodeType>().radius(d => (d.circleScale ?? 1) * 20)
-    )
-    .on('tick', () => {
+    .force("charge", d3.forceManyBody<NodeType>().strength(-80))
+    .force("center", d3.forceCenter(0, 0))
+    .force("collide", d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 20))
+    .on("tick", () => {
       clusterForce(simulation.alpha());
     });
 
-  await new Promise<void>(resolve => {
-    simulation.on('end', function () {
+  await new Promise<void>((resolve) => {
+    simulation.on("end", function () {
       resolve();
     });
   });
@@ -149,8 +144,8 @@ const createNetwork = async (
     const sourceIndex = sourceNode.index;
 
     const distances = nodes
-      .filter(targetNode => targetNode !== sourceNode)
-      .map(targetNode => ({
+      .filter((targetNode) => targetNode !== sourceNode)
+      .map((targetNode) => ({
         targetNode,
         distance: Math.sqrt(
           Math.pow((sourceNode.x ?? 0) - (targetNode.x ?? 0), 2) +
@@ -198,7 +193,7 @@ const createNetwork = async (
       if (targetNode) {
         similarGames[sourceId].push({
           steamGameId: targetNode.steamGameId,
-          twitchGameId: targetNode.twitchGameId,
+          twitchGameId: targetNode.twitchGameId
         });
       }
     });
