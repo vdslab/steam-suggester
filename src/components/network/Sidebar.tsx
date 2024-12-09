@@ -7,6 +7,7 @@ import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import ChatIcon from "@mui/icons-material/Chat";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import TourIcon from '@mui/icons-material/Tour';
+import TuneIcon from "@mui/icons-material/Tune";
 
 type Props = {
   isFilterOpen: boolean;
@@ -61,12 +62,12 @@ const Sidebar: React.FC<Props> = ({
         <span className="text-xs mt-1">配信者</span>
       </button>
 
-      {/* ChatBarボタン */}
+      {/* 類似度ボタン */}
       <button
         onClick={toggleChat}
         className={`${buttonClasses(isChatOpen)} step3`}
       >
-        <ChatIcon />
+        <TuneIcon />
         <span className="text-xs mt-1">チャット</span>
       </button>
 
