@@ -104,7 +104,7 @@ const GameList = (props: Props) => {
 
   // ゲームをクリックしたときの処理
   const handleGameClick = (index: number) => {
-    setCenterX(nodes[index].x ?? 0);
+    setCenterX((nodes[index].x ?? 0) - 150);
     setCenterY((nodes[index].y ?? 0) + 100);
     setSelectedIndex(index);
     setIsTagsExpanded(false); // 新しいゲームを選択したらタグを折りたたむ
