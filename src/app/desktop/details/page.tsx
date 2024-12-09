@@ -1,22 +1,17 @@
 import GameTitle from "@/components/common/GameTitle"
-import Header from "@/components/common/Header"
+import { DetailsHeader } from "@/components/common/Headers"
 import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
 import GameExplanation from "@/components/GameExplanation/GameExplanation"
 import Match from "@/components/match/Match"
 import Popularity from "@/components/popularity/Popularity"
 import SimilarGames from "@/components/simlarGames/SimilarGames"
 
-export default function Page({
-  params
-}: {
-  params: { steamGameId: string, twitchGameId: string }
-}){
-
-  const { steamGameId, twitchGameId } = params;
-
+export default function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
+  const steamGameId = searchParams.steam_id || "";
+  const twitchGameId = searchParams.twitch_id || "";
   return (
     <>
-      <Header />
+      <DetailsHeader />
       <div className="flex h-[92dvh]">
         <div className="w-1/5 bg-stone-950">
           <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />

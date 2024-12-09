@@ -2,7 +2,7 @@
 import { DEFAULT_FILTER, GENRE_MAPPING } from '@/constants/DEFAULT_FILTER';
 import { getFilterData } from '@/hooks/indexedDB';
 import { Filter } from '@/types/api/FilterType';
-import { SteamDetailsDataType, SteamGenreType } from '@/types/api/getSteamDetailType';
+import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 import { useState, useEffect,  } from 'react';
 import { calcAllMatchPercentage, calcGenresPercentage } from '../common/CalcMatch';
 import IsAbleBar from './IsAbleBar';
@@ -20,7 +20,7 @@ const MatchIndicator = ( props:Props ) => {
 
   useEffect(() => {
     (async() => {
-      const d = await getFilterData('unique_id');
+      const d = await getFilterData();
       if(d) {
         setLocalFilter(d);
 
@@ -50,9 +50,9 @@ const MatchIndicator = ( props:Props ) => {
       </div>
       <div className="mb-[2vh] flex">
         <div className="text-sm w-1/4">（ジャンル）</div>
-        {data.genres.map((genre: SteamGenreType, index:number) => (
-            genre.id in GENRE_MAPPING &&
-            <div key={genre.id} className='text-center m-1 text-xs text-yellow-300'>{index !== 0 ? ', ' : ''}{genre.description}</div>
+        {data.genres.map((genre: string, index:number) => (
+            genre in GENRE_MAPPING &&
+            <div key={index} className='text-center m-1 text-xs text-yellow-300'>{index !== 0 ? ', ' : ''}{genre}</div>
         ))}
       </div>
 
@@ -111,10 +111,10 @@ const MatchIndicator = ( props:Props ) => {
 
       <div className='pt-[3vh]'>ユーザが選択した項目</div>
       <div className='border border-gray-500 flex p-2 flex-wrap'>
-        {data.genres.map((genre: SteamGenreType) => (
-          genre.id in GENRE_MAPPING &&
-          <div key={genre.id} className='bg-yellow-300 rounded-sm m-1'>
-            <div className='text-center m-1 text-xs text-gray-900'>{genre.description}</div>
+        {data.genres.map((genre: string, index: number) => (
+          genre in GENRE_MAPPING &&
+          <div key={index} className='bg-yellow-300 rounded-sm m-1'>
+            <div className='text-center m-1 text-xs text-gray-900'>{genre}</div>
           </div>
         ))}
         <div className='bg-rose-400 rounded-sm m-1'>

@@ -9,6 +9,7 @@ type Params = {
 };
 
 export async function GET(req: Request, { params }: Params) {
+  const ClipCount = 3;
 
   const gameId = params.twitchGameId;
 
@@ -41,6 +42,7 @@ export async function GET(req: Request, { params }: Params) {
     const data:TwitchClipApiType  = await res.json()
 
     // 同じ配信者のクリップを除外、日本語のクリップを取得、３件に制限
+    // 日本語のクリップで3件に満たない場合、英語のクリップを追加
     const seenCreatorIds = new Set();
     const uniqueClips = data.data.filter((clip: TwitchClipDataType) => {
       if (seenCreatorIds.has(clip.broadcaster_id)) {
@@ -51,7 +53,11 @@ export async function GET(req: Request, { params }: Params) {
       }
     })
     const japaneseUniqueClips = uniqueClips.filter((clip: TwitchClipDataType) => clip.language === 'ja');
-    const japaneseUniqueClipsLimited = japaneseUniqueClips.slice(0, 3);
+    const japaneseUniqueClipsLimited = japaneseUniqueClips.slice(0, ClipCount);
+    if(japaneseUniqueClipsLimited.length !== ClipCount) {
+      const englishUniqueClips = uniqueClips.filter((clip: TwitchClipDataType) => clip.language !== 'ja').slice(0, ClipCount-japaneseUniqueClips.length);
+      japaneseUniqueClipsLimited.push(...englishUniqueClips);
+    }
     const resultClips:TwitchClipType[] = japaneseUniqueClipsLimited.map((clip: TwitchClipDataType) => {
       return ({
         id: clip.id,

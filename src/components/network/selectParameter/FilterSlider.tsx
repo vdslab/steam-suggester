@@ -17,7 +17,7 @@ const FilterSlider = (props: Props) => {
   };
 
   return (
-    <div style={{ margin: '10px 0', opacity: disabled ? 0.5 : 1, pointerEvents: disabled ? 'none' : 'auto' }}>
+    <div style={{ margin: '10px 0 50px 0', opacity: disabled ? 0.5 : 1, pointerEvents: disabled ? 'none' : 'auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
         <span>{valueFormatter(values[0])}</span>
         <span>{valueFormatter(values[1])}</span>
