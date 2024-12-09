@@ -1,12 +1,12 @@
 import { Filter } from "@/types/api/FilterType";
-import { SteamGenreType, SteamDeviceType } from "@/types/api/getSteamDetailType";
+import { SteamDeviceType } from "@/types/api/getSteamDetailType";
 import * as d3 from "d3";
 
-export const calcGenresPercentage = (filter: Filter, genres: SteamGenreType[]) => {
+export const calcGenresPercentage = (filter: Filter, genres: string[]) => {
   let genreCount = 0;
 
-  genres.forEach((genre: SteamGenreType) => {
-    if(filter.Categories[genre.id]) {
+  genres.forEach((genre: string) => {
+    if(filter.Genres[genre]) {
       genreCount++;
     }
   });
@@ -56,7 +56,7 @@ export const calcDevicePercentage = (filter: Filter, devices: SteamDeviceType) =
 }
 
 export const calcAllMatchPercentage = (filter: Filter, data: {
-  genres : SteamGenreType[],
+  genres : string[],
   price: number,
   isSinglePlayer: boolean,
   isMultiPlayer: boolean,

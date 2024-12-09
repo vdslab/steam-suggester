@@ -3,20 +3,21 @@
 import { useEffect, useState } from "react";
 import NodeLink from "./NodeLink";
 import SelectParameter from "./selectParameter/SelectParameter";
-import { DEFAULT_FILTER } from "@/constants/DEFAULT_FILTER";
-import { Filter } from "@/types/api/FilterType";
+import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
+import { Filter, SliderSettings } from "@/types/api/FilterType";
 import GameList from "./gameList/GameList";
 import StreamedList from "./streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/desktop/loading";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
-import { getFilterData, getGameIdData } from "@/hooks/indexedDB";
+import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
 import ChatIcon from "@mui/icons-material/Chat";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
 import ChatBar from "./chatBar/ChatBar";
 import SteamList from "./steamList/SteamList";
+import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 
 import Joyride from 'react-joyride';
 import Tour from "./Tour";
@@ -44,8 +45,8 @@ const Network = () => {
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
   const [tourRun, setTourRun] = useState<boolean>(true);
 
-  const initialNodes = async (filter: Filter, gameIds: string[]) => {
-    const result = await createNetwork(filter, gameIds);
+  const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
+    const result = await createNetwork(filter, gameIds, slider);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -66,8 +67,9 @@ const Network = () => {
       (async () => {
         const filter = (await getFilterData()) ?? DEFAULT_FILTER;
         const gameIds = (await getGameIdData()) ?? [];
+        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
         setFilter(filter);
-        await initialNodes(filter, gameIds);
+        await initialNodes(filter, gameIds, slider);
         setIsLoading(false);
       })();
     }
@@ -77,7 +79,8 @@ const Network = () => {
     if (!isLoading) {
       (async () => {
         const gameIds = (await getGameIdData()) ?? [];
-        initialNodes(filter, gameIds);
+        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
+        initialNodes(filter, gameIds, slider);
       })();
     }
   }, [filter]);
@@ -192,7 +195,8 @@ const Network = () => {
       {isChatOpen && (
         <div className="w-1/5 bg-transparent overflow-y-auto overflow-x-hidden">
           <Panel title="チャット" icon={<ChatIcon className="mr-2 text-white" />}>
-            <ChatBar nodes={nodes} setNodes={setNodes} />
+            {/* <ChatBar nodes={nodes} setNodes={setNodes} /> */}
+            <SimilaritySettings />
           </Panel>
         </div>
       )}

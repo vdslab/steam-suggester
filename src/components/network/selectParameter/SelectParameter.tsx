@@ -74,12 +74,12 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
   const handleMasterCheckboxChange = () => {
     const newStatus = !areAllCategoriesSelected;
     const newCategories: { [key: string]: boolean } = {};
-    for (const key in localFilter.Categories) {
+    for (const key in localFilter.Genres) {
       newCategories[key] = newStatus;
     }
     setLocalFilter({
       ...localFilter,
-      Categories: newCategories,
+      Genres: newCategories,
     });
     setAreAllCategoriesSelected(newStatus);
   };
@@ -99,7 +99,7 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
           <span className="ml-2 text-white">全選択</span>
         </label>
         <FilterButtonGroup
-          title="Categories"
+          title="Genres"
           mapping={GENRE_MAPPING}
           localFilter={localFilter}
           setLocalFilter={setLocalFilter}

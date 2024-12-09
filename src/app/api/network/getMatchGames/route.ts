@@ -2,6 +2,7 @@ import { PG_POOL } from "@/constants/PG_POOL";
 import { NextResponse } from "next/server";
 
 export async function GET() {
+  const GAME_COUNT = 200;
   try {
     const today = new Date();
     today.setDate(today.getDate() - 1);
@@ -47,7 +48,7 @@ export async function GET() {
 
     const data = rows
       .sort((a, b) => b.total_views - a.total_views)
-      .slice(0, 120)
+      .slice(0, GAME_COUNT)
       .filter((item, index, self) => (
         index === self.findIndex((t) => (
           t.steam_id === item.steam_id

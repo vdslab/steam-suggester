@@ -2,7 +2,9 @@
 import { useState, useEffect, useRef } from "react";
 import * as d3 from 'd3';
 import Icon from "./Icon";
-import { NodeType, StreamerListType } from "@/types/NetworkType";
+import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
+import { getSliderData } from "@/hooks/indexedDB";
+import { DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 
 const ZoomableSVG = (props: any) => {
   const { children, centerX, centerY } = props;
@@ -13,7 +15,7 @@ const ZoomableSVG = (props: any) => {
 
   useEffect(() => {
     zoom.current = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.2, 4]) 
+      .scaleExtent([0.15, 4]) 
       .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         setTransform(event.transform);
       });
@@ -60,16 +62,16 @@ const NodeLink = (props: any) => {
     <ZoomableSVG centerX={centerX} centerY={centerY}>
        <>
           {links.length !== 0 &&
-            links.map((link: any, i: number) => {
-              const isHovered = link.source.index === hoveredIndex || link.target.index === hoveredIndex;
+            links.map((link: LinkType, i: number) => {
+              const isHovered = link.source === hoveredIndex || link.target === hoveredIndex;
               return (
                 <line
                   key={i}
                   className="link"
-                  x1={link.source.x}
-                  y1={link.source.y}
-                  x2={link.target.x}
-                  y2={link.target.y}
+                  x1={nodes[link.source].x}
+                  y1={nodes[link.source].y}
+                  x2={nodes[link.target].x}
+                  y2={nodes[link.target].y}
                   style={{
                     stroke: isHovered ? "cyan" : "white",
                     strokeWidth: isHovered ? "2" : "1"
