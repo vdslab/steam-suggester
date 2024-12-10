@@ -59,19 +59,12 @@ interface VideoDetailsResponse {
 
 export async function GET(req: Request, { params }: Params) {
   const userId = params.youtubeUserId;
-  const apiKey = "";// process.env.YOUTUBE_API_KEY
-  const cacheKey = `youtubeUserId-${userId}`;
+  const apiKey = process.env.YOUTUBE_API_KEY;
 
   if (!apiKey) {
     console.error("Missing YouTube API key");
     return NextResponse.json({ error: "Missing API key" }, { status: 500 });
   }
-
-  // キャッシュチェック
-  // const cached = getCachedData(cacheKey);
-  // if (cached) {
-  //   return NextResponse.json(cached);
-  // }
 
   try {
     // チャンネル情報取得
@@ -218,8 +211,6 @@ export async function GET(req: Request, { params }: Params) {
       videoId: Array.from(pastVideosGames),
     };
 
-    // キャッシュに保存
-    // setCachedData(cacheKey, result);
 
     return NextResponse.json(result);
   } catch (error) {

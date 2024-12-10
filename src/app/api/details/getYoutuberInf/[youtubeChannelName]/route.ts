@@ -13,19 +13,12 @@ type Params = {
 
 export async function GET(req: Request, { params }: Params) {
   const channelName = params.youtubeChannelName;
-  const apiKey = "";//process.env.YOUTUBE_API_KEY
-  const cacheKey = `youtubeChannelName-${channelName}`;
+  const apiKey = process.env.YOUTUBE_API_KEY;
 
   if (!apiKey) {
     console.error("Missing YouTube API key");
     return NextResponse.json({ error: "Missing API key" }, { status: 500 });
   }
-
-  // キャッシュチェック
-//   const cached = getCachedData(cacheKey);
-//   if (cached) {
-//     return NextResponse.json(cached);
-//   }
 
   try {
     // 部分一致でチャンネル検索
@@ -54,8 +47,6 @@ export async function GET(req: Request, { params }: Params) {
       videoId: ['default'],
     }));
 
-    // キャッシュに保存
-    // setCachedData(cacheKey, result);
 
     return NextResponse.json(result);
   } catch (error) {
