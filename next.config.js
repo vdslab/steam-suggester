@@ -17,6 +17,10 @@ module.exports = {
         protocol: "https",
         hostname: "avatars.steamstatic.com",
       },
+      {
+        protocol: "https",
+        hostname: "yt3.ggpht.com",
+      },
     ],
   },
 };
