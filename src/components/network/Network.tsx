@@ -1,4 +1,3 @@
-/* Network.tsx */
 "use client";
 import { useEffect, useState } from "react";
 import NodeLink from "./NodeLink";
@@ -20,10 +19,9 @@ import Tour from "./Tour";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 
-
-
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
+  const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
 
   const [nodes, setNodes] = useState<NodeType[]>([]);
   const [links, setLinks] = useState<LinkType[]>([]);
@@ -67,6 +65,7 @@ const Network = () => {
         const gameIds = (await getGameIdData()) ?? [];
         const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
         setFilter(filter);
+        setSlider(slider);
         await initialNodes(filter, gameIds, slider);
         setIsLoading(false);
       })();
@@ -77,11 +76,10 @@ const Network = () => {
     if (!isLoading) {
       (async () => {
         const gameIds = (await getGameIdData()) ?? [];
-        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
         initialNodes(filter, gameIds, slider);
       })();
     }
-  }, [filter]);
+  }, [filter, slider]);
 
   // Sidebar のトグル関数
   const toggleFilter = () => {
@@ -223,7 +221,7 @@ const Network = () => {
                   }
                   icon={<TuneIcon className="mr-2 text-white" />}
                 >
-                <SimilaritySettings />
+                <SimilaritySettings slider={slider} setSlider={setSlider} />
               </Panel>
             </div>
           )}
