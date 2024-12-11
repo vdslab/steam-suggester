@@ -1,12 +1,26 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
 import * as d3 from 'd3';
 import Icon from "./Icon";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
-import { getSliderData } from "@/hooks/indexedDB";
-import { DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 
-const ZoomableSVG = (props: any) => {
+type NodeLinkProps = {
+  nodes: NodeType[],
+  links: LinkType[],
+  centerX: number,
+  centerY: number,
+  selectedIndex: number,
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>,
+  streamerIds: StreamerListType[]
+}
+
+type ZoomableSVGProps = {
+  children: ReactNode;
+  centerX: number;
+  centerY: number;
+};
+
+const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
   const { children, centerX, centerY } = props;
   const svgRef = useRef<SVGSVGElement>(null);
   const [transform, setTransform] = useState(d3.zoomIdentity);
@@ -49,13 +63,13 @@ const ZoomableSVG = (props: any) => {
   );
 };
 
-const NodeLink = (props: any) => {
-  const { nodes, links, centerX, centerY, setSelectedIndex, streamerIds = [] } = props;
+const NodeLink = (props: NodeLinkProps) => {
+  const { nodes, links, centerX, centerY, selectedIndex, setSelectedIndex, streamerIds = [] } = props;
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
-  const findHoveredNode = () => {
-    return nodes.find((node: NodeType) => node.index === hoveredIndex)
+  const findHoveredNode = (index: number) => {
+    return nodes.find((node: NodeType) => node.index === index)
   }
 
   return (
@@ -64,6 +78,7 @@ const NodeLink = (props: any) => {
           {links.length !== 0 &&
             links.map((link: LinkType, i: number) => {
               const isHovered = link.source === hoveredIndex || link.target === hoveredIndex;
+              const isSelected = link.source === selectedIndex || link.target === selectedIndex;
               return (
                 <line
                   key={i}
@@ -73,8 +88,8 @@ const NodeLink = (props: any) => {
                   x2={nodes[link.target].x}
                   y2={nodes[link.target].y}
                   style={{
-                    stroke: isHovered ? "cyan" : "white",
-                    strokeWidth: isHovered ? "2" : "1"
+                    stroke: (isHovered || isSelected) ? "cyan" : "white",
+                    strokeWidth: (isHovered || isSelected) ? "2" : "1"
                   }}
                 />
               )
@@ -131,8 +146,8 @@ const NodeLink = (props: any) => {
                 );
               })}
 
-            {hoveredIndex !== -1 && findHoveredNode() && (
-              <g transform={`translate(${findHoveredNode().x},${findHoveredNode().y})`}>
+            {hoveredIndex !== -1 && findHoveredNode(hoveredIndex) && (
+              <g transform={`translate(${findHoveredNode(hoveredIndex)?.x},${findHoveredNode(hoveredIndex)?.y})`}>
                 <g>
                   <text
                     x={0}
@@ -154,7 +169,36 @@ const NodeLink = (props: any) => {
                       `
                     }}
                   >
-                    {findHoveredNode()?.title}
+                    {findHoveredNode(hoveredIndex)?.title}
+                  </text>
+                </g>
+              </g>
+            )}
+
+            {selectedIndex !== -1 && findHoveredNode(selectedIndex) && (
+              <g transform={`translate(${findHoveredNode(selectedIndex)?.x},${findHoveredNode(selectedIndex)?.y})`}>
+                <g>
+                  <text
+                    x={0}
+                    y={80}
+                    textAnchor="middle"
+                    fill="white"
+                    fontSize="30px"
+                    pointerEvents="none"
+                    style={{
+                      textShadow: `
+                        -1px -1px 0 #000,
+                        1px -1px 0 #000,
+                        -1px 1px 0 #000,
+                        1px 1px 0 #000,
+                        -1px 0 0 #000,
+                        1px 0 0 #000,
+                        0 -1px 0 #000,
+                        0 1px 0 #000
+                      `
+                    }}
+                  >
+                    {findHoveredNode(selectedIndex)?.title}
                   </text>
                 </g>
               </g>

@@ -177,6 +177,7 @@ const Network = () => {
                 links={links}
                 centerX={centerX}
                 centerY={centerY}
+                selectedIndex={selectedIndex}
                 setSelectedIndex={setSelectedIndex}
                 streamerIds={streamerIds}
               />
