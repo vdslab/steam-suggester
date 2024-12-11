@@ -67,8 +67,6 @@ const createNetwork = async (
     };
   });
 
-  nodes.sort((n1: NodeType, n2: NodeType) => (n2.activeUsers ?? 0) - (n1.activeUsers ?? 0));
-
   if (nodes.length === 0) {
     return { nodes, links: [], similarGames: {} };
   }
@@ -129,6 +127,13 @@ const createNetwork = async (
 
   const connectionCount = new Map<number, number>();
 
+  nodes.sort((a, b) => {
+    if ((a.x ?? 0) === (b.x ?? 0)) {
+      return (a.y ?? 0) - (b.y ?? 0);
+    }
+    return (a.x ?? 0) - (b.x ?? 0);
+  });
+
   nodes.forEach((sourceNode) => {
     const sourceIndex = sourceNode.index;
 
@@ -165,6 +170,8 @@ const createNetwork = async (
       }
     });
   });
+
+  nodes.sort((a, b) => a.index - b.index);
 
   const similarGames: SimilarGameType = {};
   nodes.forEach((sourceNode) => {
