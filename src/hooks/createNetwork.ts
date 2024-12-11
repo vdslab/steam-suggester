@@ -4,6 +4,7 @@ import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
 import { calculateSimilarityMatrix } from "@/hooks/calcWeight";
+import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 
 const k = 4;
 
@@ -29,8 +30,10 @@ const createNetwork = async (
 
   const data: SteamDetailsDataType[] = await response.json();
 
+  const slicedData = data.slice(0, GAME_COUNT);
+
   const promises = gameIds
-    .filter((gameId) => !data.find((d) => d.steamGameId === gameId))
+    .filter((gameId) => !slicedData.find((d) => d.steamGameId === gameId))
     .map(async (gameId) => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`,
@@ -38,13 +41,13 @@ const createNetwork = async (
       );
       if (res.ok) {
         const d: SteamDetailsDataType = await res.json();
-        data.push(d);
+        slicedData.push(d);
       }
     });
 
   await Promise.all(promises);
 
-  const rawNodes = data.filter((item) => {
+  const rawNodes = slicedData.filter((item) => {
     return (
       filter.Price.startPrice <= item.price &&
       item.price <= filter.Price.endPrice &&

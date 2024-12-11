@@ -1,8 +1,9 @@
 import { PG_POOL } from "@/constants/PG_POOL";
 import { NextResponse } from "next/server";
+import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 
 export async function GET() {
-  const GAME_COUNT = 200;
+  const COUNT = GAME_COUNT + 50;
   try {
     const today = new Date();
     // 過去一週間のデータを取得（昨日までの7日間）
@@ -62,7 +63,7 @@ export async function GET() {
     `;
 
     // クエリ実行時のパラメータ
-    const { rows } = await PG_POOL.query(query, [startDateString, endDateString, GAME_COUNT]);
+    const { rows } = await PG_POOL.query(query, [startDateString, endDateString, COUNT]);
 
     // クエリ結果をマッピング
     const result = rows.map(item => ({
