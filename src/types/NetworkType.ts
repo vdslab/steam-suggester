@@ -1,5 +1,3 @@
-import { SteamDeviceType } from "./api/getSteamDetailType";
-
 export type IconType = {
   title: string;
   imgURL: string;
@@ -60,6 +58,7 @@ export type NodeType = {
   music: number;
   primaryGenre?: string;
   totalViews?: number;
+  activeUsers?: number;
 }
 
 export type LinkType = {

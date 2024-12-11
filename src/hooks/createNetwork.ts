@@ -67,6 +67,8 @@ const createNetwork = async (
     };
   });
 
+  nodes.sort((n1: NodeType, n2: NodeType) => (n2.activeUsers ?? 0) - (n1.activeUsers ?? 0));
+
   if (nodes.length === 0) {
     return { nodes, links: [], similarGames: {} };
   }
@@ -100,11 +102,11 @@ const createNetwork = async (
   };
 
   const sizeScale = d3.scaleSqrt()
-    .domain(d3.extent(nodes, (d) => d.totalViews) as [number, number])
-    .range([1, 4]);
+    .domain(d3.extent(nodes, (d) => d.activeUsers) as [number, number])
+    .range([1, 6]);
 
   nodes.forEach((node: NodeType) => {
-    node.circleScale = sizeScale(node.totalViews ?? 0);
+    node.circleScale = sizeScale(node.activeUsers ?? 0);
   });
 
   const simulation = d3.forceSimulation(nodes)

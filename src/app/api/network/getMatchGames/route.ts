@@ -57,7 +57,7 @@ export async function GET() {
           sd.sale_price, sd.play_time, sd.review_text, sd.difficulty, sd.graphics,
           sd.story, sd.music
       ORDER BY
-          (SUM(gv.total_views) + SUM(sa.active_user)) DESC
+          SUM(sa.active_user) DESC
       LIMIT $3;
     `;
 
@@ -71,8 +71,8 @@ export async function GET() {
       title: item.name,
       imgURL: item.image,
       url: item.url,
-      totalViews: item.total_views,
-      activeUsers: item.total_active_users,
+      totalViews: parseInt(item.total_views, 10),
+      activeUsers: parseInt(item.total_active_users, 10),
       genres: item.genres || [],
       price: item.price,
       isSinglePlayer: item.is_single_player,
