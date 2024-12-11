@@ -169,17 +169,21 @@ const Network = () => {
 
       {/* メインコンテンツエリアを relative に設定 */}
       <div className="test1 flex-1 relative bg-gray-900 overflow-hidden">
-          {/* メインコンテンツ */}
-          <div className="absolute inset-0">
-            <NodeLink
-              nodes={nodes}
-              links={links}
-              centerX={centerX}
-              centerY={centerY}
-              setSelectedIndex={setSelectedIndex}
-              streamerIds={streamerIds}
-            />
-          </div>
+          {!isLoading ? (
+            <div className="absolute inset-0">
+              {/* メインコンテンツ */}
+              <NodeLink
+                nodes={nodes}
+                links={links}
+                centerX={centerX}
+                centerY={centerY}
+                setSelectedIndex={setSelectedIndex}
+                streamerIds={streamerIds}
+              />
+            </div>
+          ) : (
+            <Loading />
+          )}
 
           {/* フィルターパネル */}
           {isFilterOpen && (
