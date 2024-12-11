@@ -237,7 +237,7 @@ const SimilaritySettings = ({ slider, setSlider }: Props) => {
         </div>
       </Section>
 
-      <div className="mt-4 space-y-2">
+      <div className="sticky bottom-0 bg-gray-800 p-4 mt-4 space-y-2">
         <button
           className="w-full text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500"
           onClick={handleApplySettings}
