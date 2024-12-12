@@ -4,8 +4,10 @@ import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
 import { calculateSimilarityMatrix } from "@/hooks/calcWeight";
+import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 
 const k = 4;
+const CLUSTER_ITERATIONS = 3; // クラスタ再計算の回数
 
 const getRandomCoordinates = (range: number): { x: number; y: number } => {
   const x = Math.random() * range - range / 2;
@@ -16,8 +18,10 @@ const getRandomCoordinates = (range: number): { x: number; y: number } => {
 const createNetwork = async (
   filter: Filter,
   gameIds: string[],
-  slider: SliderSettings
+  slider: SliderSettings,
+  onProgress?: (progress: number) => void
 ): Promise<{ nodes: NodeType[]; links: LinkType[]; similarGames: SimilarGameType }> => {
+  if (onProgress) onProgress(0);
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     { next: { revalidate: ISR_FETCH_INTERVAL } }
@@ -28,23 +32,31 @@ const createNetwork = async (
   }
 
   const data: SteamDetailsDataType[] = await response.json();
+  const slicedData = data.slice(0, GAME_COUNT);
+  if (onProgress) onProgress(20);
 
   const promises = gameIds
-    .filter((gameId) => !data.find((d) => d.steamGameId === gameId))
-    .map(async (gameId) => {
+    .filter((gameId) => !slicedData.find((d) => d.steamGameId === gameId))
+    .map(async (gameId, index, array) => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`,
         { next: { revalidate: ISR_FETCH_INTERVAL } }
       );
       if (res.ok) {
         const d: SteamDetailsDataType = await res.json();
-        data.push(d);
+        slicedData.push(d);
+      }
+
+      if (onProgress) {
+        const progress = 20 + ((index + 1) / array.length) * 20;
+        onProgress(progress);
       }
     });
 
   await Promise.all(promises);
+  if (onProgress) onProgress(40);
 
-  const rawNodes = data.filter((item) => {
+  const rawNodes = slicedData.filter((item) => {
     return (
       filter.Price.startPrice <= item.price &&
       item.price <= filter.Price.endPrice &&
@@ -55,7 +67,7 @@ const createNetwork = async (
   });
 
   const nodes: NodeType[] = rawNodes.map((item, i) => {
-    const { x, y } = getRandomCoordinates(1000); // ランダムな初期座標を設定
+    const { x, y } = getRandomCoordinates(1000);
     return {
       ...item,
       index: i,
@@ -70,64 +82,85 @@ const createNetwork = async (
   if (nodes.length === 0) {
     return { nodes, links: [], similarGames: {} };
   }
+  if (onProgress) onProgress(60);
 
   const similarityMatrix = calculateSimilarityMatrix(nodes, slider);
+  if (onProgress) onProgress(70);
 
-  const clusterCenters = new Map<number, { x: number; y: number }>();
-  nodes.forEach((node, i) => {
-    if (!clusterCenters.has(i)) {
-      clusterCenters.set(i, getRandomCoordinates(2000)); // クラスタ中心を分散
-    }
-  });
+  for (let iteration = 0; iteration < CLUSTER_ITERATIONS; iteration++) {
+    const clusterCenters = new Map<number, { x: number; y: number }>();
 
-  const clusterForce = (alpha: number) => {
-    const strength = 0.1;
-    nodes.forEach((sourceNode, i) => {
-      const targetIndex = similarityMatrix[i].reduce(
-        (bestIndex, score, index) =>
-          score > similarityMatrix[i][bestIndex] ? index : bestIndex,
-        0
-      );
-
-      const clusterCenter = clusterCenters.get(targetIndex);
-      if (clusterCenter) {
-        const dx = clusterCenter.x - (sourceNode.x ?? 0);
-        const dy = clusterCenter.y - (sourceNode.y ?? 0);
-        sourceNode.vx = (sourceNode.vx ?? 0) + dx * strength * alpha;
-        sourceNode.vy = (sourceNode.vy ?? 0) + dy * strength * alpha;
+    nodes.forEach((node, i) => {
+      if (!clusterCenters.has(i)) {
+        clusterCenters.set(i, getRandomCoordinates(2000));
       }
     });
-  };
 
-  const sizeScale = d3.scaleSqrt()
-    .domain(d3.extent(nodes, (d) => d.totalViews) as [number, number])
-    .range([1, 4]);
+    const clusterForce = (alpha: number) => {
+      const strength = 0.1;
+      nodes.forEach((sourceNode, i) => {
+        const targetIndex = similarityMatrix[i].reduce(
+          (bestIndex, score, index) =>
+            score > similarityMatrix[i][bestIndex] ? index : bestIndex,
+          0
+        );
 
-  nodes.forEach((node: NodeType) => {
-    node.circleScale = sizeScale(node.totalViews ?? 0);
-  });
+        const clusterCenter = clusterCenters.get(targetIndex);
+        if (clusterCenter) {
+          const dx = clusterCenter.x - (sourceNode.x ?? 0);
+          const dy = clusterCenter.y - (sourceNode.y ?? 0);
+          sourceNode.vx = (sourceNode.vx ?? 0) + dx * strength * alpha;
+          sourceNode.vy = (sourceNode.vy ?? 0) + dy * strength * alpha;
+        }
+      });
+    };
 
-  const simulation = d3.forceSimulation(nodes)
-    .force("charge", d3.forceManyBody<NodeType>().strength(-200)) // 強い引力でノード間を広げる
-    .force("center", d3.forceCenter(0, 0)) // 中心に配置
-    .force("collide", d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 30)) // 衝突半径を拡大
-    .on("tick", () => {
-      clusterForce(simulation.alpha());
+    const sizeScale = d3
+    .scaleSqrt()
+    .domain(d3.extent(nodes, (d) => d.activeUsers) as [number, number])
+    .range([1, 6]);
+
+    nodes.forEach((node: NodeType, i) => {
+      node.circleScale = sizeScale(node.activeUsers ?? 0);
     });
 
-  await new Promise<void>((resolve) => {
-    simulation.on("end", function () {
-      resolve();
-    });
-  });
+    const simulation = d3
+      .forceSimulation(nodes)
+      .force("charge", d3.forceManyBody<NodeType>().strength(-200))
+      .force("center", d3.forceCenter(0, 0))
+      .force("collide", d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 30))
+      .on("tick", () => {
+        clusterForce(simulation.alpha());
+      });
 
-  simulation.stop();
+    await new Promise<void>((resolve) => {
+      simulation.on("end", resolve);
+    });
+
+    simulation.stop();
+
+    clusterCenters.clear();
+    nodes.forEach((node, i) => {
+      clusterCenters.set(i, { x: node.x ?? 0, y: node.y ?? 0 });
+    });
+
+    if (onProgress) {
+      const progress = 70 + ((iteration + 1) / CLUSTER_ITERATIONS) * 20;
+      onProgress(progress);
+    }
+  }
 
   const links: LinkType[] = [];
-
   const connectionCount = new Map<number, number>();
 
-  nodes.forEach((sourceNode) => {
+  nodes.sort((a, b) => {
+    if ((a.x ?? 0) === (b.x ?? 0)) {
+      return (a.y ?? 0) - (b.y ?? 0);
+    }
+    return (a.x ?? 0) - (b.x ?? 0);
+  });
+
+  nodes.forEach((sourceNode, index) => {
     const sourceIndex = sourceNode.index;
 
     const distances = nodes
@@ -163,6 +196,8 @@ const createNetwork = async (
       }
     });
   });
+
+  nodes.sort((a, b) => a.index - b.index);
 
   const similarGames: SimilarGameType = {};
   nodes.forEach((sourceNode) => {

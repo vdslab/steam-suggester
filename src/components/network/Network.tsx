@@ -1,6 +1,5 @@
-/* Network.tsx */
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import NodeLink from "./NodeLink";
 import SelectParameter from "./selectParameter/SelectParameter";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
@@ -17,13 +16,13 @@ import Panel from "./Panel";
 import SteamList from "./steamList/SteamList";
 import HelpTooltip from "./HelpTooltip";
 import Tour from "./Tour";
+import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 
-
-
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
+  const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
 
   const [nodes, setNodes] = useState<NodeType[]>([]);
   const [links, setLinks] = useState<LinkType[]>([]);
@@ -33,6 +32,7 @@ const Network = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isNetworkLoading, setIsNetworkLoading] = useState(false);
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
@@ -43,8 +43,14 @@ const Network = () => {
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
   const [tourRun, setTourRun] = useState<boolean>(true);
 
+  const [progress, setProgress] = useState(0);
+
+  // Refを使用して副作用の実行を制御
+  const hasFetchedInitialData = useRef(false);
+
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
-    const result = await createNetwork(filter, gameIds, slider);
+    setProgress(0);
+    const result = await createNetwork(filter, gameIds, slider, setProgress);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -53,35 +59,30 @@ const Network = () => {
         (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
     );
     if (centerX === 0 && centerY === 0 && buffNodes.length > 0) {
-      setCenterX(buffNodes[0]?.x ?? 0);
-      setCenterY(buffNodes[0]?.y ?? 0);
+      setCenterX((buffNodes[0]?.x ?? 0) - 150);
+      setCenterY((buffNodes[0]?.y ?? 0) + 100);
     }
     setNodes(nodes);
     setLinks(links);
+    setProgress(100);
+    hasFetchedInitialData.current = false; 
   };
 
   useEffect(() => {
-    if (isLoading) {
+    if ((isLoading || isNetworkLoading) && !hasFetchedInitialData.current) {
+      hasFetchedInitialData.current = true; // フラグを立てる
       (async () => {
-        const filter = (await getFilterData()) ?? DEFAULT_FILTER;
+        const filterData = (await getFilterData()) ?? DEFAULT_FILTER;
         const gameIds = (await getGameIdData()) ?? [];
-        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
-        setFilter(filter);
-        await initialNodes(filter, gameIds, slider);
+        const sliderData = (await getSliderData()) ?? DEFAULT_SLIDER;
+        setFilter(filterData);
+        setSlider(sliderData);
+        await initialNodes(filterData, gameIds, sliderData);
         setIsLoading(false);
+        setIsNetworkLoading(false);
       })();
     }
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      (async () => {
-        const gameIds = (await getGameIdData()) ?? [];
-        const slider = (await getSliderData()) ?? DEFAULT_SLIDER;
-        initialNodes(filter, gameIds, slider);
-      })();
-    }
-  }, [filter]);
+  }, [isLoading, isNetworkLoading]);
 
   // Sidebar のトグル関数
   const toggleFilter = () => {
@@ -171,84 +172,97 @@ const Network = () => {
 
       {/* メインコンテンツエリアを relative に設定 */}
       <div className="test1 flex-1 relative bg-gray-900 overflow-hidden">
-          {/* メインコンテンツ */}
+        {!isNetworkLoading ? (
           <div className="absolute inset-0">
+            {/* メインコンテンツ */}
             <NodeLink
               nodes={nodes}
               links={links}
               centerX={centerX}
               centerY={centerY}
-              setSelectedIndex={setSelectedIndex}
-              streamerIds={streamerIds}
-            />
-          </div>
-
-          {/* フィルターパネル */}
-          {isFilterOpen && (
-            <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-              <SelectParameter filter={filter} setFilter={setFilter} />
-            </div>
-          )}
-
-          {/* StreamerListパネル */}
-          {isStreamerOpen && (
-            <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-              <Panel
-                  title={
-                    <div className="flex items-center">
-                      <span>配信者</span>
-                      <HelpTooltip title="配信者を追加すると配信者が配信したゲームのアイコンに枠が表示されます。" />
-                    </div>
-                  }
-                  icon={<LiveTvIcon className="mr-2 text-white" />}
-                >
-                <StreamedList
-                  nodes={nodes}
-                  streamerIds={streamerIds}
-                  setStreamerIds={setStreamerIds}
-                />
-              </Panel>
-            </div>
-          )}
-
-          {/* ChatBarパネル */}
-          {isChatOpen && (
-            <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-              <Panel
-                  title={
-                    <div className="flex items-center">
-                      <span>類似度設定</span>
-                      <HelpTooltip title="ゲーム間の類似度計算における重みを調整できます。プリセットは4軸で構成されていますが、詳細設定を有効にするとさらに細かい調整が可能です。" />
-                    </div>
-                  }
-                  icon={<TuneIcon className="mr-2 text-white" />}
-                >
-                <SimilaritySettings />
-              </Panel>
-            </div>
-          )}
-
-          {/* Steam連携パネル */}
-          {isSteamListOpen && (
-            <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-              <SteamList />
-            </div>
-          )}
-
-          {/* ゲームリストパネル */}
-          <div className="absolute top-0 right-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <GameList
-              nodes={nodes}
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
-              setCenterX={setCenterX}
-              setCenterY={setCenterY}
-              setIsLoading={setIsLoading}
+              streamerIds={streamerIds}
+              isStreamerOpen={isStreamerOpen}
             />
           </div>
+        ) : (
+          <ProgressBar progress={progress} />
+        )}
 
-        <Tour run={tourRun} setRun={setTourRun}/>
+        {/* フィルターパネル */}
+        {isFilterOpen && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <SelectParameter
+              filter={filter}
+              setFilter={setFilter}
+              setIsNetworkLoading={setIsNetworkLoading}
+            />
+          </div>
+        )}
 
+        {/* StreamerListパネル */}
+        {isStreamerOpen && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <Panel
+              title={
+                <div className="flex items-center">
+                  <span>配信者</span>
+                  <HelpTooltip title="配信者を追加すると配信者が配信したゲームのアイコンに枠が表示されます。" />
+                </div>
+              }
+              icon={<LiveTvIcon className="mr-2 text-white" />}
+            >
+              <StreamedList
+                nodes={nodes}
+                streamerIds={streamerIds}
+                setStreamerIds={setStreamerIds}
+              />
+            </Panel>
+          </div>
+        )}
+
+        {/* ChatBarパネル */}
+        {isChatOpen && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <Panel
+              title={
+                <div className="flex items-center">
+                  <span>類似度設定</span>
+                  <HelpTooltip title="ゲーム間の類似度計算における重みを調整できます。" />
+                </div>
+              }
+              icon={<TuneIcon className="mr-2 text-white" />}
+            >
+              <SimilaritySettings
+                slider={slider}
+                setSlider={setSlider}
+                setIsNetworkLoading={setIsNetworkLoading}
+              />
+            </Panel>
+          </div>
+        )}
+
+        {/* Steam連携パネル */}
+        {isSteamListOpen && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <SteamList />
+          </div>
+        )}
+
+        {/* ゲームリストパネル */}
+        <div className="absolute top-0 right-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+          <GameList
+            nodes={nodes}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            setCenterX={setCenterX}
+            setCenterY={setCenterY}
+            setIsNetworkLoading={setIsNetworkLoading}
+          />
+        </div>
+
+        <Tour run={tourRun} setRun={setTourRun} />
       </div>
     </div>
   );
