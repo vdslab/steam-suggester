@@ -7,6 +7,7 @@ import { calculateSimilarityMatrix } from "@/hooks/calcWeight";
 import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 
 const k = 4;
+const CLUSTER_ITERATIONS = 3; // クラスタ再計算の回数
 
 const getRandomCoordinates = (range: number): { x: number; y: number } => {
   const x = Math.random() * range - range / 2;
@@ -66,7 +67,7 @@ const createNetwork = async (
   });
 
   const nodes: NodeType[] = rawNodes.map((item, i) => {
-    const { x, y } = getRandomCoordinates(1000); // ランダムな初期座標を設定
+    const { x, y } = getRandomCoordinates(1000);
     return {
       ...item,
       index: i,
@@ -86,71 +87,59 @@ const createNetwork = async (
   const similarityMatrix = calculateSimilarityMatrix(nodes, slider);
   if (onProgress) onProgress(70);
 
-  const clusterCenters = new Map<number, { x: number; y: number }>();
+  for (let iteration = 0; iteration < CLUSTER_ITERATIONS; iteration++) {
+    const clusterCenters = new Map<number, { x: number; y: number }>();
 
-  nodes.forEach((node, i) => {
-    if (!clusterCenters.has(i)) {
-      clusterCenters.set(i, getRandomCoordinates(2000));
-    }
-    if (onProgress) {
-      const progress = 70 + (i / nodes.length) * 5;
-      onProgress(progress);
-    }
-  });
-
-  const clusterForce = (alpha: number) => {
-    const strength = 0.1;
-    nodes.forEach((sourceNode, i) => {
-      const targetIndex = similarityMatrix[i].reduce(
-        (bestIndex, score, index) =>
-          score > similarityMatrix[i][bestIndex] ? index : bestIndex,
-        0
-      );
-
-      const clusterCenter = clusterCenters.get(targetIndex);
-      if (clusterCenter) {
-        const dx = clusterCenter.x - (sourceNode.x ?? 0);
-        const dy = clusterCenter.y - (sourceNode.y ?? 0);
-        sourceNode.vx = (sourceNode.vx ?? 0) + dx * strength * alpha;
-        sourceNode.vy = (sourceNode.vy ?? 0) + dy * strength * alpha;
-      }
-    });
-  };
-
-  const sizeScale = d3
-    .scaleSqrt()
-    .domain(d3.extent(nodes, (d) => d.activeUsers) as [number, number])
-    .range([1, 6]);
-
-  nodes.forEach((node: NodeType, i) => {
-    node.circleScale = sizeScale(node.activeUsers ?? 0);
-    if (onProgress) {
-      const progress = 75 + (i / nodes.length) * 5;
-      onProgress(progress);
-    }
-  });
-
-  const simulation = d3
-    .forceSimulation(nodes)
-    .force("charge", d3.forceManyBody<NodeType>().strength(-200))
-    .force("center", d3.forceCenter(0, 0))
-    .force("collide", d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 30))
-    .on("tick", () => {
-      clusterForce(simulation.alpha());
-      if (onProgress) {
-        const progress = 80 + (18 - simulation.alpha() * 18);
-        onProgress(progress);
+    nodes.forEach((node, i) => {
+      if (!clusterCenters.has(i)) {
+        clusterCenters.set(i, getRandomCoordinates(2000));
       }
     });
 
-  await new Promise<void>((resolve) => {
-    simulation.on("end", function () {
-      if (onProgress) onProgress(98);
-      resolve();
-    });
-  });
+    const clusterForce = (alpha: number) => {
+      const strength = 0.1;
+      nodes.forEach((sourceNode, i) => {
+        const targetIndex = similarityMatrix[i].reduce(
+          (bestIndex, score, index) =>
+            score > similarityMatrix[i][bestIndex] ? index : bestIndex,
+          0
+        );
 
-  simulation.stop();
+        const clusterCenter = clusterCenters.get(targetIndex);
+        if (clusterCenter) {
+          const dx = clusterCenter.x - (sourceNode.x ?? 0);
+          const dy = clusterCenter.y - (sourceNode.y ?? 0);
+          sourceNode.vx = (sourceNode.vx ?? 0) + dx * strength * alpha;
+          sourceNode.vy = (sourceNode.vy ?? 0) + dy * strength * alpha;
+        }
+      });
+    };
+
+    const simulation = d3
+      .forceSimulation(nodes)
+      .force("charge", d3.forceManyBody<NodeType>().strength(-200))
+      .force("center", d3.forceCenter(0, 0))
+      .force("collide", d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 30))
+      .on("tick", () => {
+        clusterForce(simulation.alpha());
+      });
+
+    await new Promise<void>((resolve) => {
+      simulation.on("end", resolve);
+    });
+
+    simulation.stop();
+
+    clusterCenters.clear();
+    nodes.forEach((node, i) => {
+      clusterCenters.set(i, { x: node.x ?? 0, y: node.y ?? 0 });
+    });
+
+    if (onProgress) {
+      const progress = 70 + ((iteration + 1) / CLUSTER_ITERATIONS) * 20;
+      onProgress(progress);
+    }
+  }
 
   const links: LinkType[] = [];
   const connectionCount = new Map<number, number>();
@@ -197,16 +186,12 @@ const createNetwork = async (
         if (addedLinks >= k) return;
       }
     });
-    if (onProgress) {
-      const progress = 98 + ((index + 1) / nodes.length);
-      onProgress(progress);
-    }
   });
 
   nodes.sort((a, b) => a.index - b.index);
 
   const similarGames: SimilarGameType = {};
-  nodes.forEach((sourceNode, index) => {
+  nodes.forEach((sourceNode) => {
     const sourceId = sourceNode.steamGameId;
     similarGames[sourceId] = [];
 
@@ -225,10 +210,6 @@ const createNetwork = async (
         });
       }
     });
-    if (onProgress) {
-      const progress = 99 + ((index + 1) / nodes.length);
-      onProgress(progress);
-    }
   });
 
   return { nodes, links, similarGames };
