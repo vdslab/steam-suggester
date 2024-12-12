@@ -137,7 +137,7 @@ const NodeLink = (props: NodeLinkProps) => {
                               cy="0"
                               r="17" // 半径
                               stroke={color}
-                              strokeWidth="5"
+                              strokeWidth="1.5"
                               fill="transparent"
                               strokeDasharray={`${angleStep} ${360 - angleStep}`}
                               strokeDashoffset={-angleStart}
