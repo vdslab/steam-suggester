@@ -19,13 +19,14 @@ type Props = {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setCenterX: React.Dispatch<React.SetStateAction<number>>;
   setCenterY: React.Dispatch<React.SetStateAction<number>>;
-  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsNetworkLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 
 const GameList = (props: Props) => {
-  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsNetworkLoading } = props;
+  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
   const router = useRouter();
 
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
@@ -113,7 +114,12 @@ const GameList = (props: Props) => {
       setUserAddedGames(newUserAddedGames);
       (async () => {
         await changeGameIdData(newUserAddedGames);
-        setIsNetworkLoading(true);
+        // TODO:
+        if(setIsNetworkLoading) {
+          setIsNetworkLoading(true);
+        } else if (setIsLoading) {
+          setIsLoading(true);
+        }
       })();
     }
   };
@@ -124,7 +130,12 @@ const GameList = (props: Props) => {
     setUserAddedGames(newUserAddedGames);
     (async () => {
       await changeGameIdData(newUserAddedGames);
-      setIsNetworkLoading(true);
+      // TODO:
+      if(setIsNetworkLoading) {
+        setIsNetworkLoading(true);
+      } else if (setIsLoading) {
+        setIsLoading(true);
+      }
     })();
   };
 

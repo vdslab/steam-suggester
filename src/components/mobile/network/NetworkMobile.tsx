@@ -182,7 +182,7 @@ const NetworkMobile = () => {
 
         {isFilterOpen && (
           <div className="bg-gray-900 overflow-y-auto overflow-x-hidden z-50">
-            <SelectParameter filter={filter} setFilter={setFilter} />
+            <SelectParameter filter={filter} setFilter={setFilter} setIsLoading={setIsLoading} />
           </div>
         )}
 
@@ -244,6 +244,8 @@ const NetworkMobile = () => {
             centerY={centerY}
             setSelectedIndex={setSelectedIndex}
             streamerIds={streamerIds}
+            selectedIndex={selectedIndex}
+            isStreamerOpen={isStreamerOpen}
           />
         </div>
 
