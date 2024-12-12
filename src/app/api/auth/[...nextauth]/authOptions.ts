@@ -4,12 +4,15 @@ import type { AuthOptions } from 'next-auth'
 import type { NextRequest } from 'next/server'
 
 export function getAuthOptions(req?: NextRequest): AuthOptions {
+
+  console.log('STEAM_API_KEY', process.env.STEAM_API_KEY)
+
   return {
     providers: req
       ? [
           SteamProvider(req, {
-            clientSecret: "835F4070BDF4C82BEAF49B3EBB06B093",
-            callbackUrl: 'http://localhost:3000/api/auth/callback'
+            clientSecret: process.env.STEAM_API_KEY || '',
+            callbackUrl: `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/auth/callback`
           })
         ]
       : [],
