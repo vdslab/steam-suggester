@@ -11,6 +11,7 @@ export type IconType = {
 export type SteamListType = {
   steamGameId: string;
   title: string;
+  index?: number;
 }
 
 export type StreamerListType = {

@@ -4,8 +4,20 @@ import Joyride, { CallBackProps, STATUS } from 'react-joyride'
 const steps = [
   {
     target: 'body',
-    content: '類似してるゲーム近くで表示させています。',
+    content: '類似してるゲームを近くで表示させています。',
     disableBeacon: true,
+  },
+  {
+    target: 'body',
+    content: 'ドラッグアンドドロップでグラフを移動できます。',
+  },
+  {
+    target: 'body',
+    content: 'スクロールでズームインアウトができます。',
+  },
+  {
+    target: 'body',
+    content: 'クリックでノードの詳細を確認できます。',
   },
   {
     target: '.step3',

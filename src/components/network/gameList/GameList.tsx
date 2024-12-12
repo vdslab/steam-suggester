@@ -67,14 +67,20 @@ const GameList = (props: Props) => {
   useEffect(() => {
     const lowerCaseQuery = searchQuery.toLowerCase();
 
+    const allSteamList: SteamListType[] = nodes.map((node: NodeType): SteamListType => {
+      return {
+        steamGameId: node.steamGameId,
+        title: node.title,
+        index: node.index
+      }
+    });
+
+    allSteamList.push(...steamList.filter((item1: SteamListType) => !allSteamList.find((item2: SteamListType) => item2.steamGameId === item1.steamGameId)));
+
     // Steamリストのフィルタリング（ユーザーが追加していないゲームかつ固定ゲームではないもの）
-    const filteredSteam = steamList
+    const filteredSteam = allSteamList
       .filter((game) =>
-        game.title.toLowerCase().includes(lowerCaseQuery)
-      )
-      .filter((game) => 
-        !userAddedGames.includes(game.steamGameId) && 
-        !fixedGameIds.includes(game.steamGameId)
+        game.title.toLowerCase().includes(lowerCaseQuery) && game.steamGameId
       )
       .slice(0, 20); // 20件に制限
 
@@ -193,14 +199,27 @@ const GameList = (props: Props) => {
               <h2 className="text-white mb-2">検索結果（追加候補）</h2>
               {filteredSteamList.length > 0 ? (
                 filteredSteamList.map((game) => (
-                  <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
-                    <div className="text-white p-2 rounded">
-                      {game.title}
-                    </div>
-                    <PlaylistAddIcon
-                      className='cursor-pointer hover:bg-gray-600 rounded'
-                      onClick={() => handleSearchClick(game.steamGameId)}
-                    />
+                  <div key={"filteredSteamList" + game.steamGameId}>
+                    {typeof game.index === "number" ? (
+                      <div className='cursor-pointer flex pb-2 items-center' onClick={() => handleGameClick(game.index as number)}>
+                        <div className={`${selectColor(game.index + 1).rankColor} p-2`}>
+                          {game.index + 1}位
+                        </div>
+                        <div className="text-white p-2">
+                          {game.title}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className='flex pb-2 justify-between items-center'>
+                        <div className="text-white p-2 rounded">
+                          {game.title}
+                        </div>
+                        <PlaylistAddIcon
+                          className='cursor-pointer hover:bg-gray-600 rounded'
+                          onClick={() => handleSearchClick(game.steamGameId)}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))
               ) : null /* メッセージは上部に移動したためここでは何も表示しない */}
@@ -209,9 +228,9 @@ const GameList = (props: Props) => {
 
           {/* ゲームリスト表示 */}
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto step6">
-            {filteredNodeList.length > 0 ? (
+            {nodes.length > 0 ? (
               <div className="space-y-2">
-                {filteredNodeList.map((node: NodeType, idx: number) => {
+                {nodes.map((node: NodeType, idx: number) => {
                   const nodeIndex = nodes.findIndex(n => n.steamGameId === node.steamGameId);
                   const isSelected = selectedIndex === nodeIndex;
                   const { rankColor } = selectColor(node.index + 1);

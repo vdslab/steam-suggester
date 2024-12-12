@@ -65,10 +65,10 @@ const Network = () => {
     setNodes(nodes);
     setLinks(links);
     setProgress(100);
+    hasFetchedInitialData.current = false; 
   };
 
   useEffect(() => {
-    // `isLoading` または `isNetworkLoading` が true で、まだデータをフェッチしていない場合
     if ((isLoading || isNetworkLoading) && !hasFetchedInitialData.current) {
       hasFetchedInitialData.current = true; // フラグを立てる
       (async () => {
