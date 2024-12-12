@@ -16,6 +16,7 @@ import Panel from "./Panel";
 import SteamList from "./steamList/SteamList";
 import HelpTooltip from "./HelpTooltip";
 import Tour from "./Tour";
+import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 
@@ -42,8 +43,11 @@ const Network = () => {
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
   const [tourRun, setTourRun] = useState<boolean>(true);
 
+  const [progress, setProgress] = useState(0);
+
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
-    const result = await createNetwork(filter, gameIds, slider);
+    setProgress(0);
+    const result = await createNetwork(filter, gameIds, slider, setProgress);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -57,6 +61,7 @@ const Network = () => {
     }
     setNodes(nodes);
     setLinks(links);
+    setProgress(100);
   };
 
   useEffect(() => {
@@ -177,7 +182,7 @@ const Network = () => {
               />
             </div>
           ) : (
-            <Loading />
+            <ProgressBar progress={progress} />
           )}
 
           {/* フィルターパネル */}
