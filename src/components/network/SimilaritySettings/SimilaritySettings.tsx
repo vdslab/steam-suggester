@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Section from "../Section";
 import TuneIcon from "@mui/icons-material/Tune";
 import InfoIcon from "@mui/icons-material/Info";
 
 import { changeSliderData, getSliderData } from "@/hooks/indexedDB";
 import { SliderSettings } from "@/types/api/FilterType";
+
+type Props = {
+  slider: SliderSettings;
+  setSlider: React.Dispatch<React.SetStateAction<SliderSettings>>;
+  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 type SliderProps = {
   domain: [number, number];
@@ -46,25 +52,25 @@ const Slider: React.FC<SliderProps> = ({
   );
 };
 
-const SimilaritySettings = () => {
-  const [genreWeight, setGenreWeight] = useState<number>(50);
-  const [graphicWeight, setGraphicWeight] = useState<number>(50);
-  const [playstyleWeight, setPlaystyleWeight] = useState<number>(50);
-  const [reviewWeight, setReviewWeight] = useState<number>(50);
+const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) => {
+  const [genreWeight, setGenreWeight] = useState<number>(slider.genreWeight);
+  const [graphicWeight, setGraphicWeight] = useState<number>(slider.graphicWeight);
+  const [playstyleWeight, setPlaystyleWeight] = useState<number>(slider.playstyleWeight);
+  const [reviewWeight, setReviewWeight] = useState<number>(slider.reviewWeight);
 
-  const [isDetailMode, setIsDetailMode] = useState<boolean>(false);
+  const [isDetailMode, setIsDetailMode] = useState<boolean>(slider.isDetailMode);
 
-  const [subGenreWeight, setSubGenreWeight] = useState<number>(genreWeight / 2);
-  const [systemWeight, setSystemWeight] = useState<number>(genreWeight / 2);
-  const [visualWeight, setVisualWeight] = useState<number>(graphicWeight / 2);
-  const [worldviewWeight, setWorldviewWeight] = useState<number>(graphicWeight / 2);
+  const [subGenreWeight, setSubGenreWeight] = useState<number>(slider.subGenreWeight / 2);
+  const [systemWeight, setSystemWeight] = useState<number>(slider.systemWeight / 2);
+  const [visualWeight, setVisualWeight] = useState<number>(slider.visualWeight / 2);
+  const [worldviewWeight, setWorldviewWeight] = useState<number>(slider.worldviewWeight / 2);
 
-  const [difficultyWeight, setDifficultyWeight] = useState<number>(0);
-  const [playtimeWeight, setPlaytimeWeight] = useState<number>(0);
-  const [priceWeight, setPriceWeight] = useState<number>(0);
-  const [developerWeight, setDeveloperWeight] = useState<number>(0);
-  const [deviceWeight, setDeviceWeight] = useState<number>(0);
-  const [releaseDateWeight, setReleaseDateWeight] = useState<number>(0);
+  const [difficultyWeight, setDifficultyWeight] = useState<number>(slider.difficultyWeight);
+  const [playtimeWeight, setPlaytimeWeight] = useState<number>(slider.playstyleWeight);
+  const [priceWeight, setPriceWeight] = useState<number>(slider.priceWeight);
+  const [developerWeight, setDeveloperWeight] = useState<number>(slider.developerWeight);
+  const [deviceWeight, setDeviceWeight] = useState<number>(slider.deviceWeight);
+  const [releaseDateWeight, setReleaseDateWeight] = useState<number>(slider.releaseDateWeight);
 
   const handleDetailModeToggle = () => {
     setIsDetailMode(!isDetailMode);
@@ -89,35 +95,10 @@ const SimilaritySettings = () => {
       deviceWeight,
       releaseDateWeight
     };
+    setSlider(sliderData);
     await changeSliderData(sliderData);
-    console.log("類似度設定が保存されました。");
+    setIsNetworkLoading(true);
   };
-
-  useEffect(() => {
-    (async () => {
-      const sliderData = await getSliderData();
-      if (sliderData) {
-        setGenreWeight(sliderData.genreWeight);
-        setGraphicWeight(sliderData.graphicWeight);
-        setPlaystyleWeight(sliderData.playstyleWeight);
-        setReviewWeight(sliderData.reviewWeight);
-
-        setIsDetailMode(sliderData.isDetailMode);
-
-        setSubGenreWeight(sliderData.subGenreWeight);
-        setSystemWeight(sliderData.systemWeight);
-        setVisualWeight(sliderData.visualWeight);
-        setWorldviewWeight(sliderData.worldviewWeight);
-
-        setDifficultyWeight(sliderData.difficultyWeight);
-        setPlaytimeWeight(sliderData.playtimeWeight);
-        setPriceWeight(sliderData.priceWeight);
-        setDeveloperWeight(sliderData.developerWeight);
-        setDeviceWeight(sliderData.deviceWeight);
-        setReleaseDateWeight(sliderData.releaseDateWeight);
-      }
-    })();
-  }, []);
 
   return (
     <>
@@ -192,7 +173,7 @@ const SimilaritySettings = () => {
           />
         </div>
 
-        <div className="mb-4 flex items-center">
+        {/* <div className="mb-4 flex items-center">
           <input
             type="checkbox"
             className="form-checkbox h-5 w-5 text-gray-600"
@@ -200,10 +181,10 @@ const SimilaritySettings = () => {
             onChange={handleDetailModeToggle}
           />
           <span className="ml-2 text-white">詳細モードを有効にする</span>
-        </div>
+        </div> */}
       </Section>
 
-      <Section title="詳細設定" icon={<InfoIcon />}>
+      {/* <Section title="詳細設定" icon={<InfoIcon />}>
         <p className="text-gray-400 mb-2 text-sm">
           以下はオプションの細かな調整用要素です。必要に応じて微調整してください。
         </p>
@@ -255,9 +236,9 @@ const SimilaritySettings = () => {
             onChange={(val) => setReleaseDateWeight(val[0])}
           />
         </div>
-      </Section>
+      </Section> */}
 
-      <div className="mt-4 space-y-2">
+      <div className="sticky bottom-0 bg-gray-800 p-4 mt-4 space-y-2">
         <button
           className="w-full text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500"
           onClick={handleApplySettings}

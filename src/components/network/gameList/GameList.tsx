@@ -19,13 +19,14 @@ type Props = {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setCenterX: React.Dispatch<React.SetStateAction<number>>;
   setCenterY: React.Dispatch<React.SetStateAction<number>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsNetworkLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 
 const GameList = (props: Props) => {
-  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading } = props;
+  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
   const router = useRouter();
 
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
@@ -67,14 +68,20 @@ const GameList = (props: Props) => {
   useEffect(() => {
     const lowerCaseQuery = searchQuery.toLowerCase();
 
+    const allSteamList: SteamListType[] = nodes.map((node: NodeType): SteamListType => {
+      return {
+        steamGameId: node.steamGameId,
+        title: node.title,
+        index: node.index
+      }
+    });
+
+    allSteamList.push(...steamList.filter((item1: SteamListType) => !allSteamList.find((item2: SteamListType) => item2.steamGameId === item1.steamGameId)));
+
     // Steamリストのフィルタリング（ユーザーが追加していないゲームかつ固定ゲームではないもの）
-    const filteredSteam = steamList
+    const filteredSteam = allSteamList
       .filter((game) =>
-        game.title.toLowerCase().includes(lowerCaseQuery)
-      )
-      .filter((game) => 
-        !userAddedGames.includes(game.steamGameId) && 
-        !fixedGameIds.includes(game.steamGameId)
+        game.title.toLowerCase().includes(lowerCaseQuery) && game.steamGameId
       )
       .slice(0, 20); // 20件に制限
 
@@ -92,15 +99,6 @@ const GameList = (props: Props) => {
     }
   }, [steamList, searchQuery, userAddedGames, nodes, fixedGameIds]);
 
-  // 元の順位を保持するマッピングを作成
-  const rankMap = useMemo(() => {
-    const map: { [steamGameId: string]: number } = {};
-    nodes.forEach((node, idx) => {
-      map[node.steamGameId] = idx + 1; // 1位から始まる
-    });
-    return map;
-  }, [nodes]);
-
   // ゲームをクリックしたときの処理
   const handleGameClick = (index: number) => {
     setCenterX((nodes[index].x ?? 0) - 150);
@@ -114,8 +112,15 @@ const GameList = (props: Props) => {
     if(!userAddedGames.includes(steamGameId) && !fixedGameIds.includes(steamGameId)) {
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
-      changeGameIdData(newUserAddedGames);
-      setIsLoading(true);
+      (async () => {
+        await changeGameIdData(newUserAddedGames);
+        // TODO:
+        if(setIsNetworkLoading) {
+          setIsNetworkLoading(true);
+        } else if (setIsLoading) {
+          setIsLoading(true);
+        }
+      })();
     }
   };
 
@@ -123,8 +128,15 @@ const GameList = (props: Props) => {
   const handleGameDelete = (steamGameId: string) => {
     const newUserAddedGames = userAddedGames.filter((gameId: string) => gameId !== steamGameId);
     setUserAddedGames(newUserAddedGames);
-    changeGameIdData(newUserAddedGames);
-    setIsLoading(true);
+    (async () => {
+      await changeGameIdData(newUserAddedGames);
+      // TODO:
+      if(setIsNetworkLoading) {
+        setIsNetworkLoading(true);
+      } else if (setIsLoading) {
+        setIsLoading(true);
+      }
+    })();
   };
 
   // ランクカラーの選択
@@ -198,14 +210,27 @@ const GameList = (props: Props) => {
               <h2 className="text-white mb-2">検索結果（追加候補）</h2>
               {filteredSteamList.length > 0 ? (
                 filteredSteamList.map((game) => (
-                  <div className='flex pb-2 justify-between items-center' key={game.steamGameId}>
-                    <div className="text-white p-2 rounded">
-                      {game.title}
-                    </div>
-                    <PlaylistAddIcon
-                      className='cursor-pointer hover:bg-gray-600 rounded'
-                      onClick={() => handleSearchClick(game.steamGameId)}
-                    />
+                  <div key={"filteredSteamList" + game.steamGameId}>
+                    {typeof game.index === "number" ? (
+                      <div className='cursor-pointer flex pb-2 items-center' onClick={() => handleGameClick(game.index as number)}>
+                        <div className={`${selectColor(game.index + 1).rankColor} p-2`}>
+                          {game.index + 1}位
+                        </div>
+                        <div className="text-white p-2">
+                          {game.title}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className='flex pb-2 justify-between items-center'>
+                        <div className="text-white p-2 rounded">
+                          {game.title}
+                        </div>
+                        <PlaylistAddIcon
+                          className='cursor-pointer hover:bg-gray-600 rounded'
+                          onClick={() => handleSearchClick(game.steamGameId)}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))
               ) : null /* メッセージは上部に移動したためここでは何も表示しない */}
@@ -214,13 +239,12 @@ const GameList = (props: Props) => {
 
           {/* ゲームリスト表示 */}
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto step6">
-            {filteredNodeList.length > 0 ? (
+            {nodes.length > 0 ? (
               <div className="space-y-2">
-                {filteredNodeList.map((node: NodeType, idx: number) => {
-                  const originalRank = rankMap[node.steamGameId] || 0; // 元の順位を取得
+                {nodes.map((node: NodeType, idx: number) => {
                   const nodeIndex = nodes.findIndex(n => n.steamGameId === node.steamGameId);
                   const isSelected = selectedIndex === nodeIndex;
-                  const { rankColor } = selectColor(originalRank);
+                  const { rankColor } = selectColor(node.index + 1);
                   const isUserAdded = userAddedGames.includes(node.steamGameId);
 
                   // 判定: 何かしらのゲームが選択されている場合
@@ -241,7 +265,7 @@ const GameList = (props: Props) => {
                       >
                         <div className="flex items-center">
                           <div className={`${rankColor} pb-2 p-2`}>
-                            {originalRank}位
+                            {node.index + 1}位
                           </div>
                           <div className="text-white p-2">
                             {node.title}
