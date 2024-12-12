@@ -419,14 +419,40 @@ const StreamedList = (props: Props) => {
                     overflow: "hidden",
                   }}
                 >
-                  <Image
-                    src={streamer.thumbnail}
-                    alt={`${streamer.name} Thumbnail`}
-                    layout="responsive"
-                    width={16}
-                    height={9}
-                    className="w-full h-full object-cover"
-                  />
+                  {streamer.platform === 'twitch' ? (
+                    <a
+                      href={`https://www.twitch.tv/${streamer.customUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${streamer.name} のYouTube動画へ`}
+                    >
+                      <Image
+                        src={streamer.thumbnail}
+                        alt={`${streamer.name} Thumbnail`}
+                        layout="responsive"
+                        width={16}
+                        height={9}
+                        className="w-full h-full object-cover"
+                      />
+                    </a>
+
+                  ) : (
+                    <a
+                      href={`https://www.youtube.com/${streamer.customUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${streamer.name} のYouTube動画へ`}
+                    >
+                      <Image
+                        src={streamer.thumbnail}
+                        alt={`${streamer.name} Thumbnail`}
+                        layout="responsive"
+                        width={16}
+                        height={9}
+                        className="w-full h-full object-cover"
+                      />
+                    </a>
+                  )}
                 </div>
                 <div className="flex items-center">
                   {/* プラットフォームアイコン */}

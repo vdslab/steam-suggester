@@ -17,6 +17,7 @@ interface ChannelResponse {
   items: Array<{
     id: string;
     snippet: {
+      customUrl: string;
       title: string;
       thumbnails: {
         default: { url: string };
@@ -84,9 +85,11 @@ export async function GET(req: Request, { params }: Params) {
 
     const channel = channelData.items[0];
     const streamerName = channel.snippet.title;
+    const customUrl = channel.snippet.customUrl;
     const streamerId = channel.id;
     const thumbnail = channel.snippet.thumbnails.default.url;
     const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
+
 
     if (!uploadsPlaylistId) {
       console.error("Uploads playlist ID not found");
@@ -203,6 +206,7 @@ export async function GET(req: Request, { params }: Params) {
     const result: StreamerListType = {
       name: streamerName,
       id: streamerId,
+      customUrl: customUrl,
       platform: 'youtube',
       color: 'defaultColor',
       thumbnail: thumbnail || 'default',

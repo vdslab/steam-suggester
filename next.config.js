@@ -21,6 +21,14 @@ module.exports = {
         protocol: "https",
         hostname: "yt3.ggpht.com",
       },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+      },
+      {
+        protocol: "https",
+        hostname: "static-cdn.jtvnw.net",
+      },
     ],
   },
 };

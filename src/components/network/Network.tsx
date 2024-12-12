@@ -211,7 +211,7 @@ const Network = () => {
               title={
                 <div className="flex items-center">
                   <span>配信者</span>
-                  <HelpTooltip title="配信者を追加すると配信者が配信したゲームのアイコンに枠が表示されます。" />
+                  <HelpTooltip title="配信者を追加すると配信者が配信したゲームのアイコンに枠が表示されます。また、アイコンをクリックすると配信者のページに飛べます" />
                 </div>
               }
               icon={<LiveTvIcon className="mr-2 text-white" />}
