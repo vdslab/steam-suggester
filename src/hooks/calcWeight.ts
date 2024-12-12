@@ -13,7 +13,7 @@ export const calculateTagWeights = (slider: SliderSettings): Map<string, number>
   const graphicWeight = totalWeight > 0 ? slider.graphicWeight / totalWeight : 0;
   const playstyleWeight = totalWeight > 0 ? slider.playstyleWeight / totalWeight : 0;
 
-  const genreTags = [...(TAG_LIST["ジャンル"] || []), ...(TAG_LIST["サブジャンル"] || [])];
+  const genreTags = Object.values(TAG_LIST).flat();
   const visualTags = [...(TAG_LIST["ビジュアルと視点"] || [])];
   const themeTags = [...(TAG_LIST["テーマと雰囲気"] || [])];
   const playstyleTags = [...(TAG_LIST["プレイヤー"] || []), ...(TAG_LIST["プレイスタイル"] || [])];
