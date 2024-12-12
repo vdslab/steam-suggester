@@ -9,27 +9,27 @@ export const calculateTagWeights = (slider: SliderSettings): Map<string, number>
   const totalWeight = slider.genreWeight + slider.graphicWeight + slider.playstyleWeight;
 
   // スライダーの合計が0の場合を考慮
-  const genreWeight = totalWeight > 0 ? (slider.genreWeight / totalWeight) * 100 : 0;
-  const graphicWeight = totalWeight > 0 ? (slider.graphicWeight / totalWeight) * 100 : 0;
-  const playstyleWeight = totalWeight > 0 ? (slider.playstyleWeight / totalWeight) * 100 : 0;
+  const genreWeight = totalWeight > 0 ? slider.genreWeight / totalWeight : 0;
+  const graphicWeight = totalWeight > 0 ? slider.graphicWeight / totalWeight : 0;
+  const playstyleWeight = totalWeight > 0 ? slider.playstyleWeight / totalWeight : 0;
 
   const genreTags = [...(TAG_LIST["ジャンル"] || []), ...(TAG_LIST["サブジャンル"] || [])];
   const graphicTags = [...(TAG_LIST["ビジュアルと視点"] || []), ...(TAG_LIST["テーマと雰囲気"] || [])];
   const playstyleTags = [...(TAG_LIST["プレイヤー"] || []), ...(TAG_LIST["プレイスタイル"] || [])];
 
   const playstyleTagWeights: { [key: string]: number } = {
-    "シングルプレイヤー": 0.5,
+    "シングルプレイヤー": 1,
     "ローカル4プレイヤー": 0.8,
     "非同期マルチプレイヤー": 0.6,
     "協力プレイ": 0.9,
-    "協力キャンペーン": 0.5,
+    "協力キャンペーン": 0.7,
     "ローカル協力プレイ": 0.7,
     "ローカルマルチプレイヤー": 0.5,
-    "MMO": 0.5,
-    "マルチプレイヤー": 0.5,
+    "MMO": 1,
+    "マルチプレイヤー": 0.6,
     "オンライン協力プレイ": 0.8,
     "バトルロイヤル": 1,
-    "MOBA": 0.6,
+    "MOBA": 0.9,
     "MMORPG": 1,
     "PvP": 0.7,
     "PvE": 0.6,
@@ -37,10 +37,10 @@ export const calculateTagWeights = (slider: SliderSettings): Map<string, number>
     "クラス制": 0.7
   };
 
-  genreTags.forEach((tag) => tagWeights.set(tag, genreWeight));
-  graphicTags.forEach((tag) => tagWeights.set(tag, graphicWeight));
+  genreTags.forEach((tag) => tagWeights.set(tag, genreWeight * 100));
+  graphicTags.forEach((tag) => tagWeights.set(tag, graphicWeight * 100));
   playstyleTags.forEach((tag) => {
-    const adjustedWeight = playstyleWeight * (playstyleTagWeights[tag] || 1);
+    const adjustedWeight = playstyleWeight * (playstyleTagWeights[tag] || 1) * 100;
     tagWeights.set(tag, adjustedWeight);
   });
 
@@ -101,10 +101,10 @@ export const calculateSimilarityMatrix = (
   nodes: NodeType[],
   slider: SliderSettings
 ): number[][] => {
-  const totalWeight = slider.genreWeight + slider.reviewWeight;
+  const totalWeight = slider.genreWeight + slider.graphicWeight + slider.playstyleWeight + slider.reviewWeight;
 
   // スライダーの合計が0の場合を考慮
-  const tagWeightRatio = totalWeight > 0 ? slider.genreWeight / totalWeight : 0;
+  const tagWeightRatio = totalWeight > 0 ? (slider.genreWeight + slider.playstyleWeight) / totalWeight : 0;
   const reviewWeightRatio = totalWeight > 0 ? slider.reviewWeight / totalWeight : 0;
 
   const tagWeights = calculateTagWeights(slider);
@@ -119,13 +119,8 @@ export const calculateSimilarityMatrix = (
       // レビューの類似性を計算
       const reviewSim = reviewSimilarity(sourceNode.review, targetNode.review) * reviewWeightRatio;
 
-      // シングルプレイヤーとマルチプレイヤーの一致度を加味
-      const playerSim =
-        (sourceNode.isSinglePlayer === targetNode.isSinglePlayer ? 0.5 : 0) +
-        (sourceNode.isMultiPlayer === targetNode.isMultiPlayer ? 0.5 : 0);
-
       // 全体の類似性を統合
-      return tagSim + reviewSim + playerSim;
+      return tagSim + reviewSim;
     })
   );
 };

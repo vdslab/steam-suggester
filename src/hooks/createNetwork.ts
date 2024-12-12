@@ -115,6 +115,15 @@ const createNetwork = async (
       });
     };
 
+    const sizeScale = d3
+    .scaleSqrt()
+    .domain(d3.extent(nodes, (d) => d.activeUsers) as [number, number])
+    .range([1, 6]);
+
+    nodes.forEach((node: NodeType, i) => {
+      node.circleScale = sizeScale(node.activeUsers ?? 0);
+    });
+
     const simulation = d3
       .forceSimulation(nodes)
       .force("charge", d3.forceManyBody<NodeType>().strength(-200))
