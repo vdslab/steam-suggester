@@ -214,7 +214,8 @@ const Network = () => {
                   title={
                     <div className="flex items-center">
                       <span>類似度設定</span>
-                      <HelpTooltip title="ゲーム間の類似度計算における重みを調整できます。プリセットは4軸で構成されていますが、詳細設定を有効にするとさらに細かい調整が可能です。" />
+                      <HelpTooltip title="ゲーム間の類似度計算における重みを調整できます。" />
+                      {/* <HelpTooltip title="ゲーム間の類似度計算における重みを調整できます。プリセットは4軸で構成されていますが、詳細設定を有効にするとさらに細かい調整が可能です。" /> */}
                     </div>
                   }
                   icon={<TuneIcon className="mr-2 text-white" />}

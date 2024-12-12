@@ -173,7 +173,7 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
           />
         </div>
 
-        <div className="mb-4 flex items-center">
+        {/* <div className="mb-4 flex items-center">
           <input
             type="checkbox"
             className="form-checkbox h-5 w-5 text-gray-600"
@@ -181,10 +181,10 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
             onChange={handleDetailModeToggle}
           />
           <span className="ml-2 text-white">詳細モードを有効にする</span>
-        </div>
+        </div> */}
       </Section>
 
-      <Section title="詳細設定" icon={<InfoIcon />}>
+      {/* <Section title="詳細設定" icon={<InfoIcon />}>
         <p className="text-gray-400 mb-2 text-sm">
           以下はオプションの細かな調整用要素です。必要に応じて微調整してください。
         </p>
@@ -236,7 +236,7 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
             onChange={(val) => setReleaseDateWeight(val[0])}
           />
         </div>
-      </Section>
+      </Section> */}
 
       <div className="sticky bottom-0 bg-gray-800 p-4 mt-4 space-y-2">
         <button
