@@ -177,35 +177,6 @@ const NodeLink = (props: NodeLinkProps) => {
                 </g>
               </g>
             )}
-
-            {selectedIndex !== -1 && findHoveredNode(selectedIndex) && (
-              <g transform={`translate(${findHoveredNode(selectedIndex)?.x},${findHoveredNode(selectedIndex)?.y})`}>
-                <g>
-                  <text
-                    x={0}
-                    y={80}
-                    textAnchor="middle"
-                    fill="white"
-                    fontSize="30px"
-                    pointerEvents="none"
-                    style={{
-                      textShadow: `
-                        -1px -1px 0 #000,
-                        1px -1px 0 #000,
-                        -1px 1px 0 #000,
-                        1px 1px 0 #000,
-                        -1px 0 0 #000,
-                        1px 0 0 #000,
-                        0 -1px 0 #000,
-                        0 1px 0 #000
-                      `
-                    }}
-                  >
-                    {findHoveredNode(selectedIndex)?.title}
-                  </text>
-                </g>
-              </g>
-            )}
           </>
     </ZoomableSVG>
   );
