@@ -19,6 +19,7 @@ import HelpTooltip from "./HelpTooltip";
 import Tour from "./Tour";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
+import useTour from "@/hooks/useTour";
 
 
 
@@ -41,8 +42,8 @@ const Network = () => {
   const [isStreamerOpen, setIsStreamerOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
-  const [tourRun, setTourRun] = useState<boolean>(true);
-
+  const { tourRun, setTourRun } = useTour();
+  
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
     const result = await createNetwork(filter, gameIds, slider);
     const nodes = result?.nodes ?? [];
