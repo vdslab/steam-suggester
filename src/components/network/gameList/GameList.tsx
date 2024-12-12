@@ -92,15 +92,6 @@ const GameList = (props: Props) => {
     }
   }, [steamList, searchQuery, userAddedGames, nodes, fixedGameIds]);
 
-  // 元の順位を保持するマッピングを作成
-  const rankMap = useMemo(() => {
-    const map: { [steamGameId: string]: number } = {};
-    nodes.forEach((node, idx) => {
-      map[node.steamGameId] = idx + 1; // 1位から始まる
-    });
-    return map;
-  }, [nodes]);
-
   // ゲームをクリックしたときの処理
   const handleGameClick = (index: number) => {
     setCenterX((nodes[index].x ?? 0) - 150);
@@ -221,10 +212,9 @@ const GameList = (props: Props) => {
             {filteredNodeList.length > 0 ? (
               <div className="space-y-2">
                 {filteredNodeList.map((node: NodeType, idx: number) => {
-                  const originalRank = rankMap[node.steamGameId] || 0; // 元の順位を取得
                   const nodeIndex = nodes.findIndex(n => n.steamGameId === node.steamGameId);
                   const isSelected = selectedIndex === nodeIndex;
-                  const { rankColor } = selectColor(originalRank);
+                  const { rankColor } = selectColor(node.index + 1);
                   const isUserAdded = userAddedGames.includes(node.steamGameId);
 
                   // 判定: 何かしらのゲームが選択されている場合
@@ -245,7 +235,7 @@ const GameList = (props: Props) => {
                       >
                         <div className="flex items-center">
                           <div className={`${rankColor} pb-2 p-2`}>
-                            {originalRank}位
+                            {node.index + 1}位
                           </div>
                           <div className="text-white p-2">
                             {node.title}
