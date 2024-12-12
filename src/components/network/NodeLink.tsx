@@ -11,7 +11,8 @@ type NodeLinkProps = {
   centerY: number,
   selectedIndex: number,
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>,
-  streamerIds: StreamerListType[]
+  streamerIds: StreamerListType[],
+  isStreamerOpen: boolean
 }
 
 type ZoomableSVGProps = {
@@ -64,7 +65,7 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
 };
 
 const NodeLink = (props: NodeLinkProps) => {
-  const { nodes, links, centerX, centerY, selectedIndex, setSelectedIndex, streamerIds = [] } = props;
+  const { nodes, links, centerX, centerY, selectedIndex, setSelectedIndex, streamerIds = [], isStreamerOpen } = props;
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
@@ -123,13 +124,13 @@ const NodeLink = (props: NodeLinkProps) => {
                       suggestValue={node.suggestValue}
                     />
                   {/* 色付きセグメントを描画 配信者による強調 */}
-                  {streamerColors.length > 0 &&
+                  {isStreamerOpen && streamerColors.length > 0 &&
                       streamerColors.map((color: string, index: number) => {
                         const angleStart = -90 + angleStep * index; // -90は真上
                         const angleEnd = angleStart + angleStep;
 
                         return (
-                          <g transform={`scale(${node.circleScale})`}>
+                          <g transform={`scale(${node.circleScale})`} key={index}>
                             <circle
                               key={index}
                               cx="0"

@@ -173,6 +173,7 @@ const Network = () => {
                 selectedIndex={selectedIndex}
                 setSelectedIndex={setSelectedIndex}
                 streamerIds={streamerIds}
+                isStreamerOpen={isStreamerOpen}
               />
             </div>
           ) : (
