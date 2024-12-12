@@ -22,9 +22,10 @@ import HelpTooltip from "../HelpTooltip"; // 追加
 type Props = {
   filter: Filter;
   setFilter: React.Dispatch<React.SetStateAction<Filter>>;
+  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
+const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoading }) => {
   const [localFilter, setLocalFilter] = useState<Filter>(filter);
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
   const [areAllCategoriesSelected, setAreAllCategoriesSelected] = useState<boolean>(false);
@@ -65,7 +66,11 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter }) => {
   };
 
   const handleClickFilter = (filter: Filter) => {
-    changeFilterData(filter);
+    (async () => {
+      await changeFilterData(filter);
+      setIsNetworkLoading(true);
+    })();
+
     setFilter(filter);
     setLocalFilter(filter);
     if (filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {

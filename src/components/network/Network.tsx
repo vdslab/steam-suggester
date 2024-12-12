@@ -31,6 +31,7 @@ const Network = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isNetworkLoading, setIsNetworkLoading] = useState(false);
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
@@ -59,7 +60,7 @@ const Network = () => {
   };
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || isNetworkLoading) {
       (async () => {
         const filter = (await getFilterData()) ?? DEFAULT_FILTER;
         const gameIds = (await getGameIdData()) ?? [];
@@ -68,18 +69,10 @@ const Network = () => {
         setSlider(slider);
         await initialNodes(filter, gameIds, slider);
         setIsLoading(false);
+        setIsNetworkLoading(false);
       })();
     }
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      (async () => {
-        const gameIds = (await getGameIdData()) ?? [];
-        initialNodes(filter, gameIds, slider);
-      })();
-    }
-  }, [filter, slider]);
+  }, [isLoading, isNetworkLoading]);
 
   // Sidebar のトグル関数
   const toggleFilter = () => {
@@ -169,7 +162,7 @@ const Network = () => {
 
       {/* メインコンテンツエリアを relative に設定 */}
       <div className="test1 flex-1 relative bg-gray-900 overflow-hidden">
-          {!isLoading ? (
+          {!isNetworkLoading ? (
             <div className="absolute inset-0">
               {/* メインコンテンツ */}
               <NodeLink
@@ -189,7 +182,7 @@ const Network = () => {
           {/* フィルターパネル */}
           {isFilterOpen && (
             <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-              <SelectParameter filter={filter} setFilter={setFilter} />
+              <SelectParameter filter={filter} setFilter={setFilter} setIsNetworkLoading={setIsNetworkLoading} />
             </div>
           )}
 
@@ -226,7 +219,7 @@ const Network = () => {
                   }
                   icon={<TuneIcon className="mr-2 text-white" />}
                 >
-                <SimilaritySettings slider={slider} setSlider={setSlider} />
+                <SimilaritySettings slider={slider} setSlider={setSlider} setIsNetworkLoading={setIsNetworkLoading} />
               </Panel>
             </div>
           )}
@@ -246,7 +239,7 @@ const Network = () => {
               setSelectedIndex={setSelectedIndex}
               setCenterX={setCenterX}
               setCenterY={setCenterY}
-              setIsLoading={setIsLoading}
+              setIsNetworkLoading={setIsNetworkLoading}
             />
           </div>
 

@@ -19,13 +19,13 @@ type Props = {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setCenterX: React.Dispatch<React.SetStateAction<number>>;
   setCenterY: React.Dispatch<React.SetStateAction<number>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 
 const GameList = (props: Props) => {
-  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading } = props;
+  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsNetworkLoading } = props;
   const router = useRouter();
 
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
@@ -114,8 +114,10 @@ const GameList = (props: Props) => {
     if(!userAddedGames.includes(steamGameId) && !fixedGameIds.includes(steamGameId)) {
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
-      changeGameIdData(newUserAddedGames);
-      setIsLoading(true);
+      (async () => {
+        await changeGameIdData(newUserAddedGames);
+        setIsNetworkLoading(true);
+      })();
     }
   };
 
@@ -123,8 +125,10 @@ const GameList = (props: Props) => {
   const handleGameDelete = (steamGameId: string) => {
     const newUserAddedGames = userAddedGames.filter((gameId: string) => gameId !== steamGameId);
     setUserAddedGames(newUserAddedGames);
-    changeGameIdData(newUserAddedGames);
-    setIsLoading(true);
+    (async () => {
+      await changeGameIdData(newUserAddedGames);
+      setIsNetworkLoading(true);
+    })();
   };
 
   // ランクカラーの選択

@@ -11,6 +11,7 @@ import { SliderSettings } from "@/types/api/FilterType";
 type Props = {
   slider: SliderSettings;
   setSlider: React.Dispatch<React.SetStateAction<SliderSettings>>;
+  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type SliderProps = {
@@ -51,7 +52,7 @@ const Slider: React.FC<SliderProps> = ({
   );
 };
 
-const SimilaritySettings = ({ slider, setSlider }: Props) => {
+const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) => {
   const [genreWeight, setGenreWeight] = useState<number>(slider.genreWeight);
   const [graphicWeight, setGraphicWeight] = useState<number>(slider.graphicWeight);
   const [playstyleWeight, setPlaystyleWeight] = useState<number>(slider.playstyleWeight);
@@ -96,7 +97,7 @@ const SimilaritySettings = ({ slider, setSlider }: Props) => {
     };
     setSlider(sliderData);
     await changeSliderData(sliderData);
-    console.log("類似度設定が保存されました。");
+    setIsNetworkLoading(true);
   };
 
   return (
