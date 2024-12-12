@@ -19,6 +19,9 @@ import Tour from "./Tour";
 import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
+import useTour from "@/hooks/useTour";
+
+
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -41,13 +44,13 @@ const Network = () => {
   const [isStreamerOpen, setIsStreamerOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
-  const [tourRun, setTourRun] = useState<boolean>(true);
+  const { tourRun, setTourRun } = useTour();
 
   const [progress, setProgress] = useState(0);
 
   // Refを使用して副作用の実行を制御
   const hasFetchedInitialData = useRef(false);
-
+  
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
     setProgress(0);
     const result = await createNetwork(filter, gameIds, slider, setProgress);
