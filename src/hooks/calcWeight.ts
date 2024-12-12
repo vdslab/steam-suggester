@@ -14,7 +14,8 @@ export const calculateTagWeights = (slider: SliderSettings): Map<string, number>
   const playstyleWeight = totalWeight > 0 ? slider.playstyleWeight / totalWeight : 0;
 
   const genreTags = [...(TAG_LIST["ジャンル"] || []), ...(TAG_LIST["サブジャンル"] || [])];
-  const graphicTags = [...(TAG_LIST["ビジュアルと視点"] || []), ...(TAG_LIST["テーマと雰囲気"] || [])];
+  const visualTags = [...(TAG_LIST["ビジュアルと視点"] || [])];
+  const themeTags = [...(TAG_LIST["テーマと雰囲気"] || [])];
   const playstyleTags = [...(TAG_LIST["プレイヤー"] || []), ...(TAG_LIST["プレイスタイル"] || [])];
 
   const playstyleTagWeights: { [key: string]: number } = {
@@ -38,7 +39,8 @@ export const calculateTagWeights = (slider: SliderSettings): Map<string, number>
   };
 
   genreTags.forEach((tag) => tagWeights.set(tag, genreWeight * 100));
-  graphicTags.forEach((tag) => tagWeights.set(tag, graphicWeight * 100));
+  visualTags.forEach((tag) => tagWeights.set(tag, graphicWeight * 10));
+  themeTags.forEach((tag) => tagWeights.set(tag, graphicWeight * 90));
   playstyleTags.forEach((tag) => {
     const adjustedWeight = playstyleWeight * (playstyleTagWeights[tag] || 1) * 100;
     tagWeights.set(tag, adjustedWeight);
@@ -47,7 +49,6 @@ export const calculateTagWeights = (slider: SliderSettings): Map<string, number>
   return tagWeights;
 };
 
-// タグ間の類似性を計算
 export const tagSimilarity = (
   sourceTags: string[],
   targetTags: string[],
@@ -104,7 +105,7 @@ export const calculateSimilarityMatrix = (
   const totalWeight = slider.genreWeight + slider.graphicWeight + slider.playstyleWeight + slider.reviewWeight;
 
   // スライダーの合計が0の場合を考慮
-  const tagWeightRatio = totalWeight > 0 ? (slider.genreWeight + slider.playstyleWeight) / totalWeight : 0;
+  const tagWeightRatio = totalWeight > 0 ? (slider.genreWeight + slider.graphicWeight + slider.playstyleWeight) / totalWeight : 0;
   const reviewWeightRatio = totalWeight > 0 ? slider.reviewWeight / totalWeight : 0;
 
   const tagWeights = calculateTagWeights(slider);
