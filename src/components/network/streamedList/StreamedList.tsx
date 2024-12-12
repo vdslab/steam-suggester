@@ -26,6 +26,7 @@ type Props = {
 const StreamedList = (props: Props) => {
   const { nodes, streamerIds, setStreamerIds } = props;
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
+  const [isSearching, setIsSearching] = useState(false);
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
   const [isLoading, setIsLoading] = useState<string[]>([]);
   const [showLimitAlert, setShowLimitAlert] = useState<boolean>(false); // 配信者追加制限アラート
@@ -210,13 +211,13 @@ const StreamedList = (props: Props) => {
     setStreamerIds(updatedUserAddedGames);
   };
 
-  // Custom debounce implementation using useEffect and setTimeout
   useEffect(() => {
-    // If the search query is empty, clear the filtered list and return
     if (!searchStreamerQuery) {
       setFilteredStreamerList([]);
+      setIsSearching(false);
       return;
     }
+    setIsSearching(true);
 
     // Set a timeout to perform the search after 1 second of inactivity
     const handler = setTimeout(async () => {
@@ -260,6 +261,7 @@ const StreamedList = (props: Props) => {
         });
 
         setFilteredStreamerList(sortedData);
+        setIsSearching(false);
       } catch (error) {
         console.error('Error:', error);
       }
@@ -329,7 +331,10 @@ const StreamedList = (props: Props) => {
           onChange={(e) => setSearchStreamerQuery(e.target.value)}
           className="w-full px-3 py-1 mb-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out text-black"
         />
-        {searchStreamerQuery && (
+        {isSearching ? (
+          <div className="text-center">検索しています...</div>
+        ) : 
+        (searchStreamerQuery && (
           <div className="bg-gray-700 p-2 rounded-lg mt-0 relative max-h-40 overflow-y-auto">
             <h2 className="text-gray-400 text-xs font-semibold mb-2">検索結果</h2>
             <div>
@@ -397,7 +402,7 @@ const StreamedList = (props: Props) => {
               </div>
             )}
           </div>
-        )}
+        ))}
       </Section>
 
       {/* 追加済みの配信者セクション */}
