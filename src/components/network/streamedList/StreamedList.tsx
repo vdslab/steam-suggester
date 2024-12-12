@@ -8,7 +8,7 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonIcon from "@mui/icons-material/Person";
 import { NodeType, StreamerListType } from "@/types/NetworkType";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { stringSimilarity } from "string-similarity-js";
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
@@ -16,6 +16,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Image from 'next/image';
 import Panel from "../Panel";
 import Section from "../Section";
+import Button from '@mui/material/Button';
 
 type Props = {
   nodes: NodeType[];
@@ -26,6 +27,7 @@ type Props = {
 const StreamedList = (props: Props) => {
   const { nodes, streamerIds, setStreamerIds } = props;
   const [searchStreamerQuery, setSearchStreamerQuery] = useState<string>('');
+  const [isSearching, setIsSearching] = useState(false);
   const [filteredStreamerList, setFilteredStreamerList] = useState<StreamerListType[]>([]);
   const [isLoading, setIsLoading] = useState<string[]>([]);
   const [showLimitAlert, setShowLimitAlert] = useState<boolean>(false); // 配信者追加制限アラート
@@ -157,6 +159,7 @@ const StreamedList = (props: Props) => {
                 ...updatedData,
                 streamId: updatedData.streamId,
                 videoId: [node.twitchGameId],
+                color: getRandomColor(),
               };
               acc.push(newGame);
             }
@@ -210,65 +213,58 @@ const StreamedList = (props: Props) => {
     setStreamerIds(updatedUserAddedGames);
   };
 
-  // Custom debounce implementation using useEffect and setTimeout
-  useEffect(() => {
-    // If the search query is empty, clear the filtered list and return
-    if (!searchStreamerQuery) {
-      setFilteredStreamerList([]);
+  const handleSearch = async () => {
+    if (!searchStreamerQuery.trim()) {
       return;
     }
-
-    // Set a timeout to perform the search after 1 second of inactivity
-    const handler = setTimeout(async () => {
-      try {
-        // Twitch API
-        const twitchResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodeURIComponent(searchStreamerQuery)}`
-        );
-        let twitchData: StreamerListType[] = [];
-        if (twitchResponse.ok) {
-          twitchData = await twitchResponse.json();
-          // 各Twitchストリーマーにプラットフォーム情報を追加
-          twitchData = twitchData.map((streamer) => ({
-            ...streamer,
-            platform: 'twitch',
-          }));
-        }
-
-        // YouTube API
-        const youtubeResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberInf/${encodeURIComponent(searchStreamerQuery)}`
-        );
-        let youtubeData: StreamerListType[] = [];
-        if (youtubeResponse.ok) {
-          youtubeData = await youtubeResponse.json();
-          // 各YouTubeストリーマーにプラットフォーム情報を追加
-          youtubeData = youtubeData.map((streamer) => ({
-            ...streamer,
-            platform: 'youtube',
-          }));
-        }
-
-        // TwitchとYouTubeのデータを統合
-        const combinedData = [...twitchData, ...youtubeData];
-
-        // viewer_count順に並び替え（数字のみ比較）
-        const sortedData = combinedData.sort((a, b) => {
-          const viewerA = typeof a.viewer_count === 'number' ? a.viewer_count : parseInt(a.viewer_count) || 0;
-          const viewerB = typeof b.viewer_count === 'number' ? b.viewer_count : parseInt(b.viewer_count) || 0;
-          return viewerB - viewerA;
-        });
-
-        setFilteredStreamerList(sortedData);
-      } catch (error) {
-        console.error('Error:', error);
+    setIsSearching(true);
+    setFilteredStreamerList([]);
+    try {
+      // Twitch API
+      const twitchResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchStreamerInf/${encodeURIComponent(searchStreamerQuery)}`
+      );
+      let twitchData: StreamerListType[] = [];
+      if (twitchResponse.ok) {
+        twitchData = await twitchResponse.json();
+        // 各Twitchストリーマーにプラットフォーム情報を追加
+        twitchData = twitchData.map((streamer) => ({
+          ...streamer,
+          platform: 'twitch',
+        }));
       }
-    }, 1000); // 1秒の遅延
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchStreamerQuery, nodes]);
+      // YouTube API
+      const youtubeResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getYoutuberInf/${encodeURIComponent(searchStreamerQuery)}`
+      );
+      let youtubeData: StreamerListType[] = [];
+      if (youtubeResponse.ok) {
+        youtubeData = await youtubeResponse.json();
+        // 各YouTubeストリーマーにプラットフォーム情報を追加
+        youtubeData = youtubeData.map((streamer) => ({
+          ...streamer,
+          platform: 'youtube',
+        }));
+      }
+
+      // TwitchとYouTubeのデータを統合
+      const combinedData = [...twitchData, ...youtubeData];
+
+      // viewer_count順に並び替え（数字のみ比較）
+      const sortedData = combinedData.sort((a, b) => {
+        const viewerA = typeof a.viewer_count === 'number' ? a.viewer_count : parseInt(a.viewer_count) || 0;
+        const viewerB = typeof b.viewer_count === 'number' ? b.viewer_count : parseInt(b.viewer_count) || 0;
+        return viewerB - viewerA;
+      });
+
+      setFilteredStreamerList(sortedData);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   return (
     <div>
@@ -322,14 +318,28 @@ const StreamedList = (props: Props) => {
 
       {/* 配信者検索セクション */}
       <Section title="配信者を追加" icon={<PersonAddIcon />}>
-        <input
-          type="text"
-          placeholder="ここに配信者を入力"
-          value={searchStreamerQuery}
-          onChange={(e) => setSearchStreamerQuery(e.target.value)}
-          className="w-full px-3 py-1 mb-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out text-black"
-        />
-        {searchStreamerQuery && (
+        <div className="flex mb-2">
+          <input
+            type="text"
+            placeholder="ここに配信者を入力"
+            value={searchStreamerQuery}
+            onChange={(e) => setSearchStreamerQuery(e.target.value)}
+            className="w-3/4 flex-grow px-3 py-1 rounded-l-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out text-black"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSearch}
+            disabled={isSearching}
+            className="rounded-r-lg"
+          >
+            {isSearching ? <CircularProgress size={24} color="inherit" /> : '検索'}
+          </Button>
+        </div>
+        {isSearching ? (
+          <div className="text-center">検索中...</div>
+        ) : 
+        (filteredStreamerList.length > 0 && (
           <div className="bg-gray-700 p-2 rounded-lg mt-0 relative max-h-40 overflow-y-auto">
             <h2 className="text-gray-400 text-xs font-semibold mb-2">検索結果</h2>
             <div>
@@ -397,7 +407,7 @@ const StreamedList = (props: Props) => {
               </div>
             )}
           </div>
-        )}
+        ))}
       </Section>
 
       {/* 追加済みの配信者セクション */}
@@ -419,14 +429,40 @@ const StreamedList = (props: Props) => {
                     overflow: "hidden",
                   }}
                 >
-                  <Image
-                    src={streamer.thumbnail}
-                    alt={`${streamer.name} Thumbnail`}
-                    layout="responsive"
-                    width={16}
-                    height={9}
-                    className="w-full h-full object-cover"
-                  />
+                  {streamer.platform === 'twitch' ? (
+                    <a
+                      href={`https://www.twitch.tv/${streamer.customUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${streamer.name} のTwitchチャンネルへ`}
+                    >
+                      <Image
+                        src={streamer.thumbnail}
+                        alt={`${streamer.name} Thumbnail`}
+                        layout="responsive"
+                        width={16}
+                        height={9}
+                        className="w-full h-full object-cover"
+                      />
+                    </a>
+
+                  ) : (
+                    <a
+                      href={`https://www.youtube.com/${streamer.customUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${streamer.name} のYouTubeチャンネルへ`}
+                    >
+                      <Image
+                        src={streamer.thumbnail}
+                        alt={`${streamer.name} Thumbnail`}
+                        layout="responsive"
+                        width={16}
+                        height={9}
+                        className="w-full h-full object-cover"
+                      />
+                    </a>
+                  )}
                 </div>
                 <div className="flex items-center">
                   {/* プラットフォームアイコン */}

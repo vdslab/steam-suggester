@@ -17,6 +17,7 @@ export type SteamListType = {
 export type StreamerListType = {
   name: string;
   id: string;
+  customUrl: string;
   platform: 'twitch' | 'youtube';
   color: string;
   thumbnail: string;
