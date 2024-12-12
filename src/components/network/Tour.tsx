@@ -8,18 +8,6 @@ const steps = [
     disableBeacon: true,
   },
   {
-    target: 'body',
-    content: 'ドラッグアンドドロップでグラフを移動できます。',
-  },
-  {
-    target: 'body',
-    content: 'スクロールでズームインアウトができます。',
-  },
-  {
-    target: 'body',
-    content: 'クリックでノードの詳細を確認できます。',
-  },
-  {
     target: '.step3',
     content: 'グラフのゲーム配置を変更できます。',
   },
