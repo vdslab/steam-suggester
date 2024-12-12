@@ -324,7 +324,7 @@ const StreamedList = (props: Props) => {
             placeholder="ここに配信者を入力"
             value={searchStreamerQuery}
             onChange={(e) => setSearchStreamerQuery(e.target.value)}
-            className="flex-grow px-3 py-1 rounded-l-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out text-black"
+            className="w-3/4 flex-grow px-3 py-1 rounded-l-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out text-black"
           />
           <Button
             variant="contained"
