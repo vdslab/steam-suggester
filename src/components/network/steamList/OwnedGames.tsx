@@ -29,7 +29,6 @@ const OwnedGames = () => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
     fetcher,
-    { revalidateOnFocus: false }
   );
 
   // フレンドの所有ゲームを取得
@@ -38,7 +37,6 @@ const OwnedGames = () => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
     fetcher,
-    { revalidateOnFocus: false }
   );
 
   if (status === 'loading' || !session) {
