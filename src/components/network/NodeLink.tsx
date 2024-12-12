@@ -129,17 +129,19 @@ const NodeLink = (props: NodeLinkProps) => {
                         const angleEnd = angleStart + angleStep;
 
                         return (
-                          <circle
-                            key={index}
-                            cx="0"
-                            cy="0"
-                            r="50" // 半径
-                            stroke={color}
-                            strokeWidth="10"
-                            fill="transparent"
-                            strokeDasharray={`${angleStep} ${360 - angleStep}`}
-                            strokeDashoffset={-angleStart}
-                          />
+                          <g transform={`scale(${node.circleScale})`}>
+                            <circle
+                              key={index}
+                              cx="0"
+                              cy="0"
+                              r="17" // 半径
+                              stroke={color}
+                              strokeWidth="5"
+                              fill="transparent"
+                              strokeDasharray={`${angleStep} ${360 - angleStep}`}
+                              strokeDashoffset={-angleStart}
+                            />
+                          </g>
                         );
                       })}
                   </g>
