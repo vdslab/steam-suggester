@@ -12,6 +12,12 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
+import StarIcon from '@mui/icons-material/Star';
+import LanguageIcon from '@mui/icons-material/Language';
+import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
+import DevicesIcon from '@mui/icons-material/Devices';
+import MultilineChartIcon from '@mui/icons-material/MultilineChart';
+import InfoIcon from '@mui/icons-material/Info';
 
 type Props = {
   nodes: NodeType[];
@@ -293,25 +299,17 @@ console.log(nodes)
                             }}
                             className="object-cover"
                           />
-                          {/* タグ表示部分 */}
-                          <div className="text-white mt-2">
-                            <strong>タグ:</strong> 
-                            {node.tags && node.tags.length > MAX_VISIBLE_TAGS ? (
-                              <>
-                                {isTagsExpanded 
-                                  ? node.tags.join(", ") 
-                                  : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ")}
-                                <button 
-                                  className="ml-2 text-blue-400 hover:underline focus:outline-none"
-                                  onClick={toggleTags}
-                                >
-                                  {isTagsExpanded ? "一部のタグのみ表示" : "..."}
-                                </button>
-                              </>
-                            ) : (
-                              node.tags?.join(", ") || "No tags"
+                          {/* ジャンル */}
+                          {node.genres && node.genres.length > 0 && (
+                              <div className="flex items-center flex-wrap">
+                                <StarIcon className="mr-2" />
+                                {node.genres.map((genre, index) => (
+                                  <span key={index} className="bg-blue-500 text-xs text-white px-2 py-1 rounded mr-1 mb-1">
+                                    {genre}
+                                  </span>
+                                ))}
+                              </div>
                             )}
-                          </div>
                           {/* 価格表示 */}
                           <div className="text-white mt-2">
                             <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
