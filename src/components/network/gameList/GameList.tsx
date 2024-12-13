@@ -12,6 +12,10 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 type Props = {
   nodes: NodeType[];
@@ -34,6 +38,7 @@ const GameList = (props: Props) => {
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
   const [filteredNodeList, setFilteredNodeList] = useState<NodeType[]>(nodes);
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState<boolean>(false);
 
   // Ref for the selected game detail
   const selectedDetailRef = useRef<HTMLDivElement | null>(null);
@@ -105,6 +110,7 @@ const GameList = (props: Props) => {
     setCenterY((nodes[index].y ?? 0) + 100);
     setSelectedIndex(index);
     setIsTagsExpanded(false); // 新しいゲームを選択したらタグを折りたたむ
+    setIsDetailsExpanded(true);
   };
 
   // ゲームを追加する処理
@@ -163,6 +169,11 @@ const GameList = (props: Props) => {
     setIsTagsExpanded((prev) => !prev);
   };
 
+  // 詳細セクションの表示切替関数
+  const toggleDetails = () => {
+    setIsDetailsExpanded((prev) => !prev);
+  };
+
   // メッセージ表示の条件判定
   const showNoResultsMessage = searchQuery !== '' && filteredNodeList.length === 0;
   const showAddGameMessage = showNoResultsMessage && filteredSteamList.length > 0;
@@ -170,6 +181,36 @@ const GameList = (props: Props) => {
 
   // 判定用フラグ: いずれかのゲームが選択されているか
   const anyGameSelected = selectedIndex !== -1;
+
+  // 関数: 評価を星で表示
+  const renderStars = (rating: number) => {
+    const stars = [];
+    for(let i = 1; i <= 5; i++) {
+      if(i <= rating) {
+        stars.push(<StarIcon key={i} className="text-yellow-500 text-sm" />);
+      } else {
+        stars.push(<StarBorderIcon key={i} className="text-yellow-500 text-sm" />);
+      }
+    }
+    return <div className="flex">{stars}</div>;
+  };
+
+  // アコーディオンコンポーネント
+  const Accordion = ({ title, children }: { title: string, children: React.ReactNode }) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    return (
+      <div className="border-t border-gray-600 pt-2">
+        <button
+          className="flex items-center justify-between w-full text-left text-sm font-semibold text-gray-200 hover:text-white focus:outline-none"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span>{title}</span>
+          {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </button>
+        {isOpen && <div className="mt-2 text-sm text-gray-300">{children}</div>}
+      </div>
+    );
+  };
 
   return (
     <div className="flex-1 bg-gray-800 rounded-r-lg p-4 shadow-md flex flex-col space-y-2 h-full">
@@ -207,27 +248,28 @@ const GameList = (props: Props) => {
           {/* ゲーム追加候補表示 */}
           {searchQuery !== '' && filteredSteamList.length > 0 && (
             <div className="bg-gray-700 p-2 rounded-lg mb-4 max-h-40 overflow-y-auto">
-              <h2 className="text-white mb-2">検索結果（追加候補）</h2>
+              <h2 className="text-white mb-2 text-sm font-semibold">検索結果（追加候補）</h2>
               {filteredSteamList.length > 0 ? (
                 filteredSteamList.map((game) => (
-                  <div key={"filteredSteamList" + game.steamGameId}>
+                  <div key={"filteredSteamList" + game.steamGameId} className="flex items-center justify-between py-1">
                     {typeof game.index === "number" ? (
-                      <div className='cursor-pointer flex pb-2 items-center' onClick={() => handleGameClick(game.index as number)}>
-                        <div className={`${selectColor(game.index + 1).rankColor} p-2`}>
+                      <div className='cursor-pointer flex items-center' onClick={() => handleGameClick(game.index as number)}>
+                        <div className={`${selectColor(game.index + 1).rankColor} p-1 text-xs`}>
                           {game.index + 1}位
                         </div>
-                        <div className="text-white p-2">
+                        <div className="text-white ml-2 text-sm">
                           {game.title}
                         </div>
                       </div>
                     ) : (
-                      <div className='flex pb-2 justify-between items-center'>
-                        <div className="text-white p-2 rounded">
+                      <div className='flex items-center justify-between w-full'>
+                        <div className="text-white text-sm">
                           {game.title}
                         </div>
                         <PlaylistAddIcon
-                          className='cursor-pointer hover:bg-gray-600 rounded'
+                          className='cursor-pointer hover:bg-gray-600 rounded p-1 text-white'
                           onClick={() => handleSearchClick(game.steamGameId)}
+                          fontSize="small"
                         />
                       </div>
                     )}
@@ -238,7 +280,7 @@ const GameList = (props: Props) => {
           )}
 
           {/* ゲームリスト表示 */}
-          <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto step6">
+          <div className="bg-gray-700 p-0 rounded-lg overflow-y-auto">
             {nodes.length > 0 ? (
               <div className="space-y-2">
                 {nodes.map((node: NodeType, idx: number) => {
@@ -255,29 +297,30 @@ const GameList = (props: Props) => {
                       key={node.steamGameId} // 一意のキーを使用
                       className={`cursor-pointer rounded-lg transform transition-all duration-300 ${
                         isSelected 
-                          ? 'bg-gray-800 border-2 shadow-xl p-2 mb-4 scale-x-105 scale-y-102' 
-                          : 'bg-gray-900 p-2'
-                      } ${dimmed ? 'opacity-50' : 'opacity-100'} space-y-2`}
+                          ? 'bg-gray-800 border-2 shadow-xl p-2 mb-4' 
+                          : 'bg-gray-900 p-2 m-2'
+                      } ${dimmed ? 'opacity-50' : 'opacity-100'} space-y-1`}
                     >
                       <div 
                         className="flex items-center justify-between"
                         onClick={() => handleGameClick(nodeIndex)}
                       >
-                        <div className="flex items-center">
-                          <div className={`${rankColor} pb-2 p-2`}>
+                        <div className="flex items-center py-2">
+                          <div className={`${rankColor} p-1 text-xs`}>
                             {node.index + 1}位
                           </div>
-                          <div className="text-white p-2">
+                          <div className="text-white ml-2 text-sl truncate">
                             {node.title}
                           </div>
                         </div>
                         {isUserAdded && (
                           <DeleteIcon 
-                            className='cursor-pointer hover:bg-gray-600 rounded'
+                            className='cursor-pointer hover:bg-gray-600 rounded p-1 text-white'
                             onClick={(e) => {
                               e.stopPropagation(); // 親のクリックイベントを防止
                               handleGameDelete(node.steamGameId);
                             }}
+                            fontSize="small"
                           />
                         )}
                       </div>
@@ -286,54 +329,131 @@ const GameList = (props: Props) => {
                           <Image
                             src={node.imgURL}
                             alt={node.title}
-                            width={300}
-                            height={170}
+                            width={200}
+                            height={100}
                             style={{
                               borderRadius: "4px",
                             }}
-                            className="object-cover"
+                            className="object-cover w-full h-auto"
                           />
-                          {/* タグ表示部分 */}
-                          <div className="text-white mt-2">
-                            <strong>タグ:</strong> 
-                            {node.tags && node.tags.length > MAX_VISIBLE_TAGS ? (
-                              <>
-                                {isTagsExpanded 
-                                  ? node.tags.join(", ") 
-                                  : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ")}
-                                <button 
-                                  className="ml-2 text-blue-400 hover:underline focus:outline-none"
-                                  onClick={toggleTags}
-                                >
-                                  {isTagsExpanded ? "一部のタグのみ表示" : "..."}
-                                </button>
-                              </>
-                            ) : (
-                              node.tags?.join(", ") || "No tags"
-                            )}
-                          </div>
-                          {/* 価格表示 */}
-                          <div className="text-white mt-2">
-                            <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
-                          </div>
-                          {/* アクションボタン */}
-                          <div className="mt-4 flex space-x-2">
-                            <button
-                              className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
-                              onClick={() =>
-                                router.push(
-                                  `/desktop/details?steam_id=${node.steamGameId}&twitch_id=${node.twitchGameId}`
-                                )
-                              }
-                            >
-                              詳細を確認
-                            </button>
-                            <button
-                              className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
-                              onClick={() => setSelectedIndex(-1)}
-                            >
-                              閉じる
-                            </button>
+                          
+                          {/* 簡潔な詳細情報セクション */}
+                          <div className="text-white mt-2 space-y-2">
+                            {/* 短い詳細 */}
+                            <p className="text-xs">
+                              {node.shortDetails}
+                            </p>
+                            
+                            {/* 基本情報と統計情報をグリッドで表示 */}
+                            <div className="grid grid-cols-2 gap-1 text-xs">
+                              <div>
+                                <strong>リリース:</strong> {node.releaseDate || "N/A"}
+                              </div>
+                              <div>
+                                <strong>開発者:</strong> {node.developerName || "N/A"}
+                              </div>
+                              <div>
+                                <strong>価格:</strong> {node.salePrice < node.price && node.salePrice > 0 ? (
+                                  <span>
+                                    <span className="line-through text-red-500">{node.price ? `${node.price}円` : "無料"}</span>
+                                    <span className="ml-1 text-green-500">{node.salePrice ? `${node.salePrice}円` : "無料"}</span>
+                                  </span>
+                                ) : (
+                                  node.price ? `${node.price}円` : "無料"
+                                )}
+                              </div>
+                              <div>
+                                <strong>ジャンル:</strong> {node.genres?.join(", ") || "N/A"}
+                              </div>
+                              <div>
+                                <strong>デバイス:</strong> {node.device ? `${node.device.windows ? "Windows " : ""}${node.device.mac ? "Mac" : ""}` || "N/A" : "N/A"}
+                              </div>
+                              <div>
+                                <strong>総ビュー:</strong> {node.totalViews.toLocaleString() || "N/A"}
+                              </div>
+                              <div>
+                                <strong>アクティブユーザー:</strong> {node.activeUsers.toLocaleString() || "N/A"}
+                              </div>
+                              <div>
+                                <strong>プレイ時間:</strong> {node.playTime ? `${node.playTime} 時間` : "N/A"}
+                              </div>
+                            </div>
+
+                            {/* ゲームプレイ特徴 */}
+                            <div className="grid grid-cols-2 gap-1 text-xs">
+                              <div>
+                                <strong>シングル:</strong> {node.isSinglePlayer ? "対応" : "非対応"}
+                              </div>
+                              <div>
+                                <strong>マルチ:</strong> {node.isMultiPlayer ? "対応" : "非対応"}
+                              </div>
+                              <div>
+                                <strong>難易度:</strong> {renderStars(node.difficulty)}
+                              </div>
+                              <div>
+                                <strong>グラフィックス:</strong> {renderStars(node.graphics)}
+                              </div>
+                              <div>
+                                <strong>ストーリー:</strong> {renderStars(node.story)}
+                              </div>
+                              <div>
+                                <strong>音楽:</strong> {renderStars(node.music)}
+                              </div>
+                            </div>
+
+                            {/* レビューアコーディオン */}
+                            <Accordion title="レビュー">
+                              <div className="flex flex-wrap">
+                                {Object.entries(node.review)
+                                  .sort((a, b) => b[1] - a[1]) // 値の高い順にソート
+                                  .slice(0, 5) // 上位5つのみ表示
+                                  .map(([key, value]) => (
+                                    <span key={key} className="mr-2 text-xs">
+                                      {key}: {(value * 100).toFixed(0)}%
+                                    </span>
+                                  ))}
+                              </div>
+                            </Accordion>
+
+                            {/* タグ表示部分 */}
+                            <div className="text-white text-xs">
+                              <strong>タグ:</strong> 
+                              {node.tags && node.tags.length > MAX_VISIBLE_TAGS ? (
+                                <>
+                                  {isTagsExpanded 
+                                    ? node.tags.join(", ") 
+                                    : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ")}
+                                  <button 
+                                    className="ml-1 text-blue-400 hover:underline focus:outline-none text-xs"
+                                    onClick={toggleTags}
+                                  >
+                                    {isTagsExpanded ? "一部のタグのみ" : "..."}
+                                  </button>
+                                </>
+                              ) : (
+                                node.tags?.join(", ") || "No tags"
+                              )}
+                            </div>
+
+                            {/* アクションボタン */}
+                            <div className="mt-2 flex space-x-2">
+                              <button
+                                className="bg-blue-600 hover:bg-blue-500 text-white py-1 px-2 rounded text-xs flex items-center"
+                                onClick={() =>
+                                  router.push(
+                                    `/desktop/details?steam_id=${node.steamGameId}&twitch_id=${node.twitchGameId}`
+                                  )
+                                }
+                              >
+                                詳細
+                              </button>
+                              <button
+                                className="bg-gray-600 hover:bg-gray-500 text-white py-1 px-2 rounded text-xs"
+                                onClick={() => setSelectedIndex(-1)}
+                              >
+                                閉じる
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )}
