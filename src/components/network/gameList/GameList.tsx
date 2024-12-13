@@ -299,21 +299,48 @@ console.log(nodes)
                             }}
                             className="object-cover"
                           />
+                          {/* 価格 */}
+                          <div className="flex items-center p-1">
+                            {node.salePrice && parseInt(node.salePrice, 10) < node.price ? (
+                              <>
+                                <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
+                                <span className="text-red-500 ml-2">¥{node.salePrice}</span>
+                              </>
+                            ) : (
+                              <span className="text-sm ml-2">{node.price ? `¥${node.price}` : "無料"}</span>
+                            )}
+                          </div>
                           {/* ジャンル */}
                           {node.genres && node.genres.length > 0 && (
-                              <div className="flex items-center flex-wrap">
-                                <StarIcon className="mr-2" />
-                                {node.genres.map((genre, index) => (
-                                  <span key={index} className="bg-blue-500 text-xs text-white px-2 py-1 rounded mr-1 mb-1">
-                                    {genre}
-                                  </span>
-                                ))}
+                              <div className="flex items-center space-x-2 overflow-x-auto short-overflow-y">
+                                {/* <StarIcon className="flex-shrink-0" /> */}
+                                <div className="flex space-x-2">
+                                  {node.genres.map((genre, index) => (
+                                    <span key={index} className="bg-blue-500 text-xs text-white px-2 py-1 rounded flex-shrink-0">
+                                      {genre}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             )}
+                            {/* タグ */}
+                            <div className="text-white mt-2">
+                              {/* <strong>タグ:</strong> */}
+                              {node.tags && node.tags.length > 0 && (
+                                <div className="flex items-center space-x-1 overflow-x-auto mt-1 short-overflow-y">
+                                  {node.tags.map((tag, index) => (
+                                    <span
+                                      key={index}
+                                      className="bg-green-500 text-xs text-white px-1 py-0 rounded whitespace-nowrap flex-shrink-0"
+                                      title={tag} // ツールチップとしてタグ名を表示
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           {/* 価格表示 */}
-                          <div className="text-white mt-2">
-                            <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
-                          </div>
                           {/* アクションボタン */}
                           <div className="mt-4 flex space-x-2">
                             <button
