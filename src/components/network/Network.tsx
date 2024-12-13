@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import useSWR from "swr";
 import NodeLink from "./NodeLink";
 import SelectParameter from "./selectParameter/SelectParameter";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
@@ -21,6 +20,8 @@ import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import useTour from "@/hooks/useTour";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import useAllGameData from "@/hooks/useAllGameData";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -52,26 +53,25 @@ const Network = () => {
   // Refを使用して副作用の実行を制御
   const hasFetchedInitialData = useRef(false);
 
-  const { data: fetchedData } = useSWR(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 86400000, // 1日（ミリ秒）
-    }
-  );
+  // ゲームIDリストを取得
+  const [gameIds, setGameIds] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchGameIds = async () => {
+      const ids = (await getGameIdData()) ?? [];
+      setGameIds(ids);
+    };
+    fetchGameIds();
+  }, [isNetworkLoading]);
+
+  const allData: SteamDetailsDataType[] | null = useAllGameData(gameIds);
 
   const initialNodes = async (
     filter: Filter,
-    gameIds: string[],
     slider: SliderSettings
   ) => {
-    
-    if (!fetchedData) return;
+    if (!allData) return;
     setProgress(0);
-    const result = await createNetwork(fetchedData, filter, gameIds, slider, setProgress);
-    const nodes = result?.nodes ?? [];
-    const links = result?.links ?? [];
+    const { nodes, links } = await createNetwork(allData, filter, slider, setProgress);
     const buffNodes = nodes.concat();
     buffNodes.sort(
       (node1: NodeType, node2: NodeType) =>
@@ -88,23 +88,21 @@ const Network = () => {
   };
 
   useEffect(() => {
-    // データが取得できていない場合は待機
-    if (!fetchedData) return;
+    if (!allData) return;
 
     if ((isLoading || isNetworkLoading) && !hasFetchedInitialData.current) {
       hasFetchedInitialData.current = true; // フラグを立てる
       (async () => {
         const filterData = (await getFilterData()) ?? DEFAULT_FILTER;
-        const gameIds = (await getGameIdData()) ?? [];
         const sliderData = (await getSliderData()) ?? DEFAULT_SLIDER;
         setFilter(filterData);
         setSlider(sliderData);
-        await initialNodes(filterData, gameIds, sliderData);
+        await initialNodes(filterData, sliderData);
         setIsLoading(false);
         setIsNetworkLoading(false);
       })();
     }
-  }, [isLoading, isNetworkLoading, fetchedData]);
+  }, [isLoading, isNetworkLoading, allData]);
 
   // Sidebar のトグル関数
   const toggleFilter = () => {

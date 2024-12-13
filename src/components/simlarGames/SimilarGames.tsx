@@ -6,8 +6,8 @@ import { DetailsPropsType, SimilarGamePropsType } from "@/types/DetailsType";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import { useEffect, useState } from "react";
-import { fetcher } from "../common/Fetcher";
-import useSWR from "swr";
+import useAllGameData from "@/hooks/useAllGameData";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
 type GameType = {
   steamGameId: string;
@@ -20,18 +20,18 @@ const SimilarGames = (props: DetailsPropsType) => {
   const [data, setData] = useState<SimilarGamePropsType[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  const { data: fetchedData } = useSWR(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 86400000, // 1日（ミリ秒）
-    }
-  );
-
+  // ゲームIDリストを取得
+  const [gameIds, setGameIds] = useState<string[]>([]);
   useEffect(() => {
+    const fetchGameIds = async () => {
+      const ids = (await getGameIdData()) ?? [];
+      setGameIds(ids);
+    };
+    fetchGameIds();
     setIsHydrated(true);
   }, []);
+
+  const allData: SteamDetailsDataType[] | null = useAllGameData(gameIds);
 
   useEffect(() => {
     setCurrentSteamGameId(props.steamGameId);
@@ -39,13 +39,13 @@ const SimilarGames = (props: DetailsPropsType) => {
   }, [props.steamGameId, props.twitchGameId]);
 
   useEffect(() => {
-    if (!isHydrated || !fetchedData) return;
+    if (!isHydrated || !allData) return;
 
     (async () => {
       const filter = await getFilterData() ?? DEFAULT_FILTER;
       const gameIds = await getGameIdData() ?? [];
       const slider = await getSliderData() ?? DEFAULT_SLIDER;
-      const { similarGames } = await createNetwork(fetchedData, filter, gameIds, slider);
+      const { similarGames } = await createNetwork(allData, filter, slider);
   
       if (similarGames && similarGames[currentSteamGameId]) {
         const promises = similarGames[currentSteamGameId].map(async (game: GameType) => {

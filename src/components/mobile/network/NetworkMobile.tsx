@@ -24,8 +24,8 @@ import ListIcon from '@mui/icons-material/List';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import CloseIcon from '@mui/icons-material/Close';
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
-import { fetcher } from "@/components/common/Fetcher";
+import useAllGameData from "@/hooks/useAllGameData";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
 const buttonClasses = (isActive: boolean) =>
   `w-full py-2 text-center flex flex-col items-center ${
@@ -54,18 +54,21 @@ const NetworkMobile = () => {
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
 
-  const { data: fetchedData } = useSWR(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 86400000, // 1日（ミリ秒）
-    }
-  );
+  // ゲームIDリストを取得
+  const [gameIds, setGameIds] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchGameIds = async () => {
+      const ids = (await getGameIdData()) ?? [];
+      setGameIds(ids);
+    };
+    fetchGameIds();
+  }, []);
+  
+    const allData: SteamDetailsDataType[] | null = useAllGameData(gameIds);
 
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
-    if (!fetchedData) return;
-    const result = await createNetwork(fetchedData, filter, gameIds, slider);
+    if (!allData) return;
+    const result = await createNetwork(allData, filter, slider);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();

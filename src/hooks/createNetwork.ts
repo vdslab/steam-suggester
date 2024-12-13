@@ -1,6 +1,5 @@
 import * as d3 from "d3";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
 import { calculateSimilarityMatrix } from "@/hooks/calcWeight";
@@ -18,7 +17,6 @@ const getRandomCoordinates = (range: number): { x: number; y: number } => {
 const createNetwork = async (
   data: SteamDetailsDataType[], // データを引数に追加
   filter: Filter,
-  gameIds: string[],
   slider: SliderSettings,
   onProgress?: (progress: number) => void
 ): Promise<{ nodes: NodeType[]; links: LinkType[]; similarGames: SimilarGameType }> => {
@@ -27,25 +25,6 @@ const createNetwork = async (
   const slicedData = data.slice(0, GAME_COUNT);
   if (onProgress) onProgress(20);
 
-  const promises = gameIds
-    .filter((gameId) => !slicedData.find((d) => d.steamGameId === gameId))
-    .map(async (gameId, index, array) => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`,
-        { next: { revalidate: ISR_FETCH_INTERVAL } }
-      );
-      if (res.ok) {
-        const d: SteamDetailsDataType = await res.json();
-        slicedData.push(d);
-      }
-
-      if (onProgress) {
-        const progress = 20 + ((index + 1) / array.length) * 20;
-        onProgress(progress);
-      }
-    });
-
-  await Promise.all(promises);
   if (onProgress) onProgress(40);
 
   const rawNodes = slicedData.filter((item) => {
