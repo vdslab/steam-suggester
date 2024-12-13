@@ -46,6 +46,7 @@ const StackedAreaChart =({
   }).nice();
 
   const dates = data.map(d => new Date(d.date * 1000));
+  if (dates.length === 0) return <div className={`w-[${width + margin.left + margin.right}] h-[${height + margin.top + margin.bottom}]`}></div>;;
   const firstOfMonthTicks = getFirstOfMonthTicks(dates);
 
 
