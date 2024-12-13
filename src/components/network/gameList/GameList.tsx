@@ -24,14 +24,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 import Tooltip from '@mui/material/Tooltip';
 
-
-// Windowsアイコン
-const WindowsIcon = (props: any) => (
-  <SvgIcon {...props}>
-    <path d="M3 5v14h18V5H3zm2 2h14v10H5V7z" />
-  </SvgIcon>
-);
-
 type Props = {
   nodes: NodeType[];
   selectedIndex: number;
@@ -312,6 +304,13 @@ console.log(nodes)
                             }}
                             className="object-cover"
                           />
+                          
+                          {/* Short Details */}
+                          <div className="flex items-start">
+                              <InfoIcon className="mt-1 mr-1" />
+                              <p className="text-sm">{node.shortDetails}</p>
+                          </div>
+
                           {/* 価格 */}
                           <div className="flex items-center p-1">
                             {node.salePrice && parseInt(node.salePrice, 10) < node.price ? (
