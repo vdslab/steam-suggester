@@ -16,22 +16,14 @@ const getRandomCoordinates = (range: number): { x: number; y: number } => {
 };
 
 const createNetwork = async (
+  data: SteamDetailsDataType[], // データを引数に追加
   filter: Filter,
   gameIds: string[],
   slider: SliderSettings,
   onProgress?: (progress: number) => void
 ): Promise<{ nodes: NodeType[]; links: LinkType[]; similarGames: SimilarGameType }> => {
   if (onProgress) onProgress(0);
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    { next: { revalidate: ISR_FETCH_INTERVAL } }
-  );
 
-  if (!response.ok) {
-    return { nodes: [], links: [], similarGames: {} };
-  }
-
-  const data: SteamDetailsDataType[] = await response.json();
   const slicedData = data.slice(0, GAME_COUNT);
   if (onProgress) onProgress(20);
 

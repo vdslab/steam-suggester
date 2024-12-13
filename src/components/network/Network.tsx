@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import useSWR from "swr";
 import NodeLink from "./NodeLink";
 import SelectParameter from "./selectParameter/SelectParameter";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
@@ -21,7 +22,7 @@ import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import useTour from "@/hooks/useTour";
 
-
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Network = () => {
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -50,10 +51,25 @@ const Network = () => {
 
   // Refを使用して副作用の実行を制御
   const hasFetchedInitialData = useRef(false);
-  
-  const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
+
+  const { data: fetchedData } = useSWR(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 86400000, // 1日（ミリ秒）
+    }
+  );
+
+  const initialNodes = async (
+    filter: Filter,
+    gameIds: string[],
+    slider: SliderSettings
+  ) => {
+    
+    if (!fetchedData) return;
     setProgress(0);
-    const result = await createNetwork(filter, gameIds, slider, setProgress);
+    const result = await createNetwork(fetchedData, filter, gameIds, slider, setProgress);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -72,6 +88,9 @@ const Network = () => {
   };
 
   useEffect(() => {
+    // データが取得できていない場合は待機
+    if (!fetchedData) return;
+
     if ((isLoading || isNetworkLoading) && !hasFetchedInitialData.current) {
       hasFetchedInitialData.current = true; // フラグを立てる
       (async () => {
@@ -85,7 +104,7 @@ const Network = () => {
         setIsNetworkLoading(false);
       })();
     }
-  }, [isLoading, isNetworkLoading]);
+  }, [isLoading, isNetworkLoading, fetchedData]);
 
   // Sidebar のトグル関数
   const toggleFilter = () => {
