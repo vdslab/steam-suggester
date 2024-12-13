@@ -18,6 +18,19 @@ import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import DevicesIcon from '@mui/icons-material/Devices';
 import MultilineChartIcon from '@mui/icons-material/MultilineChart';
 import InfoIcon from '@mui/icons-material/Info';
+import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
+import AppleIcon from '@mui/icons-material/Apple';
+import PersonIcon from '@mui/icons-material/Person';
+import GroupIcon from '@mui/icons-material/Group';
+import Tooltip from '@mui/material/Tooltip';
+
+
+// Windowsアイコン
+const WindowsIcon = (props: any) => (
+  <SvgIcon {...props}>
+    <path d="M3 5v14h18V5H3zm2 2h14v10H5V7z" />
+  </SvgIcon>
+);
 
 type Props = {
   nodes: NodeType[];
@@ -340,7 +353,48 @@ console.log(nodes)
                                 </div>
                               )}
                             </div>
-                          {/* 価格表示 */}
+
+                              
+                          {/* アイコン表示block */}
+                          <div className="flex items-center space-x-1 mb-2">
+                            {/* デバイスサポート */}
+                            {node.device.windows && 
+                              <Tooltip title="windows対応">
+                                <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 40 40" width="20px" height="20px"><path d="M26 6H42V22H26zM38 42H26V26h16v12C42 40.209 40.209 42 38 42zM22 22H6V10c0-2.209 1.791-4 4-4h12V22zM6 26H22V42H6z" fill="white"/></svg>
+                              </Tooltip>
+                            }
+                            {node.device.mac && 
+                              <Tooltip title="mac対応">
+                                <AppleIcon className="text-white h-5 w-5" />
+                              </Tooltip>
+                            }
+
+                            {/* マルチプレイヤー情報 */}
+                            {node.isSinglePlayer && (
+                              <Tooltip title="Single Player">
+                                <PersonIcon className="text-white h-5 w-5" />
+                              </Tooltip>
+                            )}
+                            {node.isMultiPlayer && (
+                              <Tooltip title="Multiplayer">
+                                <GroupIcon className="text-white h-5 w-5" />
+                              </Tooltip>
+                            )}
+                          </div>
+
+                          {/* Developer & Release Date */}
+                          <div className="flex items-center">
+                              <DeveloperModeIcon className="mr-2" />
+                              <span className="text-sm">{node.developerName}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <LanguageIcon className="mr-2" />
+                              <span className="text-sm">Release: {node.releaseDate}</span>
+                          </div>
+
+
+
+
                           {/* アクションボタン */}
                           <div className="mt-4 flex space-x-2">
                             <button
