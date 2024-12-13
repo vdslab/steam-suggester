@@ -313,19 +313,6 @@ const GameList = (props: Props) => {
                             </div>
                           </div>
 
-
-                          {/* 価格 */}
-                          <div className="flex items-center p-1">
-                            {node.salePrice && parseInt(node.salePrice, 10) < node.price ? (
-                              <>
-                                <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
-                                <span className="text-red-500 ml-2">¥{node.salePrice}</span>
-                              </>
-                            ) : (
-                              <span className="text-sm ml-2">{node.price ? `¥${node.price}` : "無料"}</span>
-                            )}
-                          </div>
-
                           {/* ジャンル */}
                           {node.genres && node.genres.length > 0 && (
                               <div className="flex items-center space-x-0.5 overflow-x-auto short-overflow-y">
@@ -396,8 +383,17 @@ const GameList = (props: Props) => {
                               <span className="text-sm">{node.releaseDate}発売</span>
                           </div>
 
-
-
+                          {/* 価格 */}
+                          <div className="flex items-center p-1">
+                            {node.salePrice && parseInt(node.salePrice, 10) < node.price ? (
+                              <>
+                                <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
+                                <span className="text-red-500 ml-2">¥{node.salePrice}</span>
+                              </>
+                            ) : (
+                              <span className="text-sm ml-2">{node.price ? `¥${node.price}` : "無料"}</span>
+                            )}
+                          </div>
 
                           {/* アクションボタン */}
                           <div className="mt-4 flex space-x-2">
