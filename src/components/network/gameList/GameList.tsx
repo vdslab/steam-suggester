@@ -39,7 +39,7 @@ const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 const GameList = (props: Props) => {
   const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
   const router = useRouter();
-console.log(nodes)
+  console.log(nodes[0])
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
@@ -275,7 +275,7 @@ console.log(nodes)
                         onClick={() => handleGameClick(nodeIndex)}
                       >
                         <div className="flex items-center">
-                          <div className={`${rankColor} pb-2 p-2`}>
+                          <div className={`${rankColor} pb-2 p-2 whitespace-nowrap`}>
                             {node.index + 1}位
                           </div>
                           <div className="text-white p-2">
@@ -307,9 +307,12 @@ console.log(nodes)
                           
                           {/* Short Details */}
                           <div className="flex items-start">
-                              <InfoIcon className="mt-1 mr-1" />
+                            <InfoIcon className="mt-1 mr-1" />
+                            <div className="max-h-20 overflow-y-auto">
                               <p className="text-sm">{node.shortDetails}</p>
+                            </div>
                           </div>
+
 
                           {/* 価格 */}
                           <div className="flex items-center p-1">
@@ -322,24 +325,26 @@ console.log(nodes)
                               <span className="text-sm ml-2">{node.price ? `¥${node.price}` : "無料"}</span>
                             )}
                           </div>
+
                           {/* ジャンル */}
                           {node.genres && node.genres.length > 0 && (
-                              <div className="flex items-center space-x-2 overflow-x-auto short-overflow-y">
+                              <div className="flex items-center space-x-0.5 overflow-x-auto short-overflow-y">
                                 {/* <StarIcon className="flex-shrink-0" /> */}
-                                <div className="flex space-x-2">
+                                {/* <div className="flex space-x-1"> */}
                                   {node.genres.map((genre, index) => (
-                                    <span key={index} className="bg-blue-500 text-xs text-white px-2 py-1 rounded flex-shrink-0">
+                                    <span key={index} className="bg-blue-500 text-xs text-white px-1 py-0.5 rounded flex-shrink-0">
                                       {genre}
                                     </span>
                                   ))}
-                                </div>
+                                {/* </div> */}
                               </div>
                             )}
+
                             {/* タグ */}
                             <div className="text-white mt-2">
                               {/* <strong>タグ:</strong> */}
                               {node.tags && node.tags.length > 0 && (
-                                <div className="flex items-center space-x-1 overflow-x-auto mt-1 short-overflow-y">
+                                <div className="flex items-center space-x-0.5 overflow-x-auto mt-1 short-overflow-y">
                                   {node.tags.map((tag, index) => (
                                     <span
                                       key={index}
@@ -388,7 +393,7 @@ console.log(nodes)
                             </div>
                             <div className="flex items-center">
                               <LanguageIcon className="mr-2" />
-                              <span className="text-sm">Release: {node.releaseDate}</span>
+                              <span className="text-sm">{node.releaseDate}発売</span>
                           </div>
 
 
