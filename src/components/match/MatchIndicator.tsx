@@ -6,9 +6,10 @@ import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 import { useState, useEffect } from 'react';
 import { calcAllMatchPercentage, calcGenresPercentage } from '../common/CalcMatch';
 import IsAbleBar from './IsAbleBar';
-import PercentBar from './PercentBar';
-import ScoreCard from './ScoreCard'; // 追加
-import Grid from '@mui/material/Grid'; // MUIのGridを使用
+import ScoreCard from './ScoreCard';
+import Grid from '@mui/material/Grid';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 
 type Props = {
   data: SteamDetailsDataType;
@@ -19,6 +20,7 @@ const MatchIndicator = (props: Props) => {
   const [localFilter, setLocalFilter] = useState<Filter>(DEFAULT_FILTER);
   const [genreMatchPercentage, setGenreMatchPercentage] = useState<number>(0);
   const [overallMatchPercentage, setOverallMatchPercentage] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null); // エラーメッセージ用
 
   useEffect(() => {
     (async () => {
@@ -33,7 +35,7 @@ const MatchIndicator = (props: Props) => {
         }
       } catch (error) {
         console.error("Error fetching filter data:", error);
-        // 必要に応じてエラーメッセージをユーザーに表示するなどの処理を追加
+        setError("フィルターデータの取得中にエラーが発生しました。");
       }
     })();
   }, [data]);
@@ -48,27 +50,32 @@ const MatchIndicator = (props: Props) => {
 
   return (
     <div className='text-white'>
+      {error && <div className="text-red-500 mb-4">{error}</div>} {/* エラーメッセージ表示 */}
+      
       {/* スコアカードの表示 */}
       <Grid container spacing={4} className="mb-6">
-        <Grid item>
+        <Grid item xs={12} sm={6}>
           <ScoreCard label="全体の一致度" value={overallMatchPercentage} />
         </Grid>
-        <Grid item>
-          <ScoreCard label="ジャンル一致度" value={genreMatchPercentage} />
+        <Grid item xs={12} sm={6}>
+          <ScoreCard label="ジャンル一致度" value={genreMatchPercentage}>
+            {/* ジャンルリストをスコアカード内に埋め込む */}
+            <Stack direction="row" spacing={1} className="flex-wrap justify-center">
+              {data.genres?.map((genre: string, index: number) => (
+                genre in GENRE_MAPPING && (
+                  <Chip 
+                    key={index} 
+                    label={genre} 
+                    color="warning" 
+                    size="small" 
+                    className="mb-1" 
+                  />
+                )
+              ))}
+            </Stack>
+          </ScoreCard>
         </Grid>
       </Grid>
-
-      {/* ジャンルの詳細表示 */}
-      <div className="mb-[2vh] flex">
-        <div className="text-sm w-1/4">（ジャンル）</div>
-        {data.genres?.map((genre: string, index: number) => (
-          genre in GENRE_MAPPING && (
-            <div key={index} className='text-center m-1 text-xs text-yellow-300'>
-              {index !== 0 ? ', ' : ''}{genre}
-            </div>
-          )
-        ))}
-      </div>
 
       {/* 価格の表示 */}
       <div className="flex mb-[2vh]">
@@ -88,7 +95,8 @@ const MatchIndicator = (props: Props) => {
                   className={`absolute top-0 left-0 h-full rounded-lg bg-rose-400`}
                   style={{
                     width: `${priceBarPosition(data.price)}%`,
-                  }}></div>
+                  }}
+                ></div>
 
                 <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center text-lg font-bold text-gray-600`}>
                   ¥{data.price.toLocaleString()}

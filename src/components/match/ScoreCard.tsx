@@ -8,9 +8,10 @@ import ErrorIcon from '@mui/icons-material/Error';
 type Props = {
   label: string;
   value: number;
+  children?: React.ReactNode;
 };
 
-const ScoreCard: React.FC<Props> = ({ label, value }) => {
+const ScoreCard: React.FC<Props> = ({ label, value, children }) => {
   // 一致度に応じた色とアイコンを設定
   let color: string = green[500];
   let Icon = CheckCircleIcon;
@@ -24,7 +25,7 @@ const ScoreCard: React.FC<Props> = ({ label, value }) => {
   }
 
   return (
-    <Card style={{ borderTop: `5px solid ${color}`, width: '200px' }} className="shadow-lg">
+    <Card style={{ borderTop: `5px solid ${color}`, width: '100%' }} className="shadow-lg">
       <CardContent className="flex flex-col items-center">
         <Icon style={{ color: color, fontSize: 40 }} />
         <Typography variant="h5" component="div" className="mt-2">
@@ -33,6 +34,7 @@ const ScoreCard: React.FC<Props> = ({ label, value }) => {
         <Typography color="textSecondary">
           {label}
         </Typography>
+        {children && <div className="mt-2">{children}</div>}
       </CardContent>
     </Card>
   );
