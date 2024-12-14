@@ -6,12 +6,15 @@ import StarIcon from '@mui/icons-material/Star';
 import LanguageIcon from '@mui/icons-material/Language';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import Tooltip from '@mui/material/Tooltip';
-import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import { useEffect, useState } from "react";
+import MatchIndicator from "./MatchIndicator";
+import Link from "next/link";
+import FindReplaceIcon from '@mui/icons-material/FindReplace';
 
 type Props = {
   steamGameId: string;
@@ -23,9 +26,17 @@ const GameExplanation = async (props: Props) => {
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`,
-    {next: { revalidate:ISR_FETCH_INTERVAL }}
+    { next: { revalidate: ISR_FETCH_INTERVAL } }
   );
-  const node:SteamDetailsDataType = await res.json();
+  const node: SteamDetailsDataType = await res.json();
+
+  // Fetch user selection data or receive it via props/context
+  // For demonstration, let's assume we have a function to get user preferences
+  // Replace this with your actual data fetching logic
+  const userPreferences = await fetchUserPreferences(); // Implement this function
+
+  // Calculate match score based on userPreferences and node data
+  const matchScore = calculateMatchScore(userPreferences, node); // Implement this function
 
   return (
     <div className="container w-full mx-auto p-4 max-w-3xl">
@@ -125,7 +136,7 @@ const GameExplanation = async (props: Props) => {
         <div className="flex items-center mt-2">
           <StarIcon className="mr-2 text-yellow-500" />
           <span className="text-sm text-gray-300"><strong>価格:</strong></span>
-          {node.salePrice  ? (
+          {node.salePrice ? (
             <>
               <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
               <span className="text-red-500 ml-2">¥{node.salePrice}</span>
@@ -155,9 +166,50 @@ const GameExplanation = async (props: Props) => {
             </div>
           </div>
         )}
+
+        {/* Match Score Section */}
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold text-white mb-2">一致度</h3>
+          <MatchIndicator matchScore={matchScore} />
+          <div className="mt-2">
+            <Link href="/" className="inline-flex items-center px-2 py-1 text-white rounded-lg hover:underline">
+              <FindReplaceIcon className="text-xl mr-1" />
+              ユーザ選択を変更する
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+// Placeholder for fetching user preferences
+const fetchUserPreferences = async () => {
+  // Implement your logic to fetch user preferences
+  // This could be from an API, context, or props
+  return {
+    preferredGenres: ["Action", "Adventure"],
+    maxPrice: 5000,
+    // ... other preferences
+  };
+};
+
+// Placeholder for calculating match score
+const calculateMatchScore = (userPreferences: any, gameDetails: SteamDetailsDataType): number => {
+  let score = 0;
+  const totalCriteria = 2; // Adjust based on the number of criteria
+
+  // Example criteria: Genre match
+  if (userPreferences.preferredGenres.some((genre: string) => gameDetails.genres.includes(genre))) {
+    score += 50;
+  }
+
+  // Example criteria: Price within preference
+  if (gameDetails.salePrice && gameDetails.salePrice <= userPreferences.maxPrice) {
+    score += 50;
+  }
+
+  return score; // Returns a score out of 100
+};
 
 export default GameExplanation;
