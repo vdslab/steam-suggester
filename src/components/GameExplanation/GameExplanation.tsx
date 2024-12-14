@@ -1,106 +1,55 @@
-/* GameExplanation.tsx */
-'use client';
-
-import { useEffect, useState } from "react";
+'use server';
 import Image from "next/image";
+import { NodeType } from "@/types/NetworkType"; // NetworkTypeからNodeTypeをインポート
 import InfoIcon from '@mui/icons-material/Info';
 import StarIcon from '@mui/icons-material/Star';
-import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import LanguageIcon from '@mui/icons-material/Language';
+import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import Tooltip from '@mui/material/Tooltip';
+import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
-import { NodeType } from "@/types/NetworkType";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 
 type Props = {
   steamGameId: string;
   twitchGameId: string;
-};
+}
 
-const GameExplanation = ({ steamGameId, twitchGameId }: Props) => {
-  const [gameDetails, setGameDetails] = useState<NodeType | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isTagsExpanded, setIsTagsExpanded] = useState<boolean>(false);
+const GameExplanation = async (props: Props) => {
+  const { steamGameId, twitchGameId } = props;
 
-  useEffect(() => {
-    const fetchGameDetails = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`, {
-          cache: 'no-store'
-        });
-        if (!res.ok) {
-          throw new Error('Failed to fetch game details');
-        }
-        const data: NodeType = await res.json();
-        setGameDetails(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchGameDetails();
-  }, [steamGameId]);
-
-  if (isLoading) {
-    return <div className="text-white">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
-  }
-
-  if (!gameDetails) {
-    return <div className="text-white">No details available.</div>;
-  }
-
-  const {
-    title,
-    imgURL,
-    shortDetails,
-    genres,
-    tags,
-    device,
-    isSinglePlayer,
-    isMultiPlayer,
-    developerName,
-    releaseDate,
-    price,
-    salePrice,
-    playTime,
-    review
-  } = gameDetails;
-
-  const toggleTags = () => {
-    setIsTagsExpanded(prev => !prev);
-  };
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`,
+    {next: { revalidate:ISR_FETCH_INTERVAL }}
+  );
+  const node:SteamDetailsDataType = await res.json();
 
   return (
     <div className="container w-full mx-auto p-4 max-w-3xl">
-      <div className="rounded-lg overflow-hidden border border-gray-400 bg-gray-800">
+      <div className="rounded-lg overflow-hidden border border-gray-400 bg-gray-800 p-4">
         {/* ゲーム画像 */}
-        <Image src={imgURL} alt={`${title} Header`} width={1000} height={0} className="w-full h-auto object-cover" />
+        <Image src={node.imgURL} alt={`${node.title} Header`} width={1000} height={500} className="w-full h-auto rounded" />
 
         {/* ゲームタイトル */}
-        <h2 className="text-2xl font-bold text-white mt-4">{title}</h2>
+        <h2 className="text-2xl font-bold text-white mt-4">{node.title}</h2>
 
         {/* Short Details */}
         <div className="flex items-start mt-2">
           <InfoIcon className="mt-1 mr-2 text-white" />
           <div className="max-h-20 overflow-y-auto p-1 short-details-scrollbar">
-            <p className="text-sm text-gray-300">{shortDetails}</p>
+            <p className="text-sm text-gray-300">{node.shortDetails}</p>
           </div>
         </div>
 
-        {/* ジャンル */}
-        {genres && genres.length > 0 && (
+        {/* Genres */}
+        {node.genres && node.genres.length > 0 && (
           <div className="flex items-center space-x-2 overflow-x-auto h-8 mt-2 genres-scrollbar">
             <StarIcon className="flex-shrink-0 text-yellow-500" />
             <div className="flex space-x-2">
-              {genres.map((genre, index) => (
+              {node.genres.map((genre, index) => (
                 <span key={index} className="bg-blue-500 text-xs text-white px-2 py-1 rounded flex-shrink-0">
                   {genre}
                 </span>
@@ -110,34 +59,26 @@ const GameExplanation = ({ steamGameId, twitchGameId }: Props) => {
         )}
 
         {/* タグ */}
-        {tags && tags.length > 0 && (
+        {node.tags && node.tags.length > 0 && (
           <div className="text-white mt-2">
             <strong>タグ:</strong>
             <div className="flex items-center space-x-0.5 overflow-x-auto mt-1 h-8 tags-scrollbar">
-              {tags.slice(0, isTagsExpanded ? tags.length : 3).map((tag, index) => (
+              {node.tags.map((tag, index) => (
                 <span
                   key={index}
                   className="bg-green-500 text-xs text-white px-2 py-1 rounded whitespace-nowrap flex-shrink-0"
-                  title={tag} // ツールチップ
+                  title={tag} // ツールチップとしてタグ名を表示
                 >
                   {tag}
                 </span>
               ))}
-              {tags.length > 3 && (
-                <button
-                  className="ml-2 text-blue-400 hover:underline focus:outline-none flex-shrink-0"
-                  onClick={toggleTags}
-                >
-                  {isTagsExpanded ? "一部のタグのみ表示" : "..."}
-                </button>
-              )}
             </div>
           </div>
         )}
 
         {/* デバイスサポート */}
         <div className="flex items-center space-x-2 mt-2">
-          {device.windows && (
+          {node.device.windows && (
             <Tooltip title="Windows対応">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -149,21 +90,21 @@ const GameExplanation = ({ steamGameId, twitchGameId }: Props) => {
               </svg>
             </Tooltip>
           )}
-          {device.mac && (
+          {node.device.mac && (
             <Tooltip title="Mac対応">
               <AppleIcon className="text-white h-5 w-5" />
             </Tooltip>
           )}
         </div>
 
-        {/* Single Player / Multiplayer */}
+        {/* マルチプレイヤー情報 */}
         <div className="flex items-center space-x-2 mt-2">
-          {isSinglePlayer && (
+          {node.isSinglePlayer && (
             <Tooltip title="Single Player">
               <PersonIcon className="text-white h-5 w-5" />
             </Tooltip>
           )}
-          {isMultiPlayer && (
+          {node.isMultiPlayer && (
             <Tooltip title="Multiplayer">
               <GroupIcon className="text-white h-5 w-5" />
             </Tooltip>
@@ -173,25 +114,39 @@ const GameExplanation = ({ steamGameId, twitchGameId }: Props) => {
         {/* Developer & Release Date */}
         <div className="flex items-center mt-2">
           <DeveloperModeIcon className="mr-2 text-white" />
-          <span className="text-sm text-gray-300">{developerName}</span>
+          <span className="text-sm text-gray-300">{node.developerName}</span>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center mt-1">
           <LanguageIcon className="mr-2 text-white" />
-          <span className="text-sm text-gray-300">{releaseDate}発売</span>
+          <span className="text-sm text-gray-300">{node.releaseDate} 発売</span>
+        </div>
+
+        {/* 価格 */}
+        <div className="flex items-center mt-2">
+          <StarIcon className="mr-2 text-yellow-500" />
+          <span className="text-sm text-gray-300"><strong>価格:</strong></span>
+          {node.salePrice  ? (
+            <>
+              <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
+              <span className="text-red-500 ml-2">¥{node.salePrice}</span>
+            </>
+          ) : (
+            <span className="text-sm ml-2 text-gray-300">{node.price > 0 ? `¥${node.price}` : "無料"}</span>
+          )}
         </div>
 
         {/* Play Time */}
         <div className="flex items-center mt-2">
           <StarIcon className="mr-2 text-yellow-500" />
-          <span className="text-sm text-gray-300">Play Time: {playTime} hours</span>
+          <span className="text-sm text-gray-300">プレイ時間: {node.playTime} 時間</span>
         </div>
 
         {/* Reviews */}
-        {review && (
+        {node.review && (
           <div className="space-y-1 mt-2">
-            <span className="text-sm font-semibold text-gray-300">Reviews:</span>
+            <span className="text-sm font-semibold text-gray-300">レビュー:</span>
             <div className="flex flex-wrap">
-              {Object.entries(review).map(([key, value]) => (
+              {Object.entries(node.review).map(([key, value]) => (
                 <div key={key} className="flex items-center mr-2 mb-1">
                   <StarIcon className="text-yellow-400 mr-1" />
                   <span className="text-xs text-gray-300">{key}: {Math.round(value * 100)}%</span>
@@ -200,43 +155,9 @@ const GameExplanation = ({ steamGameId, twitchGameId }: Props) => {
             </div>
           </div>
         )}
-
-        {/* 価格 */}
-        <div className="flex items-center mt-2">
-          <StarIcon className="mr-2 text-yellow-500" />
-          <span className="text-sm text-gray-300"><strong>価格:</strong></span>
-          {salePrice && salePrice < price ? (
-            <>
-              <span className="line-through text-gray-400 ml-2">¥{price}</span>
-              <span className="text-red-500 ml-2">¥{salePrice}</span>
-            </>
-          ) : (
-            <span className="text-sm ml-2">{price ? `¥${price}` : "無料"}</span>
-          )}
-        </div>
-
-        {/* アクションボタン */}
-        <div className="mt-4 flex space-x-2">
-          <button
-            className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
-            onClick={() => {
-              window.location.href = `/desktop/details?steam_id=${steamGameId}&twitch_id=${twitchGameId}`;
-            }}
-          >
-            詳細を確認
-          </button>
-          <button
-            className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
-            onClick={() => {
-              // 必要に応じて閉じる処理を実装
-            }}
-          >
-            閉じる
-          </button>
-        </div>
       </div>
     </div>
   );
-};
+}
 
 export default GameExplanation;
