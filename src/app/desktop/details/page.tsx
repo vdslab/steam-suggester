@@ -10,42 +10,38 @@ import SimilarGames from "@/components/simlarGames/SimilarGames"
 export default function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
   const steamGameId = searchParams.steam_id || "";
   const twitchGameId = searchParams.twitch_id || "";
-  
+
   return (
     <>
       <DetailsHeader />
-      <div className="flex flex-col lg:flex-row h-screen">
+      <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
         {/* サイドバー */}
-        <div className="w-full lg:w-1/5 bg-stone-950 p-4 overflow-y-auto">
+        <aside className="w-full lg:w-1/4 bg-stone-950 p-4 overflow-y-auto">
           <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
-        </div>
+        </aside>
         
         {/* メインコンテンツ */}
-        <div className="w-full lg:w-4/5 bg-gray-900 flex flex-col p-4 overflow-y-auto">
+        <main className="w-full lg:w-3/4 bg-gray-900 p-6 overflow-y-auto">
           
-          {/* 上部セクション: GameTitle と GameExplanation */}
-          <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-5 mb-5">
-            <div className="lg:w-1/2">
-              <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
-              <GameExplanation steamGameId={steamGameId} twitchGameId={twitchGameId} />
-            </div>
-            <div className="lg:w-1/2">
-              <Match steamGameId={steamGameId} twitchGameId={twitchGameId} />
-            </div>
+          {/* ゲームタイトル */}
+          <div className="mb-6">
+            <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
           </div>
-          
-          {/* 下部セクション: Popularity と DistributorVideos */}
-          <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-5">
-            <div className="lg:w-3/5">
-              <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
-            </div>
-            <div className="lg:w-2/5">
-              <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
-            </div>
-          </div>
-          
-        </div>
+
+          {/* ゲーム詳細セクション */}
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <GameExplanation steamGameId={steamGameId} twitchGameId={twitchGameId} />
+            <Match steamGameId={steamGameId} twitchGameId={twitchGameId} />
+          </section>
+
+          {/* 人気度と配信者クリップ */}
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
+            <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
+          </section>
+
+        </main>
       </div>
-    </> 
+    </>
   )
 }
