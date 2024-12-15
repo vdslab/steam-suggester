@@ -64,8 +64,8 @@ export type NodeType = {
 }
 
 export type LinkType = {
-  source: number;
-  target: number;
+  source: NodeType;
+  target: NodeType;
   index?: number;
   distance?: number;
 }
