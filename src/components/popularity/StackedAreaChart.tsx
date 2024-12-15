@@ -52,12 +52,12 @@ const StackedAreaChart =({
 
   return(
     <svg width={width+ 100} height={height +50}>
-      <rect x={50} y={margin.top} width={width} height={height -margin.top} fill={BG_COLOR_STACKED_AREA} />
+      <rect x={70} y={margin.top} width={width} height={height -margin.top} fill={BG_COLOR_STACKED_AREA} />
       <AxisBottom
         scale={xScale}
         label={labelTxt.bottom}
         top={yMax+margin.top}
-        left={50}
+        left={70}
         hideZero
         numTicks={5}
         labelProps={{fill:'#e5e4e6'}}
@@ -70,9 +70,9 @@ const StackedAreaChart =({
       <AxisLeft
         scale={yScale}
         label={labelTxt.left}
-        left={50}
+        left={70}
         top={margin.top}
-        labelOffset={30}
+        labelOffset={50}
         labelProps={{fill:'#e5e4e6'}}
         tickLabelProps={{fill: '#e5e4e6'}}
         tickLineProps={{fill: '#e5e4e6'}}
@@ -83,7 +83,7 @@ const StackedAreaChart =({
         left={margin.left}
         keys={keys}
         data={data}
-        x={(d) => xScale(getX(d.data)) + 50}
+        x={(d) => xScale(getX(d.data)) + 70}
         y0={(d) => yScale(getY0(d)) + margin.top}
         y1={(d) => yScale(getY1(d)) + margin.top}
         curve={ curveBasis }
