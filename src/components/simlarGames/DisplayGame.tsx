@@ -9,7 +9,7 @@ const DisplayGame = (props: SimilarGamePropsType) => {
 
   return (
     <Link href={`/desktop/details?steam_id=${steamGameId}&twitch_id=${twitchGameId}`} className="block bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
-      <div className="relative w-full h-48">
+      <div className="relative w-full h-40">
         <Image
           src={imgURL}
           alt={title}

@@ -29,18 +29,17 @@ const DistributorVideos = ({ twitchGameId }: DetailsPropsType) => {
   }, [twitchGameId]);
 
   return (
-    <div className="bg-gray-800 rounded-lg shadow-lg p-6">
-      <Headline txt='配信者クリップ' />
+    <div className="bg-gray-700 rounded-lg shadow-lg">
       {error ? (
-        <div className="text-red-500 text-center mt-4">
+        <div className="text-red-500 text-center">
           {error}
         </div>
       ) : clips.length === 0 ? (
-        <div className="text-white text-center mt-4">
+        <div className="text-white text-center">
           直近の配信者のクリップがありません
         </div>
       ) : (
-        <div className="relative mt-6">
+        <div className="relative">
           <ClipSlideshow data={clips} />
         </div>
       )}

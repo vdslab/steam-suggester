@@ -20,8 +20,8 @@ const UserSelection: React.FC<Props> = ({
 }) => {
 
   return (
-    <div className="p-4 bg-gray-700 rounded">
-    <StarIcon className="flex-shrink-0 text-yellow-500 mb-2" />
+    <div className="rounded-lg overflow-hidden border border-gray-400 bg-gray-700 p-4">
+      <StarIcon className="flex-shrink-0 text-yellow-500 mb-2" />
       <span className="text-xl font-semibold text-white mb-4">あなたの選択</span>
       
       {/* ジャンル */}
