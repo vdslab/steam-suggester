@@ -76,14 +76,14 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
   return (
     <div className="bg-gray-800 min-h-screen">
       <DetailsHeader />
-      <div className="container mx-auto p-4 max-w-7xl">
+      <div className="w-full p-4 max-w-[1400px] mx-auto">
         {/* ゲームタイトル */}
         <div className="mb-6">
           <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
         </div>
 
         {/* メインレイアウト: 3カラム */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* 左カラム: UserSelection と MatchDegree */}
           <div className="lg:col-span-1 space-y-6">
             <UserSelection
@@ -105,7 +105,7 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
           </div>
 
           {/* 中央カラム: GameExplanation */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <GameExplanation
               steamGameId={steamGameId}
             />
