@@ -1,3 +1,4 @@
+/*StackedAreaChart.tsx*/
 'use client'
 import { AreaStack } from '@visx/shape';
 import { SeriesPoint } from '@visx/shape/lib/types';
@@ -17,7 +18,7 @@ const StackedAreaChart =({
   width,
   height,
   labelTxt,
-  margin = { top: 10, right: 0, bottom: 0, left: 0 },
+  margin = { top: 0, right: 0, bottom: 0, left: 0 },
   colorRange,
 }: StackedAreasProps) => {
   const yMax = height - margin.top - margin.bottom;
@@ -51,12 +52,12 @@ const StackedAreaChart =({
 
   return(
     <svg width={width+ 100} height={height +50}>
-      <rect x={70} y={margin.top} width={width} height={height -margin.top} fill={BG_COLOR_STACKED_AREA} />
+      <rect x={50} y={margin.top} width={width} height={height -margin.top} fill={BG_COLOR_STACKED_AREA} />
       <AxisBottom
         scale={xScale}
         label={labelTxt.bottom}
         top={yMax+margin.top}
-        left={70}
+        left={50}
         hideZero
         numTicks={5}
         labelProps={{fill:'#e5e4e6'}}
@@ -69,9 +70,9 @@ const StackedAreaChart =({
       <AxisLeft
         scale={yScale}
         label={labelTxt.left}
-        left={70}
+        left={50}
         top={margin.top}
-        labelOffset={50}
+        labelOffset={30}
         labelProps={{fill:'#e5e4e6'}}
         tickLabelProps={{fill: '#e5e4e6'}}
         tickLineProps={{fill: '#e5e4e6'}}
@@ -82,7 +83,7 @@ const StackedAreaChart =({
         left={margin.left}
         keys={keys}
         data={data}
-        x={(d) => xScale(getX(d.data)) + 70}
+        x={(d) => xScale(getX(d.data)) + 50}
         y0={(d) => yScale(getY0(d)) + margin.top}
         y1={(d) => yScale(getY1(d)) + margin.top}
         curve={ curveBasis }
@@ -105,4 +106,3 @@ const StackedAreaChart =({
 }
 
 export default StackedAreaChart
-

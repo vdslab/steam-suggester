@@ -1,5 +1,5 @@
 /* pages/game/[id]/page.tsx */
-'use client'; // クライアントコンポーネントとして扱う
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import GameTitle from "@/components/common/GameTitle";
@@ -8,7 +8,8 @@ import DistributorVideos from "@/components/distributorVideos/DistributorVideos"
 import GameExplanation from "@/components/GameExplanation/GameExplanation";
 import Popularity from "@/components/popularity/Popularity";
 import SimilarGames from "@/components/simlarGames/SimilarGames";
-import UserSelection from '@/components/GameExplanation/UserSelection'; // UserSelection のインポート
+import UserSelection from '@/components/GameExplanation/UserSelection';
+import AccordionSection from '@/components/common/AccordionSection';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { getFilterData } from '@/hooks/indexedDB';
@@ -61,69 +62,71 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
   }, []);
 
   if (error) {
-    return <div className="text-red-500">{error}</div>;
+    return <div className="text-red-500 text-center mt-4">{error}</div>;
   }
 
   if (!filterData) {
     return (
-      <div className="flex justify-center items-center h-full">
+      <div className="flex justify-center items-center h-screen">
         <CircularProgress />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="bg-gray-800">
       <DetailsHeader />
-      <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
-        {/* サイドバー */}
-        <aside className="w-full lg:w-1/4 bg-stone-950 p-4 overflow-y-auto">
-          <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
-        </aside>
-        
-        {/* メインコンテンツ */}
-        <main className="w-full lg:w-3/4 bg-gray-900 p-6 overflow-y-auto">
-          
-          {/* ゲームタイトル */}
-          <div className="mb-6">
-            <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
+      <div className="container mx-auto p-4 max-w-7xl">
+        {/* ゲームタイトル */}
+        <div className="mb-6">
+          <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
+        </div>
+
+        {/* メインレイアウト: 3カラム */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 左カラム: UserSelection */}
+          <div className="lg:col-span-1">
+            <UserSelection
+              genres={filterData.genres}
+              priceRange={filterData.priceRange}
+              modes={filterData.modes}
+              devices={filterData.devices}
+              playtimes={filterData.playtimes}
+            />
           </div>
 
-          {/* フィルターとゲーム説明を横並びに配置 */}
-          <div className="flex flex-col lg:flex-row gap-6 mb-6">
-            {/* ユーザー選択フィルターの表示 */}
-            <div className="lg:w-1/3">
-              <UserSelection
-                genres={filterData.genres}
-                priceRange={filterData.priceRange}
-                modes={filterData.modes}
-                devices={filterData.devices}
-                playtimes={filterData.playtimes}
-              />
-            </div>
-
-            {/* ゲーム詳細セクション */}
-            <div className="lg:w-2/3">
-              <GameExplanation
-                steamGameId={steamGameId}
-                twitchGameId={twitchGameId}
-                genres={filterData.genres}
-                priceRange={filterData.priceRange}
-                modes={filterData.modes}
-                devices={filterData.devices}
-                playtimes={filterData.playtimes}
-              />
-            </div>
+          {/* 中央カラム: GameExplanation */}
+          <div className="lg:col-span-1">
+            <GameExplanation
+              steamGameId={steamGameId}
+              twitchGameId={twitchGameId}
+              genres={filterData.genres}
+              priceRange={filterData.priceRange}
+              modes={filterData.modes}
+              devices={filterData.devices}
+              playtimes={filterData.playtimes}
+            />
           </div>
 
-          {/* 人気度と配信者クリップ */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId}/>
-            <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
-          </section>
+          {/* 右カラム: Accordionセクション */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* 類似しているゲーム */}
+            <AccordionSection title="類似しているゲーム">
+              <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
+            </AccordionSection>
 
-        </main>
+            {/* 流行度 */}
+            <AccordionSection title="流行度">
+              <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId} />
+            </AccordionSection>
+
+            {/* 配信者クリップ */}
+            <AccordionSection title="配信者クリップ">
+              <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
+            </AccordionSection>
+          </div>
+        </div>
       </div>
-    </>
-  );
+    </div>
+ );
 }
