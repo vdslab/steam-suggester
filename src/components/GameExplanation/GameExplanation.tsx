@@ -1,6 +1,8 @@
-'use server';
+/* GameExplanation.tsx */
+'use client';
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { NodeType } from "@/types/NetworkType";
 import InfoIcon from '@mui/icons-material/Info';
 import StarIcon from '@mui/icons-material/Star';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -11,38 +13,150 @@ import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
-import { useEffect, useState } from "react";
-import MatchIndicator from "./MatchIndicator";
-import Link from "next/link";
-import FindReplaceIcon from '@mui/icons-material/FindReplace';
+import { getFilterData } from '@/hooks/indexedDB';
+import CircularProgress from '@mui/material/CircularProgress';
 
 type Props = {
   steamGameId: string;
   twitchGameId: string;
-}
+};
 
-const GameExplanation = async (props: Props) => {
-  const { steamGameId, twitchGameId } = props;
+type LocalFilterType = {
+  Genres: { [key: string]: boolean };
+  Price: {
+    startPrice: number;
+    endPrice: number;
+  };
+  Mode: {
+    isSinglePlayer: boolean;
+    isMultiPlayer: boolean;
+  };
+  Device: {
+    windows: boolean;
+    mac: boolean;
+  };
+  Playtime: { [key: string]: boolean };
+};
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`,
-    { next: { revalidate: ISR_FETCH_INTERVAL } }
-  );
-  const node: SteamDetailsDataType = await res.json();
+const GameExplanation: React.FC<Props> = ({ steamGameId, twitchGameId }) => {
+  const [node, setNode] = useState<SteamDetailsDataType | null>(null);
+  const [localFilter, setLocalFilter] = useState<LocalFilterType | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [overallMatch, setOverallMatch] = useState<number | null>(null);
+  const [genreMatch, setGenreMatch] = useState<number | null>(null);
+  const [priceMatch, setPriceMatch] = useState<number | null>(null);
 
-  // Fetch user selection data or receive it via props/context
-  // For demonstration, let's assume we have a function to get user preferences
-  // Replace this with your actual data fetching logic
-  const userPreferences = await fetchUserPreferences(); // Implement this function
+  useEffect(() => {
+    // Fetch game data
+    const fetchGameData = async () => {
+      try {
+        const res = await fetch(
+          `/api/details/getSteamGameDetail/${steamGameId}`,
+          { next: { revalidate: ISR_FETCH_INTERVAL } }
+        );
+        if (!res.ok) {
+          throw new Error("ゲームデータの取得に失敗しました。");
+        }
+        const data: SteamDetailsDataType = await res.json();
+        setNode(data);
+      } catch (err) {
+        console.error(err);
+        setError("ゲームデータの取得中にエラーが発生しました。");
+      }
+    };
 
-  // Calculate match score based on userPreferences and node data
-  const matchScore = calculateMatchScore(userPreferences, node); // Implement this function
+    // Fetch local filter data
+    const fetchLocalFilter = async () => {
+      try {
+        const filterData = await getFilterData();
+        if (filterData) {
+          setLocalFilter(filterData);
+        } else {
+          setError("フィルターデータが見つかりませんでした。");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("フィルターデータの取得中にエラーが発生しました。");
+      }
+    };
+
+    fetchGameData();
+    fetchLocalFilter();
+  }, [steamGameId]);
+
+  useEffect(() => {
+    if (node && localFilter) {
+      // Calculate Genre Match
+      const preferredGenres = Object.keys(localFilter.Genres).filter(
+        (genre) => localFilter.Genres[genre]
+      );
+      const matchingGenres = node.genres.filter((genre) =>
+        preferredGenres.includes(genre)
+      );
+      const genreScore =
+        preferredGenres.length === 0
+          ? 100
+          : Math.min(
+              (matchingGenres.length / preferredGenres.length) * 100,
+              100
+            );
+      setGenreMatch(Math.round(genreScore));
+
+      // Calculate Price Match
+      const salePrice = typeof node.salePrice === 'string' ? parseFloat(node.salePrice) : node.salePrice;
+      const price = typeof node.price === 'string' ? parseFloat(node.price) : node.price;
+      const gamePrice = salePrice || price;
+
+      if (isNaN(gamePrice)) {
+        setPriceMatch(0);
+      } else {
+        const { startPrice, endPrice } = localFilter.Price;
+        let priceScore = 0;
+        if (gamePrice >= startPrice && gamePrice <= endPrice) {
+          priceScore = 100;
+        } else {
+          // Calculate how far the price is from the preferred range
+          const distance =
+            gamePrice < startPrice
+              ? startPrice - gamePrice
+              : gamePrice - endPrice;
+          // Assuming a maximum distance where the score becomes 0
+          const maxDistance = Math.max(startPrice, endPrice, 1); // Avoid division by zero
+          priceScore = Math.max(100 - (distance / maxDistance) * 100, 0);
+        }
+        setPriceMatch(Math.round(priceScore));
+      }
+
+      // Calculate Overall Match as average of genre and price
+      const overall =
+        (genreScore + (priceMatch !== null ? priceMatch : 0)) / 2;
+      setOverallMatch(Math.round(overall));
+    }
+  }, [node, localFilter]);
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+  if (!node || !localFilter || overallMatch === null) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
     <div className="container w-full mx-auto p-4 max-w-3xl">
       <div className="rounded-lg overflow-hidden border border-gray-400 bg-gray-800 p-4">
         {/* ゲーム画像 */}
-        <Image src={node.imgURL} alt={`${node.title} Header`} width={1000} height={500} className="w-full h-auto rounded" />
+        <Image
+          src={node.imgURL}
+          alt={`${node.title} Header`}
+          width={1000}
+          height={500}
+          className="w-full h-auto rounded"
+        />
 
         {/* ゲームタイトル */}
         <h2 className="text-2xl font-bold text-white mt-4">{node.title}</h2>
@@ -59,10 +173,18 @@ const GameExplanation = async (props: Props) => {
         {node.genres && node.genres.length > 0 && (
           <div className="flex items-center space-x-2 overflow-x-auto h-8 mt-2 genres-scrollbar">
             <StarIcon className="flex-shrink-0 text-yellow-500" />
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 items-center">
               {node.genres.map((genre, index) => (
-                <span key={index} className="bg-blue-500 text-xs text-white px-2 py-1 rounded flex-shrink-0">
+                <span
+                  key={index}
+                  className="bg-blue-500 text-xs text-white px-2 py-1 rounded flex-shrink-0 flex items-center"
+                >
                   {genre}
+                  {genreMatch !== null && (
+                    <span className="ml-1 text-yellow-300 text-xs">
+                      {genreMatch}%
+                    </span>
+                  )}
                 </span>
               ))}
             </div>
@@ -142,7 +264,14 @@ const GameExplanation = async (props: Props) => {
               <span className="text-red-500 ml-2">¥{node.salePrice}</span>
             </>
           ) : (
-            <span className="text-sm ml-2 text-gray-300">{node.price > 0 ? `¥${node.price}` : "無料"}</span>
+            <span className="text-sm ml-2 text-gray-300">
+              {node.price > 0 ? `¥${node.price}` : "無料"}
+            </span>
+          )}
+          {priceMatch !== null && (
+            <span className="ml-2 text-yellow-300 text-xs">
+              {priceMatch}%
+            </span>
           )}
         </div>
 
@@ -167,49 +296,24 @@ const GameExplanation = async (props: Props) => {
           </div>
         )}
 
-        {/* Match Score Section */}
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold text-white mb-2">一致度</h3>
-          <MatchIndicator matchScore={matchScore} />
+        {/* Overall Match Score */}
+        <div className="mt-6 p-4 bg-gray-700 rounded">
+          <h3 className="text-xl font-semibold text-white">全体の一致度: {overallMatch}%</h3>
           <div className="mt-2">
-            <Link href="/" className="inline-flex items-center px-2 py-1 text-white rounded-lg hover:underline">
-              <FindReplaceIcon className="text-xl mr-1" />
-              ユーザ選択を変更する
-            </Link>
+            <div className="flex items-center">
+              <span className="text-sm text-gray-300">ジャンルの一致度:</span>
+              <span className="ml-2 text-yellow-300 text-sm">{genreMatch}%</span>
+            </div>
+            <div className="flex items-center mt-1">
+              <span className="text-sm text-gray-300">価格の一致度:</span>
+              <span className="ml-2 text-yellow-300 text-sm">{priceMatch}%</span>
+            </div>
+            {/* 必要に応じて他の一致基準も追加 */}
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-// Placeholder for fetching user preferences
-const fetchUserPreferences = async () => {
-  // Implement your logic to fetch user preferences
-  // This could be from an API, context, or props
-  return {
-    preferredGenres: ["Action", "Adventure"],
-    maxPrice: 5000,
-    // ... other preferences
-  };
-};
-
-// Placeholder for calculating match score
-const calculateMatchScore = (userPreferences: any, gameDetails: SteamDetailsDataType): number => {
-  let score = 0;
-  const totalCriteria = 2; // Adjust based on the number of criteria
-
-  // Example criteria: Genre match
-  if (userPreferences.preferredGenres.some((genre: string) => gameDetails.genres.includes(genre))) {
-    score += 50;
-  }
-
-  // Example criteria: Price within preference
-  if (gameDetails.salePrice && gameDetails.salePrice <= userPreferences.maxPrice) {
-    score += 50;
-  }
-
-  return score; // Returns a score out of 100
 };
 
 export default GameExplanation;
