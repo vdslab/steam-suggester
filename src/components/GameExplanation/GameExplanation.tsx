@@ -11,49 +11,19 @@ import Tooltip from '@mui/material/Tooltip';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
-import { getFilterData } from '@/hooks/indexedDB';
 
 type Props = {
   steamGameId: string;
-  twitchGameId: string;
-  genres: string[];
-  priceRange: { startPrice: number; endPrice: number };
-  modes: string[];
-  devices: string[];
-  playtimes: string[];
 };
 
-type LocalFilterType = {
-  Genres: { [key: string]: boolean };
-  Price: {
-    startPrice: number;
-    endPrice: number;
-  };
-  Mode: {
-    isSinglePlayer: boolean;
-    isMultiPlayer: boolean;
-  };
-  Device: {
-    windows: boolean;
-    mac: boolean;
-  };
-  Playtime: { [key: string]: boolean };
-};
-
-const GameExplanation: React.FC<Props> = ({ steamGameId, twitchGameId, genres, priceRange, modes, devices, playtimes }) => {
+const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
   const [node, setNode] = useState<SteamDetailsDataType | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [overallMatch, setOverallMatch] = useState<number | null>(null);
-  const [genreMatch, setGenreMatch] = useState<number | null>(null);
-  const [priceMatch, setPriceMatch] = useState<number | null>(null);
-  const [modesMatch, setModesMatch] = useState<boolean>(false);
-  const [devicesMatch, setDevicesMatch] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // ゲームデータの取得
@@ -71,90 +41,19 @@ const GameExplanation: React.FC<Props> = ({ steamGameId, twitchGameId, genres, p
       } catch (err) {
         console.error(err);
         setError("ゲームデータの取得中にエラーが発生しました。");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchGameData();
   }, [steamGameId]);
 
-  useEffect(() => {
-    if (node) {
-      // ジャンル一致度の計算
-      const preferredGenres = genres;
-      const matchingGenres = node.genres.filter((genre) =>
-        preferredGenres.includes(genre)
-      );
-      const genreScore =
-        preferredGenres.length === 0
-          ? 100
-          : Math.min(
-              (matchingGenres.length / preferredGenres.length) * 100,
-              100
-            );
-      setGenreMatch(Math.round(genreScore));
-
-      // 価格一致度の計算
-      const salePrice = typeof node.salePrice === 'string' ? parseFloat(node.salePrice) : node.salePrice;
-      const price = typeof node.price === 'string' ? parseFloat(node.price) : node.price;
-      const gamePrice = salePrice || price;
-
-      if (isNaN(gamePrice)) {
-        setPriceMatch(0);
-      } else {
-        const { startPrice, endPrice } = priceRange;
-        let priceScore = 0;
-        if (gamePrice >= startPrice && gamePrice <= endPrice) {
-          priceScore = 100;
-        } else {
-          // 希望価格範囲からの距離を計算
-          const distance =
-            gamePrice < startPrice
-              ? startPrice - gamePrice
-              : gamePrice - endPrice;
-          // スコアが0になる最大距離を設定（例として希望価格範囲の最大値）
-          const maxDistance = Math.max(startPrice, endPrice, 1); // ゼロ除算を防ぐ
-          priceScore = Math.max(100 - (distance / maxDistance) * 100, 0);
-        }
-        setPriceMatch(Math.round(priceScore));
-      }
-
-      // プレイモードの一致チェック
-      if (modes.length === 0) {
-        setModesMatch(true); // モードが選択されていない場合は自動的に一致
-      } else {
-        // ゲームがユーザーの選択したすべてのモードをサポートしているか
-        const gameModes: string[] = [];
-        if (node.isSinglePlayer) gameModes.push("Single Player");
-        if (node.isMultiPlayer) gameModes.push("Multiplayer");
-
-        const allModesMatch = modes.every(mode => gameModes.includes(mode));
-        setModesMatch(allModesMatch);
-      }
-
-      // 対応デバイスの一致チェック
-      if (devices.length === 0) {
-        setDevicesMatch(true); // デバイスが選択されていない場合は自動的に一致
-      } else {
-        const gameDevices: string[] = [];
-        if (node.device.windows) gameDevices.push("Windows");
-        if (node.device.mac) gameDevices.push("Mac");
-
-        const allDevicesMatch = devices.every(device => gameDevices.includes(device));
-        setDevicesMatch(allDevicesMatch);
-      }
-
-      // 全体の一致度をジャンルと価格の平均で計算
-      const overall =
-        (genreScore + (priceMatch !== null ? priceMatch : 0)) / 2;
-      setOverallMatch(Math.round(overall));
-    }
-  }, [node, genres, priceRange, modes, devices, playtimes]);
-
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
 
-  if (!node || overallMatch === null) {
+  if (!node) {
     return (
       <div className="flex justify-center items-center h-full">
         <CircularProgress />
@@ -179,27 +78,22 @@ const GameExplanation: React.FC<Props> = ({ steamGameId, twitchGameId, genres, p
       {/* Short Details */}
       <div className="flex items-start mt-2">
         <InfoIcon className="mt-1 mr-2 text-white" />
-        <div className="max-h-20 overflow-y-auto p-1 short-details-scrollbar">
+        <div className="p-1 short-details-scrollbar">
           <p className="text-sm text-gray-300">{node.shortDetails}</p>
         </div>
       </div>
 
       {/* Genres */}
       {node.genres && node.genres.length > 0 && (
-        <div className="flex items-center space-x-2 overflow-x-auto h-8 mt-4 genres-scrollbar">
-          <StarIcon className="flex-shrink-0 text-yellow-500" />
+        <div className="flex items-center space-x-2 text-white overflow-x-auto h-8 mt-4 genres-scrollbar">
+          <strong>タグ:</strong>
           <div className="flex space-x-2 items-center">
             {node.genres.map((genre, index) => (
               <span
                 key={index}
-                className="bg-blue-500 text-xs text-white px-2 py-1 rounded flex-shrink-0 flex items-center"
+                className="bg-blue-600 text-xs text-white px-2 py-1 rounded flex-shrink-0 flex items-center"
               >
                 {genre}
-                {genreMatch !== null && (
-                  <span className="ml-1 text-yellow-300 text-xs">
-                    {genreMatch}%
-                  </span>
-                )}
               </span>
             ))}
           </div>
@@ -209,13 +103,13 @@ const GameExplanation: React.FC<Props> = ({ steamGameId, twitchGameId, genres, p
       {/* タグ */}
       {node.tags && node.tags.length > 0 && (
         <div className="text-white mt-2">
-          <strong>タグ:</strong>
-          <div className="flex items-center space-x-0.5 overflow-x-auto mt-1 h-8 tags-scrollbar">
+          <strong>詳細タグ:</strong>
+          <div className="items-center mt-1">
             {node.tags.map((tag, index) => (
               <span
                 key={index}
-                className="bg-green-500 text-xs text-white px-2 py-1 rounded whitespace-nowrap flex-shrink-0"
-                title={tag} // ツールチップとしてタグ名を表示
+                className="bg-green-600 text-xs text-white px-2 py-1 rounded whitespace-nowrap"
+                title={tag}
               >
                 {tag}
               </span>
@@ -273,19 +167,15 @@ const GameExplanation: React.FC<Props> = ({ steamGameId, twitchGameId, genres, p
       <div className="flex items-center mt-2">
         <StarIcon className="mr-2 text-yellow-500" />
         <span className="text-sm text-gray-300"><strong>価格:</strong></span>
-        {node.salePrice ? (
+        {node.salePrice && parseInt(node.salePrice, 10) < node.price ? (
           <>
             <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
             <span className="text-red-500 ml-2">¥{node.salePrice}</span>
+            <span className="text-white ml-2">{Math.round((parseInt(node.salePrice, 10) / node.price) * 100)}%Off</span>
           </>
         ) : (
           <span className="text-sm ml-2 text-gray-300">
             {node.price > 0 ? `¥${node.price}` : "無料"}
-          </span>
-        )}
-        {priceMatch !== null && (
-          <span className="ml-2 text-yellow-300 text-xs">
-            {priceMatch}%
           </span>
         )}
       </div>
@@ -310,38 +200,6 @@ const GameExplanation: React.FC<Props> = ({ steamGameId, twitchGameId, genres, p
           </div>
         </div>
       )}
-
-      {/* 全体の一致度 */}
-      <div className="mt-6 p-4 bg-gray-700 rounded">
-        <h3 className="text-xl font-semibold text-white">全体の一致度: {overallMatch}%</h3>
-        <div className="mt-2">
-          <div className="flex items-center">
-            <span className="text-sm text-gray-300">ジャンルの一致度:</span>
-            <span className="ml-2 text-yellow-300 text-sm">{genreMatch}%</span>
-          </div>
-          <div className="flex items-center mt-1">
-            <span className="text-sm text-gray-300">価格の一致度:</span>
-            <span className="ml-2 text-yellow-300 text-sm">{priceMatch}%</span>
-          </div>
-          <div className="flex items-center mt-1">
-            <span className="text-sm text-gray-300">プレイモードがOK:</span>
-            {modesMatch ? (
-              <CheckCircleIcon className="ml-2 text-green-500" />
-            ) : (
-              <ErrorIcon className="ml-2 text-red-500" />
-            )}
-          </div>
-          <div className="flex items-center mt-1">
-            <span className="text-sm text-gray-300">対応デバイスがOK:</span>
-            {devicesMatch ? (
-              <CheckCircleIcon className="ml-2 text-green-500" />
-            ) : (
-              <ErrorIcon className="ml-2 text-red-500" />
-            )}
-          </div>
-          {/* 必要に応じて他の一致基準も追加 */}
-        </div>
-      </div>
     </div>
   );
 };

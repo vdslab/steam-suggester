@@ -1,4 +1,3 @@
-/* pages/game/[id]/page.tsx */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -9,6 +8,7 @@ import GameExplanation from "@/components/GameExplanation/GameExplanation";
 import Popularity from "@/components/popularity/Popularity";
 import SimilarGames from "@/components/simlarGames/SimilarGames";
 import UserSelection from '@/components/GameExplanation/UserSelection';
+import MatchDegree from '@/components/GameExplanation/MatchDegree';
 import AccordionSection from '@/components/common/AccordionSection';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -74,7 +74,7 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
   }
 
   return (
-    <div className="bg-gray-800">
+    <div className="bg-gray-800 min-h-screen">
       <DetailsHeader />
       <div className="container mx-auto p-4 max-w-7xl">
         {/* ゲームタイトル */}
@@ -84,9 +84,18 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
 
         {/* メインレイアウト: 3カラム */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 左カラム: UserSelection */}
-          <div className="lg:col-span-1">
+          {/* 左カラム: UserSelection と MatchDegree */}
+          <div className="lg:col-span-1 space-y-6">
             <UserSelection
+              genres={filterData.genres}
+              priceRange={filterData.priceRange}
+              modes={filterData.modes}
+              devices={filterData.devices}
+              playtimes={filterData.playtimes}
+            />
+            <MatchDegree
+              steamGameId={steamGameId}
+              twitchGameId={twitchGameId}
               genres={filterData.genres}
               priceRange={filterData.priceRange}
               modes={filterData.modes}
@@ -99,12 +108,6 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
           <div className="lg:col-span-1">
             <GameExplanation
               steamGameId={steamGameId}
-              twitchGameId={twitchGameId}
-              genres={filterData.genres}
-              priceRange={filterData.priceRange}
-              modes={filterData.modes}
-              devices={filterData.devices}
-              playtimes={filterData.playtimes}
             />
           </div>
 
@@ -128,5 +131,5 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
         </div>
       </div>
     </div>
- );
+  );
 }
