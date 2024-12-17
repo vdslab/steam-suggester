@@ -61,6 +61,7 @@ export type NodeType = {
   primaryGenre?: string;
   totalViews?: number;
   activeUsers?: number;
+  similarGames?: string[];
 }
 
 export type LinkType = {

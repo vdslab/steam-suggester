@@ -117,7 +117,7 @@ const createNetwork = async (
     // 類似度の降順にソート
     const similarities = similarityMatrix[sourceIndex]
       .map((similarity, targetIndex) => ({ similarity, targetIndex }))
-      .filter((d) => d.targetIndex !== sourceIndex) // 自分自身は除外
+      .filter((d) => d.targetIndex !== sourceIndex)
       .sort((a, b) => b.similarity - a.similarity);
 
     let addedLinks = 0; // 追加したリンクの数をカウント
