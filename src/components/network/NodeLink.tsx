@@ -90,7 +90,7 @@ const NodeLink = (props: NodeLinkProps) => {
                   y2={link.target.y}
                   style={{
                     stroke: (isHovered || isSelected) ? "cyan" : "white",
-                    strokeWidth: (isHovered || isSelected) ? "2" : "1"
+                    strokeWidth: (isHovered || isSelected) ? "3" : "0.3"
                   }}
                 />
               )
