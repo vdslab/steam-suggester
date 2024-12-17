@@ -30,9 +30,19 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
 
   useEffect(() => {
     zoom.current = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.25, 4]) 
+      .scaleExtent([0.25, 4])
+      .on("start", () => {
+        if (svgRef.current) {
+          d3.select(svgRef.current).style("cursor", "grabbing");
+        }
+      })
       .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         setTransform(event.transform);
+      })
+      .on("end", () => {
+        if (svgRef.current) {
+          d3.select(svgRef.current).style("cursor", "grab");
+        }
       });
 
     if (svgRef.current) {
