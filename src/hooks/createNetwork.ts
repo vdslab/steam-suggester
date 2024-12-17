@@ -5,7 +5,7 @@ import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
 import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 
-const k = 3;
+const k = 4;
 
 const getRandomCoordinates = (range: number): { x: number; y: number } => {
   const x = Math.random() * range - range / 2;
@@ -96,7 +96,7 @@ const createNetwork = async (
     similarityMatrix[i] = [];
     const setA = new Set(nodes[i].tags ?? []);
     for (let j = 0; j < nodes.length; j++) {
-      if (i === j) {
+      if (i === j || !nodes[i].similarGames?.find((id) => id === nodes[j].steamGameId)) {
         similarityMatrix[i][j] = 0;
         continue;
       }
@@ -122,8 +122,8 @@ const createNetwork = async (
 
     let addedLinks = 0; // 追加したリンクの数をカウント
 
-    for (const { targetIndex } of similarities) {
-      if (addedLinks >= k) break; // k本以上の接続を許可しない
+    for (const { similarity, targetIndex } of similarities) {
+      if (addedLinks >= k || similarity === 0) break; // k本以上の接続を許可しない
 
       // 接続済みのペアをスキップ
       const linkKey = `${Math.min(sourceIndex, targetIndex)}-${Math.max(sourceIndex, targetIndex)}`;
@@ -158,40 +158,42 @@ const createNetwork = async (
   });
 
   const simulation = d3
-  .forceSimulation<NodeType>(nodes)
-  .force("charge", d3.forceManyBody<NodeType>().strength(-50)) // 弱い反発力
-  .force("center", d3.forceCenter(0, 0)) // グラフの重心
-  .force(
-    "collide",
-    d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 20)
-  ) // ノード間の衝突回避
-  .force(
-    "link",
-    d3.forceLink<NodeType, LinkType>(links)
-      .id((d) => d.index)
-      .distance((link) => {
-        // 類似度に基づいてエッジの長さを調整
-        const sourceNode = link.source as NodeType;
-        const targetNode = link.target as NodeType;
-        const similarity =
-          similarityMatrix[sourceNode.index][targetNode.index] || 0;
-        return 200 - similarity * 100; // 類似度が高いほど短く
-      })
-      .strength((link) => {
-        // 類似度に基づいてエッジの強さを調整
-        const sourceNode = link.source as NodeType;
-        const targetNode = link.target as NodeType;
-        const similarity =
-          similarityMatrix[sourceNode.index][targetNode.index] || 0;
-        return similarity * 0.5; // 類似度が高いほど強い引力
-      })
-  )
-  .force(
-    "cluster",
-    d3
-      .forceManyBody<NodeType>()
-      .strength((node) => -20 * (node.circleScale ?? 1)) // クラスタ中心を強化
-  );
+    .forceSimulation<NodeType>(nodes)
+    .force("charge", d3.forceManyBody<NodeType>().strength(-300))
+    .force("center", d3.forceCenter(0, 0).strength(0.05))
+    .force(
+      "collide",
+      d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 25)
+    )
+    .force(
+      "link",
+      d3.forceLink<NodeType, LinkType>(links)
+        .id((d) => d.index)
+        .distance((link) => {
+          const sourceNode = link.source as NodeType;
+          const targetNode = link.target as NodeType;
+          const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
+          return 100 - similarity * 50;
+        })
+        .strength((link) => {
+          const sourceNode = link.source as NodeType;
+          const targetNode = link.target as NodeType;
+          const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
+          return 1 + similarity * 2;
+        })
+    )
+    .force("x", d3.forceX().x((d) => d.x || 0).strength(0.01))
+    .force("y", d3.forceY().y((d) => d.y || 0).strength(0.01))
+    .force(
+      "radial",
+      d3.forceRadial(400).strength(0.1)
+    )
+    .force(
+      "cluster",
+      d3
+        .forceManyBody<NodeType>()
+        .strength((node) => -40 * (node.circleScale ?? 1))
+    );
 
   await new Promise<void>((resolve) => {
     simulation.on("end", resolve);

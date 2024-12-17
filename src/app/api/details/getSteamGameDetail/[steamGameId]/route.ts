@@ -55,7 +55,7 @@ export async function GET(req: Request, { params }: Params) {
     const gameDetailData = result.rows[0];
 
     let similarGames: string[] = [];
-    similarGames = [...new Set(gameDetailData.similar_games["topselling"] as string[])];
+    similarGames = [...new Set(gameDetailData.similar_games["released"] as string[])];
 
     const formattedResult: SteamDetailsDataType = {
       // マッチ度で使用

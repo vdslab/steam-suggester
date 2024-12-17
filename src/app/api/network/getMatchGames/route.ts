@@ -69,7 +69,7 @@ export async function GET() {
     // クエリ結果をマッピング
     const result = rows.map(item => {
       let similarGames: string[] = [];
-      similarGames = [...new Set(item.similar_games["topselling"] as string[])];
+      similarGames = [...new Set(item.similar_games["released"] as string[])];
 
       return {
         twitchGameId: item.twitch_id,
