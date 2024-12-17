@@ -30,7 +30,7 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
 
   useEffect(() => {
     zoom.current = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.15, 4]) 
+      .scaleExtent([0.25, 4]) 
       .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         setTransform(event.transform);
       });
