@@ -73,7 +73,7 @@ const createNetwork = async (
   });
 
   const nodes: NodeType[] = rawNodes.map((item, i) => {
-    const { x, y } = getRandomCoordinates(1000);
+    const { x, y } = getRandomCoordinates(2000);
     return {
       ...item,
       index: i,
@@ -159,11 +159,13 @@ const createNetwork = async (
 
   const simulation = d3
     .forceSimulation<NodeType>(nodes)
-    .force("charge", d3.forceManyBody<NodeType>().strength(-300))
+    .force("charge", d3.forceManyBody<NodeType>().strength(-400))
     .force("center", d3.forceCenter(0, 0).strength(0.05))
     .force(
       "collide",
-      d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 25)
+      d3.forceCollide<NodeType>()
+        .radius((d) => (d.circleScale ?? 1) * 30)
+        .iterations(3)
     )
     .force(
       "link",
@@ -173,7 +175,7 @@ const createNetwork = async (
           const sourceNode = link.source as NodeType;
           const targetNode = link.target as NodeType;
           const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
-          return 100 - similarity * 50;
+          return 150 - similarity * 75;
         })
         .strength((link) => {
           const sourceNode = link.source as NodeType;
@@ -182,22 +184,19 @@ const createNetwork = async (
           return 1 + similarity * 2;
         })
     )
-    .force("x", d3.forceX().x((d) => d.x || 0).strength(0.01))
-    .force("y", d3.forceY().y((d) => d.y || 0).strength(0.01))
     .force(
       "radial",
-      d3.forceRadial(400).strength(0.1)
+      d3.forceRadial(800).strength(0.1)
     )
     .force(
       "cluster",
-      d3
-        .forceManyBody<NodeType>()
-        .strength((node) => -40 * (node.circleScale ?? 1))
-    );
+      d3.forceManyBody<NodeType>()
+        .strength((node) => -25 * (node.circleScale ?? 1))
+    )
 
-  await new Promise<void>((resolve) => {
-    simulation.on("end", resolve);
-  });
+  while (simulation.alpha() > 0.01) {
+    simulation.tick();
+  }
   simulation.stop();
 
   if (onProgress) onProgress(90);
