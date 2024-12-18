@@ -8,6 +8,7 @@ import SimilarGames from "@/components/simlarGames/SimilarGames";
 import UserSelection from '@/components/GameExplanation/UserSelection';
 import MatchDegree from '@/components/GameExplanation/MatchDegree';
 import AccordionSection from '@/components/common/AccordionSection';
+import Typography from '@mui/material/Typography';
 
 
 export default function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
@@ -54,9 +55,10 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
             </AccordionSection>
 
             {/* 配信者クリップ */}
-            <AccordionSection title="配信者クリップ">
+            <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
+              <Typography className="text-white font-semibold">配信者</Typography>
               <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
-            </AccordionSection>
+            </div>
           </div>
         </div>
       </div>

@@ -58,7 +58,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
         alt={`${node.title} Header`}
         width={1000}
         height={500}
-        className="w-full h-auto rounded"
+        className="w-2/3 h-auto rounded"
         priority
       />
 

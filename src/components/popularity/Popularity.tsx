@@ -61,7 +61,6 @@ const Popularity: React.FC<Props> = ({ twitchGameId, steamGameId }) => {
 
   return (
     <div>
-      <Headline txt="流行度" />
       {steamData && twitchData ? (
         <div className="flex flex-col space-y-4">
           {/* Steamレビュー数 */}
