@@ -12,18 +12,11 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
-import StarIcon from '@mui/icons-material/Star';
-import LanguageIcon from '@mui/icons-material/Language';
-import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
-import DevicesIcon from '@mui/icons-material/Devices';
-import MultilineChartIcon from '@mui/icons-material/MultilineChart';
 import InfoIcon from '@mui/icons-material/Info';
-import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 import Tooltip from '@mui/material/Tooltip';
-import PriceDisplay from "./PriceDisplay";
 
 type Props = {
   nodes: NodeType[];
@@ -34,8 +27,6 @@ type Props = {
   setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
   setIsNetworkLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
-const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 
 const GameList = (props: Props) => {
   const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
@@ -244,9 +235,8 @@ const GameList = (props: Props) => {
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto step6">
             {nodes.length > 0 ? (
               <div className="space-y-2">
-                {nodes.map((node: NodeType, idx: number) => {
-                  const nodeIndex = nodes.findIndex(n => n.steamGameId === node.steamGameId);
-                  const isSelected = selectedIndex === nodeIndex;
+                {nodes.map((node: NodeType) => {
+                  const isSelected = selectedIndex === node.index;
                   const { rankColor } = selectColor(node.index + 1);
                   const isUserAdded = userAddedGames.includes(node.steamGameId);
 
@@ -264,7 +254,7 @@ const GameList = (props: Props) => {
                     >
                       <div 
                         className="flex items-center justify-between"
-                        onClick={() => handleGameClick(nodeIndex)}
+                        onClick={() => handleGameClick(node.index)}
                       >
                         <div className="flex items-center">
                           <div className={`${rankColor} pb-2 p-2 whitespace-nowrap`}>
