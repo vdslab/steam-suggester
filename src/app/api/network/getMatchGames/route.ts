@@ -39,6 +39,7 @@ export async function GET() {
           sd.graphics,
           sd.story,
           sd.music,
+          sd.similar_games,
           SUM(gv.total_views) AS total_views,
           COALESCE(SUM(sa.active_user), 0) AS total_active_users
       FROM 
@@ -56,7 +57,7 @@ export async function GET() {
           sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
           sd.genres, sd.tags, sd.short_details, sd.release_date, sd.developer_name,
           sd.sale_price, sd.play_time, sd.review_text, sd.difficulty, sd.graphics,
-          sd.story, sd.music
+          sd.story, sd.music, sd.similar_games
       ORDER BY
           SUM(sa.active_user) DESC
       LIMIT $3;
@@ -66,34 +67,40 @@ export async function GET() {
     const { rows } = await PG_POOL.query(query, [startDateString, endDateString, COUNT]);
 
     // クエリ結果をマッピング
-    const result = rows.map(item => ({
-      twitchGameId: item.twitch_id,
-      steamGameId: item.steam_id,
-      title: item.name,
-      imgURL: item.image,
-      url: item.url,
-      totalViews: parseInt(item.total_views, 10),
-      activeUsers: parseInt(item.total_active_users, 10),
-      genres: item.genres || [],
-      price: item.price,
-      isSinglePlayer: item.is_single_player,
-      isMultiPlayer: item.is_multi_player,
-      device: {
-        windows: item.is_device_windows,
-        mac: item.is_device_mac,
-      },
-      tags: item.tags || [],
-      shortDetails: item.short_details,
-      releaseDate: item.release_date,
-      developerName: item.developer_name,
-      salePrice: item.sale_price,
-      playTime: item.play_time,
-      review: item.review_text,
-      difficulty: item.difficulty,
-      graphics: item.graphics,
-      story: item.story,
-      music: item.music
-    }));
+    const result = rows.map(item => {
+      let similarGames: string[] = [];
+      similarGames = [...new Set(item.similar_games["released"] as string[])];
+
+      return {
+        twitchGameId: item.twitch_id,
+        steamGameId: item.steam_id,
+        title: item.name,
+        imgURL: item.image,
+        url: item.url,
+        totalViews: parseInt(item.total_views, 10),
+        activeUsers: parseInt(item.total_active_users, 10),
+        genres: item.genres || [],
+        price: item.price,
+        isSinglePlayer: item.is_single_player,
+        isMultiPlayer: item.is_multi_player,
+        device: {
+          windows: item.is_device_windows,
+          mac: item.is_device_mac,
+        },
+        tags: item.tags || [],
+        shortDetails: item.short_details,
+        releaseDate: item.release_date,
+        developerName: item.developer_name,
+        salePrice: item.sale_price,
+        playTime: item.play_time,
+        review: item.review_text,
+        difficulty: item.difficulty,
+        graphics: item.graphics,
+        story: item.story,
+        music: item.music,
+        similarGames: similarGames
+      };
+    });
 
     return NextResponse.json(result);
 
