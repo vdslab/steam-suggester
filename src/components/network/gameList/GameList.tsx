@@ -12,6 +12,7 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
+import PriceDisplay from "./PriceDisplay";
 
 type Props = {
   nodes: NodeType[];
@@ -166,7 +167,6 @@ const GameList = (props: Props) => {
   // メッセージ表示の条件判定
   const showNoResultsMessage = searchQuery !== '' && filteredNodeList.length === 0;
   const showAddGameMessage = showNoResultsMessage && filteredSteamList.length > 0;
-  const showNoGameFoundMessage = showNoResultsMessage && filteredSteamList.length === 0;
 
   // 判定用フラグ: いずれかのゲームが選択されているか
   const anyGameSelected = selectedIndex !== -1;
@@ -314,7 +314,7 @@ const GameList = (props: Props) => {
                           </div>
                           {/* 価格表示 */}
                           <div className="text-white mt-2">
-                            <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
+                            <PriceDisplay node={node} />
                           </div>
                           {/* アクションボタン */}
                           <div className="mt-4 flex space-x-2">
