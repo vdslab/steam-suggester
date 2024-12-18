@@ -14,7 +14,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import fetchWithCache from "@/hooks/fetchWithCache";
 
 type Props = {
   steamGameId: string;
@@ -23,31 +23,20 @@ type Props = {
 const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
   const [node, setNode] = useState<SteamDetailsDataType | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // ゲームデータの取得
     const fetchGameData = async () => {
       try {
-        const res = await fetch(
-          `/api/details/getSteamGameDetail/${steamGameId}`,
-          { next: { revalidate: ISR_FETCH_INTERVAL } }
-        );
-        if (!res.ok) {
-          throw new Error("ゲームデータの取得に失敗しました。");
-        }
-        const data: SteamDetailsDataType = await res.json();
+        const data = await fetchWithCache(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
         setNode(data);
       } catch (err) {
         console.error(err);
         setError("ゲームデータの取得中にエラーが発生しました。");
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchGameData();
-  }, [steamGameId]);
+  }, []);
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -72,9 +61,6 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
         className="w-full h-auto rounded"
         priority
       />
-
-      {/* ゲームタイトル */}
-      <h2 className="text-2xl font-bold text-white mt-4">{node.title}</h2>
 
       {/* Short Details */}
       <div className="flex items-start mt-2">

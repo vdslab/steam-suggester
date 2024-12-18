@@ -290,35 +290,29 @@ const GameList = (props: Props) => {
                           {/* Short Details */}
                           <div className="flex items-start my-2">
                             <InfoIcon className="mt-1 mr-1 mb-1" />
-                            <div className="max-h-20 overflow-y-auto">
-                              <p className="text-sm">{node.shortDetails}</p>
-                            </div>
+                            <p className="text-sm">{node.shortDetails}</p>
                           </div>
 
                           {/* ジャンル */}
                           {node.genres && node.genres.length > 0 && (
-                              <div className="flex items-center space-x-0.5 overflow-x-auto short-overflow-y">
-                                {/* <StarIcon className="flex-shrink-0" /> */}
-                                {/* <div className="flex space-x-1"> */}
-                                  {node.genres.map((genre, index) => (
-                                    <span key={index} className="bg-blue-500 text-xs text-white px-1 py-0 rounded flex-shrink-0">
-                                      {genre}
-                                    </span>
-                                  ))}
-                                {/* </div> */}
+                              <div className="flex items-center space-x-0.5 flex-wrap">
+                                {node.genres.map((genre, index) => (
+                                  <span key={index} className="bg-blue-500 text-xs p-0.5 mr-1 mb-1  rounded flex-shrink-0">
+                                    {genre}
+                                  </span>
+                                ))}
                               </div>
                             )}
 
                             {/* タグ */}
                             <div className="text-white mt-2">
-                              {/* <strong>タグ:</strong> */}
                               {node.tags && node.tags.length > 0 && (
-                                <div className="flex items-center space-x-0.5 overflow-x-auto mt-1 short-overflow-y">
+                                <div className="flex items-center space-x-0.5 mt-1 flex-wrap">
                                   {node.tags.map((tag, index) => (
                                     <span
                                       key={index}
-                                      className="bg-green-500 text-xs text-white px-1 py-0 rounded whitespace-nowrap flex-shrink-0"
-                                      title={tag} // ツールチップとしてタグ名を表示
+                                      className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded flex-shrink-0"
+                                      title={tag}
                                     >
                                       {tag}
                                     </span>

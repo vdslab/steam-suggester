@@ -1,23 +1,28 @@
 'use client';
+import { useFilterData } from '@/hooks/useFilterData';
 import StarIcon from '@mui/icons-material/Star';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import React from "react";
 
-type Props = {
-  genres: string[];
-  priceRange: { startPrice: number; endPrice: number };
-  modes: string[];
-  devices: string[];
-  playtimes: string[];
-};
 
-const UserSelection: React.FC<Props> = ({
-  genres,
-  priceRange,
-  modes,
-  devices,
-  playtimes,
-}) => {
+const UserSelection = () => {
+
+  const { filterData, error } = useFilterData();
+
+  if (error) {
+    return <div className="text-red-500 text-center mt-4">{error}</div>;
+  }
+
+  if (!filterData) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  const { genres, priceRange, modes, devices, playtimes } = filterData;
 
   return (
     <div className="rounded-lg overflow-hidden border border-gray-400 bg-gray-700 p-4">

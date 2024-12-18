@@ -1,23 +1,32 @@
-import useSWR from 'swr';
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+'use client'
 import { DetailsPropsType } from "@/types/DetailsType";
 import Link from "next/link";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { fetcher } from './Fetcher';
+import fetchWithCache from '@/hooks/fetchWithCache';
+import { useState, useEffect } from 'react';
+import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
+
 
 const GameTitle = ({ steamGameId }: DetailsPropsType) => {
-  const { data, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`,
-    fetcher,
-    { revalidateOnFocus: false, dedupingInterval: ISR_FETCH_INTERVAL }
-  );
 
-  if (error) {
-    return <div className="text-red-500">Failed to load game details.</div>;
-  }
+  const [ data, setData ] = useState<SteamDetailsDataType | null>(null);
+
+  useEffect(() => {
+
+    const fetchGameData = async () => {
+      try {
+        const data = await fetchWithCache(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
+        setData(data);
+      } catch (err: any) {
+        console.error(err);
+      }
+    };
+
+    fetchGameData();
+  }, []);
 
   if (!data) {
-    return <div className="text-white">Loading...</div>;
+    return;
   }
 
   return (
@@ -26,7 +35,7 @@ const GameTitle = ({ steamGameId }: DetailsPropsType) => {
         href={`https://store.steampowered.com/app/${steamGameId}/`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center text-5xl font-semibold mb-4 text-white hover:underline"
+        className="flex items-center text-5xl font-semibold text-white hover:underline"
       >
         {data.title}
         <OpenInNewIcon className="text-3xl ml-2 mt-3" />
