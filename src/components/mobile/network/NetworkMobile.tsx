@@ -64,7 +64,7 @@ const NetworkMobile = () => {
     fetchGameIds();
   }, []);
   
-    const allData: SteamDetailsDataType[] | null = useAllGameData(gameIds);
+    const allData = useAllGameData(gameIds);
 
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
     if (!allData) return;

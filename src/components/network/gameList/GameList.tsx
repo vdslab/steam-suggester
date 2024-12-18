@@ -4,14 +4,13 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
-import Image from "next/image";
-import { useRouter } from 'next/navigation';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-import DeleteIcon from '@mui/icons-material/Delete';
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
+import SearchBar from "./SearchBar";
+import ListContent from "./ListContent";
 
 type Props = {
   nodes: NodeType[];
@@ -21,13 +20,12 @@ type Props = {
   setCenterY: React.Dispatch<React.SetStateAction<number>>;
   setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
   setIsNetworkLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  setGameIds: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 
 const GameList = (props: Props) => {
-  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
-  const router = useRouter();
+  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading, setGameIds } = props;
 
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -37,9 +35,6 @@ const GameList = (props: Props) => {
 
   // Ref for the selected game detail
   const selectedDetailRef = useRef<HTMLDivElement | null>(null);
-
-  // タグの展開状態を管理
-  const [isTagsExpanded, setIsTagsExpanded] = useState<boolean>(false);
 
   // 固定のゲームIDリストを取得
   const fixedGameIds = useMemo(() => nodes.map(node => node.steamGameId), [nodes]);
@@ -99,12 +94,13 @@ const GameList = (props: Props) => {
     }
   }, [steamList, searchQuery, userAddedGames, nodes, fixedGameIds]);
 
+  console.log("GameList.tsx: filteredNodeList", filteredSteamList);
+
   // ゲームをクリックしたときの処理
   const handleGameClick = (index: number) => {
     setCenterX((nodes[index].x ?? 0) - 150);
     setCenterY((nodes[index].y ?? 0) + 100);
     setSelectedIndex(index);
-    setIsTagsExpanded(false); // 新しいゲームを選択したらタグを折りたたむ
   };
 
   // ゲームを追加する処理
@@ -114,6 +110,8 @@ const GameList = (props: Props) => {
       setUserAddedGames(newUserAddedGames);
       (async () => {
         await changeGameIdData(newUserAddedGames);
+        await setGameIds(newUserAddedGames);
+        setSearchQuery('');
         // TODO:
         if(setIsNetworkLoading) {
           setIsNetworkLoading(true);
@@ -158,15 +156,10 @@ const GameList = (props: Props) => {
     }
   }, [selectedIndex]);
 
-  // タグの表示切替関数
-  const toggleTags = () => {
-    setIsTagsExpanded((prev) => !prev);
-  };
 
   // メッセージ表示の条件判定
   const showNoResultsMessage = searchQuery !== '' && filteredNodeList.length === 0;
   const showAddGameMessage = showNoResultsMessage && filteredSteamList.length > 0;
-  const showNoGameFoundMessage = showNoResultsMessage && filteredSteamList.length === 0;
 
   // 判定用フラグ: いずれかのゲームが選択されているか
   const anyGameSelected = selectedIndex !== -1;
@@ -187,13 +180,7 @@ const GameList = (props: Props) => {
         {/* 全ゲームから検索セクション */}
         <Section title="全ゲームから検索" icon={<SearchIcon />} hasDivider={false}>
           {/* 検索入力 */}
-          <input
-            type="text"
-            placeholder="ゲームタイトルを検索"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 mb-2 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
-          />
+          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           
           {/* メッセージ表示エリア */}
           {showNoResultsMessage && (
@@ -241,105 +228,20 @@ const GameList = (props: Props) => {
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto step6">
             {nodes.length > 0 ? (
               <div className="space-y-2">
-                {nodes.map((node: NodeType, idx: number) => {
-                  const nodeIndex = nodes.findIndex(n => n.steamGameId === node.steamGameId);
-                  const isSelected = selectedIndex === nodeIndex;
-                  const { rankColor } = selectColor(node.index + 1);
-                  const isUserAdded = userAddedGames.includes(node.steamGameId);
-
-                  // 判定: 何かしらのゲームが選択されている場合
-                  const dimmed = anyGameSelected && !isSelected;
-
+                {nodes.map((node: NodeType) => {
                   return (
-                    <div
-                      key={node.steamGameId} // 一意のキーを使用
-                      className={`cursor-pointer rounded-lg transform transition-all duration-300 ${
-                        isSelected 
-                          ? 'bg-gray-800 border-2 shadow-xl p-2 mb-4 scale-x-105 scale-y-102' 
-                          : 'bg-gray-900 p-2'
-                      } ${dimmed ? 'opacity-50' : 'opacity-100'} space-y-2`}
-                    >
-                      <div 
-                        className="flex items-center justify-between"
-                        onClick={() => handleGameClick(nodeIndex)}
-                      >
-                        <div className="flex items-center">
-                          <div className={`${rankColor} pb-2 p-2`}>
-                            {node.index + 1}位
-                          </div>
-                          <div className="text-white p-2">
-                            {node.title}
-                          </div>
-                        </div>
-                        {isUserAdded && (
-                          <DeleteIcon 
-                            className='cursor-pointer hover:bg-gray-600 rounded'
-                            onClick={(e) => {
-                              e.stopPropagation(); // 親のクリックイベントを防止
-                              handleGameDelete(node.steamGameId);
-                            }}
-                          />
-                        )}
-                      </div>
-                      {isSelected && (
-                        <div className="mt-2" ref={selectedDetailRef}>
-                          <Image
-                            src={node.imgURL}
-                            alt={node.title}
-                            width={300}
-                            height={170}
-                            style={{
-                              borderRadius: "4px",
-                            }}
-                            className="object-cover"
-                          />
-                          {/* タグ表示部分 */}
-                          <div className="text-white mt-2">
-                            <strong>タグ:</strong> 
-                            {node.tags && node.tags.length > MAX_VISIBLE_TAGS ? (
-                              <>
-                                {isTagsExpanded 
-                                  ? node.tags.join(", ") 
-                                  : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ")}
-                                <button 
-                                  className="ml-2 text-blue-400 hover:underline focus:outline-none"
-                                  onClick={toggleTags}
-                                >
-                                  {isTagsExpanded ? "一部のタグのみ表示" : "..."}
-                                </button>
-                              </>
-                            ) : (
-                              node.tags?.join(", ") || "No tags"
-                            )}
-                          </div>
-                          {/* 価格表示 */}
-                          <div className="text-white mt-2">
-                            <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
-                          </div>
-                          {/* アクションボタン */}
-                          <div className="mt-4 flex space-x-2">
-                            <button
-                              className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
-                              onClick={() =>
-                                router.push(
-                                  `/desktop/details?steam_id=${node.steamGameId}&twitch_id=${node.twitchGameId}`
-                                )
-                              }
-                            >
-                              詳細を確認
-                            </button>
-                            <button
-                              className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
-                              onClick={() => setSelectedIndex(-1)}
-                            >
-                              閉じる
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                  <ListContent
+                    key={node.steamGameId}
+                    node={node}
+                    selectedIndex={selectedIndex}
+                    setSelectedIndex={setSelectedIndex}
+                    userAddedGames={userAddedGames}
+                    handleGameClick={handleGameClick}
+                    handleGameDelete={handleGameDelete}
+                    selectedDetailRef={selectedDetailRef}
+                    anyGameSelected={anyGameSelected}
+                  />
+                )})}
               </div>
             ) : (
               /* ゲームリストが空の場合、メッセージは上部に表示されるためここでは何も表示しない */

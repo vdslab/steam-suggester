@@ -1,15 +1,11 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import NodeLink from "./NodeLink";
 import SelectParameter from "./selectParameter/SelectParameter";
-import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
-import { Filter, SliderSettings } from "@/types/api/FilterType";
 import GameList from "./gameList/GameList";
 import StreamedList from "./streamedList/StreamedList";
-import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/desktop/loading";
-import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
-import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
+import { StreamerListType } from "@/types/NetworkType";
 import Sidebar from "./Sidebar";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
@@ -20,151 +16,62 @@ import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import useTour from "@/hooks/useTour";
-import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import useNetworkGraph from "@/hooks/useNetworkGraph";
 import useAllGameData from "@/hooks/useAllGameData";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { getGameIdData } from "@/hooks/indexedDB";
 
 const Network = () => {
-  const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
-  const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
-
-  const [nodes, setNodes] = useState<NodeType[]>([]);
-  const [links, setLinks] = useState<LinkType[]>([]);
-  const [centerX, setCenterX] = useState<number>(0);
-  const [centerY, setCenterY] = useState<number>(0);
-
   const [selectedIndex, setSelectedIndex] = useState(-1);
-
   const [isLoading, setIsLoading] = useState(true);
   const [isNetworkLoading, setIsNetworkLoading] = useState(false);
-
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
-
-  // 各機能の開閉状態を管理
-  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
-  const [isStreamerOpen, setIsStreamerOpen] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
-  const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
   const { tourRun, setTourRun } = useTour();
-
   const [progress, setProgress] = useState(0);
 
-  // Refを使用して副作用の実行を制御
-  const hasFetchedInitialData = useRef(false);
-
-  // ゲームIDリストを取得
   const [gameIds, setGameIds] = useState<string[]>([]);
+
   useEffect(() => {
     const fetchGameIds = async () => {
       const ids = (await getGameIdData()) ?? [];
       setGameIds(ids);
     };
     fetchGameIds();
-  }, [isNetworkLoading]);
+  }, [gameIds]);
 
-  const allData: SteamDetailsDataType[] | null = useAllGameData(gameIds);
+  const allData = useAllGameData(gameIds);
 
-  const initialNodes = async (
-    filter: Filter,
-    slider: SliderSettings
-  ) => {
-    if (!allData) return;
-    setProgress(0);
-    const { nodes, links } = await createNetwork(allData, filter, slider, setProgress);
-    const buffNodes = nodes.concat();
-    buffNodes.sort(
-      (node1: NodeType, node2: NodeType) =>
-        (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
-    );
-    if (centerX === 0 && centerY === 0 && buffNodes.length > 0) {
-      setCenterX((buffNodes[0]?.x ?? 0) - 150);
-      setCenterY((buffNodes[0]?.y ?? 0) + 100);
-    }
-    setNodes(nodes);
-    setLinks(links);
-    setProgress(100);
-    hasFetchedInitialData.current = false; 
-  };
-
-  useEffect(() => {
-    if (!allData) return;
-
-    if ((isLoading || isNetworkLoading) && !hasFetchedInitialData.current) {
-      hasFetchedInitialData.current = true; // フラグを立てる
-      (async () => {
-        const filterData = (await getFilterData()) ?? DEFAULT_FILTER;
-        const sliderData = (await getSliderData()) ?? DEFAULT_SLIDER;
-        setFilter(filterData);
-        setSlider(sliderData);
-        await initialNodes(filterData, sliderData);
-        setIsLoading(false);
-        setIsNetworkLoading(false);
-      })();
-    }
-  }, [isLoading, isNetworkLoading, allData]);
+  const {
+    nodes,
+    links,
+    centerX,
+    centerY,
+    filter,
+    setFilter,
+    slider,
+    setSlider,
+    setCenterX,
+    setCenterY,
+  } = useNetworkGraph(
+    allData,
+    isLoading,
+    isNetworkLoading,
+    setIsLoading,
+    setIsNetworkLoading,
+    setProgress
+  );
 
   // Sidebar のトグル関数
-  const toggleFilter = () => {
-    setIsFilterOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
-
-  const toggleStreamer = () => {
-    setIsStreamerOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
-
-  const toggleChat = () => {
-    setIsChatOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
-
-  const toggleSteamList = () => {
-    setIsSteamListOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
+  const togglePanel = (panelName: string) => {
+    setOpenPanel((prevPanel) => (prevPanel === panelName ? null : panelName));
+    setTourRun(false);
   };
 
   const toggleTourRun = () => {
     setTourRun((prev) => {
       const newState = !prev;
       if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
+        setOpenPanel(null);
       }
       return newState;
     });
@@ -178,23 +85,16 @@ const Network = () => {
     <div className="flex h-[92vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
-        isFilterOpen={isFilterOpen}
-        toggleFilter={toggleFilter}
-        isStreamerOpen={isStreamerOpen}
-        toggleStreamer={toggleStreamer}
-        isChatOpen={isChatOpen}
-        toggleChat={toggleChat}
-        isSteamListOpen={isSteamListOpen}
-        toggleSteamList={toggleSteamList}
+        openPanel={openPanel}
+        togglePanel={togglePanel}
         tourRun={tourRun}
         toggleTourRun={toggleTourRun}
       />
 
-      {/* メインコンテンツエリアを relative に設定 */}
+      {/* メインコンテンツエリア */}
       <div className="test1 flex-1 relative bg-gray-900 overflow-hidden">
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
-            {/* メインコンテンツ */}
             <NodeLink
               nodes={nodes}
               links={links}
@@ -203,7 +103,7 @@ const Network = () => {
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
               streamerIds={streamerIds}
-              isStreamerOpen={isStreamerOpen}
+              isStreamerOpen={openPanel === "streamer"}
             />
           </div>
         ) : (
@@ -211,7 +111,7 @@ const Network = () => {
         )}
 
         {/* フィルターパネル */}
-        {isFilterOpen && (
+        {openPanel === "filter" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <SelectParameter
               filter={filter}
@@ -222,7 +122,7 @@ const Network = () => {
         )}
 
         {/* StreamerListパネル */}
-        {isStreamerOpen && (
+        {openPanel === "streamer" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <Panel
               title={
@@ -243,7 +143,7 @@ const Network = () => {
         )}
 
         {/* ChatBarパネル */}
-        {isChatOpen && (
+        {openPanel === "chat" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <Panel
               title={
@@ -264,7 +164,7 @@ const Network = () => {
         )}
 
         {/* Steam連携パネル */}
-        {isSteamListOpen && (
+        {openPanel === "steamList" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <SteamList />
           </div>
@@ -279,6 +179,7 @@ const Network = () => {
             setCenterX={setCenterX}
             setCenterY={setCenterY}
             setIsNetworkLoading={setIsNetworkLoading}
+            setGameIds={setGameIds}
           />
         </div>
 
