@@ -305,13 +305,24 @@ const GameList = (props: Props) => {
                                   className="ml-2 text-blue-400 hover:underline focus:outline-none"
                                   onClick={toggleTags}
                                 >
-                                  {isTagsExpanded ? "一部のタグのみ表示" : "..."}
+                                  {isTagsExpanded ? "一部のタグのみ表示" : "全てのタグを表示"}
                                 </button>
                               </>
                             ) : (
                               node.tags?.join(", ") || "No tags"
                             )}
                           </div>
+                          <div className="mt-2">
+                            <strong>ジャンル:</strong> {node.genres?.join(", ") || "ジャンルなし"}
+                          </div>
+                          <div className="mt-2">
+                            <strong>リリース日:</strong> {node.releaseDate}
+                          </div>
+                          <div className="mt-2">
+                            <strong>開発者:</strong> {node.developerName}
+                          </div>
+
+
                           {/* 価格表示 */}
                           <div className="text-white mt-2">
                             <PriceDisplay node={node} />
