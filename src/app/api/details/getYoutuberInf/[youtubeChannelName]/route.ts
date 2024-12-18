@@ -39,6 +39,7 @@ export async function GET(req: Request, { params }: Params) {
     const result: StreamerListType[] = channelData.items.map((channel: any) => ({
       name: channel.snippet.channelTitle,
       id: channel.id.channelId,
+      customUrl: 'default',
       platform: 'youtube',
       color: 'default',
       thumbnail: channel.snippet.thumbnails.default.url || "default",

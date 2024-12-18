@@ -116,6 +116,7 @@ export async function GET(req: Request, { params }: Params) {
 
       const resultData: StreamerListType = {
         name: streamerName,
+        customUrl: 'default',
         id: streamerId,
         platform: 'twitch',
         color: 'default',

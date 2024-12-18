@@ -30,9 +30,19 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
 
   useEffect(() => {
     zoom.current = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.15, 4]) 
+      .scaleExtent([0.25, 4])
+      .on("start", () => {
+        if (svgRef.current) {
+          d3.select(svgRef.current).style("cursor", "grabbing");
+        }
+      })
       .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         setTransform(event.transform);
+      })
+      .on("end", () => {
+        if (svgRef.current) {
+          d3.select(svgRef.current).style("cursor", "grab");
+        }
       });
 
     if (svgRef.current) {
@@ -78,19 +88,19 @@ const NodeLink = (props: NodeLinkProps) => {
        <>
           {links.length !== 0 &&
             links.map((link: LinkType, i: number) => {
-              const isHovered = link.source === hoveredIndex || link.target === hoveredIndex;
-              const isSelected = link.source === selectedIndex || link.target === selectedIndex;
+              const isHovered = link.source.index === hoveredIndex || link.target.index === hoveredIndex;
+              const isSelected = link.source.index === selectedIndex || link.target.index === selectedIndex;
               return (
                 <line
                   key={i}
                   className="link"
-                  x1={nodes[link.source].x}
-                  y1={nodes[link.source].y}
-                  x2={nodes[link.target].x}
-                  y2={nodes[link.target].y}
+                  x1={link.source.x}
+                  y1={link.source.y}
+                  x2={link.target.x}
+                  y2={link.target.y}
                   style={{
                     stroke: (isHovered || isSelected) ? "cyan" : "white",
-                    strokeWidth: (isHovered || isSelected) ? "2" : "1"
+                    strokeWidth: (isHovered || isSelected) ? "2" : "0.3"
                   }}
                 />
               )

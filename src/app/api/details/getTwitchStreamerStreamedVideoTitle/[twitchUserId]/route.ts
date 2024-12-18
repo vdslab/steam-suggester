@@ -40,6 +40,7 @@ export async function GET(req: Request, { params }: Params) {
 
     const user = userData.data[0];
     const streamerName = user.display_name;
+    const customUrl = user.login;
     const streamerId = user.id;
     const thumbnail = user.profile_image_url;
     const view_count = user.view_count;
@@ -95,6 +96,7 @@ export async function GET(req: Request, { params }: Params) {
     // 結果の整形
     const result: StreamerListType = {
       name: streamerName,
+      customUrl: customUrl,
       id: streamerId,
       platform: 'twitch',
       color: 'defaultColor',

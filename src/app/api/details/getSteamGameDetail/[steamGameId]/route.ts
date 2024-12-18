@@ -37,7 +37,8 @@ export async function GET(req: Request, { params }: Params) {
           sd.difficulty,
           sd.graphics,
           sd.story,
-          sd.music
+          sd.music,
+          sd.similar_games
       FROM 
           steam_game_data sd
       WHERE 
@@ -52,6 +53,9 @@ export async function GET(req: Request, { params }: Params) {
     }
 
     const gameDetailData = result.rows[0];
+
+    let similarGames: string[] = [];
+    similarGames = [...new Set(gameDetailData.similar_games["released"] as string[])];
 
     const formattedResult: SteamDetailsDataType = {
       // マッチ度で使用
@@ -82,7 +86,8 @@ export async function GET(req: Request, { params }: Params) {
       difficulty: gameDetailData.difficulty,
       graphics: gameDetailData.graphics,
       story: gameDetailData.story,
-      music: gameDetailData.music
+      music: gameDetailData.music,
+      similarGames: similarGames
     };
 
     return NextResponse.json(formattedResult);

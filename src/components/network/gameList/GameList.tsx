@@ -12,6 +12,7 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
+import PriceDisplay from "./PriceDisplay";
 
 type Props = {
   nodes: NodeType[];
@@ -166,7 +167,6 @@ const GameList = (props: Props) => {
   // メッセージ表示の条件判定
   const showNoResultsMessage = searchQuery !== '' && filteredNodeList.length === 0;
   const showAddGameMessage = showNoResultsMessage && filteredSteamList.length > 0;
-  const showNoGameFoundMessage = showNoResultsMessage && filteredSteamList.length === 0;
 
   // 判定用フラグ: いずれかのゲームが選択されているか
   const anyGameSelected = selectedIndex !== -1;
@@ -305,16 +305,27 @@ const GameList = (props: Props) => {
                                   className="ml-2 text-blue-400 hover:underline focus:outline-none"
                                   onClick={toggleTags}
                                 >
-                                  {isTagsExpanded ? "一部のタグのみ表示" : "..."}
+                                  {isTagsExpanded ? "一部のタグのみ表示" : "全てのタグを表示"}
                                 </button>
                               </>
                             ) : (
                               node.tags?.join(", ") || "No tags"
                             )}
                           </div>
+                          <div className="mt-2">
+                            <strong>ジャンル:</strong> {node.genres?.join(", ") || "ジャンルなし"}
+                          </div>
+                          <div className="mt-2">
+                            <strong>リリース日:</strong> {node.releaseDate}
+                          </div>
+                          <div className="mt-2">
+                            <strong>開発者:</strong> {node.developerName}
+                          </div>
+
+
                           {/* 価格表示 */}
                           <div className="text-white mt-2">
-                            <strong>価格:</strong> {node.price ? `${node.price}円` : "無料"}
+                            <PriceDisplay node={node} />
                           </div>
                           {/* アクションボタン */}
                           <div className="mt-4 flex space-x-2">

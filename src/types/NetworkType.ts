@@ -17,6 +17,7 @@ export type SteamListType = {
 export type StreamerListType = {
   name: string;
   id: string;
+  customUrl: string;
   platform: 'twitch' | 'youtube';
   color: string;
   thumbnail: string;
@@ -60,11 +61,12 @@ export type NodeType = {
   primaryGenre?: string;
   totalViews?: number;
   activeUsers?: number;
+  similarGames?: string[];
 }
 
 export type LinkType = {
-  source: number;
-  target: number;
+  source: NodeType;
+  target: NodeType;
   index?: number;
   distance?: number;
 }
