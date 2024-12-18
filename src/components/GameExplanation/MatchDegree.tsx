@@ -1,21 +1,15 @@
-/* components/GameExplanation/MatchDegree.tsx */
 'use client';
 
 import React, { useState, useEffect } from "react";
 import CircularProgress from '@mui/material/CircularProgress';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import Tooltip from '@mui/material/Tooltip';
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import { useFilterData } from "@/hooks/useFilterData";
+import fetchWithCache from "@/hooks/fetchWithCache";
 
 type Props = {
   steamGameId: string;
   twitchGameId: string;
-  genres: string[];
-  priceRange: { startPrice: number; endPrice: number };
-  modes: string[];
-  devices: string[];
-  playtimes: string[];
 };
 
 type SteamDetailsDataType = {
@@ -28,10 +22,10 @@ type SteamDetailsDataType = {
     windows: boolean;
     mac: boolean;
   };
-  // その他の必要なフィールド
 };
 
-const MatchDegree: React.FC<Props> = ({ steamGameId, twitchGameId, genres, priceRange, modes, devices, playtimes }) => {
+const MatchDegree = ({ steamGameId, twitchGameId }: Props) => {
+  // フックを無条件で呼び出す
   const [node, setNode] = useState<SteamDetailsDataType | null>(null);
   const [overallMatch, setOverallMatch] = useState<number | null>(null);
   const [genreMatch, setGenreMatch] = useState<number | null>(null);
@@ -41,18 +35,14 @@ const MatchDegree: React.FC<Props> = ({ steamGameId, twitchGameId, genres, price
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { filterData, error: filterError } = useFilterData();
+
   useEffect(() => {
-    // ゲームデータの取得
+    if (filterError || !filterData) return;
+
     const fetchGameData = async () => {
       try {
-        const res = await fetch(
-          `/api/details/getSteamGameDetail/${steamGameId}`,
-          { next: { revalidate: ISR_FETCH_INTERVAL } }
-        );
-        if (!res.ok) {
-          throw new Error("ゲームデータの取得に失敗しました。");
-        }
-        const data: SteamDetailsDataType = await res.json();
+        const data = await fetchWithCache(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
         setNode(data);
       } catch (err: any) {
         console.error(err);
@@ -63,84 +53,88 @@ const MatchDegree: React.FC<Props> = ({ steamGameId, twitchGameId, genres, price
     };
 
     fetchGameData();
-  }, [steamGameId]);
+  }, [steamGameId, filterData, filterError]);
 
   useEffect(() => {
-    if (node) {
-      // ジャンル一致度の計算
-      const preferredGenres = genres;
-      const matchingGenres = node.genres.filter((genre) =>
-        preferredGenres.includes(genre)
-      );
-      const genreScore =
-        preferredGenres.length === 0
-          ? 100
-          : Math.min(
-              (matchingGenres.length / preferredGenres.length) * 100,
-              100
-            );
-      setGenreMatch(Math.round(genreScore));
+    if (!node || !filterData) return;
 
-      // 価格一致度の計算
-      const salePrice = typeof node.salePrice === 'string' ? parseFloat(node.salePrice) : node.salePrice;
-      const price = typeof node.price === 'string' ? parseFloat(node.price) : node.price;
-      const gamePrice = salePrice || price;
+    const { genres, priceRange, modes, devices } = filterData;
 
-      if (isNaN(gamePrice)) {
-        setPriceMatch(0);
+    // ジャンル一致度の計算
+    const preferredGenres = genres;
+    const matchingGenres = node.genres.filter((genre) =>
+      preferredGenres.includes(genre)
+    );
+    const genreScore =
+      preferredGenres.length === 0
+        ? 100
+        : Math.min(
+            (matchingGenres.length / preferredGenres.length) * 100,
+            100
+          );
+    setGenreMatch(Math.round(genreScore));
+
+    // 価格一致度の計算
+    const salePrice = typeof node.salePrice === 'string' ? parseFloat(node.salePrice) : node.salePrice;
+    const price = typeof node.price === 'string' ? parseFloat(node.price) : node.price;
+    const gamePrice = salePrice || price;
+
+    if (isNaN(gamePrice)) {
+      setPriceMatch(0);
+    } else {
+      const { startPrice, endPrice } = priceRange;
+      let priceScore = 0;
+      if (gamePrice >= startPrice && gamePrice <= endPrice) {
+        priceScore = 100;
       } else {
-        const { startPrice, endPrice } = priceRange;
-        let priceScore = 0;
-        if (gamePrice >= startPrice && gamePrice <= endPrice) {
-          priceScore = 100;
-        } else {
-          // 希望価格範囲からの距離を計算
-          const distance =
-            gamePrice < startPrice
-              ? startPrice - gamePrice
-              : gamePrice - endPrice;
-          // スコアが0になる最大距離を設定（例として希望価格範囲の最大値）
-          const maxDistance = Math.max(startPrice, endPrice, 1); // ゼロ除算を防ぐ
-          priceScore = Math.max(100 - (distance / maxDistance) * 100, 0);
-        }
-        setPriceMatch(Math.round(priceScore));
+        const distance =
+          gamePrice < startPrice
+            ? startPrice - gamePrice
+            : gamePrice - endPrice;
+        const maxDistance = Math.max(startPrice, endPrice, 1);
+        priceScore = Math.max(100 - (distance / maxDistance) * 100, 0);
       }
-
-      // プレイモードの一致チェック
-      if (modes.length === 0) {
-        setModesMatch(true); // モードが選択されていない場合は自動的に一致
-      } else {
-        // ゲームがユーザーの選択したすべてのモードをサポートしているか
-        const gameModes: string[] = [];
-        if (node.isSinglePlayer) gameModes.push("Single Player");
-        if (node.isMultiPlayer) gameModes.push("Multiplayer");
-
-        const allModesMatch = modes.every(mode => gameModes.includes(mode));
-        setModesMatch(allModesMatch);
-      }
-
-      // 対応デバイスの一致チェック
-      if (devices.length === 0) {
-        setDevicesMatch(true); // デバイスが選択されていない場合は自動的に一致
-      } else {
-        const gameDevices: string[] = [];
-        if (node.device.windows) gameDevices.push("Windows");
-        if (node.device.mac) gameDevices.push("Mac");
-
-        const allDevicesMatch = devices.every(device => gameDevices.includes(device));
-        setDevicesMatch(allDevicesMatch);
-      }
-
-      // 全体の一致度をジャンルと価格の平均で計算
-      const overall =
-        (genreScore + (priceMatch !== null ? priceMatch : 0)) / 2;
-      setOverallMatch(Math.round(overall));
+      setPriceMatch(Math.round(priceScore));
     }
-  }, [node, genres, priceRange, modes, devices, playtimes]);
 
-  if (loading) {
+    // プレイモードの一致チェック
+    if (modes.length === 0) {
+      setModesMatch(true);
+    } else {
+      const gameModes: string[] = [];
+      if (node.isSinglePlayer) gameModes.push("Single Player");
+      if (node.isMultiPlayer) gameModes.push("Multiplayer");
+      const allModesMatch = modes.every((mode) => gameModes.includes(mode));
+      setModesMatch(allModesMatch);
+    }
+
+    // 対応デバイスの一致チェック
+    if (devices.length === 0) {
+      setDevicesMatch(true);
+    } else {
+      const gameDevices: string[] = [];
+      if (node.device.windows) gameDevices.push("Windows");
+      if (node.device.mac) gameDevices.push("Mac");
+      const allDevicesMatch = devices.every((device) =>
+        gameDevices.includes(device)
+      );
+      setDevicesMatch(allDevicesMatch);
+    }
+
+    // 全体の一致度をジャンルと価格の平均で計算
+    const overall =
+      (genreScore + (priceMatch !== null ? priceMatch : 0)) / 2;
+    setOverallMatch(Math.round(overall));
+  }, [node, filterData]);
+
+  // 条件に応じて早期リターン
+  if (filterError) {
+    return <div className="text-red-500 text-center mt-4">{filterError}</div>;
+  }
+
+  if (!filterData || loading) {
     return (
-      <div className="flex justify-center items-center h-40">
+      <div className="flex justify-center items-center h-screen">
         <CircularProgress />
       </div>
     );

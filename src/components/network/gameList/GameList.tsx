@@ -12,18 +12,11 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
-import StarIcon from '@mui/icons-material/Star';
-import LanguageIcon from '@mui/icons-material/Language';
-import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
-import DevicesIcon from '@mui/icons-material/Devices';
-import MultilineChartIcon from '@mui/icons-material/MultilineChart';
 import InfoIcon from '@mui/icons-material/Info';
-import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 import Tooltip from '@mui/material/Tooltip';
-import PriceDisplay from "./PriceDisplay";
 
 type Props = {
   nodes: NodeType[];
@@ -35,12 +28,9 @@ type Props = {
   setIsNetworkLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
-
 const GameList = (props: Props) => {
   const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
   const router = useRouter();
-  console.log(nodes[0])
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
@@ -49,9 +39,6 @@ const GameList = (props: Props) => {
 
   // Ref for the selected game detail
   const selectedDetailRef = useRef<HTMLDivElement | null>(null);
-
-  // タグの展開状態を管理
-  const [isTagsExpanded, setIsTagsExpanded] = useState<boolean>(false);
 
   // 固定のゲームIDリストを取得
   const fixedGameIds = useMemo(() => nodes.map(node => node.steamGameId), [nodes]);
@@ -116,7 +103,6 @@ const GameList = (props: Props) => {
     setCenterX((nodes[index].x ?? 0) - 150);
     setCenterY((nodes[index].y ?? 0) + 100);
     setSelectedIndex(index);
-    setIsTagsExpanded(false); // 新しいゲームを選択したらタグを折りたたむ
   };
 
   // ゲームを追加する処理
@@ -126,6 +112,7 @@ const GameList = (props: Props) => {
       setUserAddedGames(newUserAddedGames);
       (async () => {
         await changeGameIdData(newUserAddedGames);
+        setSearchQuery('')
         // TODO:
         if(setIsNetworkLoading) {
           setIsNetworkLoading(true);
@@ -142,6 +129,7 @@ const GameList = (props: Props) => {
     setUserAddedGames(newUserAddedGames);
     (async () => {
       await changeGameIdData(newUserAddedGames);
+      setSearchQuery('')
       // TODO:
       if(setIsNetworkLoading) {
         setIsNetworkLoading(true);
@@ -169,11 +157,6 @@ const GameList = (props: Props) => {
       selectedDetailRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [selectedIndex]);
-
-  // タグの表示切替関数
-  const toggleTags = () => {
-    setIsTagsExpanded((prev) => !prev);
-  };
 
   // メッセージ表示の条件判定
   const showNoResultsMessage = searchQuery !== '' && filteredNodeList.length === 0;
@@ -252,9 +235,8 @@ const GameList = (props: Props) => {
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto step6">
             {nodes.length > 0 ? (
               <div className="space-y-2">
-                {nodes.map((node: NodeType, idx: number) => {
-                  const nodeIndex = nodes.findIndex(n => n.steamGameId === node.steamGameId);
-                  const isSelected = selectedIndex === nodeIndex;
+                {nodes.map((node: NodeType) => {
+                  const isSelected = selectedIndex === node.index;
                   const { rankColor } = selectColor(node.index + 1);
                   const isUserAdded = userAddedGames.includes(node.steamGameId);
 
@@ -272,7 +254,7 @@ const GameList = (props: Props) => {
                     >
                       <div 
                         className="flex items-center justify-between"
-                        onClick={() => handleGameClick(nodeIndex)}
+                        onClick={() => handleGameClick(node.index)}
                       >
                         <div className="flex items-center">
                           <div className={`${rankColor} pb-2 p-2 whitespace-nowrap`}>
@@ -308,35 +290,29 @@ const GameList = (props: Props) => {
                           {/* Short Details */}
                           <div className="flex items-start my-2">
                             <InfoIcon className="mt-1 mr-1 mb-1" />
-                            <div className="max-h-20 overflow-y-auto">
-                              <p className="text-sm">{node.shortDetails}</p>
-                            </div>
+                            <p className="text-sm">{node.shortDetails}</p>
                           </div>
 
                           {/* ジャンル */}
                           {node.genres && node.genres.length > 0 && (
-                              <div className="flex items-center space-x-0.5 overflow-x-auto short-overflow-y">
-                                {/* <StarIcon className="flex-shrink-0" /> */}
-                                {/* <div className="flex space-x-1"> */}
-                                  {node.genres.map((genre, index) => (
-                                    <span key={index} className="bg-blue-500 text-xs text-white px-1 py-0 rounded flex-shrink-0">
-                                      {genre}
-                                    </span>
-                                  ))}
-                                {/* </div> */}
+                              <div className="flex items-center space-x-0.5 flex-wrap">
+                                {node.genres.map((genre, index) => (
+                                  <span key={index} className="bg-blue-500 text-xs p-0.5 mr-1 mb-1  rounded flex-shrink-0">
+                                    {genre}
+                                  </span>
+                                ))}
                               </div>
                             )}
 
                             {/* タグ */}
                             <div className="text-white mt-2">
-                              {/* <strong>タグ:</strong> */}
                               {node.tags && node.tags.length > 0 && (
-                                <div className="flex items-center space-x-0.5 overflow-x-auto mt-1 short-overflow-y">
+                                <div className="flex items-center space-x-0.5 mt-1 flex-wrap">
                                   {node.tags.map((tag, index) => (
                                     <span
                                       key={index}
-                                      className="bg-green-500 text-xs text-white px-1 py-0 rounded whitespace-nowrap flex-shrink-0"
-                                      title={tag} // ツールチップとしてタグ名を表示
+                                      className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded flex-shrink-0"
+                                      title={tag}
                                     >
                                       {tag}
                                     </span>

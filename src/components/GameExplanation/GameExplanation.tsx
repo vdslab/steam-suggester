@@ -14,7 +14,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import fetchWithCache from "@/hooks/fetchWithCache";
 
 type Props = {
   steamGameId: string;
@@ -23,31 +23,20 @@ type Props = {
 const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
   const [node, setNode] = useState<SteamDetailsDataType | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // ゲームデータの取得
     const fetchGameData = async () => {
       try {
-        const res = await fetch(
-          `/api/details/getSteamGameDetail/${steamGameId}`,
-          { next: { revalidate: ISR_FETCH_INTERVAL } }
-        );
-        if (!res.ok) {
-          throw new Error("ゲームデータの取得に失敗しました。");
-        }
-        const data: SteamDetailsDataType = await res.json();
+        const data = await fetchWithCache(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
         setNode(data);
       } catch (err) {
         console.error(err);
         setError("ゲームデータの取得中にエラーが発生しました。");
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchGameData();
-  }, [steamGameId]);
+  }, []);
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -72,9 +61,6 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
         className="w-full h-auto rounded"
         priority
       />
-
-      {/* ゲームタイトル */}
-      <h2 className="text-2xl font-bold text-white mt-4">{node.title}</h2>
 
       {/* Short Details */}
       <div className="flex items-start mt-2">
@@ -123,14 +109,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
       <div className="flex items-center space-x-2 mt-2">
         {node.device.windows && (
           <Tooltip title="Windows対応">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 448 512"
-              className="text-white h-5 w-5"
-              fill="currentColor"
-            >
-              <path d="M0 0h224v224H0zM224 0h224v224H224zM0 224h224v288H0zM224 224h224v288H224z" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 40 40" width="20px" height="20px"><path d="M26 6H42V22H26zM38 42H26V26h16v12C42 40.209 40.209 42 38 42zM22 22H6V10c0-2.209 1.791-4 4-4h12V22zM6 26H22V42H6z" fill="white"/></svg>
           </Tooltip>
         )}
         {node.device.mac && (
