@@ -9,12 +9,8 @@ import Panel from '../Panel';
 import Section from '../Section';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Image from 'next/image';
-import { IconButton } from '@mui/material';
+import { Avatar, AvatarGroup, IconButton } from '@mui/material';
 
-type GetFriendGamesResponse = {
-  friendsName: string[];
-  gameName: string;
-};
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -149,6 +145,11 @@ const OwnedGames = () => {
                     <div className="flex items-center">
                       <div className="text-white p-2">{game.gameName}</div>
                     </div>
+                    <AvatarGroup max={3} spacing={'small'}>
+                      {game.friends.map((friend, friendIndex) => (
+                        <Avatar key={friendIndex} alt={friend.name} src={friend.avatar} />
+                      ))}
+                    </AvatarGroup>
                   </div>
                   {/* ホバー時に表示されるリスト */}
                   <div
@@ -156,9 +157,9 @@ const OwnedGames = () => {
                   >
                     <h4 className="text-lg font-bold mb-2">所持しているフレンドリスト</h4>
                     <ul>
-                      {game.friendsName.map((friend, friendIndex) => (
+                      {game.friends.map((friend, friendIndex) => (
                         <li key={friendIndex} className="text-sm">
-                          {friend}
+                          {friend.name}
                         </li>
                       ))}
                     </ul>
