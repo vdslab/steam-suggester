@@ -14,7 +14,7 @@ type AccordionSectionProps = {
 
 const AccordionSection: React.FC<AccordionSectionProps> = ({ title, children }) => {
   return (
-    <Accordion className="bg-gray-700 rounded-lg overflow-hidden border border-gray-600">
+    <Accordion className="bg-gray-700 rounded-lg overflow-hidden border border-gray-400">
       <AccordionSummary
         expandIcon={<ExpandMoreIcon className="text-white" />}
         aria-controls={`${title}-content`}
