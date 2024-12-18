@@ -49,9 +49,6 @@ const GameList = (props: Props) => {
   // Ref for the selected game detail
   const selectedDetailRef = useRef<HTMLDivElement | null>(null);
 
-  // タグの展開状態を管理
-  const [isTagsExpanded, setIsTagsExpanded] = useState<boolean>(false);
-
   // 固定のゲームIDリストを取得
   const fixedGameIds = useMemo(() => nodes.map(node => node.steamGameId), [nodes]);
 
@@ -115,7 +112,6 @@ const GameList = (props: Props) => {
     setCenterX((nodes[index].x ?? 0) - 150);
     setCenterY((nodes[index].y ?? 0) + 100);
     setSelectedIndex(index);
-    setIsTagsExpanded(false); // 新しいゲームを選択したらタグを折りたたむ
   };
 
   // ゲームを追加する処理
@@ -170,11 +166,6 @@ const GameList = (props: Props) => {
       selectedDetailRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [selectedIndex]);
-
-  // タグの表示切替関数
-  const toggleTags = () => {
-    setIsTagsExpanded((prev) => !prev);
-  };
 
   // メッセージ表示の条件判定
   const showNoResultsMessage = searchQuery !== '' && filteredNodeList.length === 0;
