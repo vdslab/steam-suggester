@@ -23,7 +23,7 @@ const GameTitle = ({ steamGameId }: DetailsPropsType) => {
     };
 
     fetchGameData();
-  }, []);
+  }, [steamGameId]);
 
   if (!data) {
     return;

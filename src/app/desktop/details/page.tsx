@@ -18,7 +18,7 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
   return (
     <div className="bg-gray-800 min-h-screen">
       <DetailsHeader />
-      <div className="w-full p-4 max-w-[1400px] mx-auto">
+      <div className="w-full p-4 max-w-screen-2xl mx-auto">
         {/* ゲームタイトル */}
         <div className="mb-6">
           <GameTitle steamGameId={steamGameId} twitchGameId={twitchGameId} />
@@ -27,19 +27,23 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
         {/* メインレイアウト: 3カラム */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* 左カラム: UserSelection と MatchDegree */}
-          <div className="lg:col-span-1 space-y-6">
-            <UserSelection />
-            <MatchDegree
+          <div className="lg:col-span-2 space-y-6">
+            <GameExplanation
               steamGameId={steamGameId}
-              twitchGameId={twitchGameId}
             />
           </div>
 
           {/* 中央カラム: GameExplanation */}
-          <div className="lg:col-span-2">
-            <GameExplanation
+          <div className="lg:col-span-1 space-y-6">
+            {/* <MatchDegree
               steamGameId={steamGameId}
-            />
+              twitchGameId={twitchGameId}
+            /> */}
+            {/* 流行度 */}
+            <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
+              <Typography className="text-white font-semibold pb-3 pt-2">流行度</Typography>
+              <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId} />
+            </div>
           </div>
 
           {/* 右カラム: Accordionセクション */}
@@ -47,11 +51,6 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
             {/* 類似しているゲーム */}
             <AccordionSection title="類似しているゲーム">
               <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
-            </AccordionSection>
-
-            {/* 流行度 */}
-            <AccordionSection title="流行度">
-              <Popularity twitchGameId={twitchGameId} steamGameId={steamGameId} />
             </AccordionSection>
 
             {/* 配信者クリップ */}

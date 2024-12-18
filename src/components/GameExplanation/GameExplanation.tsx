@@ -20,7 +20,7 @@ type Props = {
   steamGameId: string;
 };
 
-const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
+const GameExplanation = ({ steamGameId }:Props) => {
   const [node, setNode] = useState<SteamDetailsDataType | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +36,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
     };
 
     fetchGameData();
-  }, []);
+  }, [steamGameId]);
 
   if (error) {
     return <div className="text-red-500">{error}</div>;

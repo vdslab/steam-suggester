@@ -48,7 +48,7 @@ const SimilarGames = (props: DetailsPropsType) => {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [steamGameId]);
 
   if (!data || loading) {
     return (
@@ -63,7 +63,7 @@ const SimilarGames = (props: DetailsPropsType) => {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-2 gap-4">
       {data.map((game: SimilarGamePropsType) => (
         <DisplayGame 
           key={game.steamGameId} 
