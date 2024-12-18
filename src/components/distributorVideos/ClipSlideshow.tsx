@@ -25,11 +25,6 @@ const ClipSlideshow = (props: Props) => {
     );
   };
 
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 10000);
-    return () => clearInterval(timer);
-  }, [data.length, nextSlide]);
-
   return (
     <div>
       <div className="relative flex items-center justify-center">

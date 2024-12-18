@@ -1,3 +1,4 @@
+/*StackedAreaChart.tsx*/
 'use client'
 import { AreaStack } from '@visx/shape';
 import { SeriesPoint } from '@visx/shape/lib/types';
@@ -17,7 +18,7 @@ const StackedAreaChart =({
   width,
   height,
   labelTxt,
-  margin = { top: 10, right: 0, bottom: 0, left: 0 },
+  margin = { top: 0, right: 0, bottom: 0, left: 0 },
   colorRange,
 }: StackedAreasProps) => {
   const yMax = height - margin.top - margin.bottom;
@@ -105,4 +106,3 @@ const StackedAreaChart =({
 }
 
 export default StackedAreaChart
-

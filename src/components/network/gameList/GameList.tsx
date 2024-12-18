@@ -12,6 +12,17 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
+import StarIcon from '@mui/icons-material/Star';
+import LanguageIcon from '@mui/icons-material/Language';
+import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
+import DevicesIcon from '@mui/icons-material/Devices';
+import MultilineChartIcon from '@mui/icons-material/MultilineChart';
+import InfoIcon from '@mui/icons-material/Info';
+import LaptopWindowsIcon from '@mui/icons-material/LaptopWindows';
+import AppleIcon from '@mui/icons-material/Apple';
+import PersonIcon from '@mui/icons-material/Person';
+import GroupIcon from '@mui/icons-material/Group';
+import Tooltip from '@mui/material/Tooltip';
 import PriceDisplay from "./PriceDisplay";
 
 type Props = {
@@ -29,7 +40,7 @@ const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 const GameList = (props: Props) => {
   const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
   const router = useRouter();
-
+  console.log(nodes[0])
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
@@ -264,7 +275,7 @@ const GameList = (props: Props) => {
                         onClick={() => handleGameClick(nodeIndex)}
                       >
                         <div className="flex items-center">
-                          <div className={`${rankColor} pb-2 p-2`}>
+                          <div className={`${rankColor} pb-2 p-2 whitespace-nowrap`}>
                             {node.index + 1}位
                           </div>
                           <div className="text-white p-2">
@@ -293,40 +304,98 @@ const GameList = (props: Props) => {
                             }}
                             className="object-cover"
                           />
-                          {/* タグ表示部分 */}
-                          <div className="text-white mt-2">
-                            <strong>タグ:</strong> 
-                            {node.tags && node.tags.length > MAX_VISIBLE_TAGS ? (
-                              <>
-                                {isTagsExpanded 
-                                  ? node.tags.join(", ") 
-                                  : node.tags.slice(0, MAX_VISIBLE_TAGS).join(", ")}
-                                <button 
-                                  className="ml-2 text-blue-400 hover:underline focus:outline-none"
-                                  onClick={toggleTags}
-                                >
-                                  {isTagsExpanded ? "一部のタグのみ表示" : "全てのタグを表示"}
-                                </button>
-                              </>
-                            ) : (
-                              node.tags?.join(", ") || "No tags"
+                          
+                          {/* Short Details */}
+                          <div className="flex items-start my-2">
+                            <InfoIcon className="mt-1 mr-1 mb-1" />
+                            <div className="max-h-20 overflow-y-auto">
+                              <p className="text-sm">{node.shortDetails}</p>
+                            </div>
+                          </div>
+
+                          {/* ジャンル */}
+                          {node.genres && node.genres.length > 0 && (
+                              <div className="flex items-center space-x-0.5 overflow-x-auto short-overflow-y">
+                                {/* <StarIcon className="flex-shrink-0" /> */}
+                                {/* <div className="flex space-x-1"> */}
+                                  {node.genres.map((genre, index) => (
+                                    <span key={index} className="bg-blue-500 text-xs text-white px-1 py-0 rounded flex-shrink-0">
+                                      {genre}
+                                    </span>
+                                  ))}
+                                {/* </div> */}
+                              </div>
+                            )}
+
+                            {/* タグ */}
+                            <div className="text-white mt-2">
+                              {/* <strong>タグ:</strong> */}
+                              {node.tags && node.tags.length > 0 && (
+                                <div className="flex items-center space-x-0.5 overflow-x-auto mt-1 short-overflow-y">
+                                  {node.tags.map((tag, index) => (
+                                    <span
+                                      key={index}
+                                      className="bg-green-500 text-xs text-white px-1 py-0 rounded whitespace-nowrap flex-shrink-0"
+                                      title={tag} // ツールチップとしてタグ名を表示
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                              
+                          {/* アイコン表示block */}
+                          <div className="flex items-center space-x-1 mt-1 mb-2">
+                            {/* デバイスサポート */}
+                            {node.device.windows && 
+                              <Tooltip title="windows対応">
+                                <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 40 40" width="20px" height="20px"><path d="M26 6H42V22H26zM38 42H26V26h16v12C42 40.209 40.209 42 38 42zM22 22H6V10c0-2.209 1.791-4 4-4h12V22zM6 26H22V42H6z" fill="white"/></svg>
+                              </Tooltip>
+                            }
+                            {node.device.mac && 
+                              <Tooltip title="mac対応">
+                                <AppleIcon className="text-white h-5 w-5" />
+                              </Tooltip>
+                            }
+
+                            {/* マルチプレイヤー情報 */}
+                            {node.isSinglePlayer && (
+                              <Tooltip title="Single Player">
+                                <PersonIcon className="text-white h-5 w-5" />
+                              </Tooltip>
+                            )}
+                            {node.isMultiPlayer && (
+                              <Tooltip title="Multiplayer">
+                                <GroupIcon className="text-white h-5 w-5" />
+                              </Tooltip>
                             )}
                           </div>
-                          <div className="mt-2">
-                            <strong>ジャンル:</strong> {node.genres?.join(", ") || "ジャンルなし"}
-                          </div>
-                          <div className="mt-2">
-                            <strong>リリース日:</strong> {node.releaseDate}
-                          </div>
-                          <div className="mt-2">
-                            <strong>開発者:</strong> {node.developerName}
+
+                          {/* Developer & Release Date */}
+                          <div className="flex items-center">
+                              {/* <DeveloperModeIcon className="mr-2" /> */}
+                              <span className="text-sm mb-1">開発者: {node.developerName}</span>
+                            </div>
+                            <div className="flex items-center">
+                              {/* <LanguageIcon className="mr-2" /> */}
+                              <span className="text-sm mb-1">発売日: {node.releaseDate}</span>
                           </div>
 
-
-                          {/* 価格表示 */}
-                          <div className="text-white mt-2">
-                            <PriceDisplay node={node} />
+                          {/* 価格 */}
+                          <div className="flex items-center">
+                            <div>価格: </div>
+                            {node.salePrice && parseInt(node.salePrice, 10) < node.price ? (
+                              <>
+                                <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
+                                <span className="text-red-500 ml-2">¥{node.salePrice}</span>
+                              </>
+                            ) : (
+                              <span className="text-sm ml-2">{node.price ? `¥${node.price}` : "無料"}</span>
+                            )}
                           </div>
+
                           {/* アクションボタン */}
                           <div className="mt-4 flex space-x-2">
                             <button
