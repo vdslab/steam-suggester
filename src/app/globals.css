@@ -36,6 +36,10 @@ body {
   background-color: #dbdbdb;
 }
 
+.short-overflow-y::-webkit-scrollbar {
+  height: 7px;
+}
+
 /* ランキングデザイン */
 @keyframes gradient {
   0% {
@@ -51,24 +55,47 @@ body {
   }
 }
 
-.gold, .silver, .bronze {
+.gold,
+.silver,
+.bronze {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   background-size: 800% 400%;
-  animation: gradient 5s infinite cubic-bezier(.62, .28, .23, .99) both;
+  animation: gradient 5s infinite cubic-bezier(0.62, 0.28, 0.23, 0.99) both;
   display: inline-block;
   font-weight: bold;
 }
 
 .gold {
-  background-image: linear-gradient(45deg, #DAAF08 0%, #DAAF08 45%, #FEE9A0 70%, #DAAF08 85%, #DAAF08 90% 100%);
+  background-image: linear-gradient(
+    45deg,
+    #daaf08 0%,
+    #daaf08 45%,
+    #fee9a0 70%,
+    #daaf08 85%,
+    #daaf08 90% 100%
+  );
 }
 
 .silver {
-  background-image: linear-gradient(45deg, #757575 0%, #9E9E9E 45%, #E8E8E8 70%, #9E9E9E 85%, #757575 90% 100%);
+  background-image: linear-gradient(
+    45deg,
+    #757575 0%,
+    #9e9e9e 45%,
+    #e8e8e8 70%,
+    #9e9e9e 85%,
+    #757575 90% 100%
+  );
 }
 
 .bronze {
-  background-image: linear-gradient(45deg, #a57e65 0%, #a57e65 45%, #f3cfb8 70%, #a57e65 85%, #a57e65 90% 100%);
+  background-image: linear-gradient(
+    45deg,
+    #a57e65 0%,
+    #a57e65 45%,
+    #f3cfb8 70%,
+    #a57e65 85%,
+    #a57e65 90% 100%
+  );
 }
