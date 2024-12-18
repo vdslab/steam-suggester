@@ -86,7 +86,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
       {/* Genres */}
       {node.genres && node.genres.length > 0 && (
         <div className="flex items-center space-x-2 text-white overflow-x-auto h-8 mt-4 genres-scrollbar">
-          <strong>タグ:</strong>
+          <strong>ジャンル:</strong>
           <div className="flex space-x-2 items-center">
             {node.genres.map((genre, index) => (
               <span
@@ -103,7 +103,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
       {/* タグ */}
       {node.tags && node.tags.length > 0 && (
         <div className="text-white mt-2">
-          <strong>詳細タグ:</strong>
+          <strong>詳細ジャンル:</strong>
           <div className="items-center mt-1">
             {node.tags.map((tag, index) => (
               <span
@@ -187,7 +187,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
       </div>
 
       {/* Reviews */}
-      {node.review && (
+      {/* {node.review && (
         <div className="space-y-1 mt-2">
           <span className="text-sm font-semibold text-gray-300">レビュー:</span>
           <div className="flex flex-wrap">
@@ -199,7 +199,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

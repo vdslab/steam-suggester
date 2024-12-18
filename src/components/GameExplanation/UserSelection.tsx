@@ -43,7 +43,7 @@ const UserSelection: React.FC<Props> = ({
       <div className="mb-2">
         <strong className="text-white">価格範囲:</strong>
         <div className="flex flex-wrap mt-2">
-          <span className="bg-green-600 text-xs text-white px-2 py-1 rounded mr-2 mb-2 flex items-center">
+          <span className="bg-orange-600 text-xs text-white px-2 py-1 rounded mr-2 mb-2 flex items-center">
             ¥{priceRange.startPrice} - ¥{priceRange.endPrice}
           </span>
         </div>
@@ -80,7 +80,7 @@ const UserSelection: React.FC<Props> = ({
       </div>
       
       {/* プレイ時間 */}
-      <div className="mb-2">
+      {/* <div className="mb-2">
         <strong className="text-white">プレイ時間:</strong>
         <div className="flex flex-wrap mt-2">
           {playtimes.map((time, index) => (
@@ -92,7 +92,7 @@ const UserSelection: React.FC<Props> = ({
             </span>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

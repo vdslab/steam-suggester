@@ -306,8 +306,8 @@ const GameList = (props: Props) => {
                           />
                           
                           {/* Short Details */}
-                          <div className="flex items-start">
-                            <InfoIcon className="mt-1 mr-1" />
+                          <div className="flex items-start my-2">
+                            <InfoIcon className="mt-1 mr-1 mb-1" />
                             <div className="max-h-20 overflow-y-auto">
                               <p className="text-sm">{node.shortDetails}</p>
                             </div>
