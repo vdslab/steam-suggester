@@ -100,7 +100,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
         </div>
       )}
 
-      {/* タグ */}
+      {/* 詳細ジャンル */}
       {node.tags && node.tags.length > 0 && (
         <div className="text-white mt-2">
           <strong>詳細ジャンル:</strong>
@@ -108,7 +108,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
             {node.tags.map((tag, index) => (
               <span
                 key={index}
-                className="bg-green-600 text-xs text-white px-2 py-1 rounded whitespace-nowrap"
+                className="bg-green-600 text-xs text-white px-2 py-1 mr-1 rounded whitespace-nowrap"
                 title={tag}
               >
                 {tag}
