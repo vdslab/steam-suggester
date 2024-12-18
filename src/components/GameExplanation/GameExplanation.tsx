@@ -70,6 +70,7 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
         width={1000}
         height={500}
         className="w-full h-auto rounded"
+        priority
       />
 
       {/* ゲームタイトル */}
