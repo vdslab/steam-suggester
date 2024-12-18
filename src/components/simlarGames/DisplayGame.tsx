@@ -16,14 +16,14 @@ const DisplayGame = (props: SimilarGamePropsType) => {
       href={`${basePath}/details?steam_id=${steamGameId}&twitch_id=${twitchGameId}`}
       className="block bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
     >
-      <div className="relative w-full h-40">
+      <div className="relative w-full">
         <Image
           src={imgURL}
           alt={title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+          width={3000}
+          height={0}
           style={{ objectFit: "cover" }}
-          className="transform hover:scale-105 transition-transform duration-300"
+          className="w-auto h-auto transform hover:scale-105 transition-transform duration-300"
           priority
         />
       </div>

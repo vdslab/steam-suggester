@@ -296,7 +296,7 @@ const StreamedList = (props: Props) => {
           severity="error"
           sx={{ width: '100%' }}
         >
-          データが見つかりませんでした。もう一度お試しください。
+          データが見つかりませんでした。別の配信者でお試しください。
         </Alert>
       </Snackbar>
 
@@ -324,14 +324,14 @@ const StreamedList = (props: Props) => {
             placeholder="ここに配信者を入力"
             value={searchStreamerQuery}
             onChange={(e) => setSearchStreamerQuery(e.target.value)}
-            className="w-3/4 flex-grow px-3 py-1 rounded-l-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out text-black"
+            className="w-3/4 flex-grow px-3 py-1 border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out text-black"
           />
           <Button
             variant="contained"
             color="primary"
             onClick={handleSearch}
             disabled={isSearching}
-            className="rounded-r-lg"
+            className="rounded-none"
           >
             {isSearching ? <CircularProgress size={24} color="inherit" /> : '検索'}
           </Button>
