@@ -23,8 +23,11 @@ type FriendsGames = {
 };
 
 type GetFriendGamesResponse = {
-  steamId: string[],
-  appId: string,
+  friends: {
+    name: string,
+    avatar: string
+  }[],
+  gameName: string
 };
 
 type GetPlayerSummariesResponse = {

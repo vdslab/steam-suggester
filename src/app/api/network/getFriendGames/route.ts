@@ -16,17 +16,20 @@ export async function GET(req: NextRequest) {
     const friendListData: GetFriendListResponse = await friendsResponse.json();
     const friends: Friends[] = friendListData.friendslist?.friends || [];
 
-    const friendNameMap = new Map<string, string>(); // steamId をキーにフレンド名をマップ
+    const friendNameMap = new Map<string, { name: string, avatar: string }>(); // steamId をキーにフレンド名をマップ
 
     // フレンドの名前を取得
     const friendIds = friends.map(friend => friend.steamid).join(",");
     const playerSummariesResponse = await fetch(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2?key=${apiKey}&steamids=${friendIds}`);
     const playerSummariesData: GetPlayerSummariesResponse = await playerSummariesResponse.json();
     for (const player of playerSummariesData.response.players) {
-      friendNameMap.set(player.steamid, player.personaname);
+      friendNameMap.set(player.steamid, {
+        name: player.personaname,
+        avatar: player.avatarfull
+      });
     }
 
-    const gameFriendMap = new Map<string, { friendsName: string[], gameName: string }>();
+    const gameFriendMap = new Map<string, { friends: { name: string, avatar: string }[], gameName: string }>();
 
     const client = await PG_POOL.connect();
 
@@ -43,7 +46,7 @@ export async function GET(req: NextRequest) {
 
       for (const game of gamesData.response.games) {
         const appId = game.appid;
-        const friendName = friendNameMap.get(friend.steamid) || "Unknown Friend";
+        const friendData = friendNameMap.get(friend.steamid) || { name: "Unknown Friend", avatar: "" };
 
         // ゲームタイトルを取得
         const result = await client.query(
@@ -60,12 +63,12 @@ export async function GET(req: NextRequest) {
         // 既に存在する場合、フレンド名を追加（重複を防ぐためにチェック）
         if (gameFriendMap.has(appId)) {
           const entry = gameFriendMap.get(appId)!;
-          if (!entry.friendsName.includes(friendName)) {
-            entry.friendsName.push(friendName);
+          if (!entry.friends.some(f => f.name === friendData.name)) {
+            entry.friends.push(friendData);
           }
         } else {
           gameFriendMap.set(appId, {
-            friendsName: [friendName],
+            friends: [friendData],
             gameName
           });
         }

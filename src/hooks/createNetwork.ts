@@ -3,16 +3,20 @@ import { Filter, SliderSettings } from "@/types/api/FilterType";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
-import { calculateSimilarityMatrix } from "@/hooks/calcWeight";
 import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 
 const k = 4;
-const CLUSTER_ITERATIONS = 3; // クラスタ再計算の回数
 
 const getRandomCoordinates = (range: number): { x: number; y: number } => {
   const x = Math.random() * range - range / 2;
   const y = Math.random() * range - range / 2;
   return { x, y };
+};
+
+const jaccardSimilarity = (setA: Set<string>, setB: Set<string>): number => {
+  const intersection = new Set([...setA].filter((x) => setB.has(x)));
+  const union = new Set([...setA, ...setB]);
+  return union.size === 0 ? 0 : intersection.size / union.size;
 };
 
 const createNetwork = async (
@@ -35,6 +39,7 @@ const createNetwork = async (
   const slicedData = data.slice(0, GAME_COUNT);
   if (onProgress) onProgress(20);
 
+  // 追加で取得が必要なゲーム詳細情報を取得
   const promises = gameIds
     .filter((gameId) => !slicedData.find((d) => d.steamGameId === gameId))
     .map(async (gameId, index, array) => {
@@ -56,6 +61,7 @@ const createNetwork = async (
   await Promise.all(promises);
   if (onProgress) onProgress(40);
 
+  // フィルターに合致したノード群を抽出
   const rawNodes = slicedData.filter((item) => {
     return (
       filter.Price.startPrice <= item.price &&
@@ -67,7 +73,7 @@ const createNetwork = async (
   });
 
   const nodes: NodeType[] = rawNodes.map((item, i) => {
-    const { x, y } = getRandomCoordinates(1000);
+    const { x, y } = getRandomCoordinates(2000);
     return {
       ...item,
       index: i,
@@ -84,121 +90,118 @@ const createNetwork = async (
   }
   if (onProgress) onProgress(60);
 
-  const similarityMatrix = calculateSimilarityMatrix(nodes, slider);
+  // 類似度行列を計算（Jaccard類似度）
+  const similarityMatrix: number[][] = [];
+  for (let i = 0; i < nodes.length; i++) {
+    similarityMatrix[i] = [];
+    const setA = new Set(nodes[i].tags ?? []);
+    for (let j = 0; j < nodes.length; j++) {
+      if (i === j || !nodes[i].similarGames?.find((id) => id === nodes[j].steamGameId)) {
+        similarityMatrix[i][j] = 0;
+        continue;
+      }
+      const setB = new Set(nodes[j].tags ?? []);
+      const similarity = jaccardSimilarity(setA, setB);
+      similarityMatrix[i][j] = similarity;
+    }
+  }
   if (onProgress) onProgress(70);
 
-  for (let iteration = 0; iteration < CLUSTER_ITERATIONS; iteration++) {
-    const clusterCenters = new Map<number, { x: number; y: number }>();
+  const links: LinkType[] = [];
+  const connectionCounts = new Map<number, number>(); // 各ノードの接続数を追跡
+  const usedConnections = new Set<string>(); // 接続済みのペアを記録
 
-    nodes.forEach((node, i) => {
-      if (!clusterCenters.has(i)) {
-        clusterCenters.set(i, getRandomCoordinates(2000));
-      }
-    });
+  nodes.forEach((sourceNode) => {
+    const sourceIndex = sourceNode.index;
 
-    const clusterForce = (alpha: number) => {
-      const strength = 0.1;
-      nodes.forEach((sourceNode, i) => {
-        const targetIndex = similarityMatrix[i].reduce(
-          (bestIndex, score, index) =>
-            score > similarityMatrix[i][bestIndex] ? index : bestIndex,
-          0
-        );
+    // 類似度の降順にソート
+    const similarities = similarityMatrix[sourceIndex]
+      .map((similarity, targetIndex) => ({ similarity, targetIndex }))
+      .filter((d) => d.targetIndex !== sourceIndex)
+      .sort((a, b) => b.similarity - a.similarity);
 
-        const clusterCenter = clusterCenters.get(targetIndex);
-        if (clusterCenter) {
-          const dx = clusterCenter.x - (sourceNode.x ?? 0);
-          const dy = clusterCenter.y - (sourceNode.y ?? 0);
-          sourceNode.vx = (sourceNode.vx ?? 0) + dx * strength * alpha;
-          sourceNode.vy = (sourceNode.vy ?? 0) + dy * strength * alpha;
-        }
-      });
-    };
+    let addedLinks = 0; // 追加したリンクの数をカウント
 
-    const sizeScale = d3
+    for (const { similarity, targetIndex } of similarities) {
+      if (addedLinks >= k || similarity === 0) break; // k本以上の接続を許可しない
+
+      // 接続済みのペアをスキップ
+      const linkKey = `${Math.min(sourceIndex, targetIndex)}-${Math.max(sourceIndex, targetIndex)}`;
+      if (usedConnections.has(linkKey)) continue;
+
+      // 両ノードが最大5本までの接続を持っている場合はスキップ
+      const sourceConnections = connectionCounts.get(sourceIndex) || 0;
+      const targetConnections = connectionCounts.get(targetIndex) || 0;
+      if (sourceConnections >= k || targetConnections >= k) continue;
+
+      // 接続を作成
+      links.push({ source: nodes[sourceIndex], target: nodes[targetIndex] });
+      usedConnections.add(linkKey);
+
+      // 接続数を更新
+      connectionCounts.set(sourceIndex, sourceConnections + 1);
+      connectionCounts.set(targetIndex, targetConnections + 1);
+
+      addedLinks++;
+    }
+  });
+
+
+  // ノードサイズ等をスケーリング
+  const sizeScale = d3
     .scaleSqrt()
     .domain(d3.extent(nodes, (d) => d.activeUsers) as [number, number])
     .range([1, 6]);
 
-    nodes.forEach((node: NodeType, i) => {
-      node.circleScale = sizeScale(node.activeUsers ?? 0);
-    });
+  nodes.forEach((node: NodeType) => {
+    node.circleScale = sizeScale(node.activeUsers ?? 0);
+  });
 
-    const simulation = d3
-      .forceSimulation(nodes)
-      .force("charge", d3.forceManyBody<NodeType>().strength(-200))
-      .force("center", d3.forceCenter(0, 0))
-      .force("collide", d3.forceCollide<NodeType>().radius((d) => (d.circleScale ?? 1) * 30))
-      .on("tick", () => {
-        clusterForce(simulation.alpha());
-      });
+  const simulation = d3
+    .forceSimulation<NodeType>(nodes)
+    .force("charge", d3.forceManyBody<NodeType>().strength(-400))
+    .force("center", d3.forceCenter(0, 0).strength(0.05))
+    .force(
+      "collide",
+      d3.forceCollide<NodeType>()
+        .radius((d) => (d.circleScale ?? 1) * 30)
+        .iterations(3)
+    )
+    .force(
+      "link",
+      d3.forceLink<NodeType, LinkType>(links)
+        .id((d) => d.index)
+        .distance((link) => {
+          const sourceNode = link.source as NodeType;
+          const targetNode = link.target as NodeType;
+          const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
+          return 150 - similarity * 75;
+        })
+        .strength((link) => {
+          const sourceNode = link.source as NodeType;
+          const targetNode = link.target as NodeType;
+          const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
+          return 1 + similarity * 2;
+        })
+    )
+    .force(
+      "radial",
+      d3.forceRadial(800).strength(0.1)
+    )
+    .force(
+      "cluster",
+      d3.forceManyBody<NodeType>()
+        .strength((node) => -25 * (node.circleScale ?? 1))
+    )
 
-    await new Promise<void>((resolve) => {
-      simulation.on("end", resolve);
-    });
-
-    simulation.stop();
-
-    clusterCenters.clear();
-    nodes.forEach((node, i) => {
-      clusterCenters.set(i, { x: node.x ?? 0, y: node.y ?? 0 });
-    });
-
-    if (onProgress) {
-      const progress = 70 + ((iteration + 1) / CLUSTER_ITERATIONS) * 20;
-      onProgress(progress);
-    }
+  while (simulation.alpha() > 0.01) {
+    simulation.tick();
   }
+  simulation.stop();
 
-  const links: LinkType[] = [];
-  const connectionCount = new Map<number, number>();
+  if (onProgress) onProgress(90);
 
-  nodes.sort((a, b) => {
-    if ((a.x ?? 0) === (b.x ?? 0)) {
-      return (a.y ?? 0) - (b.y ?? 0);
-    }
-    return (a.x ?? 0) - (b.x ?? 0);
-  });
-
-  nodes.forEach((sourceNode, index) => {
-    const sourceIndex = sourceNode.index;
-
-    const distances = nodes
-      .filter((targetNode) => targetNode !== sourceNode)
-      .map((targetNode) => ({
-        targetNode,
-        distance: Math.sqrt(
-          Math.pow((sourceNode.x ?? 0) - (targetNode.x ?? 0), 2) +
-          Math.pow((sourceNode.y ?? 0) - (targetNode.y ?? 0), 2)
-        ),
-      }))
-      .sort((a, b) => a.distance - b.distance);
-
-    let addedLinks = 0;
-    distances.forEach(({ targetNode }) => {
-      const targetIndex = targetNode.index;
-
-      const sourceConnections = connectionCount.get(sourceIndex) ?? 0;
-      const targetConnections = connectionCount.get(targetIndex) ?? 0;
-
-      if (sourceConnections < k && targetConnections < k) {
-        links.push({
-          source: sourceIndex,
-          target: targetIndex,
-        });
-
-        connectionCount.set(sourceIndex, sourceConnections + 1);
-        connectionCount.set(targetIndex, targetConnections + 1);
-
-        addedLinks++;
-
-        if (addedLinks >= k) return;
-      }
-    });
-  });
-
-  nodes.sort((a, b) => a.index - b.index);
-
+  // 類似ゲーム一覧の生成
   const similarGames: SimilarGameType = {};
   nodes.forEach((sourceNode) => {
     const sourceId = sourceNode.steamGameId;
@@ -206,10 +209,10 @@ const createNetwork = async (
 
     links.forEach((link) => {
       const targetNode =
-        link.source === sourceNode.index
-          ? nodes[link.target as number]
-          : link.target === sourceNode.index
-          ? nodes[link.source as number]
+        link.source.index === sourceNode.index
+          ? link.target
+          : link.target.index === sourceNode.index
+          ? link.source
           : null;
 
       if (targetNode) {
@@ -220,6 +223,8 @@ const createNetwork = async (
       }
     });
   });
+
+  if (onProgress) onProgress(100);
 
   return { nodes, links, similarGames };
 };

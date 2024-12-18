@@ -22,6 +22,8 @@ export type SteamDetailsDataType = {
   graphics: number;
   story: number;
   music: number;
+
+  similarGames: string[];
 }
 
 export type SteamDetailApiType = {

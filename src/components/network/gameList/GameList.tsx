@@ -23,6 +23,7 @@ import AppleIcon from '@mui/icons-material/Apple';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 import Tooltip from '@mui/material/Tooltip';
+import PriceDisplay from "./PriceDisplay";
 
 type Props = {
   nodes: NodeType[];
@@ -177,7 +178,6 @@ const GameList = (props: Props) => {
   // メッセージ表示の条件判定
   const showNoResultsMessage = searchQuery !== '' && filteredNodeList.length === 0;
   const showAddGameMessage = showNoResultsMessage && filteredSteamList.length > 0;
-  const showNoGameFoundMessage = showNoResultsMessage && filteredSteamList.length === 0;
 
   // 判定用フラグ: いずれかのゲームが選択されているか
   const anyGameSelected = selectedIndex !== -1;
@@ -319,7 +319,7 @@ const GameList = (props: Props) => {
                                 {/* <StarIcon className="flex-shrink-0" /> */}
                                 {/* <div className="flex space-x-1"> */}
                                   {node.genres.map((genre, index) => (
-                                    <span key={index} className="bg-blue-500 text-xs text-white px-1 py-0.5 rounded flex-shrink-0">
+                                    <span key={index} className="bg-blue-500 text-xs text-white px-1 py-0 rounded flex-shrink-0">
                                       {genre}
                                     </span>
                                   ))}
@@ -347,7 +347,7 @@ const GameList = (props: Props) => {
 
                               
                           {/* アイコン表示block */}
-                          <div className="flex items-center space-x-1 mb-2">
+                          <div className="flex items-center space-x-1 mt-1 mb-2">
                             {/* デバイスサポート */}
                             {node.device.windows && 
                               <Tooltip title="windows対応">
@@ -375,16 +375,17 @@ const GameList = (props: Props) => {
 
                           {/* Developer & Release Date */}
                           <div className="flex items-center">
-                              <DeveloperModeIcon className="mr-2" />
-                              <span className="text-sm">{node.developerName}</span>
+                              {/* <DeveloperModeIcon className="mr-2" /> */}
+                              <span className="text-sm mb-1">開発者: {node.developerName}</span>
                             </div>
                             <div className="flex items-center">
-                              <LanguageIcon className="mr-2" />
-                              <span className="text-sm">{node.releaseDate}発売</span>
+                              {/* <LanguageIcon className="mr-2" /> */}
+                              <span className="text-sm mb-1">発売日: {node.releaseDate}</span>
                           </div>
 
                           {/* 価格 */}
-                          <div className="flex items-center p-1">
+                          <div className="flex items-center">
+                            <div>価格: </div>
                             {node.salePrice && parseInt(node.salePrice, 10) < node.price ? (
                               <>
                                 <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
