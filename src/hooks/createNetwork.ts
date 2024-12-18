@@ -177,12 +177,13 @@ const createNetwork = async (
           const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
           return 150 - similarity * 75;
         })
-        .strength((link) => {
-          const sourceNode = link.source as NodeType;
-          const targetNode = link.target as NodeType;
-          const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
-          return 1 + similarity * 2;
-        })
+        // .strength((link) => {
+        //   const sourceNode = link.source as NodeType;
+        //   const targetNode = link.target as NodeType;
+        //   const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
+        //   console.log(1 + similarity * 2);
+        //   return 1 + similarity * 2;
+        // })
     )
     .force(
       "radial",
