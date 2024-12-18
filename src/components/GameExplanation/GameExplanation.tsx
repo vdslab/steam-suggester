@@ -137,10 +137,8 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
             <AppleIcon className="text-white h-5 w-5" />
           </Tooltip>
         )}
-      </div>
 
       {/* マルチプレイヤー情報 */}
-      <div className="flex items-center space-x-2 mt-2">
         {node.isSinglePlayer && (
           <Tooltip title="Single Player">
             <PersonIcon className="text-white h-5 w-5" />
@@ -154,13 +152,13 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
       </div>
 
       {/* Developer & Release Date */}
-      <div className="flex items-center mt-2">
+      <div className="flex items-center mt-4">
         <DeveloperModeIcon className="mr-2 text-white" />
-        <span className="text-sm text-gray-300">{node.developerName}</span>
+        <span className="text-sm text-gray-300">開発者: {node.developerName}</span>
       </div>
       <div className="flex items-center mt-1">
         <LanguageIcon className="mr-2 text-white" />
-        <span className="text-sm text-gray-300">{node.releaseDate} 発売</span>
+        <span className="text-sm text-gray-300">発売日: {node.releaseDate}</span>
       </div>
 
       {/* 価格 */}
