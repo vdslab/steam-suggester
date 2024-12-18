@@ -40,7 +40,6 @@ const MAX_VISIBLE_TAGS = 3; // 表示する最大タグ数
 const GameList = (props: Props) => {
   const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
   const router = useRouter();
-  console.log(nodes[0])
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
@@ -126,6 +125,7 @@ const GameList = (props: Props) => {
       setUserAddedGames(newUserAddedGames);
       (async () => {
         await changeGameIdData(newUserAddedGames);
+        setSearchQuery('')
         // TODO:
         if(setIsNetworkLoading) {
           setIsNetworkLoading(true);
@@ -142,6 +142,7 @@ const GameList = (props: Props) => {
     setUserAddedGames(newUserAddedGames);
     (async () => {
       await changeGameIdData(newUserAddedGames);
+      setSearchQuery('')
       // TODO:
       if(setIsNetworkLoading) {
         setIsNetworkLoading(true);

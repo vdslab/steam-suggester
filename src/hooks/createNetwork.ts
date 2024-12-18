@@ -4,8 +4,9 @@ import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
 import { GAME_COUNT } from "@/constants/NETWORK_DATA";
+import fetchWithCache from "./fetchWithCache";
 
-const k = 4;
+const k = 3;
 
 const getRandomCoordinates = (range: number): { x: number; y: number } => {
   const x = Math.random() * range - range / 2;
@@ -19,6 +20,7 @@ const jaccardSimilarity = (setA: Set<string>, setB: Set<string>): number => {
   return union.size === 0 ? 0 : intersection.size / union.size;
 };
 
+
 const createNetwork = async (
   filter: Filter,
   gameIds: string[],
@@ -26,16 +28,10 @@ const createNetwork = async (
   onProgress?: (progress: number) => void
 ): Promise<{ nodes: NodeType[]; links: LinkType[]; similarGames: SimilarGameType }> => {
   if (onProgress) onProgress(0);
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    { next: { revalidate: ISR_FETCH_INTERVAL } }
+
+  const data: SteamDetailsDataType[] = await fetchWithCache(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`
   );
-
-  if (!response.ok) {
-    return { nodes: [], links: [], similarGames: {} };
-  }
-
-  const data: SteamDetailsDataType[] = await response.json();
   const slicedData = data.slice(0, GAME_COUNT);
   if (onProgress) onProgress(20);
 
@@ -43,13 +39,12 @@ const createNetwork = async (
   const promises = gameIds
     .filter((gameId) => !slicedData.find((d) => d.steamGameId === gameId))
     .map(async (gameId, index, array) => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`,
-        { next: { revalidate: ISR_FETCH_INTERVAL } }
-      );
-      if (res.ok) {
-        const d: SteamDetailsDataType = await res.json();
+      const url = `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`;
+      try {
+        const d: SteamDetailsDataType = await fetchWithCache(url);
         slicedData.push(d);
+      } catch (error) {
+        console.error(error);
       }
 
       if (onProgress) {
