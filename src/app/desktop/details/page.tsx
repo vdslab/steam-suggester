@@ -31,14 +31,11 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
             <GameExplanation
               steamGameId={steamGameId}
             />
+            <UserSelection />
           </div>
 
           {/* 中央カラム: GameExplanation */}
           <div className="lg:col-span-1 space-y-6">
-            {/* <MatchDegree
-              steamGameId={steamGameId}
-              twitchGameId={twitchGameId}
-            /> */}
             {/* 流行度 */}
             <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
               <Typography className="text-white font-semibold pb-3 pt-2">流行度</Typography>
