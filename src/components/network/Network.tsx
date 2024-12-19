@@ -61,9 +61,10 @@ const Network = () => {
       (node1: NodeType, node2: NodeType) =>
         (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
     );
-    if (centerX === 0 && centerY === 0 && buffNodes.length > 0) {
+    if (buffNodes.length > 0) {
       setCenterX((buffNodes[0]?.x ?? 0) - 150);
       setCenterY((buffNodes[0]?.y ?? 0) + 100);
+      setSelectedIndex(-1);
     }
     setNodes(nodes);
     setLinks(links);

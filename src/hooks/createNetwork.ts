@@ -6,7 +6,7 @@ import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
 import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 import fetchWithCache from "./fetchWithCache";
 
-const k = 3;
+const k = 4;
 
 const getRandomCoordinates = (range: number): { x: number; y: number } => {
   const x = Math.random() * range - range / 2;
@@ -58,7 +58,11 @@ const createNetwork = async (
 
   // フィルターに合致したノード群を抽出
   const rawNodes = slicedData.filter((item) => {
+    const isInGenresFilter = item.genres.find((genre) => {
+      return filter.Genres[genre]
+    });
     return (
+      isInGenresFilter &&
       filter.Price.startPrice <= item.price &&
       item.price <= filter.Price.endPrice &&
       ((item.isSinglePlayer && filter.Mode.isSinglePlayer) ||
