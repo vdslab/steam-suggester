@@ -6,8 +6,6 @@ import GameExplanation from "@/components/GameExplanation/GameExplanation";
 import Popularity from "@/components/popularity/Popularity";
 import SimilarGames from "@/components/simlarGames/SimilarGames";
 import UserSelection from '@/components/GameExplanation/UserSelection';
-import MatchDegree from '@/components/GameExplanation/MatchDegree';
-import AccordionSection from '@/components/common/AccordionSection';
 import Typography from '@mui/material/Typography';
 
 
@@ -43,18 +41,19 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
             </div>
           </div>
 
-          {/* 右カラム: Accordionセクション */}
           <div className="lg:col-span-1 space-y-6">
             {/* 類似しているゲーム */}
-            <AccordionSection title="類似しているゲーム">
+            <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
+              <Typography className="text-white font-semibold p-3">類似しているゲーム</Typography>
               <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
-            </AccordionSection>
+            </div>
 
             {/* 配信者クリップ */}
-            <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
-              <Typography className="text-white font-semibold">配信者</Typography>
+            {/* <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
+              <Typography className="text-white font-semibold p-3">配信者</Typography>
               <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
-            </div>
+            </div> */}
+
           </div>
         </div>
       </div>

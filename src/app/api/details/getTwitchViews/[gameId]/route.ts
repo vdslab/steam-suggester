@@ -26,7 +26,7 @@ export async function GET(req: Request, params: Params) {
 
     const formatData =[]
 
-    for(let i = 0; i < 8; i++) {
+    for(let i = 0; i < 9; i++) {
 
       const date = new Date();
       // 指定日の0時0分0秒

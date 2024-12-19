@@ -66,7 +66,7 @@ const Popularity: React.FC<Props> = ({ twitchGameId, steamGameId }) => {
           {/* Steamレビュー数 */}
           <div className="border border-gray-500 p-3">
             <div className="text-white pb-3">Steamレビュー数</div>
-            <div className="w-full h-64">
+            <div className="w-full">
               <StackedAreaChart
                 data={steamData}
                 width={600}
@@ -80,7 +80,7 @@ const Popularity: React.FC<Props> = ({ twitchGameId, steamGameId }) => {
           {/* Twitch視聴数 */}
           <div className="border border-gray-500 p-3">
             <div className="text-white pb-3">Twitch視聴数</div>
-            <div className="w-full h-64">
+            <div className="w-full">
               <StackedAreaChart
                 data={twitchData}
                 width={600}

@@ -53,44 +53,45 @@ const GameExplanation = ({ steamGameId }:Props) => {
   return (
     <div className="rounded-lg overflow-hidden border border-gray-400 bg-gray-800 p-4">
       {/* ゲーム画像 */}
+
+
+      {/* Short Details */}
+      <div className="flex items-start mt-2">
       <Image
         src={node.imgURL}
         alt={`${node.title} Header`}
         width={1000}
         height={500}
-        className="w-2/3 h-auto rounded"
+        className="w-1/2 h-auto rounded mr-2"
         priority
       />
-
-      {/* Short Details */}
-      <div className="flex items-start mt-2">
-        <InfoIcon className="mt-1 mr-2 text-white" />
         <div className="p-1 short-details-scrollbar">
           <p className="text-sm text-gray-300">{node.shortDetails}</p>
         </div>
       </div>
 
       {/* Genres */}
-      {node.genres && node.genres.length > 0 && (
-        <div className="flex items-center space-x-2 text-white overflow-x-auto h-8 mt-4 genres-scrollbar">
+      {node.tags && node.tags.length > 0 && (
+        <div className="text-white mt-2">
           <strong>ジャンル:</strong>
-          <div className="flex space-x-2 items-center">
-            {node.genres.map((genre, index) => (
+          <div className="items-center mt-1">
+            {node.genres.map((tag, index) => (
               <span
                 key={index}
-                className="bg-blue-600 text-xs text-white px-2 py-1 rounded flex-shrink-0 flex items-center"
+                className="bg-blue-600 text-xs text-white px-2 py-1 mr-1 rounded whitespace-nowrap"
+                title={tag}
               >
-                {genre}
+                {tag}
               </span>
             ))}
           </div>
         </div>
-      )}
+    )}
 
       {/* 詳細ジャンル */}
       {node.tags && node.tags.length > 0 && (
         <div className="text-white mt-2">
-          <strong>詳細ジャンル:</strong>
+          <strong>タグ:</strong>
           <div className="items-center mt-1">
             {node.tags.map((tag, index) => (
               <span
@@ -134,7 +135,7 @@ const GameExplanation = ({ steamGameId }:Props) => {
       {/* Developer & Release Date */}
       <div className="flex items-center mt-4">
         <DeveloperModeIcon className="mr-2 text-white" />
-        <span className="text-sm text-gray-300">開発者: {node.developerName}</span>
+        <span className="text-sm text-gray-300">デベロッパー: {node.developerName}</span>
       </div>
       <div className="flex items-center mt-1">
         <LanguageIcon className="mr-2 text-white" />
@@ -161,7 +162,7 @@ const GameExplanation = ({ steamGameId }:Props) => {
       {/* Play Time */}
       <div className="flex items-center mt-2">
         <StarIcon className="mr-2 text-yellow-500" />
-        <span className="text-sm text-gray-300">プレイ時間: {node.playTime} 時間</span>
+        <span className="text-sm text-gray-300">平均プレイ時間: {node.playTime} 時間</span>
       </div>
 
       {/* Reviews */}

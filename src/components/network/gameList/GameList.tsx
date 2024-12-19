@@ -283,15 +283,16 @@ const GameList = (props: Props) => {
                             height={170}
                             style={{
                               borderRadius: "4px",
+                              marginBottom: "0.5rem"
                             }}
                             className="object-cover"
                           />
                           
-                          {/* Short Details */}
+                          {/* Short Details
                           <div className="flex items-start my-2">
                             <InfoIcon className="mt-1 mr-1 mb-1" />
                             <p className="text-sm">{node.shortDetails}</p>
-                          </div>
+                          </div> */}
 
                           {/* ジャンル */}
                           {node.genres && node.genres.length > 0 && (
@@ -308,7 +309,7 @@ const GameList = (props: Props) => {
                             <div className="text-white mt-2">
                               {node.tags && node.tags.length > 0 && (
                                 <div className="flex items-center space-x-0.5 mt-1 flex-wrap">
-                                  {node.tags.map((tag, index) => (
+                                  {node.tags.slice(0, 7).map((tag, index) => (
                                     <span
                                       key={index}
                                       className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded flex-shrink-0"
