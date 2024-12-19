@@ -88,8 +88,6 @@ const Network = () => {
     }
   }, [isLoading, isNetworkLoading]);
 
-  console.log(centerX, centerY);
-
   // Sidebar のトグル関数
   const toggleFilter = () => {
     setIsFilterOpen((prev) => {
