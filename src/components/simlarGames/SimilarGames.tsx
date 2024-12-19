@@ -7,6 +7,7 @@ import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import { CircularProgress } from '@mui/material';
 import fetchWithCache from "@/hooks/fetchWithCache";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
 type GameType = {
   steamGameId: string;
@@ -17,7 +18,7 @@ const SimilarGames = (props: DetailsPropsType) => {
 
   const { steamGameId, twitchGameId } = props;
 
-  const [data, setData] = useState<SimilarGamePropsType[]>([]);
+  const [data, setData] = useState<SteamDetailsDataType[]>([]);
   const [loading, setLoading] = useState(true);
 
 
@@ -64,13 +65,10 @@ const SimilarGames = (props: DetailsPropsType) => {
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      {data.map((game: SimilarGamePropsType) => (
+      {data.map((node: SteamDetailsDataType) => (
         <DisplayGame 
-          key={game.steamGameId} 
-          title={game.title} 
-          imgURL={game.imgURL} 
-          steamGameId={game.steamGameId} 
-          twitchGameId={game.twitchGameId} 
+          key={node.steamGameId} 
+          node={node}
         />
       ))}
     </div>

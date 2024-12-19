@@ -1,25 +1,32 @@
 "use client"
 import React from "react";
-import { SimilarGamePropsType } from "@/types/DetailsType";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
-const DisplayGame = (props: SimilarGamePropsType) => {
-  const { title, imgURL, steamGameId, twitchGameId } = props;
+type Props = {
+  node: SteamDetailsDataType;
+}
+
+const DisplayGame = (props:Props) => {
+
+  const { node } = props;
 
   const currentPath = usePathname();
   const basePath = currentPath.startsWith('/desktop') ? '/desktop' : '/mobile';
 
+  console.log(node);
+
   return (
     <Link
-      href={`${basePath}/details?steam_id=${steamGameId}&twitch_id=${twitchGameId}`}
+      href={`${basePath}/details?steam_id=${node.steamGameId}&twitch_id=${node.twitchGameId}`}
       className="block bg-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
     >
       <div className="relative w-full">
         <Image
-          src={imgURL}
-          alt={title}
+          src={node.imgURL}
+          alt={node.title}
           width={3000}
           height={0}
           style={{ objectFit: "cover" }}
@@ -28,7 +35,7 @@ const DisplayGame = (props: SimilarGamePropsType) => {
         />
       </div>
       <div className="p-4">
-        <p className="text-center text-white font-semibold">{title}</p>
+        <p className="text-center text-white font-semibold">{node.title}</p>
       </div>
     </Link>
   );
