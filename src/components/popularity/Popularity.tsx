@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { STEAM_COLOR_RANGE, TWITCH_COLOR_RANGE } from "@/constants/STYLES";
 import StackedAreaChart from "./StackedAreaChart";
-import Headline from "../common/Headline";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import CircularProgress from '@mui/material/CircularProgress';
 

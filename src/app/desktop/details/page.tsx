@@ -7,11 +7,16 @@ import Popularity from "@/components/popularity/Popularity";
 import SimilarGames from "@/components/simlarGames/SimilarGames";
 import UserSelection from '@/components/GameExplanation/UserSelection';
 import Typography from '@mui/material/Typography';
+import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 
 
-export default function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
+export default async function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
   const steamGameId = searchParams.steam_id || "";
   const twitchGameId = searchParams.twitch_id || "";
+
+  const data = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
+  const steamData:SteamDetailsDataType = await data.json()
+
 
   return (
     <div className="bg-gray-800 min-h-screen">
@@ -28,6 +33,7 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
           <div className="lg:col-span-2 space-y-6">
             <GameExplanation
               steamGameId={steamGameId}
+              steamDetailData={steamData}
             />
             <UserSelection />
           </div>
@@ -49,10 +55,10 @@ export default function Page({ searchParams }: { searchParams: { steam_id?: stri
             </div>
 
             {/* 配信者クリップ */}
-            {/* <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
+            <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
               <Typography className="text-white font-semibold p-3">配信者</Typography>
               <DistributorVideos twitchGameId={twitchGameId} steamGameId={steamGameId} />
-            </div> */}
+            </div>
 
           </div>
         </div>
