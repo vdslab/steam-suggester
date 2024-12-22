@@ -202,7 +202,7 @@ const Network = (props:Props) => {
         {/* Steam連携パネル */}
         {openPanel === "steamList" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <SteamList nodes={nodes} setSelectedIndex={setSelectedIndex}/>
+            <SteamList steamAllData={steamAllData} nodes={nodes} setSelectedIndex={setSelectedIndex}/>
           </div>
         )}
 

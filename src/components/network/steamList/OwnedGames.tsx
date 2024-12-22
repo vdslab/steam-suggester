@@ -13,11 +13,12 @@ import { Avatar, AvatarGroup, IconButton } from '@mui/material';
 import { fetcher } from '@/components/common/Fetcher';
 import { SteamListProps } from '@/types/Props';
 import SearchIcon from '@mui/icons-material/Search';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
 
 const OwnedGames = (props:SteamListProps) => {
 
-  const { nodes, setSelectedIndex } = props;
+  const { steamAllData, nodes, setSelectedIndex } = props;
 
   const { data: session, status } = useSession();
 
@@ -95,6 +96,21 @@ const OwnedGames = (props:SteamListProps) => {
     );
   }
 
+  const handleGameInNode = (game: GetFriendGamesResponse) => {
+    const nodeIndex = nodes.findIndex((node) => node.title == game.gameName);
+    if (nodeIndex !== -1){
+      setSelectedIndex(nodeIndex);
+    }
+  }
+
+  const isGameInNode = (game: GetFriendGamesResponse) => {
+    const nodeIndex = nodes.findIndex((node) => node.title == game.gameName);
+    if (nodeIndex !== -1){
+      return true;
+    }
+    return false;
+  }
+
   return (
     <Panel title="Steamゲーム一覧" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
       <div>
@@ -127,6 +143,7 @@ const OwnedGames = (props:SteamListProps) => {
                     <div className="p-2">{game.title}</div>
                     {nodes && (() => {
                       const nodeIndex = nodes.findIndex((node) => node.steamGameId == game.id);
+                      // const dataIndex = steamAllData.findIndex((data) => data.title == game.title);
                       if (nodeIndex !== -1) {
                         return (
                           <IconButton sx={{ color:'white' }} onClick={() => setSelectedIndex(nodeIndex)}>
@@ -134,6 +151,14 @@ const OwnedGames = (props:SteamListProps) => {
                           </IconButton>
                         );
                       }
+                      // TODO: 追加ボタン実装
+                      // } else if(dataIndex !== -1) {
+                      //   return(
+                      //     <IconButton sx={{ color:'white' }} onClick={() => console.log('add')}>
+                      //       <PlaylistAddIcon />
+                      //     </IconButton>
+                      //   );
+                      // }
                       return null;
                     })()}
                   </div>
@@ -156,7 +181,7 @@ const OwnedGames = (props:SteamListProps) => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <div className="text-white p-2">{game.gameName}</div>
+                      <div className={`text-white p-2 ${isGameInNode(game) && 'cursor-pointer hover:underline'}`} onClick={() => handleGameInNode(game)}>{game.gameName}</div>
                     </div>
                     <AvatarGroup max={3} spacing={'small'}>
                       {game.friends.map((friend, friendIndex) => (
@@ -166,7 +191,7 @@ const OwnedGames = (props:SteamListProps) => {
                   </div>
                   {/* ホバー時に表示されるリスト */}
                   <div
-                    className="absolute left-1/2 w-64 top-full mt-2 -translate-x-1/2 bg-black text-white p-4 rounded shadow-lg z-50 hidden group-hover:block opacity-0 group-hover:opacity-100"
+                    className="absolute left-1/2 w-64 top-full mt-2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg border border-gray-600 shadow-xl z-50 hidden group-hover:block opacity-0 group-hover:opacity-100"
                   >
                     <h4 className="text-lg font-bold mb-2">所持しているフレンドリスト</h4>
                     <ul>
