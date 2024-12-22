@@ -22,12 +22,11 @@ type Props = {
   nodes: NodeType[];
   selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsNetworkLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const GameList = (props: Props) => {
-  const { nodes, selectedIndex, setSelectedIndex, setIsLoading, setIsNetworkLoading } = props;
+  const { nodes, selectedIndex, setSelectedIndex, setIsNetworkLoading } = props;
   const router = useRouter();
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -104,12 +103,7 @@ const GameList = (props: Props) => {
       (async () => {
         await changeGameIdData(newUserAddedGames);
         setSearchQuery('')
-        // TODO:
-        if(setIsNetworkLoading) {
-          setIsNetworkLoading(true);
-        } else if (setIsLoading) {
-          setIsLoading(true);
-        }
+        setIsNetworkLoading(true);
       })();
     }
   };
@@ -121,12 +115,7 @@ const GameList = (props: Props) => {
     (async () => {
       await changeGameIdData(newUserAddedGames);
       setSearchQuery('')
-      // TODO:
-      if(setIsNetworkLoading) {
-        setIsNetworkLoading(true);
-      } else if (setIsLoading) {
-        setIsLoading(true);
-      }
+      setIsNetworkLoading(true);
     })();
   };
 
