@@ -40,8 +40,7 @@ const Network = (props:Props) => {
 
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isNetworkLoading, setIsNetworkLoading] = useState(false);
+  const [isNetworkLoading, setIsNetworkLoading] = useState(true);
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
@@ -71,11 +70,11 @@ const Network = (props:Props) => {
     setNodes(nodes);
     setLinks(links);
     setProgress(100);
-    hasFetchedInitialData.current = false; 
+    hasFetchedInitialData.current = false;
   };
 
   useEffect(() => {
-    if ((isLoading || isNetworkLoading) && !hasFetchedInitialData.current) {
+    if (isNetworkLoading && !hasFetchedInitialData.current) {
       hasFetchedInitialData.current = true; // フラグを立てる
       (async () => {
         const filterData = (await getFilterData()) ?? DEFAULT_FILTER;
@@ -84,11 +83,10 @@ const Network = (props:Props) => {
         setFilter(filterData);
         setSlider(sliderData);
         await initialNodes(filterData, gameIds, sliderData);
-        setIsLoading(false);
         setIsNetworkLoading(false);
       })();
     }
-  }, [isLoading, isNetworkLoading]);
+  }, [isNetworkLoading]);
 
   // 選択されたノードが変更されたときに中心座標を更新
   useEffect(() => {
@@ -113,7 +111,7 @@ const Network = (props:Props) => {
     });
   };
 
-  if (isLoading) {
+  if (isNetworkLoading) {
     return <Loading />;
   }
 
