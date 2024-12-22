@@ -12,7 +12,6 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
-import InfoIcon from '@mui/icons-material/Info';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
@@ -23,14 +22,12 @@ type Props = {
   nodes: NodeType[];
   selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-  setCenterX: React.Dispatch<React.SetStateAction<number>>;
-  setCenterY: React.Dispatch<React.SetStateAction<number>>;
   setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
   setIsNetworkLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const GameList = (props: Props) => {
-  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
+  const { nodes, selectedIndex, setSelectedIndex, setIsLoading, setIsNetworkLoading } = props;
   const router = useRouter();
   const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -98,13 +95,6 @@ const GameList = (props: Props) => {
       setFilteredNodeList(filteredNodes);
     }
   }, [steamList, searchQuery, userAddedGames, nodes, fixedGameIds]);
-
-  // ゲームをクリックしたときの処理
-  const handleGameClick = (index: number) => {
-    setCenterX((nodes[index].x ?? 0) - 150);
-    setCenterY((nodes[index].y ?? 0) + 100);
-    setSelectedIndex(index);
-  };
 
   // ゲームを追加する処理
   const handleSearchClick = (steamGameId: string) => {
@@ -207,7 +197,7 @@ const GameList = (props: Props) => {
                 filteredSteamList.map((game) => (
                   <div key={"filteredSteamList" + game.steamGameId}>
                     {typeof game.index === "number" ? (
-                      <div className='cursor-pointer flex pb-2 items-center' onClick={() => handleGameClick(game.index as number)}>
+                      <div className='cursor-pointer flex pb-2 items-center' onClick={() => game.index !== undefined && setSelectedIndex(game.index)}>
                         <div className={`${selectColor(game.index + 1).rankColor} p-2`}>
                           {game.index + 1}位
                         </div>
@@ -255,7 +245,7 @@ const GameList = (props: Props) => {
                     >
                       <div 
                         className="flex items-center justify-between"
-                        onClick={() => handleGameClick(node.index)}
+                        onClick={() => node.index !== undefined && setSelectedIndex(node.index)}
                       >
                         <div className="flex items-center">
                           <div className={`${rankColor} pb-2 p-2 whitespace-nowrap`}>

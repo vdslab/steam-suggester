@@ -88,6 +88,14 @@ const Network = () => {
     }
   }, [isLoading, isNetworkLoading]);
 
+  // 選択されたノードが変更されたときに中心座標を更新
+  useEffect(() => {
+    if (selectedIndex !== -1 && nodes[selectedIndex]) {
+      setCenterX((nodes[selectedIndex].x ?? 0) -150);
+      setCenterY((nodes[selectedIndex].y ?? 0) +100);
+    }
+  }, [selectedIndex]);
+
   // Sidebar のトグル関数
   const toggleFilter = () => {
     setIsFilterOpen((prev) => {
@@ -250,7 +258,7 @@ const Network = () => {
         {/* Steam連携パネル */}
         {isSteamListOpen && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <SteamList />
+            <SteamList nodes={nodes} setSelectedIndex={setSelectedIndex}/>
           </div>
         )}
 
@@ -260,8 +268,6 @@ const Network = () => {
             nodes={nodes}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
-            setCenterX={setCenterX}
-            setCenterY={setCenterY}
             setIsNetworkLoading={setIsNetworkLoading}
           />
         </div>

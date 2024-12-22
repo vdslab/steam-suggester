@@ -10,17 +10,21 @@ import Section from '../Section';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Image from 'next/image';
 import { Avatar, AvatarGroup, IconButton } from '@mui/material';
+import { fetcher } from '@/components/common/Fetcher';
+import { SteamListProps } from '@/types/Props';
+import SearchIcon from '@mui/icons-material/Search';
 
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const OwnedGames = (props:SteamListProps) => {
 
-const OwnedGames = () => {
+  const { nodes, setSelectedIndex } = props;
+
   const { data: session, status } = useSession();
 
   const steamId = session?.user?.email ? session.user.email.split('@')[0] : null;
 
   // 自分の所有ゲームを取得
-  const { data: myOwnGames, error: myGamesError } = useSWR(
+  const { data: myOwnGames, error: myGamesError } = useSWR<GetSteamOwnedGamesResponse[]>(
     status === 'authenticated' && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
@@ -117,12 +121,21 @@ const OwnedGames = () => {
         <Section title="自分の所有ゲーム" icon={<PersonIcon />}>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
             {myOwnGames.length > 0 ? (
-              myOwnGames.map((game: string) => (
-                <div key={game} className="p-2 mb-2 bg-gray-900 rounded-lg">
+              myOwnGames.map((game: GetSteamOwnedGamesResponse) => (
+                <div key={game.title} className="p-2 mb-2 bg-gray-900 rounded-lg text-white" >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="text-white p-2">{game}</div>
-                    </div>
+                    <div className="p-2">{game.title}</div>
+                    {nodes && (() => {
+                      const nodeIndex = nodes.findIndex((node) => node.steamGameId == game.id);
+                      if (nodeIndex !== -1) {
+                        return (
+                          <IconButton sx={{ color:'white' }} onClick={() => setSelectedIndex(nodeIndex)}>
+                            <SearchIcon />
+                          </IconButton>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                 </div>
               ))
