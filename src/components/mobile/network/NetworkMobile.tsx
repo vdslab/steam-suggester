@@ -47,8 +47,6 @@ const NetworkMobile = (props: Props) => {
 
   const [progress, setProgress] = useState(0);
 
-  // Refを使用して副作用の実行を制御
-  const hasFetchedInitialData = useRef(false);
   
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
     setProgress(0);
@@ -68,12 +66,10 @@ const NetworkMobile = (props: Props) => {
     setNodes(nodes);
     setLinks(links);
     setProgress(100);
-    hasFetchedInitialData.current = false;
   };
 
   useEffect(() => {
-    if (isNetworkLoading && !hasFetchedInitialData.current) {
-      hasFetchedInitialData.current = true; // フラグを立てる
+    if (isNetworkLoading) {
       (async () => {
         const filterData = (await getFilterData()) ?? DEFAULT_FILTER;
         const gameIds = (await getGameIdData()) ?? [];
