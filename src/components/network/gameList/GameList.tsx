@@ -319,7 +319,7 @@ const GameList = (props: Props) => {
                             {/* デバイスサポート */}
                             {node.device.windows && 
                               <Tooltip title="windows対応">
-                                <WindowsIcon />
+                                <WindowsIcon size={20} />
                               </Tooltip>
                             }
                             {node.device.mac && 

@@ -101,7 +101,7 @@ const GameExplanation = ({ steamGameId, steamDetailData }: Props) => {
       <div className="flex items-center space-x-2 mt-2">
         {device.windows && (
           <Tooltip title="Windows対応">
-            <WindowsIcon />
+            <WindowsIcon size={20}/>
           </Tooltip>
         )}
         {device.mac && (

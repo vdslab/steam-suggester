@@ -1,13 +1,16 @@
+'use client'
+
 import ClipSlideshow from "./ClipSlideshow";
 import { DetailsPropsType } from "@/types/DetailsType";
 import CircularProgress from "@mui/material/CircularProgress";
+import useSWR from "swr";
+import { fetcher } from "../common/Fetcher";
 
-const DistributorVideos = async({ twitchGameId }: DetailsPropsType) => {
+const DistributorVideos = ({ twitchGameId }: DetailsPropsType) => {
 
-  const data = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchClips/${twitchGameId}`);
-  const twitchClipData = await data.json();
+  const { data, error } = useSWR(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchClips/${twitchGameId}`, fetcher);
 
-  if (!twitchClipData) {
+  if (!data) {
     return (
       <div className="flex justify-center items-center h-40">
         <CircularProgress />
@@ -15,15 +18,23 @@ const DistributorVideos = async({ twitchGameId }: DetailsPropsType) => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-red-500 text-center">
+        データの取得中にエラーが発生しました。
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-700 rounded-lg shadow-lg">
-      {twitchClipData.length === 0 ? (
+      {data.length === 0 ? (
         <div className="text-white text-center">
           直近の配信者のクリップがありません
         </div>
       ) : (
         <div className="relative">
-          <ClipSlideshow data={twitchClipData} />
+          <ClipSlideshow data={data} />
         </div>
       )}
     </div>

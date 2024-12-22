@@ -1,4 +1,3 @@
-import React from 'react';
 import GameTitle from "@/components/common/GameTitle";
 import { DetailsHeader } from "@/components/common/Headers";
 import DistributorVideos from "@/components/distributorVideos/DistributorVideos";

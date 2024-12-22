@@ -39,7 +39,6 @@ const Network = () => {
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
-  // 各機能の開閉状態を管理
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const { tourRun, setTourRun } = useTour();
 
