@@ -8,7 +8,7 @@ import GameList from "./gameList/GameList";
 import StreamedList from "./streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/desktop/loading";
-import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
+import { LinkType, NodeType, SteamListType, StreamerListType } from "@/types/NetworkType";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
@@ -24,11 +24,12 @@ import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
+  steamListData: SteamListType[];
 }
 
 const Network = (props:Props) => {
 
-  const { steamAllData } = props;
+  const { steamAllData, steamListData } = props;
 
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
   const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
@@ -208,6 +209,7 @@ const Network = (props:Props) => {
         {/* ゲームリストパネル */}
         <div className="absolute top-0 right-0 w-1/4 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
           <GameList
+            steamListData={steamListData}
             nodes={nodes}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}

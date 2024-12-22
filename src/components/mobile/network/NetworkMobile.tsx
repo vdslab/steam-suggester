@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
 import createNetwork from "@/hooks/createNetwork";
-import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
+import { LinkType, NodeType, SteamListType, StreamerListType } from "@/types/NetworkType";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import SelectParameter from "@/components/network/selectParameter/SelectParameter";
 import GameList from "@/components/network/gameList/GameList";
@@ -21,11 +21,12 @@ import { buttonClasses } from "@/components/network/Sidebar";
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
+  steamListData: SteamListType[];
 }
 
 const NetworkMobile = (props: Props) => {
 
-  const { steamAllData } = props;
+  const { steamAllData, steamListData } = props;
 
   const router = useRouter();
 
@@ -111,6 +112,7 @@ const NetworkMobile = (props: Props) => {
       {openPanel === "steamList" && (
         <div className="w-2/3 bg-transparent overflow-y-auto overflow-x-hidden fixed max-h-[93vh]">
           <GameList
+            steamListData={steamListData}
             nodes={nodes}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}

@@ -5,8 +5,6 @@ import type { NextRequest } from 'next/server'
 
 export function getAuthOptions(req?: NextRequest): AuthOptions {
 
-  console.log('STEAM_API_KEY', process.env.STEAM_API_KEY)
-
   return {
     providers: req
       ? [

@@ -19,6 +19,7 @@ import Tooltip from '@mui/material/Tooltip';
 import WindowsIcon from "@/components/common/WindowsIcon";
 
 type Props = {
+  steamListData: SteamListType[];
   nodes: NodeType[];
   selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -26,9 +27,8 @@ type Props = {
 };
 
 const GameList = (props: Props) => {
-  const { nodes, selectedIndex, setSelectedIndex, setIsNetworkLoading } = props;
+  const { steamListData, nodes, selectedIndex, setSelectedIndex, setIsNetworkLoading } = props;
   const router = useRouter();
-  const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
   const [filteredNodeList, setFilteredNodeList] = useState<NodeType[]>(nodes);
@@ -43,20 +43,8 @@ const GameList = (props: Props) => {
   // Steamゲームリストとユーザーが追加したゲームを取得
   useEffect(() => {
     (async () => {
-      const CURRENT_URL = process.env.NEXT_PUBLIC_CURRENT_URL || '';
-      const res1 = await fetch(
-        `${CURRENT_URL}/api/network/getSteamList`,
-        { next: { revalidate: ISR_FETCH_INTERVAL } }
-      );
-      if(!res1.ok) {
-        console.error("Failed to fetch Steam list");
-        return;
-      }
-      const data = await res1.json();
-      const res2 = await getGameIdData();
-
-      setSteamList(data);
-      setUserAddedGames(res2 ?? []);
+      const res = await getGameIdData();
+      setUserAddedGames(res ?? []);
     })();
   }, []);
 
@@ -72,7 +60,7 @@ const GameList = (props: Props) => {
       }
     });
 
-    allSteamList.push(...steamList.filter((item1: SteamListType) => !allSteamList.find((item2: SteamListType) => item2.steamGameId === item1.steamGameId)));
+    allSteamList.push(...steamListData.filter((item1: SteamListType) => !allSteamList.find((item2: SteamListType) => item2.steamGameId === item1.steamGameId)));
 
     // Steamリストのフィルタリング（ユーザーが追加していないゲームかつ固定ゲームではないもの）
     const filteredSteam = allSteamList
@@ -93,7 +81,7 @@ const GameList = (props: Props) => {
         );
       setFilteredNodeList(filteredNodes);
     }
-  }, [steamList, searchQuery, userAddedGames, nodes, fixedGameIds]);
+  }, [searchQuery, userAddedGames, nodes, fixedGameIds]);
 
   // ゲームを追加する処理
   const handleSearchClick = (steamGameId: string) => {
