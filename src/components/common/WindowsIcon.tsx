@@ -23,4 +23,6 @@ const WindowsIcon = forwardRef<SVGSVGElement, Props>(({ size = 20, color = "whit
   );
 });
 
+WindowsIcon.displayName = "WindowsIcon";
+
 export default WindowsIcon;
