@@ -111,6 +111,8 @@ const OwnedGames = (props:SteamListProps) => {
     return false;
   }
 
+  const descFriendsData =  friendsOwnGames.sort((prev:GetFriendGamesResponse, next:GetFriendGamesResponse) => next.friends.length - prev.friends.length);
+
   return (
     <Panel title="Steamゲーム一覧" icon={<SportsEsportsIcon className="mr-2 text-white" />}>
       <div>
@@ -174,7 +176,7 @@ const OwnedGames = (props:SteamListProps) => {
         <Section title="フレンドの所有ゲーム" icon={<GroupIcon />}>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
             {friendsOwnGames.length > 0 ? (
-              friendsOwnGames.map((game: GetFriendGamesResponse, index: number) => (
+              descFriendsData.map((game: GetFriendGamesResponse, index: number) => (
                 <div
                   key={index}
                   className="p-2 mb-2 bg-gray-900 rounded-lg relative group"
