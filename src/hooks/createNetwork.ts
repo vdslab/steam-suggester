@@ -1,6 +1,5 @@
 import * as d3 from "d3";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
 import { GAME_COUNT } from "@/constants/NETWORK_DATA";
@@ -22,16 +21,14 @@ const jaccardSimilarity = (setA: Set<string>, setB: Set<string>): number => {
 
 
 const createNetwork = async (
+  data: SteamDetailsDataType[],
   filter: Filter,
   gameIds: string[],
   slider: SliderSettings,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
 ): Promise<{ nodes: NodeType[]; links: LinkType[]; similarGames: SimilarGameType }> => {
   if (onProgress) onProgress(0);
 
-  const data: SteamDetailsDataType[] = await fetchWithCache(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`
-  );
   const slicedData = data.slice(0, GAME_COUNT);
   if (onProgress) onProgress(20);
 

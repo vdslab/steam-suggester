@@ -4,6 +4,12 @@ export type DetailsPropsType = {
   twitchGameId: string;
 }
 
+ // createNetworkの返り値similarGamesのオブジェクト内のvalue
+export type SimilarGameValueType = {
+  steamGameId: string;
+  twitchGameId: string;
+}
+
 // 類似ゲームで使用
 export type SimilarGamePropsType = {
   title: string;

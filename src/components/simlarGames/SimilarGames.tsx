@@ -1,22 +1,24 @@
 'use client';
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import createNetwork from "@/hooks/createNetwork";
 import DisplayGame from "./DisplayGame";
-import { DetailsPropsType, SimilarGamePropsType } from "@/types/DetailsType";
+import { SimilarGameValueType } from "@/types/DetailsType";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import { CircularProgress } from '@mui/material';
 import fetchWithCache from "@/hooks/fetchWithCache";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
-type GameType = {
+type Props = {
   steamGameId: string;
   twitchGameId: string;
+  steamAllData: SteamDetailsDataType[];
 }
 
-const SimilarGames = (props: DetailsPropsType) => {
+const SimilarGames = (props: Props) => {
 
-  const { steamGameId, twitchGameId } = props;
+  const { steamGameId, steamAllData } = props;
 
   const [data, setData] = useState<SteamDetailsDataType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,10 +30,10 @@ const SimilarGames = (props: DetailsPropsType) => {
         const filter = await getFilterData() ?? DEFAULT_FILTER;
         const gameIds = await getGameIdData() ?? [];
         const slider = await getSliderData() ?? DEFAULT_SLIDER;
-        const { similarGames } = await createNetwork(filter, gameIds, slider);
+        const { similarGames } = await createNetwork(steamAllData, filter, gameIds, slider);
     
         if (similarGames && similarGames[steamGameId]) {
-          const promises = similarGames[steamGameId].map(async (game: GameType) => {
+          const promises = similarGames[steamGameId].map(async (game: SimilarGameValueType) => {
             const d = await fetchWithCache(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${game.steamGameId}`);
             return {
               ...d, 
@@ -66,8 +68,8 @@ const SimilarGames = (props: DetailsPropsType) => {
   return (
     <div className="grid grid-cols-2 gap-4">
       {data.map((node: SteamDetailsDataType) => (
-        <DisplayGame 
-          key={node.steamGameId} 
+        <DisplayGame
+          key={node.steamGameId}
           node={node}
         />
       ))}

@@ -15,13 +15,17 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import ListIcon from '@mui/icons-material/List';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import { useRouter } from "next/navigation";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import { buttonClasses } from "@/components/network/Sidebar";
 
-const buttonClasses = (isActive: boolean) =>
-  `w-full py-2 text-center flex flex-col items-center ${
-    isActive ? "bg-gray-700" : "hover:bg-gray-700"
-  } rounded transition-colors duration-200`;
 
-const NetworkMobile = () => {
+type Props = {
+  steamAllData: SteamDetailsDataType[];
+}
+
+const NetworkMobile = (props: Props) => {
+
+  const { steamAllData } = props;
 
   const router = useRouter();
 
@@ -48,7 +52,7 @@ const NetworkMobile = () => {
   
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
     setProgress(0);
-    const result = await createNetwork(filter, gameIds, slider, setProgress);
+    const result = await createNetwork(steamAllData, filter, gameIds, slider, setProgress);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();

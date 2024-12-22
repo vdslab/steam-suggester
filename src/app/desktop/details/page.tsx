@@ -16,6 +16,9 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
   const data = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
   const steamData:SteamDetailsDataType = await data.json()
 
+  const matchRes = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
+  const steamAllData:SteamDetailsDataType[] = await matchRes.json()
+
 
   return (
     <div className="bg-gray-800 min-h-screen">
@@ -50,7 +53,7 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
             {/* 類似しているゲーム */}
             <div className='bg-gray-700 rounded-lg overflow-hidden border border-gray-400 p-3'>
               <Typography className="text-white font-semibold p-3">類似しているゲーム</Typography>
-              <SimilarGames steamGameId={steamGameId} twitchGameId={twitchGameId} />
+              <SimilarGames steamAllData={steamAllData} steamGameId={steamGameId} twitchGameId={twitchGameId} />
             </div>
 
             {/* 配信者クリップ */}

@@ -8,6 +8,12 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import TourIcon from '@mui/icons-material/Tour';
 import TuneIcon from "@mui/icons-material/Tune";
 
+// 共通のボタンクラス
+export const buttonClasses = (isActive: boolean) =>
+  `w-full py-2 text-center flex flex-col items-center ${
+    isActive ? "bg-gray-700" : "hover:bg-gray-700"
+  } rounded transition-colors duration-200`;
+
 type Props = {
   openPanel: string | null;
   togglePanel: (panelName:string) => void;
@@ -23,11 +29,6 @@ const Sidebar: React.FC<Props> = ({
   toggleTourRun
 
 }) => {
-  // 共通のボタンクラス
-  const buttonClasses = (isActive: boolean) =>
-    `w-full py-2 text-center flex flex-col items-center ${
-      isActive ? "bg-gray-700" : "hover:bg-gray-700"
-    } rounded transition-colors duration-200`;
 
   return (
     <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4">

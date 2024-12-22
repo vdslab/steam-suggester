@@ -20,10 +20,16 @@ import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import useTour from "@/hooks/useTour";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
+type Props = {
+  steamAllData: SteamDetailsDataType[];
+}
 
+const Network = (props:Props) => {
 
-const Network = () => {
+  const { steamAllData } = props;
+
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
   const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
 
@@ -49,7 +55,7 @@ const Network = () => {
   
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
     setProgress(0);
-    const result = await createNetwork(filter, gameIds, slider, setProgress);
+    const result = await createNetwork(steamAllData, filter, gameIds, slider, setProgress);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
