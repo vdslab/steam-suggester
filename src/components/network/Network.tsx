@@ -40,10 +40,7 @@ const Network = () => {
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
   // 各機能の開閉状態を管理
-  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
-  const [isStreamerOpen, setIsStreamerOpen] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
-  const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
   const { tourRun, setTourRun } = useTour();
 
   const [progress, setProgress] = useState(0);
@@ -96,67 +93,16 @@ const Network = () => {
     }
   }, [selectedIndex]);
 
-  // Sidebar のトグル関数
-  const toggleFilter = () => {
-    setIsFilterOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
-
-  const toggleStreamer = () => {
-    setIsStreamerOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
-
-  const toggleChat = () => {
-    setIsChatOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
-
-  const toggleSteamList = () => {
-    setIsSteamListOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
+  const togglePanel = (panelName: string) => {
+    setOpenPanel((prevPanel) => (prevPanel === panelName ? null : panelName));
+    setTourRun(false);
   };
 
   const toggleTourRun = () => {
     setTourRun((prev) => {
       const newState = !prev;
       if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
+        setOpenPanel(null);
       }
       return newState;
     });
@@ -170,14 +116,8 @@ const Network = () => {
     <div className="flex h-[92vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
-        isFilterOpen={isFilterOpen}
-        toggleFilter={toggleFilter}
-        isStreamerOpen={isStreamerOpen}
-        toggleStreamer={toggleStreamer}
-        isChatOpen={isChatOpen}
-        toggleChat={toggleChat}
-        isSteamListOpen={isSteamListOpen}
-        toggleSteamList={toggleSteamList}
+        openPanel={openPanel}
+        togglePanel={togglePanel}
         tourRun={tourRun}
         toggleTourRun={toggleTourRun}
       />
@@ -195,7 +135,7 @@ const Network = () => {
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
               streamerIds={streamerIds}
-              isStreamerOpen={isStreamerOpen}
+              openPanel={openPanel}
             />
           </div>
         ) : (
@@ -203,7 +143,7 @@ const Network = () => {
         )}
 
         {/* フィルターパネル */}
-        {isFilterOpen && (
+        {openPanel === "filter" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <SelectParameter
               filter={filter}
@@ -214,7 +154,7 @@ const Network = () => {
         )}
 
         {/* StreamerListパネル */}
-        {isStreamerOpen && (
+        {openPanel === "streamer" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <Panel
               title={
@@ -234,8 +174,8 @@ const Network = () => {
           </div>
         )}
 
-        {/* ChatBarパネル */}
-        {isChatOpen && (
+        {/* 類似度 */}
+        {openPanel === "similarity"  && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <Panel
               title={
@@ -256,7 +196,7 @@ const Network = () => {
         )}
 
         {/* Steam連携パネル */}
-        {isSteamListOpen && (
+        {openPanel === "steamList" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <SteamList nodes={nodes} setSelectedIndex={setSelectedIndex}/>
           </div>
