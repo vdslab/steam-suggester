@@ -79,30 +79,6 @@ const GameEasySearchPanel: React.FC<Props> = ({
     // フィルターの設定
     const newFilter: Filter = {
       ...DEFAULT_FILTER,
-      Genres: selectedGenres.reduce((acc, genre) => {
-        acc[genre] = true;
-        return acc;
-      }, {} as { [key: string]: boolean }),
-      Price: (() => {
-        switch (selectedPrice) {
-          case "free":
-            return { startPrice: 0, endPrice: 0 };
-          case "1-1000":
-            return { startPrice: 1, endPrice: 1000 };
-          case "1001-":
-            return { startPrice: 1001, endPrice: 100000 }; // 上限は適宜調整
-          default:
-            return { startPrice: 0, endPrice: 0 };
-        }
-      })(),
-      Mode: {
-        single: selectedPreferences.includes("single"),
-        multi: selectedPreferences.includes("multi"),
-      },
-      Device: {
-        windows: selectedPreferences.includes("windows"),
-        mac: selectedPreferences.includes("mac"),
-      },
     };
 
     // IndexedDBにフィルターを保存
