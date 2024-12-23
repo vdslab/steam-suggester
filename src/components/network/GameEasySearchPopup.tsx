@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Panel from "./Panel";
 import CloseIcon from "@mui/icons-material/Close";
 import { Filter } from "@/types/api/FilterType";
 import { changeFilterData } from "@/hooks/indexedDB";
@@ -46,6 +45,7 @@ const GameEasySearchPanel: React.FC<Props> = ({
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedPrice, setSelectedPrice] = useState<string>("free");
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleGenreChange = (genre: string) => {
     setSelectedGenres((prev) =>
@@ -66,9 +66,39 @@ const GameEasySearchPanel: React.FC<Props> = ({
   };
 
   const handleSubmit = async () => {
+    // バリデーション: 少なくとも1つのジャンルが選択されているか確認
+    if (selectedGenres.length === 0) {
+      setErrorMessage("少なくとも1つのゲームジャンルを選択してください。");
+      return;
+    }
+
     // フィルターの設定
     const newFilter: Filter = {
       ...DEFAULT_FILTER,
+      Genres: selectedGenres.reduce((acc, genre) => {
+        acc[genre] = true;
+        return acc;
+      }, {} as { [key: string]: boolean }),
+      Price: (() => {
+        switch (selectedPrice) {
+          case "free":
+            return { startPrice: 0, endPrice: 0 };
+          case "1-1000":
+            return { startPrice: 1, endPrice: 1000 };
+          case "1001-":
+            return { startPrice: 1001, endPrice: 100000 }; // 上限は適宜調整
+          default:
+            return { startPrice: 0, endPrice: 0 };
+        }
+      })(),
+      Mode: {
+        single: selectedPreferences.includes("single"),
+        multi: selectedPreferences.includes("multi"),
+      },
+      Device: {
+        windows: selectedPreferences.includes("windows"),
+        mac: selectedPreferences.includes("mac"),
+      },
     };
 
     // IndexedDBにフィルターを保存
@@ -85,35 +115,60 @@ const GameEasySearchPanel: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-30">
-      <div className="bg-gray-800 rounded-lg w-11/12 md:w-3/4 lg:w-1/2 p-6 relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-30 transition-opacity duration-300">
+      <div className="bg-gray-800 rounded-lg w-11/12 md:w-3/4 lg:w-1/2 p-6 relative transform transition-transform duration-300">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white hover:text-gray-400"
+          aria-label="閉じる"
         >
           <CloseIcon />
         </button>
-        <h2 className="text-2xl mb-4 text-white">ゲームを簡単に探す</h2>
+        <h2 className="text-2xl mb-6 text-white text-center">
+          ゲームを簡単に探す
+        </h2>
+
+        {/* エラーメッセージの表示 */}
+        {errorMessage && (
+          <div className="mb-4 text-red-500 text-center">{errorMessage}</div>
+        )}
 
         {/* 1. ゲームジャンルの選択 */}
         <div className="mb-6">
           <h3 className="text-lg mb-2 text-white">
             1. 探したいゲームジャンルを選んでください。
+            <span className="text-red-500 ml-1">*</span>
           </h3>
-          <div className="flex flex-wrap">
+          <div className="flex flex-wrap gap-2">
             {GENRE_OPTIONS.map((genre) => (
-              <label
+              <button
                 key={genre}
-                className="mr-4 mb-2 flex items-center text-white"
+                onClick={() => handleGenreChange(genre)}
+                aria-pressed={selectedGenres.includes(genre)}
+                className={`px-4 py-2 rounded-full border flex items-center justify-center transition-colors duration-300 ${
+                  selectedGenres.includes(genre)
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-gray-700 text-white border-gray-700 hover:bg-gray-600"
+                }`}
               >
-                <input
-                  type="checkbox"
-                  className="form-checkbox h-5 w-5 text-blue-600"
-                  checked={selectedGenres.includes(genre)}
-                  onChange={() => handleGenreChange(genre)}
-                />
-                <span className="ml-2">{genre}</span>
-              </label>
+                {genre}
+                {selectedGenres.includes(genre) && (
+                  <span className="ml-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-white"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414L8.414 15 4.293 10.879a1 1 0 011.414-1.414L8.414 12.172l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </button>
             ))}
           </div>
         </div>
@@ -123,22 +178,36 @@ const GameEasySearchPanel: React.FC<Props> = ({
           <h3 className="text-lg mb-2 text-white">
             2. ゲーム価格の予算はいくらですか？
           </h3>
-          <div className="flex flex-col">
+          <div className="flex flex-wrap gap-2">
             {PRICE_OPTIONS.map((option) => (
-              <label
+              <button
                 key={option.value}
-                className="mr-4 mb-2 flex items-center text-white"
+                onClick={() => handlePriceChange(option.value)}
+                aria-pressed={selectedPrice === option.value}
+                className={`px-4 py-2 rounded-full border flex items-center justify-center transition-colors duration-300 ${
+                  selectedPrice === option.value
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-gray-700 text-white border-gray-700 hover:bg-gray-600"
+                }`}
               >
-                <input
-                  type="radio"
-                  name="price"
-                  className="form-radio h-5 w-5 text-blue-600"
-                  value={option.value}
-                  checked={selectedPrice === option.value}
-                  onChange={() => handlePriceChange(option.value)}
-                />
-                <span className="ml-2">{option.label}</span>
-              </label>
+                {option.label}
+                {selectedPrice === option.value && (
+                  <span className="ml-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-white"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414L8.414 15 4.293 10.879a1 1 0 011.414-1.414L8.414 12.172l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </button>
             ))}
           </div>
         </div>
@@ -148,29 +217,50 @@ const GameEasySearchPanel: React.FC<Props> = ({
           <h3 className="text-lg mb-2 text-white">
             3. その他に希望はありますか？
           </h3>
-          <div className="flex flex-wrap">
+          <div className="flex flex-wrap gap-2">
             {PREFERENCE_OPTIONS.map((pref) => (
-              <label
+              <button
                 key={pref.value}
-                className="mr-4 mb-2 flex items-center text-white"
+                onClick={() => handlePreferenceChange(pref.value)}
+                aria-pressed={selectedPreferences.includes(pref.value)}
+                className={`px-4 py-2 rounded-full border flex items-center justify-center transition-colors duration-300 ${
+                  selectedPreferences.includes(pref.value)
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-gray-700 text-white border-gray-700 hover:bg-gray-600"
+                }`}
               >
-                <input
-                  type="checkbox"
-                  className="form-checkbox h-5 w-5 text-blue-600"
-                  checked={selectedPreferences.includes(pref.value)}
-                  onChange={() => handlePreferenceChange(pref.value)}
-                />
-                <span className="ml-2">{pref.label}</span>
-              </label>
+                {pref.label}
+                {selectedPreferences.includes(pref.value) && (
+                  <span className="ml-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-white"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414L8.414 15 4.293 10.879a1 1 0 011.414-1.414L8.414 12.172l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </button>
             ))}
           </div>
         </div>
 
         {/* 検索ボタン */}
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md"
+            disabled={selectedGenres.length === 0}
+            className={`${
+              selectedGenres.length === 0
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-500"
+            } text-white px-6 py-3 rounded-md shadow-md transition-colors duration-300`}
           >
             検索
           </button>
