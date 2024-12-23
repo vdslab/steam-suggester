@@ -20,7 +20,8 @@ const DistributorVideos: React.FC<Props> = ({ nodes, selectedIndex }) => {
 
   if (!selectedNode) {
     return (
-      <div className="text-white text-center">ゲームが選択されていません。</div>
+      <></>
+      //   <div className="text-white text-center">ゲームが選択されていません。</div>
     );
   }
 

@@ -287,7 +287,7 @@ const GameSearchPanel = (props: Props) => {
       </div>
 
       {/* 選択されたゲームの詳細表示 */}
-      {selectedIndex !== -1 && nodes[selectedIndex] && (
+      {selectedIndex !== -1 && nodes[selectedIndex] ? (
         <div className="rounded-lg mt-24" ref={selectedDetailRef}>
           {/* ゲーム詳細内容 */}
           <div className="flex flex-col space-y-2">
@@ -432,11 +432,14 @@ const GameSearchPanel = (props: Props) => {
               </div>
             </div>
           </div>
+          {/* トグル表示 */}
+          <ToggleDisplay nodes={nodes} selectedIndex={selectedIndex} />
+        </div>
+      ) : (
+        <div className="text-white text-center pt-24">
+          ゲームを選択してください。
         </div>
       )}
-
-      {/* トグル表示 */}
-      <ToggleDisplay nodes={nodes} selectedIndex={selectedIndex} />
     </div>
   );
 };
