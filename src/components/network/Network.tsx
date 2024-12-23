@@ -25,11 +25,12 @@ import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./Leaderboard";
-import GameSearchPanel from "./GameSearchPanel";
+import GameEasySearchPanel from "./GameEasySearchPanel";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import UserAvatar from "./steamList/UserAvatar";
-import GameSearchButton from "./GameSearchButton";
+import GameEasySearchButton from "./GameEasySearchButton";
+import GameSearchPopup from "./GameSearchPopup";
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
@@ -137,6 +138,10 @@ const Network = (props: Props) => {
     setTourRun(false);
   };
 
+  const handleGameSearchClose = () => {
+    setOpenPanel(null);
+  };
+
   if (isNetworkLoading) {
     return <Loading />;
   }
@@ -154,7 +159,16 @@ const Network = (props: Props) => {
       {/* メインコンテンツエリアを relative に設定 */}
       <div className="flex-1 relative bg-gray-900 overflow-hidden">
         {/* ゲーム検索ボタンを追加 */}
-        <GameSearchButton onClick={handleGameSearchClick} />
+        <GameEasySearchButton onClick={handleGameSearchClick} />
+        {/* GameSearchPopup の表示 */}
+        {openPanel === "gameSearch" && (
+          <GameSearchPopup
+            filter={filter}
+            setFilter={setFilter}
+            setIsNetworkLoading={setIsNetworkLoading}
+            onClose={handleGameSearchClose}
+          />
+        )}
 
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
@@ -252,7 +266,7 @@ const Network = (props: Props) => {
 
         {/* ゲーム検索および詳細パネルを右側に配置 */}
         <div className="absolute top-0 right-0 w-1/4 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-          <GameSearchPanel
+          <GameEasySearchPanel
             nodes={nodes}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
