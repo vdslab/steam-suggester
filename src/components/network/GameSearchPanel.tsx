@@ -181,7 +181,7 @@ const GameSearchPanel = (props: Props) => {
   }, []);
 
   return (
-    <div className="flex-1 bg-gray-800 rounded-l-lg p-0 shadow-md flex flex-col space-y-0 h-full relative">
+    <div className="flex-1 bg-gray-800 rounded-l-lg p-0 shadow-md flex flex-col space-y-0 overflow-y-scroll h-full relative">
       {/* ヘッダー */}
       {/* <div className="flex items-center space-x-2 mb-0">
         <SearchIcon className="text-white" />
@@ -205,7 +205,7 @@ const GameSearchPanel = (props: Props) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
-              className="w-full p-2 pr-8 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
+              className="w-full p-2 pr-8 text-black rounded border-2 border-gray-200 focus:outline-none transition duration-300 ease-in-out"
             />
             {selectedIndex !== -1 && (
               <button
@@ -227,16 +227,19 @@ const GameSearchPanel = (props: Props) => {
 
           {/* ゲーム追加候補表示 */}
           {isFocused && searchQuery !== "" && filteredSteamList.length > 0 && (
-            <div className="bg-white text-black p-2 rounded-b-lg max-h-60 overflow-y-auto mt-0 cursor-pointer">
-              {/* <h2 className="text-white mb-2">検索結果（追加候補）</h2> */}
+            <div className="bg-white text-black rounded-b-lg max-h-60 overflow-y-auto cursor-pointer">
               {filteredSteamList.map((game) => (
                 <div key={"filteredSteamList" + game.steamGameId}>
                   {typeof game.index === "number" ? (
                     <div
-                      className="cursor-pointer flex items-center"
-                      onMouseDown={() =>
-                        game.index !== undefined && setSelectedIndex(game.index)
-                      }
+                      className="cursor-pointer flex items-center hover:bg-gray-400 px-2"
+                      onClick={() => {
+                        if (game.index !== undefined) {
+                          setSelectedIndex(game.index);
+                          setSearchQuery(game.title); // 選択したゲームのタイトルを設定
+                          setIsFocused(false); // 候補を非表示にする
+                        }
+                      }}
                     >
                       {/* 左側の順位 */}
                       <div
@@ -251,7 +254,13 @@ const GameSearchPanel = (props: Props) => {
                       <div className="p-2">{game.title}</div>
                     </div>
                   ) : (
-                    <div className="flex items-center">
+                    <div
+                      className="flex items-center hover:bg-gray-400 px-2"
+                      onClick={() => {
+                        handleSearchClick(game.steamGameId);
+                        setIsFocused(false); // 候補を非表示にする
+                      }}
+                    >
                       {/* 左側のアイコン */}
                       <div
                         style={{
@@ -260,15 +269,10 @@ const GameSearchPanel = (props: Props) => {
                           justifyContent: "center", // アイコンを中央揃え
                         }}
                       >
-                        <PlaylistAddIcon
-                          className="cursor-pointer hover:bg-gray-600 rounded"
-                          onMouseDown={() =>
-                            handleSearchClick(game.steamGameId)
-                          }
-                        />
+                        <PlaylistAddIcon className="cursor-pointer hover:bg-gray-600 rounded" />
                       </div>
                       {/* 右側のタイトル */}
-                      <div className="p-2 rounded">{game.title}</div>
+                      <div className="p-2">{game.title}</div>
                     </div>
                   )}
                 </div>
