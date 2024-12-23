@@ -383,6 +383,16 @@ const GameSearchPanel = (props: Props) => {
                     <span className="text-red-500 ml-2">
                       ¥{nodes[selectedIndex].salePrice}
                     </span>
+                    <span className="text-sm text-green-500 ml-2">
+                      (
+                      {Math.round(
+                        ((nodes[selectedIndex].price -
+                          parseInt(nodes[selectedIndex].salePrice, 10)) /
+                          nodes[selectedIndex].price) *
+                          100
+                      )}
+                      % OFF)
+                    </span>
                   </>
                 ) : (
                   <span className="text-sm ml-2">
@@ -394,24 +404,24 @@ const GameSearchPanel = (props: Props) => {
               </div>
 
               {/* アクションボタン */}
-              {/* <div className="mt-4 flex space-x-2">
-              <button
-                className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
-                onClick={() =>
-                  router.push(
-                    `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
-                  )
-                }
-              >
-                詳細を確認
-              </button>
-              <button
-                className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
-                onClick={() => setSelectedIndex(-1)}
-              >
-                閉じる
-              </button>
-            </div> */}
+              <div className="flex">
+                <button
+                  className="bg-blue-600 hover:bg-blue-500 text-white rounded"
+                  onClick={() =>
+                    router.push(
+                      `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
+                    )
+                  }
+                >
+                  詳細を確認(デバッグ用)
+                </button>
+                {/* <button
+                  className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
+                  onClick={() => setSelectedIndex(-1)}
+                >
+                  閉じる
+                </button> */}
+              </div>
             </div>
           </div>
         </div>
