@@ -29,6 +29,7 @@ import GameSearchPanel from "./GameSearchPanel";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import UserAvatar from "./steamList/UserAvatar";
+import GameSearchButton from "./GameSearchButton";
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
@@ -129,6 +130,13 @@ const Network = (props: Props) => {
     });
   };
 
+  const handleGameSearchClick = () => {
+    setOpenPanel((prevPanel) =>
+      prevPanel === "gameSearch" ? null : "gameSearch"
+    );
+    setTourRun(false);
+  };
+
   if (isNetworkLoading) {
     return <Loading />;
   }
@@ -145,6 +153,9 @@ const Network = (props: Props) => {
 
       {/* メインコンテンツエリアを relative に設定 */}
       <div className="flex-1 relative bg-gray-900 overflow-hidden">
+        {/* ゲーム検索ボタンを追加 */}
+        <GameSearchButton onClick={handleGameSearchClick} />
+
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
             {/* TODO: right調整の修正 */}

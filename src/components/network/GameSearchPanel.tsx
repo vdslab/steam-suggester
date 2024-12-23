@@ -205,7 +205,11 @@ const GameSearchPanel = (props: Props) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
-              className="w-full p-2 pr-8 text-black rounded border-2 border-gray-200 focus:outline-none transition duration-300 ease-in-out"
+              className={`w-full p-2 pr-8 text-black border-2 border-gray-200 focus:outline-none transition duration-300 ease-in-out ${
+                isFocused && searchQuery !== "" && filteredSteamList.length > 0
+                  ? "rounded-t-lg"
+                  : "rounded-lg"
+              }`}
             />
             {selectedIndex !== -1 && (
               <button
