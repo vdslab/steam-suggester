@@ -140,7 +140,7 @@ const GameEasySearchPanel: React.FC<Props> = ({
         {/* 1. ゲームジャンルの選択 */}
         <div className="mb-6">
           <h3 className="text-lg mb-2 text-white">
-            1. 探したいゲームジャンルを選んでください。
+            1. 気になるゲームジャンルを選んでください。
             <span className="text-red-500 ml-1">*</span>
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -180,7 +180,7 @@ const GameEasySearchPanel: React.FC<Props> = ({
         {/* 2. ゲーム価格の予算 */}
         <div className="mb-6">
           <h3 className="text-lg mb-2 text-white">
-            2. ゲーム価格の予算はいくらですか？
+            2. ゲームの予算はいくらですか？
           </h3>
           <div className="flex flex-wrap gap-2">
             {PRICE_OPTIONS.map((option) => (
@@ -219,7 +219,7 @@ const GameEasySearchPanel: React.FC<Props> = ({
         {/* 3. その他の希望 */}
         <div className="mb-6">
           <h3 className="text-lg mb-2 text-white">
-            3. その他に希望はありますか？
+            3. その他に希望はありますか？(要らないけどテスト用)
           </h3>
           <div className="flex flex-wrap gap-2">
             {PREFERENCE_OPTIONS.map((pref) => (
