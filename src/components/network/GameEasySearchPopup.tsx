@@ -6,6 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Filter } from "@/types/api/FilterType";
 import { changeFilterData } from "@/hooks/indexedDB";
 import { DEFAULT_FILTER } from "@/constants/DEFAULT_FILTER";
+import HelpTooltip from "./HelpTooltip";
 
 type Props = {
   filter: Filter;
@@ -71,6 +72,9 @@ const GameEasySearchPanel: React.FC<Props> = ({
       setErrorMessage("少なくとも1つのゲームジャンルを選択してください。");
       return;
     }
+
+    // エラーメッセージをクリア
+    setErrorMessage("");
 
     // フィルターの設定
     const newFilter: Filter = {
@@ -248,6 +252,35 @@ const GameEasySearchPanel: React.FC<Props> = ({
                 )}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* 4. Steam連携 */}
+        <div className="mb-6">
+          <h3 className="text-lg mb-2 text-white">
+            4. Steam連携
+            <HelpTooltip title="Steamアカウントにログインすると、所持ゲームや友達リストを活用して、よりパーソナライズされたゲーム検索が可能になります。" />
+          </h3>
+          <div className="flex flex-col items-center">
+            <button
+              onClick={() => {
+                // TODO:
+                alert("test");
+              }}
+              className="flex items-center bg-steam-blue hover:bg-steam-dark-blue text-white px-6 py-3 rounded-md shadow-md transition-colors duration-300"
+            >
+              {/* Steamアイコンの追加（SVG） */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 mr-2"
+                viewBox="0 0 448 512"
+                fill="currentColor"
+              >
+                {/* FontAwesomeのSteamアイコンを使用 */}
+                <path d="M424.1 0H23.9C10.7 0 0 10.7 0 23.9V488c0 13.2 10.7 23.9 23.9 23.9H424c13.2 0 23.9-10.7 23.9-23.9V23.9C448 10.7 437.3 0 424.1 0zM96.4 396c-5.3 0-10.4-2.3-14.4-6.4L24 271.1c-4-4-6.4-9.1-6.4-14.4s2.3-10.4 6.4-14.4l58.1-58.1c4-4 9.1-6.4 14.4-6.4s10.4 2.3 14.4 6.4l58.1 58.1c4 4 6.4 9.1 6.4 14.4s-2.3 10.4-6.4 14.4l-58.1 58.1c-4 4-9.1 6.4-14.4 6.4zM352 340c-5.3 0-10.4-2.3-14.4-6.4l-58.1-58.1c-4-4-6.4-9.1-6.4-14.4s2.3-10.4 6.4-14.4l58.1-58.1c4-4 9.1-6.4 14.4-6.4s10.4 2.3 14.4 6.4l58.1 58.1c4 4 6.4 9.1 6.4 14.4s-2.3 10.4-6.4 14.4l-58.1 58.1c-4 4-9.1 6.4-14.4 6.4z" />
+              </svg>
+              Steamと連携する
+            </button>
           </div>
         </div>
 
