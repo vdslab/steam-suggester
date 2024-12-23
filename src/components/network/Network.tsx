@@ -25,12 +25,12 @@ import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./Leaderboard";
-import GameEasySearchPanel from "./GameEasySearchPanel";
+import GameSearchPanel from "./GameSearchPanel";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import UserAvatar from "./steamList/UserAvatar";
 import GameEasySearchButton from "./GameEasySearchButton";
-import GameSearchPopup from "./GameSearchPopup";
+import GameEasySearchPopup from "./GameEasySearchPopup";
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
@@ -162,7 +162,7 @@ const Network = (props: Props) => {
         <GameEasySearchButton onClick={handleGameSearchClick} />
         {/* GameSearchPopup の表示 */}
         {openPanel === "gameSearch" && (
-          <GameSearchPopup
+          <GameEasySearchPopup
             filter={filter}
             setFilter={setFilter}
             setIsNetworkLoading={setIsNetworkLoading}
@@ -266,7 +266,7 @@ const Network = (props: Props) => {
 
         {/* ゲーム検索および詳細パネルを右側に配置 */}
         <div className="absolute top-0 right-0 w-1/4 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-          <GameEasySearchPanel
+          <GameSearchPanel
             nodes={nodes}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
