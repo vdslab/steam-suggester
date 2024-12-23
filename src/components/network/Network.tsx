@@ -28,6 +28,7 @@ import Leaderboard from "./Leaderboard";
 import GameSearchPanel from "./GameSearchPanel";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import UserAvatar from "./steamList/UserAvatar";
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
@@ -133,7 +134,7 @@ const Network = (props: Props) => {
   }
 
   return (
-    <div className="flex h-[92vh] overflow-hidden text-white">
+    <div className="flex h-[100vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
         openPanel={openPanel}
@@ -146,6 +147,11 @@ const Network = (props: Props) => {
       <div className="flex-1 relative bg-gray-900 overflow-hidden">
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
+            {/* TODO: right調整の修正 */}
+            <div className="absolute top-4 right-96">
+              {/* ユーザーアイコンの表示 */}
+              <UserAvatar />
+            </div>
             {/* メインコンテンツ */}
             <NodeLink
               nodes={nodes}

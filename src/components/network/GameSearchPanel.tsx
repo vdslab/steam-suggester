@@ -1,4 +1,4 @@
-/*GameSearchPanel.tsx*/
+/* GameSearchPanel.tsx */
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
@@ -16,6 +16,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import GroupIcon from "@mui/icons-material/Group";
 import Tooltip from "@mui/material/Tooltip";
 import WindowsIcon from "@/components/common/WindowsIcon";
+import ToggleDisplay from "./ToggleDisplay";
 
 type Props = {
   nodes: NodeType[];
@@ -39,9 +40,11 @@ const GameSearchPanel = (props: Props) => {
     []
   );
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
   // Ref for the selected game detail
   const selectedDetailRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // 固定のゲームIDリストを取得
   const fixedGameIds = useMemo(
@@ -56,6 +59,13 @@ const GameSearchPanel = (props: Props) => {
       setUserAddedGames(res ?? []);
     })();
   }, []);
+
+  // ゲーム選択時に検索クエリを設定
+  useEffect(() => {
+    if (selectedIndex !== -1 && nodes[selectedIndex]) {
+      setSearchQuery(nodes[selectedIndex].title);
+    }
+  }, [selectedIndex, nodes]);
 
   // Steamリストとユーザー追加ゲームがロードされた後にフィルタリングを行う
   useEffect(() => {
@@ -147,206 +157,244 @@ const GameSearchPanel = (props: Props) => {
   const showNoResultsMessage =
     searchQuery !== "" && filteredSteamList.length === 0;
 
+  // 閉じるボタンのハンドラー
+  const handleClose = () => {
+    setSelectedIndex(-1);
+    setSearchQuery("");
+  };
+
+  // 外部クリックを検出してフォーカスを解除
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsFocused(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="flex-1 bg-gray-800 rounded-l-lg p-4 shadow-md flex flex-col space-y-4 h-full">
+    <div className="flex-1 bg-gray-800 rounded-l-lg p-0 shadow-md flex flex-col space-y-0 h-full relative">
       {/* ヘッダー */}
-      <div className="flex items-center space-x-2 mb-4">
+      {/* <div className="flex items-center space-x-2 mb-0">
         <SearchIcon className="text-white" />
         <div className="flex items-center">
           <span className="text-white text-lg font-semibold">ゲーム検索</span>
           <HelpTooltip title="ゲームを検索して追加できます。検索結果からゲームを選択すると詳細が表示されます。" />
         </div>
-      </div>
+      </div> */}
 
-      {/* 検索フォーム */}
-      <div className="flex flex-col space-y-2">
-        <input
-          type="text"
-          placeholder="ゲームタイトルを検索"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
-        />
-
-        {/* メッセージ表示エリア */}
-        {showNoResultsMessage && (
-          <p className="text-gray-300">
-            該当するゲームが見つかりません。別のゲームをお探しください。
-          </p>
-        )}
-
-        {/* ゲーム追加候補表示 */}
-        {searchQuery !== "" && filteredSteamList.length > 0 && (
-          <div className="bg-gray-700 p-2 rounded-lg mb-4 max-h-40 overflow-y-auto">
-            <h2 className="text-white mb-2">検索結果（追加候補）</h2>
-            {
-              filteredSteamList.length > 0
-                ? filteredSteamList.map((game) => (
-                    <div key={"filteredSteamList" + game.steamGameId}>
-                      {typeof game.index === "number" ? (
-                        <div
-                          className="cursor-pointer flex pb-2 items-center"
-                          onClick={() =>
-                            game.index !== undefined &&
-                            setSelectedIndex(game.index)
-                          }
-                        >
-                          <div
-                            className={`${
-                              selectColor(game.index + 1).rankColor
-                            } p-2`}
-                          >
-                            {game.index + 1}位
-                          </div>
-                          <div className="text-white p-2">{game.title}</div>
-                        </div>
-                      ) : (
-                        <div className="flex pb-2 justify-between items-center">
-                          <div className="text-white p-2 rounded">
-                            {game.title}
-                          </div>
-                          <PlaylistAddIcon
-                            className="cursor-pointer hover:bg-gray-600 rounded"
-                            onClick={() => handleSearchClick(game.steamGameId)}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))
-                : null /* メッセージは上部に移動したためここでは何も表示しない */
-            }
+      {/* 検索フォームと検索候補を絶対位置に配置 */}
+      <div
+        className="absolute top-0 left-0 right-0 z-30 p-4 rounded-lg"
+        ref={containerRef}
+      >
+        {/* 検索フォーム */}
+        <div className="flex flex-col">
+          <div className="relative flex items-center">
+            <input
+              type="text"
+              placeholder="ゲームタイトルを検索"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              className="w-full p-2 pr-8 text-black rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
+            />
+            {selectedIndex !== -1 && (
+              <button
+                onClick={handleClose}
+                className="absolute right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                aria-label="閉じる"
+              >
+                ×
+              </button>
+            )}
           </div>
-        )}
+
+          {/* メッセージ表示エリア */}
+          {showNoResultsMessage && (
+            <p className="text-gray-300 mt-1">
+              該当するゲームが見つかりません。別のゲームをお探しください。
+            </p>
+          )}
+
+          {/* ゲーム追加候補表示 */}
+          {isFocused && searchQuery !== "" && filteredSteamList.length > 0 && (
+            <div className="bg-white text-black p-2 rounded-b-lg max-h-60 overflow-y-auto mt-0 cursor-pointer">
+              {/* <h2 className="text-white mb-2">検索結果（追加候補）</h2> */}
+              {filteredSteamList.map((game) => (
+                <div key={"filteredSteamList" + game.steamGameId}>
+                  {typeof game.index === "number" ? (
+                    <div
+                      className="cursor-pointer flex items-center"
+                      onMouseDown={() =>
+                        game.index !== undefined && setSelectedIndex(game.index)
+                      }
+                    >
+                      {/* 左側の順位 */}
+                      <div
+                        className="text-center"
+                        style={{
+                          minWidth: "40px", // 固定幅を指定して左揃えを実現
+                        }}
+                      >
+                        {game.index + 1}位
+                      </div>
+                      {/* 右側のタイトル */}
+                      <div className="p-2">{game.title}</div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      {/* 左側のアイコン */}
+                      <div
+                        style={{
+                          minWidth: "40px", // 左揃え用の固定幅
+                          display: "flex",
+                          justifyContent: "center", // アイコンを中央揃え
+                        }}
+                      >
+                        <PlaylistAddIcon
+                          className="cursor-pointer hover:bg-gray-600 rounded"
+                          onMouseDown={() =>
+                            handleSearchClick(game.steamGameId)
+                          }
+                        />
+                      </div>
+                      {/* 右側のタイトル */}
+                      <div className="p-2 rounded">{game.title}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 選択されたゲームの詳細表示 */}
       {selectedIndex !== -1 && nodes[selectedIndex] && (
-        <div className="bg-gray-700 p-4 rounded-lg overflow-y-auto flex-1">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-white text-xl font-semibold">
-              {nodes[selectedIndex].title}
-            </h2>
-            <button
-              className="text-red-500 hover:text-red-400"
-              onClick={() => setSelectedIndex(-1)}
-            >
-              閉じる
-            </button>
-          </div>
-
+        <div className="rounded-lg mt-24" ref={selectedDetailRef}>
+          {/* ゲーム詳細内容 */}
           <div className="flex flex-col space-y-2">
             {/* ゲーム画像 */}
             {nodes[selectedIndex].imgURL && (
               <Image
                 src={nodes[selectedIndex].imgURL}
                 alt={nodes[selectedIndex].title}
-                width={300}
+                width={400}
                 height={170}
-                style={{
-                  borderRadius: "4px",
-                  marginBottom: "0.5rem",
-                }}
-                className="object-cover"
+                style={{ borderRadius: "4px" }}
+                className="object-cover rounded mb-2"
               />
             )}
+            <div className="px-2">
+              <h2 className="text-white text-xl font-semibold">
+                {nodes[selectedIndex].title}
+              </h2>
 
-            {/* ジャンル */}
-            {nodes[selectedIndex].genres &&
-              nodes[selectedIndex].genres.length > 0 && (
-                <div className="flex items-center space-x-0.5 flex-wrap">
-                  {nodes[selectedIndex].genres.map((genre, index) => (
-                    <span
-                      key={index}
-                      className="bg-blue-500 text-xs p-0.5 mr-1 mb-1 rounded flex-shrink-0"
-                    >
-                      {genre}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-            {/* タグ */}
-            <div className="text-white mt-2">
-              {nodes[selectedIndex].tags &&
-                nodes[selectedIndex].tags.length > 0 && (
-                  <div className="flex items-center space-x-0.5 mt-1 flex-wrap">
-                    {nodes[selectedIndex].tags.slice(0, 7).map((tag, index) => (
+              {/* ジャンル */}
+              {nodes[selectedIndex].genres &&
+                nodes[selectedIndex].genres.length > 0 && (
+                  <div className="flex items-center space-x-0.5 flex-wrap">
+                    {nodes[selectedIndex].genres.map((genre, index) => (
                       <span
                         key={index}
-                        className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded flex-shrink-0"
-                        title={tag}
+                        className="bg-blue-500 text-xs p-0.5 mr-1 mt-1 mb-1 rounded flex-shrink-0 cursor-pointer select-none"
                       >
-                        {tag}
+                        {genre}
                       </span>
                     ))}
                   </div>
                 )}
-            </div>
 
-            {/* アイコン表示 */}
-            <div className="flex items-center space-x-1 mt-1 mb-2">
-              {/* デバイスサポート */}
-              {nodes[selectedIndex].device.windows && (
-                <Tooltip title="Windows対応">
-                  <WindowsIcon size={20} />
-                </Tooltip>
-              )}
-              {nodes[selectedIndex].device.mac && (
-                <Tooltip title="Mac対応">
-                  <AppleIcon className="text-white h-5 w-5" />
-                </Tooltip>
-              )}
+              {/* タグ */}
+              <div className="text-white">
+                {nodes[selectedIndex].tags &&
+                  nodes[selectedIndex].tags.length > 0 && (
+                    <div className="line-clamp-2 overflow-hidden">
+                      {nodes[selectedIndex].tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded inline-block whitespace-nowrap cursor-pointer select-none"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+              </div>
 
-              {/* マルチプレイヤー情報 */}
-              {nodes[selectedIndex].isSinglePlayer && (
-                <Tooltip title="Single Player">
-                  <PersonIcon className="text-white h-5 w-5" />
-                </Tooltip>
-              )}
-              {nodes[selectedIndex].isMultiPlayer && (
-                <Tooltip title="Multiplayer">
-                  <GroupIcon className="text-white h-5 w-5" />
-                </Tooltip>
-              )}
-            </div>
+              {/* アイコン表示 */}
+              <div className="flex items-center space-x-1 mt-1 mb-2">
+                {/* デバイスサポート */}
+                {nodes[selectedIndex].device.windows && (
+                  <Tooltip title="Windows対応">
+                    <WindowsIcon size={20} />
+                  </Tooltip>
+                )}
+                {nodes[selectedIndex].device.mac && (
+                  <Tooltip title="Mac対応">
+                    <AppleIcon className="text-white h-5 w-5" />
+                  </Tooltip>
+                )}
 
-            {/* Developer & Release Date */}
-            <div className="flex items-center">
-              <span className="text-sm mb-1">
-                開発者: {nodes[selectedIndex].developerName}
-              </span>
-            </div>
-            <div className="flex items-center">
-              <span className="text-sm mb-1">
-                発売日: {nodes[selectedIndex].releaseDate}
-              </span>
-            </div>
+                {/* マルチプレイヤー情報 */}
+                {nodes[selectedIndex].isSinglePlayer && (
+                  <Tooltip title="Single Player">
+                    <PersonIcon className="text-white h-5 w-5" />
+                  </Tooltip>
+                )}
+                {nodes[selectedIndex].isMultiPlayer && (
+                  <Tooltip title="Multiplayer">
+                    <GroupIcon className="text-white h-5 w-5" />
+                  </Tooltip>
+                )}
+              </div>
 
-            {/* 価格 */}
-            <div className="flex items-center">
-              <div>価格: </div>
-              {nodes[selectedIndex].salePrice &&
-              parseInt(nodes[selectedIndex].salePrice, 10) <
-                nodes[selectedIndex].price ? (
-                <>
-                  <span className="line-through text-gray-400 ml-2">
-                    ¥{nodes[selectedIndex].price}
-                  </span>
-                  <span className="text-red-500 ml-2">
-                    ¥{nodes[selectedIndex].salePrice}
-                  </span>
-                </>
-              ) : (
-                <span className="text-sm ml-2">
-                  {nodes[selectedIndex].price
-                    ? `¥${nodes[selectedIndex].price}`
-                    : "無料"}
+              {/* Developer & Release Date */}
+              <div className="flex items-center">
+                <span className="text-sm mb-1">
+                  開発者: {nodes[selectedIndex].developerName}
                 </span>
-              )}
-            </div>
+              </div>
+              <div className="flex items-center">
+                <span className="text-sm mb-1">
+                  発売日: {nodes[selectedIndex].releaseDate}
+                </span>
+              </div>
 
-            {/* アクションボタン */}
-            <div className="mt-4 flex space-x-2">
+              {/* 価格 */}
+              <div className="flex items-center">
+                <div>価格: </div>
+                {nodes[selectedIndex].salePrice &&
+                parseInt(nodes[selectedIndex].salePrice, 10) <
+                  nodes[selectedIndex].price ? (
+                  <>
+                    <span className="line-through text-gray-400 ml-2">
+                      ¥{nodes[selectedIndex].price}
+                    </span>
+                    <span className="text-red-500 ml-2">
+                      ¥{nodes[selectedIndex].salePrice}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-sm ml-2">
+                    {nodes[selectedIndex].price
+                      ? `¥${nodes[selectedIndex].price}`
+                      : "無料"}
+                  </span>
+                )}
+              </div>
+
+              {/* アクションボタン */}
+              {/* <div className="mt-4 flex space-x-2">
               <button
                 className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded"
                 onClick={() =>
@@ -363,10 +411,14 @@ const GameSearchPanel = (props: Props) => {
               >
                 閉じる
               </button>
+            </div> */}
             </div>
           </div>
         </div>
       )}
+
+      {/* トグル表示 */}
+      <ToggleDisplay nodes={nodes} selectedIndex={selectedIndex} />
     </div>
   );
 };
