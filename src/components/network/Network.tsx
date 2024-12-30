@@ -1,14 +1,19 @@
+/*Network.tsx*/
 "use client";
 import { useEffect, useState, useRef } from "react";
 import NodeLink from "./NodeLink";
 import SelectParameter from "./selectParameter/SelectParameter";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
-import GameList from "./gameList/GameList";
 import StreamedList from "./streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/desktop/loading";
-import { LinkType, NodeType, SteamListType, StreamerListType } from "@/types/NetworkType";
+import {
+  LinkType,
+  NodeType,
+  SteamListType,
+  StreamerListType,
+} from "@/types/NetworkType";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
@@ -19,16 +24,20 @@ import Tour from "./Tour";
 import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
+import Leaderboard from "./Leaderboard";
+import GameSearchPanel from "./GameSearchPanel";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import UserAvatar from "./steamList/UserAvatar";
+import GameEasySearchButton from "./GameEasySearchButton";
+import GameEasySearchPopup from "./GameEasySearchPopup";
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
   steamListData: SteamListType[];
-}
+};
 
-const Network = (props:Props) => {
-
+const Network = (props: Props) => {
   const { steamAllData, steamListData } = props;
 
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -52,10 +61,20 @@ const Network = (props:Props) => {
 
   // Refを使用して副作用の実行を制御
   const hasFetchedInitialData = useRef(false);
-  
-  const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
+
+  const initialNodes = async (
+    filter: Filter,
+    gameIds: string[],
+    slider: SliderSettings
+  ) => {
     setProgress(0);
-    const result = await createNetwork(steamAllData, filter, gameIds, slider, setProgress);
+    const result = await createNetwork(
+      steamAllData,
+      filter,
+      gameIds,
+      slider,
+      setProgress
+    );
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -92,8 +111,8 @@ const Network = (props:Props) => {
   // 選択されたノードが変更されたときに中心座標を更新
   useEffect(() => {
     if (selectedIndex !== -1 && nodes[selectedIndex]) {
-      setCenterX((nodes[selectedIndex].x ?? 0) -150);
-      setCenterY((nodes[selectedIndex].y ?? 0) +100);
+      setCenterX((nodes[selectedIndex].x ?? 0) - 150);
+      setCenterY((nodes[selectedIndex].y ?? 0) + 100);
     }
   }, [selectedIndex]);
 
@@ -112,12 +131,23 @@ const Network = (props:Props) => {
     });
   };
 
+  const handleGameSearchClick = () => {
+    setOpenPanel((prevPanel) =>
+      prevPanel === "gameSearch" ? null : "gameSearch"
+    );
+    setTourRun(false);
+  };
+
+  const handleGameSearchClose = () => {
+    setOpenPanel(null);
+  };
+
   if (isNetworkLoading) {
     return <Loading />;
   }
 
   return (
-    <div className="flex h-[92vh] overflow-hidden text-white">
+    <div className="flex h-[100vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
         openPanel={openPanel}
@@ -127,9 +157,26 @@ const Network = (props:Props) => {
       />
 
       {/* メインコンテンツエリアを relative に設定 */}
-      <div className="test1 flex-1 relative bg-gray-900 overflow-hidden">
+      <div className="flex-1 relative bg-gray-900 overflow-hidden">
+        {/* ゲーム検索ボタンを追加 */}
+        <GameEasySearchButton onClick={handleGameSearchClick} />
+        {/* GameSearchPopup の表示 */}
+        {openPanel === "gameSearch" && (
+          <GameEasySearchPopup
+            filter={filter}
+            setFilter={setFilter}
+            setIsNetworkLoading={setIsNetworkLoading}
+            onClose={handleGameSearchClose}
+          />
+        )}
+
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
+            {/* TODO: right調整の修正 */}
+            <div className="absolute top-4 right-96">
+              {/* ユーザーアイコンの表示 */}
+              <UserAvatar />
+            </div>
             {/* メインコンテンツ */}
             <NodeLink
               nodes={nodes}
@@ -179,7 +226,7 @@ const Network = (props:Props) => {
         )}
 
         {/* 類似度 */}
-        {openPanel === "similarity"  && (
+        {openPanel === "similarity" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <Panel
               title={
@@ -202,18 +249,29 @@ const Network = (props:Props) => {
         {/* Steam連携パネル */}
         {openPanel === "steamList" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <SteamList steamAllData={steamAllData} nodes={nodes} setSelectedIndex={setSelectedIndex}/>
+            <SteamList
+              steamAllData={steamAllData}
+              nodes={nodes}
+              setSelectedIndex={setSelectedIndex}
+            />
           </div>
         )}
 
-        {/* ゲームリストパネル */}
-        <div className="absolute top-0 right-0 w-1/4 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-          <GameList
-            steamListData={steamListData}
+        {/* ランキングパネル */}
+        {openPanel === "ranking" && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <Leaderboard nodes={nodes} setSelectedIndex={setSelectedIndex} />
+          </div>
+        )}
+
+        {/* ゲーム検索および詳細パネルを右側に配置 */}
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+          <GameSearchPanel
             nodes={nodes}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
             setIsNetworkLoading={setIsNetworkLoading}
+            steamListData={steamListData}
           />
         </div>
 

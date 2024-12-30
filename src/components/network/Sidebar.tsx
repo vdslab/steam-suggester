@@ -1,12 +1,13 @@
-/* Sidebar.tsx */
+/*Sidebar.tsx*/
 "use client";
 
 import React from "react";
-import FilterListIcon from '@mui/icons-material/FilterList';
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import FilterListIcon from "@mui/icons-material/FilterList";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
-import TourIcon from '@mui/icons-material/Tour';
+import TourIcon from "@mui/icons-material/Tour";
 import TuneIcon from "@mui/icons-material/Tune";
+import LeaderboardIcon from "@mui/icons-material/Leaderboard"; // ランキング用アイコンの追加
 
 // 共通のボタンクラス
 export const buttonClasses = (isActive: boolean) =>
@@ -16,26 +17,23 @@ export const buttonClasses = (isActive: boolean) =>
 
 type Props = {
   openPanel: string | null;
-  togglePanel: (panelName:string) => void;
+  togglePanel: (panelName: string) => void;
   tourRun: boolean;
   toggleTourRun: () => void;
 };
-
 
 const Sidebar: React.FC<Props> = ({
   openPanel,
   togglePanel,
   tourRun,
-  toggleTourRun
-
+  toggleTourRun,
 }) => {
-
   return (
     <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4">
       {/* 類似度ボタン */}
       <button
         onClick={() => togglePanel("similarity")}
-        className={`${buttonClasses(openPanel == "similarity")} step3`}
+        className={`${buttonClasses(openPanel === "similarity")} step3`}
       >
         <TuneIcon />
         <span className="text-xs mt-1">類似度設定</span>
@@ -44,7 +42,7 @@ const Sidebar: React.FC<Props> = ({
       {/* フィルターボタン */}
       <button
         onClick={() => togglePanel("filter")}
-        className={`${buttonClasses(openPanel == "filter")} step1`}
+        className={`${buttonClasses(openPanel === "filter")} step1`}
       >
         <FilterListIcon />
         <span className="text-xs mt-1">フィルター</span>
@@ -53,7 +51,7 @@ const Sidebar: React.FC<Props> = ({
       {/* Streamerボタン */}
       <button
         onClick={() => togglePanel("streamer")}
-        className={`${buttonClasses(openPanel == "streamer")} step2`}
+        className={`${buttonClasses(openPanel === "streamer")} step2`}
       >
         <LiveTvIcon />
         <span className="text-xs mt-1">配信者</span>
@@ -62,22 +60,26 @@ const Sidebar: React.FC<Props> = ({
       {/* Steamリストボタン */}
       <button
         onClick={() => togglePanel("steamList")}
-        className={`${buttonClasses(openPanel == "steamList")} step4`}
+        className={`${buttonClasses(openPanel === "steamList")} step4`}
       >
         <SportsEsportsIcon />
         <span className="text-xs mt-1">Steam連携</span>
       </button>
 
-      {/* ツアーボタン */}
+      {/* ランキングボタン */}
       <button
-        onClick={toggleTourRun}
-        className={`${buttonClasses(tourRun)}`}
+        onClick={() => togglePanel("ranking")}
+        className={`${buttonClasses(openPanel === "ranking")} step5`}
       >
+        <LeaderboardIcon />
+        <span className="text-xs mt-1">ランキング</span>
+      </button>
+
+      {/* ツアーボタン */}
+      <button onClick={toggleTourRun} className={`${buttonClasses(tourRun)}`}>
         <TourIcon />
         <span className="text-xs mt-1">ツアー開始</span>
       </button>
-
-
     </div>
   );
 };
