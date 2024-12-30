@@ -7,6 +7,7 @@ import SimilarGames from "@/components/simlarGames/SimilarGames";
 import UserSelection from '@/components/GameExplanation/UserSelection';
 import Typography from '@mui/material/Typography';
 import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
+import ReviewCloud from "@/components/charts/ReviewCloud";
 
 
 export default async function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
@@ -63,6 +64,10 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
             </div>
 
           </div>
+        </div>
+
+        <div>
+          <ReviewCloud steamData={steamData} />
         </div>
       </div>
     </div>
