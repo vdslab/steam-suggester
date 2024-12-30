@@ -16,8 +16,6 @@ const DisplayGame = (props:Props) => {
   const currentPath = usePathname();
   const basePath = currentPath.startsWith('/desktop') ? '/desktop' : '/mobile';
 
-  console.log(node);
-
   return (
     <Link
       href={`${basePath}/details?steam_id=${node.steamGameId}&twitch_id=${node.twitchGameId}`}
