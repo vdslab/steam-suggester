@@ -16,7 +16,7 @@ export default async function Page() {
 
   return (
     <>
-      {/* <HomeHeader /> */}
+      <HomeHeader />
       <Network steamAllData={steamAllData} steamListData={steamListData} />
     </>
   );
