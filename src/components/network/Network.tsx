@@ -8,7 +8,7 @@ import GameList from "./gameList/GameList";
 import StreamedList from "./streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/desktop/loading";
-import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
+import { LinkType, NodeType, SteamListType, StreamerListType } from "@/types/NetworkType";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
@@ -20,10 +20,17 @@ import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import useTour from "@/hooks/useTour";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
+type Props = {
+  steamAllData: SteamDetailsDataType[];
+  steamListData: SteamListType[];
+}
 
+const Network = (props:Props) => {
 
-const Network = () => {
+  const { steamAllData, steamListData } = props;
+
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
   const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
 
@@ -34,16 +41,11 @@ const Network = () => {
 
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isNetworkLoading, setIsNetworkLoading] = useState(false);
+  const [isNetworkLoading, setIsNetworkLoading] = useState(true);
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
-  // 各機能の開閉状態を管理
-  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
-  const [isStreamerOpen, setIsStreamerOpen] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
-  const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
   const { tourRun, setTourRun } = useTour();
 
   const [progress, setProgress] = useState(0);
@@ -53,7 +55,7 @@ const Network = () => {
   
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
     setProgress(0);
-    const result = await createNetwork(filter, gameIds, slider, setProgress);
+    const result = await createNetwork(steamAllData, filter, gameIds, slider, setProgress);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -69,11 +71,11 @@ const Network = () => {
     setNodes(nodes);
     setLinks(links);
     setProgress(100);
-    hasFetchedInitialData.current = false; 
+    hasFetchedInitialData.current = false;
   };
 
   useEffect(() => {
-    if ((isLoading || isNetworkLoading) && !hasFetchedInitialData.current) {
+    if (isNetworkLoading && !hasFetchedInitialData.current) {
       hasFetchedInitialData.current = true; // フラグを立てる
       (async () => {
         const filterData = (await getFilterData()) ?? DEFAULT_FILTER;
@@ -82,79 +84,35 @@ const Network = () => {
         setFilter(filterData);
         setSlider(sliderData);
         await initialNodes(filterData, gameIds, sliderData);
-        setIsLoading(false);
         setIsNetworkLoading(false);
       })();
     }
-  }, [isLoading, isNetworkLoading]);
+  }, [isNetworkLoading]);
 
-  // Sidebar のトグル関数
-  const toggleFilter = () => {
-    setIsFilterOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
+  // 選択されたノードが変更されたときに中心座標を更新
+  useEffect(() => {
+    if (selectedIndex !== -1 && nodes[selectedIndex]) {
+      setCenterX((nodes[selectedIndex].x ?? 0) -150);
+      setCenterY((nodes[selectedIndex].y ?? 0) +100);
+    }
+  }, [selectedIndex]);
 
-  const toggleStreamer = () => {
-    setIsStreamerOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
-
-  const toggleChat = () => {
-    setIsChatOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsSteamListOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
-  };
-
-  const toggleSteamList = () => {
-    setIsSteamListOpen((prev) => {
-      const newState = !prev;
-      if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setTourRun(false);
-      }
-      return newState;
-    });
+  const togglePanel = (panelName: string) => {
+    setOpenPanel((prevPanel) => (prevPanel === panelName ? null : panelName));
+    setTourRun(false);
   };
 
   const toggleTourRun = () => {
     setTourRun((prev) => {
       const newState = !prev;
       if (newState) {
-        setIsFilterOpen(false);
-        setIsStreamerOpen(false);
-        setIsChatOpen(false);
-        setIsSteamListOpen(false);
+        setOpenPanel(null);
       }
       return newState;
     });
   };
 
-  if (isLoading) {
+  if (isNetworkLoading) {
     return <Loading />;
   }
 
@@ -162,14 +120,8 @@ const Network = () => {
     <div className="flex h-[92vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
-        isFilterOpen={isFilterOpen}
-        toggleFilter={toggleFilter}
-        isStreamerOpen={isStreamerOpen}
-        toggleStreamer={toggleStreamer}
-        isChatOpen={isChatOpen}
-        toggleChat={toggleChat}
-        isSteamListOpen={isSteamListOpen}
-        toggleSteamList={toggleSteamList}
+        openPanel={openPanel}
+        togglePanel={togglePanel}
         tourRun={tourRun}
         toggleTourRun={toggleTourRun}
       />
@@ -187,7 +139,7 @@ const Network = () => {
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
               streamerIds={streamerIds}
-              isStreamerOpen={isStreamerOpen}
+              openPanel={openPanel}
             />
           </div>
         ) : (
@@ -195,7 +147,7 @@ const Network = () => {
         )}
 
         {/* フィルターパネル */}
-        {isFilterOpen && (
+        {openPanel === "filter" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <SelectParameter
               filter={filter}
@@ -206,7 +158,7 @@ const Network = () => {
         )}
 
         {/* StreamerListパネル */}
-        {isStreamerOpen && (
+        {openPanel === "streamer" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <Panel
               title={
@@ -226,8 +178,8 @@ const Network = () => {
           </div>
         )}
 
-        {/* ChatBarパネル */}
-        {isChatOpen && (
+        {/* 類似度 */}
+        {openPanel === "similarity"  && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <Panel
               title={
@@ -248,20 +200,19 @@ const Network = () => {
         )}
 
         {/* Steam連携パネル */}
-        {isSteamListOpen && (
+        {openPanel === "steamList" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <SteamList />
+            <SteamList steamAllData={steamAllData} nodes={nodes} setSelectedIndex={setSelectedIndex}/>
           </div>
         )}
 
         {/* ゲームリストパネル */}
-        <div className="absolute top-0 right-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+        <div className="absolute top-0 right-0 w-1/4 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
           <GameList
+            steamListData={steamListData}
             nodes={nodes}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
-            setCenterX={setCenterX}
-            setCenterY={setCenterY}
             setIsNetworkLoading={setIsNetworkLoading}
           />
         </div>

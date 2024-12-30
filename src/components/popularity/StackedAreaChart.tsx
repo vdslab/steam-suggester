@@ -51,7 +51,11 @@ const StackedAreaChart =({
 
 
   return(
-    <svg width={width+ 100} height={height +50}>
+    <svg
+      width="100%"
+      height="100%"
+      viewBox={`0 0 ${width + 100} ${height + 50}`}
+    >
       <rect x={70} y={margin.top} width={width} height={height -margin.top} fill={BG_COLOR_STACKED_AREA} />
       <AxisBottom
         scale={xScale}

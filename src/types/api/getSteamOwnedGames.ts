@@ -8,3 +8,9 @@ type Game = {
   rtime_last_played: number,
   playtime_disconnected: number
 };
+
+
+type GetSteamOwnedGamesResponse = {
+  id: string,
+  title: string,
+};

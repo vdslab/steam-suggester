@@ -12,26 +12,23 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import SearchIcon from "@mui/icons-material/Search";
 import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
-import InfoIcon from '@mui/icons-material/Info';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 import Tooltip from '@mui/material/Tooltip';
+import WindowsIcon from "@/components/common/WindowsIcon";
 
 type Props = {
+  steamListData: SteamListType[];
   nodes: NodeType[];
   selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-  setCenterX: React.Dispatch<React.SetStateAction<number>>;
-  setCenterY: React.Dispatch<React.SetStateAction<number>>;
-  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsNetworkLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const GameList = (props: Props) => {
-  const { nodes, selectedIndex, setSelectedIndex, setCenterX, setCenterY, setIsLoading, setIsNetworkLoading } = props;
+  const { steamListData, nodes, selectedIndex, setSelectedIndex, setIsNetworkLoading } = props;
   const router = useRouter();
-  const [steamList, setSteamList] = useState<SteamListType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
   const [filteredNodeList, setFilteredNodeList] = useState<NodeType[]>(nodes);
@@ -46,20 +43,8 @@ const GameList = (props: Props) => {
   // Steamゲームリストとユーザーが追加したゲームを取得
   useEffect(() => {
     (async () => {
-      const CURRENT_URL = process.env.NEXT_PUBLIC_CURRENT_URL || '';
-      const res1 = await fetch(
-        `${CURRENT_URL}/api/network/getSteamList`,
-        { next: { revalidate: ISR_FETCH_INTERVAL } }
-      );
-      if(!res1.ok) {
-        console.error("Failed to fetch Steam list");
-        return;
-      }
-      const data = await res1.json();
-      const res2 = await getGameIdData();
-
-      setSteamList(data);
-      setUserAddedGames(res2 ?? []);
+      const res = await getGameIdData();
+      setUserAddedGames(res ?? []);
     })();
   }, []);
 
@@ -75,7 +60,7 @@ const GameList = (props: Props) => {
       }
     });
 
-    allSteamList.push(...steamList.filter((item1: SteamListType) => !allSteamList.find((item2: SteamListType) => item2.steamGameId === item1.steamGameId)));
+    allSteamList.push(...steamListData.filter((item1: SteamListType) => !allSteamList.find((item2: SteamListType) => item2.steamGameId === item1.steamGameId)));
 
     // Steamリストのフィルタリング（ユーザーが追加していないゲームかつ固定ゲームではないもの）
     const filteredSteam = allSteamList
@@ -96,14 +81,7 @@ const GameList = (props: Props) => {
         );
       setFilteredNodeList(filteredNodes);
     }
-  }, [steamList, searchQuery, userAddedGames, nodes, fixedGameIds]);
-
-  // ゲームをクリックしたときの処理
-  const handleGameClick = (index: number) => {
-    setCenterX((nodes[index].x ?? 0) - 150);
-    setCenterY((nodes[index].y ?? 0) + 100);
-    setSelectedIndex(index);
-  };
+  }, [searchQuery, userAddedGames, nodes, fixedGameIds]);
 
   // ゲームを追加する処理
   const handleSearchClick = (steamGameId: string) => {
@@ -113,12 +91,7 @@ const GameList = (props: Props) => {
       (async () => {
         await changeGameIdData(newUserAddedGames);
         setSearchQuery('')
-        // TODO:
-        if(setIsNetworkLoading) {
-          setIsNetworkLoading(true);
-        } else if (setIsLoading) {
-          setIsLoading(true);
-        }
+        setIsNetworkLoading(true);
       })();
     }
   };
@@ -130,12 +103,7 @@ const GameList = (props: Props) => {
     (async () => {
       await changeGameIdData(newUserAddedGames);
       setSearchQuery('')
-      // TODO:
-      if(setIsNetworkLoading) {
-        setIsNetworkLoading(true);
-      } else if (setIsLoading) {
-        setIsLoading(true);
-      }
+      setIsNetworkLoading(true);
     })();
   };
 
@@ -206,7 +174,7 @@ const GameList = (props: Props) => {
                 filteredSteamList.map((game) => (
                   <div key={"filteredSteamList" + game.steamGameId}>
                     {typeof game.index === "number" ? (
-                      <div className='cursor-pointer flex pb-2 items-center' onClick={() => handleGameClick(game.index as number)}>
+                      <div className='cursor-pointer flex pb-2 items-center' onClick={() => game.index !== undefined && setSelectedIndex(game.index)}>
                         <div className={`${selectColor(game.index + 1).rankColor} p-2`}>
                           {game.index + 1}位
                         </div>
@@ -254,7 +222,7 @@ const GameList = (props: Props) => {
                     >
                       <div 
                         className="flex items-center justify-between"
-                        onClick={() => handleGameClick(node.index)}
+                        onClick={() => node.index !== undefined && setSelectedIndex(node.index)}
                       >
                         <div className="flex items-center">
                           <div className={`${rankColor} pb-2 p-2 whitespace-nowrap`}>
@@ -283,15 +251,16 @@ const GameList = (props: Props) => {
                             height={170}
                             style={{
                               borderRadius: "4px",
+                              marginBottom: "0.5rem"
                             }}
                             className="object-cover"
                           />
                           
-                          {/* Short Details */}
+                          {/* Short Details
                           <div className="flex items-start my-2">
                             <InfoIcon className="mt-1 mr-1 mb-1" />
                             <p className="text-sm">{node.shortDetails}</p>
-                          </div>
+                          </div> */}
 
                           {/* ジャンル */}
                           {node.genres && node.genres.length > 0 && (
@@ -308,7 +277,7 @@ const GameList = (props: Props) => {
                             <div className="text-white mt-2">
                               {node.tags && node.tags.length > 0 && (
                                 <div className="flex items-center space-x-0.5 mt-1 flex-wrap">
-                                  {node.tags.map((tag, index) => (
+                                  {node.tags.slice(0, 7).map((tag, index) => (
                                     <span
                                       key={index}
                                       className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded flex-shrink-0"
@@ -327,7 +296,7 @@ const GameList = (props: Props) => {
                             {/* デバイスサポート */}
                             {node.device.windows && 
                               <Tooltip title="windows対応">
-                                <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 40 40" width="20px" height="20px"><path d="M26 6H42V22H26zM38 42H26V26h16v12C42 40.209 40.209 42 38 42zM22 22H6V10c0-2.209 1.791-4 4-4h12V22zM6 26H22V42H6z" fill="white"/></svg>
+                                <WindowsIcon size={20} />
                               </Tooltip>
                             }
                             {node.device.mac && 

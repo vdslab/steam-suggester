@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const games = data.response.games;
 
     const client = await PG_POOL.connect();
-    const result = [];
+    const result:GetSteamOwnedGamesResponse[] = [];
     for (const game of games) {
       const appId = game.appid;
       const queryResult = await client.query(
@@ -31,7 +31,10 @@ export async function GET(req: NextRequest) {
       );
 
       if (queryResult.rows.length > 0 && queryResult.rows[0].game_title) {
-        result.push(queryResult.rows[0].game_title);
+        result.push({
+          id: appId,
+          title: queryResult.rows[0].game_title,
+      });
       }
     }
     await client.release(true);

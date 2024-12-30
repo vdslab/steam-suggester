@@ -14,15 +14,13 @@ import { useSearchParams } from 'next/navigation'
 type Props = {
   nodes: any;
   isFilterOpen: boolean;
-  setIsFilterOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setCenterX: React.Dispatch<React.SetStateAction<number>>;
-  setCenterY: React.Dispatch<React.SetStateAction<number>>;
+  setOpenPanel: React.Dispatch<React.SetStateAction<string | null>>;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const SearchBar = (props:Props) => {
 
-  const { nodes, isFilterOpen, setIsFilterOpen, setCenterX, setCenterY, setSelectedIndex } = props;
+  const { nodes, isFilterOpen, setOpenPanel, setSelectedIndex } = props;
 
   const [searchNodesQuery, setSearchNodesQuery] = useState<string>('');
 
@@ -35,23 +33,21 @@ const SearchBar = (props:Props) => {
   }
 
   const handleGameClick = (index: number) => {
-
     updateIdParam(index);
-    setCenterX(nodes[index].x ?? 0);
-    setCenterY((nodes[index].y ?? 0) + 100);
     setSelectedIndex(index);
   };
 
   const handleOptionClick = () => {
+    // 検索ボックスが空の場合はフィルターパネルを開閉
     if (searchNodesQuery == "") {
-      setIsFilterOpen(!isFilterOpen);
+      isFilterOpen ? setOpenPanel(null) : setOpenPanel("filter");
     } else {
       setSearchNodesQuery('');
     }
   }
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsFilterOpen(false);
+    setOpenPanel(null);
     setSearchNodesQuery(e.target.value);
   }
 
