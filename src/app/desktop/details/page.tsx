@@ -8,6 +8,8 @@ import UserSelection from '@/components/GameExplanation/UserSelection';
 import Typography from '@mui/material/Typography';
 import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 import ReviewCloud from "@/components/charts/ReviewCloud";
+import ActiveUsersChart from "@/components/charts/ActiveUsersChart";
+import { GetActiveUserResponse } from "@/types/api/getActiveUserType";
 
 
 export default async function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
@@ -19,6 +21,11 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
 
   const matchRes = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
   const steamAllData:SteamDetailsDataType[] = await matchRes.json()
+
+  const activeUserRes = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${steamGameId}`);
+  const activeUserData:GetActiveUserResponse[] = await activeUserRes.json();
+
+  console.log(activeUserData);
 
 
   return (
@@ -68,6 +75,10 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
 
         <div>
           <ReviewCloud steamData={steamData} />
+        </div>
+
+        <div>
+          <ActiveUsersChart width={500} height={500} data={activeUserData} />
         </div>
       </div>
     </div>
