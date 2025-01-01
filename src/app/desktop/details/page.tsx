@@ -10,6 +10,8 @@ import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 import ReviewCloud from "@/components/charts/ReviewCloud";
 import ActiveUsersChart from "@/components/charts/ActiveUsersChart";
 import { GetActiveUserResponse } from "@/types/api/getActiveUserType";
+import SteamReviewBrushChart from "@/components/charts/SteamReviewBrushChart";
+import { GetSteamAllReviewsResponse } from "@/types/api/countSteamReviewsType";
 
 
 export default async function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
@@ -25,7 +27,8 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
   const activeUserRes = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${steamGameId}`);
   const activeUserData:GetActiveUserResponse[] = await activeUserRes.json();
 
-  console.log(activeUserData);
+  const steamAllReviewRes = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countSteamAllReviews/${steamGameId}`);
+  const steamAllReviewData:GetSteamAllReviewsResponse[] = await steamAllReviewRes.json();
 
 
   return (
@@ -79,6 +82,10 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
 
         <div>
           <ActiveUsersChart width={500} height={500} data={activeUserData} />
+        </div>
+
+        <div>
+          <SteamReviewBrushChart width={500} height={500} data={steamAllReviewData} />
         </div>
       </div>
     </div>

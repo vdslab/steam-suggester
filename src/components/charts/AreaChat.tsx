@@ -4,7 +4,6 @@ import { AreaClosed } from '@visx/shape';
 import { AxisLeft, AxisBottom, AxisScale } from '@visx/axis';
 import { LinearGradient } from '@visx/gradient';
 import { curveMonotoneX } from '@visx/curve';
-import { GetActiveUserResponse } from '@/types/api/getActiveUserType';
 
 // Initialize some variables
 const axisColor = '#fff';
@@ -23,10 +22,6 @@ const axisLeftTickLabelProps = {
   fill: axisColor,
 };
 
-// accessors
-const getDate = (d: GetActiveUserResponse) => new Date(d.get_date);
-const getStockValue = (d: GetActiveUserResponse) => d.active_user;
-
 export default function AreaChart({
   data,
   gradientColor,
@@ -40,8 +35,10 @@ export default function AreaChart({
   top,
   left,
   children,
+  getDate,
+  getStockValue,
 }: {
-  data: GetActiveUserResponse[];
+  data: any[];
   gradientColor: string;
   xScale: AxisScale<number>;
   yScale: AxisScale<number>;
@@ -53,12 +50,14 @@ export default function AreaChart({
   top?: number;
   left?: number;
   children?: React.ReactNode;
+  getDate: (d:any) => Date;
+  getStockValue: (d:any) => number;
 }) {
   if (width < 10) return null;
   return (
     <Group left={left || margin.left} top={top || margin.top}>
       <LinearGradient
-        id="gradient"
+        id={gradientColor}
         from={gradientColor}
         fromOpacity={1}
         to={gradientColor}
@@ -70,8 +69,8 @@ export default function AreaChart({
         y={(d) => yScale(getStockValue(d)) || 0}
         yScale={yScale}
         strokeWidth={1}
-        stroke="url(#gradient)"
-        fill="url(#gradient)"
+        stroke={`url(#${gradientColor})`}
+        fill={`url(#${gradientColor})`}
         curve={curveMonotoneX}
       />
       {!hideBottomAxis && (

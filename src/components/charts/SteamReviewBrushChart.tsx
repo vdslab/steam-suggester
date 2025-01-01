@@ -10,34 +10,35 @@ import { LinearGradient } from '@visx/gradient';
 import { max, extent } from '@visx/vendor/d3-array';
 import { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle';
 import AreaChart from './AreaChat';
-import { GetActiveUserResponse } from '@/types/api/getActiveUserType';
+import { GetSteamAllReviewsResponse } from '@/types/api/countSteamReviewsType';
 
+const colors = ['#143059', '#2F6B9A', '#82a6c2'];
 
 // Initialize some variables
 const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 };
 const chartSeparation = 30;
-const PATTERN_ID = 'brush_pattern';
-const GRADIENT_ID = 'brush_gradient';
-export const accentColor = '#f6acc8'; //ブラシのパターンの色
-export const background = '#584153'; //グラフの背景色
-export const background2 = '#af8baf'; //グラフの塗りつぶし色
+const PATTERN_ID = 'brush_pattern2';
+const GRADIENT_ID = 'brush_gradient2';
+export const accentColor = '#143059'; //ブラシのパターンの色
+export const background = '#2F6B9A'; //グラフの背景色
+export const background2 = '#82a6c2'; //グラフの塗りつぶし色
 const selectedBrushStyle = {
   fill: `url(#${PATTERN_ID})`,
   stroke: 'white',
 };
 
 // accessors
-const getDate = (d: GetActiveUserResponse) => new Date(d.get_date);
-const getStockValue = (d: GetActiveUserResponse) => d.active_user;
+const getDate = (d: GetSteamAllReviewsResponse) => new Date(d.date);
+const getStockValue = (d: GetSteamAllReviewsResponse) => d.count;
 
 export type BrushProps = {
   width: number;
   height: number;
   margin?: { top: number; right: number; bottom: number; left: number };
-  data: GetActiveUserResponse[];
+  data: GetSteamAllReviewsResponse[];
 };
 
-function ActiveUsersChart({
+function SteamReviewBrushChart({
   width,
   height,
   margin = {
@@ -229,4 +230,4 @@ function BrushHandle({ x, height, isBrushActive }: BrushHandleRenderProps) {
   );
 }
 
-export default ActiveUsersChart;
+export default SteamReviewBrushChart;

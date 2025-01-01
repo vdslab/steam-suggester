@@ -1,4 +1,4 @@
-import { RollupType, SteamReviewHistogramApiType } from "@/types/api/countSteamReviewsType";
+import { GetSteamAllReviewsResponse, RollupType, SteamReviewHistogramApiType } from "@/types/api/countSteamReviewsType";
 import { NextResponse } from "next/server";
 
 type Params = {
@@ -13,9 +13,11 @@ export async function GET(req: Request, { params }: Params) {
   const response = await fetch(`https://store.steampowered.com/appreviewhistogram/${gameID}?json=1`)
   const data:SteamReviewHistogramApiType = await response.json()
 
-  const reviewsCount = data.results.rollups.map((rollup:RollupType) => ({
-    date: rollup.date,
+  const reviewsCount:GetSteamAllReviewsResponse[] = data.results.rollups.map((rollup:RollupType) => ({
+    date: new Date(rollup.date*1000).toISOString(),
     count: (rollup.recommendations_down + rollup.recommendations_up),
+    positiveCount: rollup.recommendations_up,
+    negativeCount: rollup.recommendations_down
   }))
 
 
