@@ -55,15 +55,27 @@ function SteamReviewBrushChart({
 
   const [filteredStock, setFilteredStock] = useState<GetSteamAllReviewsResponse[]>([]);
   const brushRef = useRef<BaseBrush | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // モバイル判定をパスで行うようにするかも
+  // const basePath = currentPath.startsWith('/desktop') ? '/desktop' : '/mobile';
 
   useEffect(() => {
     if (data) {
       setFilteredStock(data);
     }
+    if (typeof window !== 'undefined') {
+      // モバイル端末を判定
+      setIsMobile(/Mobi|Android/i.test(window.navigator.userAgent));
+    }
   }, [data]);
 
   const onBrushChange = (domain: Bounds | null) => {
     if (!domain) return;
+
+    // モバイルデバイスではスクロールを防ぐ
+    window.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+    
     const { x0, x1, y0, y1 } = domain;
     const stockCopy = data?.filter((s) => {
       const x = getDate(s).getTime();
@@ -222,7 +234,7 @@ function SteamReviewBrushChart({
             onChange={onBrushChange}
             onClick={() => setFilteredStock(data)}
             selectedBoxStyle={selectedBrushStyle}
-            useWindowMoveEvents
+            useWindowMoveEvents={!isMobile}
             renderBrushHandle={(props) => <BrushHandle {...props} />}
           />
         </AreaChart>

@@ -11,8 +11,6 @@ type Params = {
 export async function GET(req: Request, { params }: Params) {
   const steamGameId = params.steamGameId;
 
-  console.log("steamGameId:", steamGameId);
-
   try {
     const client = await PG_POOL.connect();
 
