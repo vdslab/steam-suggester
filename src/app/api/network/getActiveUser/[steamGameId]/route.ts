@@ -22,7 +22,9 @@ export async function GET(req: Request, { params }: Params) {
       FROM
           steam_active_users
       WHERE
-          steam_id = $1;
+          steam_id = $1
+      ORDER BY
+          get_date ASC;
     `;
 
     const result = await client.query(query, [steamGameId]);
@@ -31,8 +33,6 @@ export async function GET(req: Request, { params }: Params) {
     if (result.rows.length === 0) {
       return NextResponse.json({ error: "Game not found" }, { status: 404 });
     }
-
-
 
     const activeUsers:GetActiveUserResponse[] = result.rows.map((row) => {
       return {

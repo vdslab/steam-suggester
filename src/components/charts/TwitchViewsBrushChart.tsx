@@ -10,33 +10,33 @@ import { LinearGradient } from '@visx/gradient';
 import { max, extent } from '@visx/vendor/d3-array';
 import { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle';
 import AreaChart from './AreaChat';
-import { GetSteamAllReviewsResponse } from '@/types/api/countSteamReviewsType';
-import { fetcher } from '../common/Fetcher';
+import { GetTwitchAllReviewsResponse } from '@/types/api/getTwitchAllReviewsType';
 import useSWR from 'swr';
+import { fetcher } from '../common/Fetcher';
 import CircularProgress from '@mui/material/CircularProgress';
 
 // Initialize some variables
-const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 };
+const brushMargin = { top: 10, bottom: 15, left: 80, right: 20 };
 const chartSeparation = 30;
-const PATTERN_ID = 'brush_pattern2';
-const GRADIENT_ID = 'brush_gradient2';
-export const accentColor = '#143059'; //ブラシのパターンの色
-export const background = '#2F6B9A'; //グラフの背景色
-export const background2 = '#82a6c2'; //グラフの塗りつぶし色
+const PATTERN_ID = 'brush_pattern3';
+const GRADIENT_ID = 'brush_gradient3';
+export const accentColor = '#262d97'; //ブラシのパターンの色
+export const background = '#6441a5'; //グラフの背景色
+export const background2 = '#b39cd2'; //グラフの塗りつぶし色
 const selectedBrushStyle = {
   fill: `url(#${PATTERN_ID})`,
   stroke: 'white',
 };
 
 // accessors
-const getDate = (d: GetSteamAllReviewsResponse) => new Date(d.date);
-const getStockValue = (d: GetSteamAllReviewsResponse) => d.count;
+const getDate = (d: GetTwitchAllReviewsResponse) => new Date(d.get_date);
+const getStockValue = (d: GetTwitchAllReviewsResponse) => d.total_views;
 
 export type BrushProps = {
   width: number;
   height: number;
   margin?: { top: number; right: number; bottom: number; left: number };
-  steamGameId: string;
+  twitchGameId: string;
 };
 
 function SteamReviewBrushChart({
@@ -44,16 +44,16 @@ function SteamReviewBrushChart({
   height,
   margin = {
     top: 20,
-    left: 50,
+    left: 80,
     bottom: 20,
     right: 20,
   },
-  steamGameId
+  twitchGameId,
 }: BrushProps) {
 
-  const { data, error } = useSWR<GetSteamAllReviewsResponse[]>(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countSteamAllReviews/${steamGameId}`, fetcher);
+  const { data, error } = useSWR<GetTwitchAllReviewsResponse[]>(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchAllViews/${twitchGameId}`, fetcher);
 
-  const [filteredStock, setFilteredStock] = useState<GetSteamAllReviewsResponse[]>([]);
+  const [filteredStock, setFilteredStock] = useState<GetTwitchAllReviewsResponse[]>([]);
   const brushRef = useRef<BaseBrush | null>(null);
 
   useEffect(() => {
@@ -122,9 +122,9 @@ function SteamReviewBrushChart({
 
   const initialBrushPosition = useMemo(() => {
     const middleIndex = Math.floor((data?.length || 0) / 4);
-    const middleData = data?.[middleIndex] || { date: '', count: 0, positiveCount: 0, negativeCount: 0 };
+    const middleData = data?.[middleIndex] || { get_date: '', total_views: 0 };
     return {
-      start: { x: brushDateScale(getDate(data ? data[0] : { date: '', count: 0, positiveCount: 0, negativeCount: 0 })) },
+      start: { x: brushDateScale(getDate(data ? data[0] : { get_date: '', total_views: 0 })) },
       end: { x: brushDateScale(getDate(middleData)) },
     };
   }, [brushDateScale, data]);
@@ -157,18 +157,17 @@ function SteamReviewBrushChart({
     }
   };
 
-    if (error) {
-      return <div>Error loading data</div>;
-    }
-  
-    if (!data) {
-      return (
-        <div className="flex justify-center items-center h-40">
-          <CircularProgress />
-        </div>
-      );
-    }
-  
+  if (error) {
+    return <div>Error loading data</div>;
+  }
+
+  if (!data) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -232,7 +231,8 @@ function SteamReviewBrushChart({
     </div>
   );
 }
-// We need to manually offset the handles for them to be rendered at the right position
+
+// BrushHandle component
 function BrushHandle({ x, height, isBrushActive }: BrushHandleRenderProps) {
   const pathWidth = 8;
   const pathHeight = 15;

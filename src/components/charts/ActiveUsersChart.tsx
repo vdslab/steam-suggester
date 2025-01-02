@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { scaleTime, scaleLinear } from '@visx/scale';
 import { Brush } from '@visx/brush';
 import { Bounds } from '@visx/brush/lib/types';
@@ -11,7 +11,9 @@ import { max, extent } from '@visx/vendor/d3-array';
 import { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle';
 import AreaChart from './AreaChat';
 import { GetActiveUserResponse } from '@/types/api/getActiveUserType';
-
+import CircularProgress from '@mui/material/CircularProgress';
+import { fetcher } from '../common/Fetcher';
+import useSWR from 'swr';
 
 // Initialize some variables
 const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 };
@@ -34,7 +36,7 @@ export type BrushProps = {
   width: number;
   height: number;
   margin?: { top: number; right: number; bottom: number; left: number };
-  data: GetActiveUserResponse[];
+  steamGameId: string;
 };
 
 function ActiveUsersChart({
@@ -46,20 +48,28 @@ function ActiveUsersChart({
     bottom: 20,
     right: 20,
   },
-  data,
+  steamGameId,
 }: BrushProps) {
 
+  const { data, error } = useSWR<GetActiveUserResponse[]>(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${steamGameId}`, fetcher);
+
+  const [filteredStock, setFilteredStock] = useState<GetActiveUserResponse[]>([]);
   const brushRef = useRef<BaseBrush | null>(null);
-  const [filteredStock, setFilteredStock] = useState(data);
+
+  useEffect(() => {
+    if (data) {
+      setFilteredStock(data);
+    }
+  }, [data]);
 
   const onBrushChange = (domain: Bounds | null) => {
     if (!domain) return;
     const { x0, x1, y0, y1 } = domain;
-    const stockCopy = data.filter((s) => {
+    const stockCopy = data?.filter((s) => {
       const x = getDate(s).getTime();
       const y = getStockValue(s);
       return x > x0 && x < x1 && y > y0 && y < y1;
-    });
+    }) || [];
     setFilteredStock(stockCopy);
   };
 
@@ -96,32 +106,32 @@ function ActiveUsersChart({
     () =>
       scaleTime<number>({
         range: [0, xBrushMax],
-        domain: extent(data, getDate) as [Date, Date],
+        domain: extent(data || [], getDate) as [Date, Date],
       }),
-    [xBrushMax],
+    [xBrushMax, data],
   );
   const brushStockScale = useMemo(
     () =>
       scaleLinear({
         range: [yBrushMax, 0],
-        domain: [0, max(data, getStockValue) || 0],
+        domain: [0, max(data || [], getStockValue) || 0],
         nice: true,
       }),
-    [yBrushMax],
+    [yBrushMax, data],
   );
 
-  const initialBrushPosition = useMemo(
-    () => ({
-      start: { x: brushDateScale(getDate(data[0])) },
-      end: { x: brushDateScale(getDate(data[5])) },
-    }),
-    [brushDateScale],
-  );
+  const initialBrushPosition = useMemo(() => {
+    const middleIndex = Math.floor((data?.length || 0) / 4);
+    const middleData = data?.[middleIndex] || { get_date: '', active_user: 0 };
+    return {
+      start: { x: brushDateScale(getDate(data ? data[0] : { get_date: '', active_user: 0 })) },
+      end: { x: brushDateScale(getDate(middleData)) },
+    };
+  }, [brushDateScale, data]);
 
-  // event handlers
   const handleClearClick = () => {
     if (brushRef?.current) {
-      setFilteredStock(data);
+      setFilteredStock(data || []);
       brushRef.current.reset();
     }
   };
@@ -146,6 +156,19 @@ function ActiveUsersChart({
       brushRef.current.updateBrush(updater);
     }
   };
+
+    if (error) {
+      return <div>Error loading data</div>;
+    }
+  
+    if (!data) {
+      return (
+        <div className="flex justify-center items-center h-40">
+          <CircularProgress />
+        </div>
+      );
+    }
+  
 
   return (
     <div>

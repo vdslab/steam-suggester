@@ -12,6 +12,8 @@ import ActiveUsersChart from "@/components/charts/ActiveUsersChart";
 import { GetActiveUserResponse } from "@/types/api/getActiveUserType";
 import SteamReviewBrushChart from "@/components/charts/SteamReviewBrushChart";
 import { GetSteamAllReviewsResponse } from "@/types/api/countSteamReviewsType";
+import TwitchViewsBrushChart from "@/components/charts/TwitchViewsBrushChart";
+import { GetTwitchAllReviewsResponse } from "@/types/api/getTwitchAllReviewsType";
 
 
 export default async function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
@@ -24,15 +26,10 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
   const matchRes = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`);
   const steamAllData:SteamDetailsDataType[] = await matchRes.json()
 
-  const activeUserRes = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${steamGameId}`);
-  const activeUserData:GetActiveUserResponse[] = await activeUserRes.json();
-
-  const steamAllReviewRes = await fetch(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countSteamAllReviews/${steamGameId}`);
-  const steamAllReviewData:GetSteamAllReviewsResponse[] = await steamAllReviewRes.json();
 
 
   return (
-    <div className="bg-gray-800 min-h-screen">
+    <div className="bg-gray-800 min-h-screen text-white">
       <DetailsHeader />
       <div className="w-full p-4 max-w-screen-2xl mx-auto">
         {/* ゲームタイトル */}
@@ -81,12 +78,20 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
         </div>
 
         <div>
-          <ActiveUsersChart width={500} height={500} data={activeUserData} />
+          <div>アクティブユーザ</div>
+          <ActiveUsersChart width={500} height={500} steamGameId={steamGameId} />
         </div>
 
         <div>
-          <SteamReviewBrushChart width={500} height={500} data={steamAllReviewData} />
+          <div>Steamレビュー</div>
+          <SteamReviewBrushChart width={500} height={500} steamGameId={steamGameId} />
         </div>
+
+        <div>
+          <div>Twitch視聴数</div>
+          <TwitchViewsBrushChart width={500} height={500} twitchGameId={twitchGameId} />
+        </div>
+        
       </div>
     </div>
   );
