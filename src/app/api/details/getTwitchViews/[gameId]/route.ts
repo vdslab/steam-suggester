@@ -1,5 +1,4 @@
 import { PG_POOL } from "@/constants/PG_POOL";
-import { TwitchViews } from "@/types/api/getTwitchClipType";
 import { NextResponse } from "next/server"
 
 type Params = {
@@ -7,8 +6,6 @@ type Params = {
     gameId: string;
   };
 };
-
-
 
 export async function GET(req: Request, params: Params) {
 
