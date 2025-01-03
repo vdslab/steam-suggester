@@ -3,7 +3,6 @@
 import {
   DEFAULT_FILTER,
   DEVICE_MAPPING,
-  GENRE_MAPPING,
   MODE_MAPPING,
 } from "@/constants/DEFAULT_FILTER";
 import { changeFilterData } from "@/hooks/indexedDB";
@@ -17,8 +16,8 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DevicesIcon from "@mui/icons-material/Devices";
 import Section from "../Section";
-import HelpTooltip from "../HelpTooltip"; // 追加
-import { TextField } from "@mui/material";
+import HelpTooltip from "../HelpTooltip";
+import GenreFilter from "./GenreFilter";
 
 type Props = {
   filter: Filter;
@@ -31,7 +30,6 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoadi
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
   const [areAllCategoriesSelected, setAreAllCategoriesSelected] = useState<boolean>(false);
   const [previousPrice, setPreviousPrice] = useState<{ startPrice: number; endPrice: number } | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
 
 
   useEffect(() => {
@@ -97,9 +95,6 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoadi
     setAreAllCategoriesSelected(newStatus);
   };
 
-  const handleSearchQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  }
 
   return (
     <Panel
@@ -124,36 +119,7 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoadi
           />
           <span className="ml-2 text-white">全選択</span>
         </label>
-        <FilterButtonGroup
-          title="Genres"
-          mapping={GENRE_MAPPING}
-          localFilter={localFilter}
-          setLocalFilter={setLocalFilter}
-          rowLevel={3}
-        />
-        <div className="flex flex-col">
-          <TextField label="検索" variant="standard" size="small" sx={{ color: "white"}} margin="none" onChange={handleSearchQueryChange}/>
-          <div className="bg-white text-black rounded-b-lg max-h-60 overflow-y-auto cursor-pointer">
-            {Object.keys(filter.Genres).map((genre, index) => (
-              <span
-                key={index}
-                className="bg-white text-xs text-black px-2 py-1 rounded mr-2 flex items-center"
-              >
-                {genre}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-wrap">
-          {Object.keys(filter.Genres).map((genre, index) => (
-            <span
-              key={index}
-              className="bg-blue-600 text-xs text-white px-2 py-1 rounded mr-2 mb-2 flex items-center"
-            >
-              {genre}
-            </span>
-          ))}
-        </div>
+        <GenreFilter filter={filter} localFilter={localFilter} setLocalFilter={setLocalFilter} />
 
       </Section>
 
