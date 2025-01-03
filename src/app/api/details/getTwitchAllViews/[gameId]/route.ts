@@ -30,7 +30,7 @@ export async function GET(req: Request, params: Params) {
     await client.release(true);
 
     if (result.rows.length === 0) {
-      return NextResponse.json({ error: "Game not found" }, { status: 404 });
+      return NextResponse.json([]);
     }
     
     const data: GetTwitchAllReviewsResponse[] = result.rows.map(row => ({

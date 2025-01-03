@@ -29,7 +29,7 @@ export async function GET(req: Request, { params }: Params) {
     client.release();
 
     if (result.rows.length === 0) {
-      return NextResponse.json({ error: "Game not found" }, { status: 404 });
+      return NextResponse.json([]);
     }
 
     const activeUsers:GetActiveUserResponse[] = result.rows.map((row) => {

@@ -1,19 +1,18 @@
 'use client';
 import React, { useRef, useState, useMemo, useEffect } from 'react';
-import { scaleTime, scaleLinear } from '@visx/scale';
 import { Brush } from '@visx/brush';
 import { Bounds } from '@visx/brush/lib/types';
 import BaseBrush, { BaseBrushState, UpdateBrush } from '@visx/brush/lib/BaseBrush';
 import { PatternLines } from '@visx/pattern';
 import { Group } from '@visx/group';
 import { LinearGradient } from '@visx/gradient';
-import { max, extent } from '@visx/vendor/d3-array';
 import { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle';
 import AreaChart from './AreaChat';
 import { GetTwitchAllReviewsResponse } from '@/types/api/getTwitchAllReviewsType';
 import useSWR from 'swr';
 import { fetcher } from '../common/Fetcher';
 import CircularProgress from '@mui/material/CircularProgress';
+import useBrushScales from '@/hooks/useBrushScales';
 
 // Initialize some variables
 const brushMargin = { top: 10, bottom: 15, left: 80, right: 20 };
@@ -27,6 +26,7 @@ const selectedBrushStyle = {
   fill: `url(#${PATTERN_ID})`,
   stroke: 'white',
 };
+const MIN_DATA_LENGTH = 7;
 
 // accessors
 const getDate = (d: GetTwitchAllReviewsResponse) => new Date(d.get_date);
@@ -97,49 +97,7 @@ function SteamReviewBrushChart({
   const yBrushMax = Math.max(bottomChartHeight - brushMargin.top - brushMargin.bottom, 0);
 
   // scales
-  const dateScale = useMemo(
-    () =>
-      scaleTime<number>({
-        range: [0, xMax],
-        domain: extent(filteredStock, getDate) as [Date, Date],
-      }),
-    [xMax, filteredStock],
-  );
-  const stockScale = useMemo(
-    () =>
-      scaleLinear<number>({
-        range: [yMax, 0],
-        domain: [0, max(filteredStock, getStockValue) || 0],
-        nice: true,
-      }),
-    [yMax, filteredStock],
-  );
-  const brushDateScale = useMemo(
-    () =>
-      scaleTime<number>({
-        range: [0, xBrushMax],
-        domain: extent(data || [], getDate) as [Date, Date],
-      }),
-    [xBrushMax, data],
-  );
-  const brushStockScale = useMemo(
-    () =>
-      scaleLinear({
-        range: [yBrushMax, 0],
-        domain: [0, max(data || [], getStockValue) || 0],
-        nice: true,
-      }),
-    [yBrushMax, data],
-  );
-
-  const initialBrushPosition = useMemo(() => {
-    const middleIndex = Math.floor((data?.length || 0) / 4);
-    const middleData = data?.[middleIndex] || { get_date: '', total_views: 0 };
-    return {
-      start: { x: brushDateScale(getDate(data ? data[0] : { get_date: '', total_views: 0 })) },
-      end: { x: brushDateScale(getDate(middleData)) },
-    };
-  }, [brushDateScale, data]);
+  const { dateScale, stockScale, brushDateScale, brushStockScale, initialBrushPosition } = useBrushScales({ data, filteredStock, xMax, yMax, xBrushMax, yBrushMax, getDate, getStockValue });
 
   const handleClearClick = () => {
     if (brushRef?.current) {
@@ -179,6 +137,10 @@ function SteamReviewBrushChart({
         <CircularProgress />
       </div>
     );
+  }
+
+  if (data.length < MIN_DATA_LENGTH) {
+    return <div>データがありません。</div>;
   }
 
   return (
