@@ -41,6 +41,7 @@ const GenreFilter = (props: Props) => {
             "& .MuiInputBase-root": {
               color: "white", // 文字の色
               borderColor: "white", // 入力フィールドの枠線の色
+              backgroundColor: "#374151"
             },
             "& .MuiOutlinedInput-root": {
               // "& fieldset": {
@@ -49,12 +50,13 @@ const GenreFilter = (props: Props) => {
               // "&:hover fieldset": {
               //   borderColor: "white", // ホバー時の枠線の色
               // },
-              // "&.Mui-focused fieldset": {
-              //   borderColor: "white", // フォーカス時の枠線の色
-              // },
+              "&.Mui-focused fieldset": {
+                borderColor: "white", // フォーカス時の枠線の色
+                borderWidth: 1, // フォーカス時の枠線の太さ
+              },
             },
             "& .MuiInputLabel-root": {
-              color: "gray", // ラベルの文字色
+              color: "white", // ラベルの文字色
             },
             "& .MuiAutocomplete-option": {
               color: "black", // ドロップダウン内の候補の文字色
