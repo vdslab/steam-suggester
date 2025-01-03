@@ -40,6 +40,10 @@ const ReviewCloud = (props:Props) => {
   });
   const fontSizeSetter = (datum: WordData) => fontScale(datum.value);
 
+  if(Object.keys(steamData.review).length === 0) {
+    return <div>レビューがありません</div>
+  }
+
   return (
     <div className="select-none ">
       <Wordcloud
