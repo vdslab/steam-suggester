@@ -39,7 +39,7 @@ export type BrushProps = {
   twitchGameId: string;
 };
 
-function SteamReviewBrushChart({
+function TwitchViewsBrushChart({
   width,
   height,
   margin = {
@@ -226,4 +226,4 @@ function BrushHandle({ x, height, isBrushActive }: BrushHandleRenderProps) {
   );
 }
 
-export default SteamReviewBrushChart;
+export default TwitchViewsBrushChart;

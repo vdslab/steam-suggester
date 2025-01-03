@@ -9,11 +9,8 @@ import Typography from '@mui/material/Typography';
 import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 import ReviewCloud from "@/components/charts/ReviewCloud";
 import ActiveUsersChart from "@/components/charts/ActiveUsersChart";
-import { GetActiveUserResponse } from "@/types/api/getActiveUserType";
 import SteamReviewBrushChart from "@/components/charts/SteamReviewBrushChart";
-import { GetSteamAllReviewsResponse } from "@/types/api/countSteamReviewsType";
 import TwitchViewsBrushChart from "@/components/charts/TwitchViewsBrushChart";
-import { GetTwitchAllReviewsResponse } from "@/types/api/getTwitchAllReviewsType";
 
 
 export default async function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
