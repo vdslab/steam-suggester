@@ -8,6 +8,9 @@ import UserSelection from '@/components/GameExplanation/UserSelection';
 import Typography from '@mui/material/Typography';
 import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
 import ReviewCloud from "@/components/charts/ReviewCloud";
+import ActiveUsersChart from "@/components/charts/ActiveUsersChart";
+import SteamReviewBrushChart from "@/components/charts/SteamReviewBrushChart";
+import TwitchViewsBrushChart from "@/components/charts/TwitchViewsBrushChart";
 
 
 export default async function Page({ searchParams }: { searchParams: { steam_id?: string; twitch_id?: string } }) {
@@ -21,8 +24,9 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
   const steamAllData:SteamDetailsDataType[] = await matchRes.json()
 
 
+
   return (
-    <div className="bg-gray-800 min-h-screen">
+    <div className="bg-gray-800 min-h-screen text-white">
       <DetailsHeader />
       <div className="w-full p-4 max-w-screen-2xl mx-auto">
         {/* ゲームタイトル */}
@@ -69,6 +73,22 @@ export default async function Page({ searchParams }: { searchParams: { steam_id?
         <div>
           <ReviewCloud steamData={steamData} />
         </div>
+
+        <div>
+          <div>アクティブユーザ</div>
+          <ActiveUsersChart width={500} height={500} steamGameId={steamGameId} />
+        </div>
+
+        <div>
+          <div>Steamレビュー</div>
+          <SteamReviewBrushChart width={500} height={500} steamGameId={steamGameId} />
+        </div>
+
+        <div>
+          <div>Twitch視聴数</div>
+          <TwitchViewsBrushChart width={500} height={500} twitchGameId={twitchGameId} />
+        </div>
+        
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ const GameDescription = async(props:Props) => {
     <>
       <div className="container">
         <div className="rounded-lg overflow-hidden border border-gray-400">
-          <Image src={data.imgURL} alt="Game Header" width={1000} height={0} className="w-full h-auto" />
+          <Image src={data.imgURL} alt="Game Header" width={1000} height={0}  className="w-full h-auto" />
         </div>
       </div>
       <Link href={`https://store.steampowered.com/app/${steamGameId}/`} target="_blank" rel="noopener noreferrer" className="text-3xl font-semibold m-3 text-white flex justify-center">

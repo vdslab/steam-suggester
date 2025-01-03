@@ -147,7 +147,7 @@ const Network = (props: Props) => {
   }
 
   return (
-    <div className="flex h-[100vh] overflow-hidden text-white">
+    <div className="flex h-[92vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
         openPanel={openPanel}
@@ -265,7 +265,7 @@ const Network = (props: Props) => {
         )}
 
         {/* ゲーム検索および詳細パネルを右側に配置 */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+        <div className="absolute top-0 right-0 w-5/12 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
           <GameSearchPanel
             nodes={nodes}
             selectedIndex={selectedIndex}

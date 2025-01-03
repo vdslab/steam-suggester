@@ -3,7 +3,6 @@
 import {
   DEFAULT_FILTER,
   DEVICE_MAPPING,
-  GENRE_MAPPING,
   MODE_MAPPING,
 } from "@/constants/DEFAULT_FILTER";
 import { changeFilterData } from "@/hooks/indexedDB";
@@ -17,7 +16,8 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DevicesIcon from "@mui/icons-material/Devices";
 import Section from "../Section";
-import HelpTooltip from "../HelpTooltip"; // 追加
+import HelpTooltip from "../HelpTooltip";
+import GenreFilter from "./GenreFilter";
 
 type Props = {
   filter: Filter;
@@ -30,6 +30,7 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoadi
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
   const [areAllCategoriesSelected, setAreAllCategoriesSelected] = useState<boolean>(false);
   const [previousPrice, setPreviousPrice] = useState<{ startPrice: number; endPrice: number } | null>(null);
+
 
   useEffect(() => {
     if (filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {
@@ -94,6 +95,7 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoadi
     setAreAllCategoriesSelected(newStatus);
   };
 
+
   return (
     <Panel
       title={
@@ -105,7 +107,6 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoadi
       icon={<FilterListIcon className="mr-2 text-white" />}
     >
       <div className="flex flex-col h-full">
-        {/* 既存の説明テキストを削除 */}
         
         {/* ジャンルフィルター */}
       <Section title="ジャンル" icon={<CategoryIcon />}>
@@ -118,13 +119,8 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoadi
           />
           <span className="ml-2 text-white">全選択</span>
         </label>
-        <FilterButtonGroup
-          title="Genres"
-          mapping={GENRE_MAPPING}
-          localFilter={localFilter}
-          setLocalFilter={setLocalFilter}
-          rowLevel={3}
-        />
+        <GenreFilter filter={filter} localFilter={localFilter} setLocalFilter={setLocalFilter} />
+
       </Section>
 
         {/* 価格フィルター */}
