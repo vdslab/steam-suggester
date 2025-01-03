@@ -296,8 +296,8 @@ const GameSearchPanel = (props: Props) => {
               <Image
                 src={nodes[selectedIndex].imgURL}
                 alt={nodes[selectedIndex].title}
-                width={400}
-                height={170}
+                width={600}
+                height={400}
                 style={{ borderRadius: "4px" }}
                 className="object-cover rounded mb-2"
               />
