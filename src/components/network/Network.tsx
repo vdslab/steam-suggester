@@ -113,6 +113,8 @@ const Network = (props: Props) => {
     if (selectedIndex !== -1 && nodes[selectedIndex]) {
       setCenterX((nodes[selectedIndex].x ?? 0) - 150);
       setCenterY((nodes[selectedIndex].y ?? 0) + 100);
+      // ノードが選択されたら GameSearchPanel を開く
+      setOpenPanel("gameSearch");
     }
   }, [selectedIndex]);
 
@@ -156,24 +158,25 @@ const Network = (props: Props) => {
         toggleTourRun={toggleTourRun}
       />
 
-      {/* メインコンテンツエリアを relative に設定 */}
-      <div className="flex-1 relative bg-gray-900 overflow-hidden">
-        {/* ゲーム検索ボタンを追加 */}
-        <GameEasySearchButton onClick={handleGameSearchClick} />
-        {/* GameSearchPopup の表示 */}
-        {openPanel === "gameSearch" && (
-          <GameEasySearchPopup
-            filter={filter}
-            setFilter={setFilter}
+      {/* GameSearchPanel を左側に配置 */}
+      {openPanel === "gameSearch" && (
+        <div className="w-1/4">
+          <GameSearchPanel
+            nodes={nodes}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
             setIsNetworkLoading={setIsNetworkLoading}
-            onClose={handleGameSearchClose}
+            steamListData={steamListData}
           />
-        )}
+        </div>
+      )}
 
+      {/* メインコンテンツエリアを flex-1 に設定 */}
+      <div className="flex-1 relative bg-gray-900 overflow-hidden">
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
             {/* TODO: right調整の修正 */}
-            <div className="absolute top-4 right-96">
+            <div className="absolute top-0 right-4">
               {/* ユーザーアイコンの表示 */}
               <UserAvatar />
             </div>
@@ -264,17 +267,7 @@ const Network = (props: Props) => {
           </div>
         )}
 
-        {/* ゲーム検索および詳細パネルを右側に配置 */}
-        <div className="absolute top-0 right-0 w-5/12 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-          <GameSearchPanel
-            nodes={nodes}
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-            setIsNetworkLoading={setIsNetworkLoading}
-            steamListData={steamListData}
-          />
-        </div>
-
+        {/* Tourコンポーネント */}
         <Tour run={tourRun} setRun={setTourRun} />
       </div>
     </div>
