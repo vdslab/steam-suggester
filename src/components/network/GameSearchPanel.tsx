@@ -15,8 +15,10 @@ import AppleIcon from "@mui/icons-material/Apple";
 import PersonIcon from "@mui/icons-material/Person";
 import GroupIcon from "@mui/icons-material/Group";
 import Tooltip from "@mui/material/Tooltip";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import WindowsIcon from "@/components/common/WindowsIcon";
 import ToggleDisplay from "./ToggleDisplay";
+import Link from "next/link";
 
 type Props = {
   nodes: NodeType[];
@@ -303,10 +305,35 @@ const GameSearchPanel = (props: Props) => {
               />
             )}
             <div className="px-2">
-              <h2 className="text-white text-xl font-semibold">
-                {nodes[selectedIndex].title}
-              </h2>
+              <div className="flex">
+                {/*flexデバッグ用 */}
+                <h2 className="text-white text-xl font-semibold">
+                  {nodes[selectedIndex].title}
+                </h2>
 
+                {/* Steamアイコンリンク */}
+                <Tooltip title="Steamで開く">
+                  <Link
+                    href={`https://store.steampowered.com/app/${nodes[selectedIndex].steamGameId}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-2 text-blue-400"
+                  >
+                    <OpenInNewIcon fontSize="small" />
+                  </Link>
+                </Tooltip>
+
+                <button
+                  className="bg-gray-600 hover:bg-gray-500 text-white rounded ml-4"
+                  onClick={() =>
+                    router.push(
+                      `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
+                    )
+                  }
+                >
+                  詳細へ(デバッグ用)
+                </button>
+              </div>
               {/* ジャンル */}
               {nodes[selectedIndex].genres &&
                 nodes[selectedIndex].genres.length > 0 && (
@@ -412,24 +439,14 @@ const GameSearchPanel = (props: Props) => {
               </div>
 
               {/* アクションボタン */}
-              <div className="flex">
-                <button
-                  className="bg-blue-600 hover:bg-blue-500 text-white rounded"
-                  onClick={() =>
-                    router.push(
-                      `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
-                    )
-                  }
-                >
-                  詳細を確認(デバッグ用)
-                </button>
-                {/* <button
+              {/* <div className="flex">
+                /* <button
                   className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
                   onClick={() => setSelectedIndex(-1)}
                 >
                   閉じる
-                </button> */}
-              </div>
+                </button> 
+              </div> */}
             </div>
           </div>
           {/* トグル表示 */}

@@ -20,7 +20,7 @@ const ToggleDisplay: React.FC<Props> = ({ nodes, selectedIndex }) => {
   };
 
   return (
-    <Box sx={{ width: "100%", mt: 4 }}>
+    <Box sx={{ width: "100%", mt: 0 }}>
       {/* タブ付きナビゲーションバー */}
       <Tabs
         value={activeTab}
