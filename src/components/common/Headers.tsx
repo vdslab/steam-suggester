@@ -17,7 +17,7 @@ export const DetailsHeader = () => {
 
 export const HomeHeader = () => {
   return (
-    <header className="absolute top-0 left-0 w-full h-[12vh] bg-gradient-to-b from-black to-transparent text-white flex items-center justify-center z-50">
+    <header className="absolute top-0 left-0 w-full h-[8vh] bg-gradient-to-b from-black to-transparent text-white flex items-center justify-center z-50">
       <h1 className="text-4xl font-bold">Steam Suggester</h1>
     </header>
   );

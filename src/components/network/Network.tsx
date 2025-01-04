@@ -149,7 +149,7 @@ const Network = (props: Props) => {
   }
 
   return (
-    <div className="flex h-[92vh] overflow-hidden text-white">
+    <div className="flex h-[100vh] overflow-hidden text-white">
       {/* Sidebar を追加 */}
       <Sidebar
         openPanel={openPanel}
