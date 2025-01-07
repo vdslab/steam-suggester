@@ -138,7 +138,7 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
-          <div className="font-medium">Steamレビュー数:</div>
+          <div className="font-medium">Steamレビュー:</div>
           <div className="font-semibold">
             {steamData[steamData.length - 1]?.count} 件
             {steamData.length > 1 && (
@@ -189,7 +189,7 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
-          <div className="font-medium">Twitch視聴数:</div>
+          <div className="font-medium">Twitch視聴:</div>
           <div className="font-semibold">
             {twitchData[twitchData.length - 1]?.count} 人
             {twitchData.length > 1 && (
@@ -240,7 +240,7 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
-          <div className="font-medium">アクティブユーザー数:</div>
+          <div className="font-medium">アクティブユーザー:</div>
           <div className="font-semibold">
             {activeUsersData[activeUsersData.length - 1]?.active_user} 人
             {activeUsersData.length > 1 && (

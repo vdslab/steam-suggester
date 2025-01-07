@@ -1,4 +1,4 @@
-/*Network.tsx*/
+/* Network.tsx */
 "use client";
 import { useEffect, useState, useRef } from "react";
 import NodeLink from "./NodeLink";
@@ -29,8 +29,7 @@ import GameSearchPanel from "./GameSearchPanel";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import UserAvatar from "./steamList/UserAvatar";
-import GameEasySearchButton from "./GameEasySearchButton";
-import GameEasySearchPopup from "./GameEasySearchPopup";
+import { HomeHeader } from "../common/Headers";
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
@@ -133,24 +132,24 @@ const Network = (props: Props) => {
     });
   };
 
+  if (isNetworkLoading) {
+    return <Loading />;
+  }
+
+  // 簡易サーチボタン(保留)
   const handleGameSearchClick = () => {
     setOpenPanel((prevPanel) =>
       prevPanel === "gameSearch" ? null : "gameSearch"
     );
     setTourRun(false);
   };
-
   const handleGameSearchClose = () => {
     setOpenPanel(null);
   };
 
-  if (isNetworkLoading) {
-    return <Loading />;
-  }
-
   return (
-    <div className="flex h-[100vh] overflow-hidden text-white">
-      {/* Sidebar を追加 */}
+    <div className="flex flex-1 overflow-hidden text-white relative">
+      {/* Sidebar */}
       <Sidebar
         openPanel={openPanel}
         togglePanel={togglePanel}
@@ -158,29 +157,15 @@ const Network = (props: Props) => {
         toggleTourRun={toggleTourRun}
       />
 
-      {/* GameSearchPanel を左側に配置 */}
-      {openPanel === "gameSearch" && (
-        <div className="w-1/4">
-          <GameSearchPanel
-            nodes={nodes}
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-            setIsNetworkLoading={setIsNetworkLoading}
-            steamListData={steamListData}
-          />
-        </div>
-      )}
-
-      {/* メインコンテンツエリアを flex-1 に設定 */}
+      {/* メインコンテンツ */}
       <div className="flex-1 relative bg-gray-900 overflow-hidden">
+        <HomeHeader />
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
-            {/* TODO: right調整の修正 */}
-            <div className="absolute top-0 right-4">
-              {/* ユーザーアイコンの表示 */}
+            <div className="absolute top-0 right-4 z-10">
+              {/* ユーザーアイコン */}
               <UserAvatar />
             </div>
-            {/* メインコンテンツ */}
             <NodeLink
               nodes={nodes}
               links={links}
@@ -194,6 +179,19 @@ const Network = (props: Props) => {
           </div>
         ) : (
           <ProgressBar progress={progress} />
+        )}
+
+        {/* GameSearchPanel */}
+        {openPanel === "gameSearch" && (
+          <div className="w-1/4 z-20 absolute top-0 left-0">
+            <GameSearchPanel
+              nodes={nodes}
+              selectedIndex={selectedIndex}
+              setSelectedIndex={setSelectedIndex}
+              setIsNetworkLoading={setIsNetworkLoading}
+              steamListData={steamListData}
+            />
+          </div>
         )}
 
         {/* フィルターパネル */}
@@ -268,7 +266,7 @@ const Network = (props: Props) => {
         )}
 
         {/* Tourコンポーネント */}
-        <Tour run={tourRun} setRun={setTourRun} />
+        <Tour run={tourRun} setRun={setTourRun} className="z-10" />
       </div>
     </div>
   );

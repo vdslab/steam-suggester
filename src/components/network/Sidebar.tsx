@@ -29,51 +29,51 @@ const Sidebar: React.FC<Props> = ({
   toggleTourRun,
 }) => {
   return (
-    <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4">
-      {/* 類似度ボタン */}
-      <button
-        onClick={() => togglePanel("similarity")}
-        className={`${buttonClasses(openPanel === "similarity")} step3`}
-      >
-        <TuneIcon />
-        <span className="text-xs mt-1">類似度設定</span>
-      </button>
-
-      {/* フィルターボタン */}
-      <button
-        onClick={() => togglePanel("filter")}
-        className={`${buttonClasses(openPanel === "filter")} step1`}
-      >
-        <FilterListIcon />
-        <span className="text-xs mt-1">フィルター</span>
-      </button>
-
-      {/* Streamerボタン */}
-      <button
-        onClick={() => togglePanel("streamer")}
-        className={`${buttonClasses(openPanel === "streamer")} step2`}
-      >
-        <LiveTvIcon />
-        <span className="text-xs mt-1">配信者</span>
-      </button>
-
-      {/* Steamリストボタン */}
-      <button
-        onClick={() => togglePanel("steamList")}
-        className={`${buttonClasses(openPanel === "steamList")} step4`}
-      >
-        <SportsEsportsIcon />
-        <span className="text-xs mt-1">Steam連携</span>
-      </button>
-
-      {/* ランキングボタン */}
-      <button
-        onClick={() => togglePanel("ranking")}
-        className={`${buttonClasses(openPanel === "ranking")} step5`}
-      >
-        <LeaderboardIcon />
-        <span className="text-xs mt-1">ランキング</span>
-      </button>
+    <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4 z-10">
+      {/* 上部ボタン群 */}
+      <div className="flex flex-col items-center space-y-4 flex-grow">
+        {" "}
+        {/* 類似度ボタン */}
+        <button
+          onClick={() => togglePanel("similarity")}
+          className={`${buttonClasses(openPanel === "similarity")} step3`}
+        >
+          <TuneIcon />
+          <span className="text-xs mt-1">類似度設定</span>
+        </button>
+        {/* フィルターボタン */}
+        <button
+          onClick={() => togglePanel("filter")}
+          className={`${buttonClasses(openPanel === "filter")} step1`}
+        >
+          <FilterListIcon />
+          <span className="text-xs mt-1">フィルター</span>
+        </button>
+        {/* Streamerボタン */}
+        <button
+          onClick={() => togglePanel("streamer")}
+          className={`${buttonClasses(openPanel === "streamer")} step2`}
+        >
+          <LiveTvIcon />
+          <span className="text-xs mt-1">配信者</span>
+        </button>
+        {/* Steamリストボタン */}
+        <button
+          onClick={() => togglePanel("steamList")}
+          className={`${buttonClasses(openPanel === "steamList")} step4`}
+        >
+          <SportsEsportsIcon />
+          <span className="text-xs mt-1">Steam連携</span>
+        </button>
+        {/* ランキングボタン */}
+        <button
+          onClick={() => togglePanel("ranking")}
+          className={`${buttonClasses(openPanel === "ranking")} step5`}
+        >
+          <LeaderboardIcon />
+          <span className="text-xs mt-1">ランキング</span>
+        </button>
+      </div>
 
       {/* ツアーボタン */}
       <button onClick={toggleTourRun} className={`${buttonClasses(tourRun)}`}>
