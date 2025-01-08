@@ -190,6 +190,7 @@ const Network = (props: Props) => {
               setSelectedIndex={setSelectedIndex}
               setIsNetworkLoading={setIsNetworkLoading}
               steamListData={steamListData}
+              steamAllData={steamAllData}
             />
           </div>
         )}
@@ -266,7 +267,7 @@ const Network = (props: Props) => {
         )}
 
         {/* Tourコンポーネント */}
-        <Tour run={tourRun} setRun={setTourRun} className="z-10" />
+        <Tour run={tourRun} setRun={setTourRun} />
       </div>
     </div>
   );

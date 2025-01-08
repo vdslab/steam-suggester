@@ -48,8 +48,8 @@ const ReviewCloud = (props:Props) => {
     <div className="select-none ">
       <Wordcloud
         words={words}
-        width={width/2}
-        height={height/2}
+        width={width/5}
+        height={height/4}
         fontSize={fontSizeSetter}
         padding={2}
         rotate={0}

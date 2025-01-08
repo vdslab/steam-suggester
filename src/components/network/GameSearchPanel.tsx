@@ -19,6 +19,9 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import WindowsIcon from "@/components/common/WindowsIcon";
 import ToggleDisplay from "./ToggleDisplay";
 import Link from "next/link";
+import Popularity from "./Popularity2";
+import ReviewCloud from "../charts/ReviewCloud";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
 type Props = {
   nodes: NodeType[];
@@ -26,6 +29,7 @@ type Props = {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
   steamListData: SteamListType[];
+  steamAllData: SteamDetailsDataType[];
 };
 
 const GameSearchPanel = (props: Props) => {
@@ -35,6 +39,7 @@ const GameSearchPanel = (props: Props) => {
     selectedIndex,
     setSelectedIndex,
     setIsNetworkLoading,
+    steamAllData
   } = props;
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -184,14 +189,6 @@ const GameSearchPanel = (props: Props) => {
 
   return (
     <div className="flex-1 bg-gray-800 rounded-l-lg p-0 shadow-md flex flex-col space-y-0 overflow-y-scroll h-full relative">
-      {/* ヘッダー */}
-      {/* <div className="flex items-center space-x-2 mb-0">
-        <SearchIcon className="text-white" />
-        <div className="flex items-center">
-          <span className="text-white text-lg font-semibold">ゲーム検索</span>
-          <HelpTooltip title="ゲームを検索して追加できます。検索結果からゲームを選択すると詳細が表示されます。" />
-        </div>
-      </div> */}
 
       {/* 検索フォームと検索候補を絶対位置に配置 */}
       <div
@@ -334,20 +331,14 @@ const GameSearchPanel = (props: Props) => {
                   詳細へ(デバッグ用)
                 </button>
               </div>
-              {/* ジャンル */}
-              {nodes[selectedIndex].genres &&
-                nodes[selectedIndex].genres.length > 0 && (
-                  <div className="flex items-center space-x-0.5 flex-wrap">
-                    {nodes[selectedIndex].genres.map((genre, index) => (
-                      <span
-                        key={index}
-                        className="bg-blue-500 text-xs p-0.5 mr-1 mt-1 mb-1 rounded flex-shrink-0 cursor-pointer select-none"
-                      >
-                        {genre}
-                      </span>
-                    ))}
+              
+              <div>
+                {nodes[selectedIndex].shortDetails && (
+                  <div className="text-white text-sm mt-1">
+                    {nodes[selectedIndex].shortDetails}
                   </div>
                 )}
+              </div>
 
               {/* タグ */}
               <div className="text-white">
@@ -366,91 +357,10 @@ const GameSearchPanel = (props: Props) => {
                   )}
               </div>
 
-              {/* アイコン表示 */}
-              <div className="flex items-center space-x-1 mt-1 mb-2">
-                {/* デバイスサポート */}
-                {nodes[selectedIndex].device.windows && (
-                  <Tooltip title="Windows対応">
-                    <WindowsIcon size={20} />
-                  </Tooltip>
-                )}
-                {nodes[selectedIndex].device.mac && (
-                  <Tooltip title="Mac対応">
-                    <AppleIcon className="text-white h-5 w-5" />
-                  </Tooltip>
-                )}
-
-                {/* マルチプレイヤー情報 */}
-                {nodes[selectedIndex].isSinglePlayer && (
-                  <Tooltip title="Single Player">
-                    <PersonIcon className="text-white h-5 w-5" />
-                  </Tooltip>
-                )}
-                {nodes[selectedIndex].isMultiPlayer && (
-                  <Tooltip title="Multiplayer">
-                    <GroupIcon className="text-white h-5 w-5" />
-                  </Tooltip>
-                )}
-              </div>
-
-              {/* Developer & Release Date */}
-              <div className="flex items-center">
-                <span className="text-sm mb-1">
-                  開発者: {nodes[selectedIndex].developerName}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-sm mb-1">
-                  発売日: {nodes[selectedIndex].releaseDate}
-                </span>
-              </div>
-
-              {/* 価格 */}
-              <div className="flex items-center">
-                <div>価格: </div>
-                {nodes[selectedIndex].salePrice &&
-                parseInt(nodes[selectedIndex].salePrice, 10) <
-                  nodes[selectedIndex].price ? (
-                  <>
-                    <span className="line-through text-gray-400 ml-2">
-                      ¥{nodes[selectedIndex].price}
-                    </span>
-                    <span className="text-red-500 ml-2">
-                      ¥{nodes[selectedIndex].salePrice}
-                    </span>
-                    <span className="text-sm text-green-500 ml-2">
-                      (
-                      {Math.round(
-                        ((nodes[selectedIndex].price -
-                          parseInt(nodes[selectedIndex].salePrice, 10)) /
-                          nodes[selectedIndex].price) *
-                          100
-                      )}
-                      % OFF)
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-sm ml-2">
-                    {nodes[selectedIndex].price
-                      ? `¥${nodes[selectedIndex].price}`
-                      : "無料"}
-                  </span>
-                )}
-              </div>
-
-              {/* アクションボタン */}
-              {/* <div className="flex">
-                /* <button
-                  className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded"
-                  onClick={() => setSelectedIndex(-1)}
-                >
-                  閉じる
-                </button> 
-              </div> */}
             </div>
           </div>
-          {/* トグル表示 */}
-          <ToggleDisplay nodes={nodes} selectedIndex={selectedIndex} />
+          <ReviewCloud steamData={steamAllData[selectedIndex]} />
+          <Popularity nodes={nodes} selectedIndex={selectedIndex} />
         </div>
       ) : (
         <div className="text-white text-center pt-24">
