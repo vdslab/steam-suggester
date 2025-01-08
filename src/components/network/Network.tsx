@@ -158,7 +158,7 @@ const Network = (props: Props) => {
       />
 
       {/* メインコンテンツ */}
-      <div className="flex-1 relative bg-gray-900 overflow-hidden">
+      <div className="flex-1 relative bg-gray-900 overflow-hidden z-10">
         <HomeHeader />
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
@@ -183,7 +183,7 @@ const Network = (props: Props) => {
 
         {/* GameSearchPanel */}
         {openPanel === "gameSearch" && (
-          <div className="w-1/4 z-20 absolute top-0 left-0">
+          <div className="w-1/4 z-20 absolute top-0 right-0">
             <GameSearchPanel
               nodes={nodes}
               selectedIndex={selectedIndex}

@@ -322,17 +322,6 @@ const GameSearchPanel = (props: Props) => {
                     <OpenInNewIcon fontSize="small" />
                   </Link>
                 </Tooltip>
-
-                <button
-                  className="bg-gray-600 hover:bg-gray-500 text-white rounded ml-4"
-                  onClick={() =>
-                    router.push(
-                      `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
-                    )
-                  }
-                >
-                  詳細へ(デバッグ用)
-                </button>
               </div>
               {/* ジャンル */}
               {nodes[selectedIndex].genres &&
@@ -394,7 +383,7 @@ const GameSearchPanel = (props: Props) => {
               </div>
 
               {/* Developer & Release Date */}
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <span className="text-sm mb-1">
                   開発者: {nodes[selectedIndex].developerName}
                 </span>
@@ -403,7 +392,7 @@ const GameSearchPanel = (props: Props) => {
                 <span className="text-sm mb-1">
                   発売日: {nodes[selectedIndex].releaseDate}
                 </span>
-              </div>
+              </div> */}
 
               {/* 価格 */}
               <div className="flex items-center">
@@ -451,6 +440,17 @@ const GameSearchPanel = (props: Props) => {
           </div>
           {/* トグル表示 */}
           <ToggleDisplay nodes={nodes} selectedIndex={selectedIndex} />
+
+          <button
+            className="bg-gray-600 hover:bg-gray-500 text-white rounded ml-4"
+            onClick={() =>
+              router.push(
+                `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
+              )
+            }
+          >
+            詳細へ(デバッグ用)
+          </button>
         </div>
       ) : (
         <div className="text-white text-center pt-24">
