@@ -25,7 +25,7 @@ import ProgressBar from "./ProgressBar";
 import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./Leaderboard";
-import GameSearchPanel from "./GameSearchPanel";
+import GameSearchPanel from "./gameDetail/GameSearchPanel";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import UserAvatar from "./steamList/UserAvatar";
