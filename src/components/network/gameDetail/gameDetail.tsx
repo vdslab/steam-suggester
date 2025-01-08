@@ -26,6 +26,7 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import BuildIcon from "@mui/icons-material/Build";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 
 type Props = {
   nodes: NodeType[];
@@ -178,7 +179,7 @@ const GameSearchPanel = (props: Props) => {
               {/* ゲーム説明文 */}
               <div>
                 {nodes[selectedIndex].shortDetails && (
-                  <div className="text-white text-sm mt-1">
+                  <div className="text-white text-sm mt-1 h-24 overflow-y-auto mb-2">
                     {nodes[selectedIndex].shortDetails}
                   </div>
                 )}
@@ -204,8 +205,9 @@ const GameSearchPanel = (props: Props) => {
           </div>
 
           {/* レビュー分析タイトルの追加 */}
-          <div className="px-2 mt-4">
-            <h3 className="text-white text-lg font-semibold mb-2">
+          <div className="px-2 mt-2">
+            <h3 className="text-white text-lg font-semibold mb-2 flex items-center">
+              <RateReviewIcon className="mr-1" /> {/* 追加 */}
               レビュー分析
             </h3>
             <ReviewCloud steamData={steamAllData[selectedIndex]} />
