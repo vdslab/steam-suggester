@@ -22,6 +22,7 @@ import Link from "next/link";
 import Popularity from "./Popularity2";
 import ReviewCloud from "../charts/ReviewCloud";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 
 type Props = {
   nodes: NodeType[];
@@ -39,7 +40,7 @@ const GameSearchPanel = (props: Props) => {
     selectedIndex,
     setSelectedIndex,
     setIsNetworkLoading,
-    steamAllData
+    steamAllData,
   } = props;
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -189,7 +190,6 @@ const GameSearchPanel = (props: Props) => {
 
   return (
     <div className="flex-1 bg-gray-800 rounded-l-lg p-0 shadow-md flex flex-col space-y-0 overflow-y-scroll h-full relative">
-
       {/* 検索フォームと検索候補を絶対位置に配置 */}
       <div
         className="absolute top-0 left-0 right-0 z-30 p-4 rounded-lg"
@@ -308,7 +308,7 @@ const GameSearchPanel = (props: Props) => {
                   {nodes[selectedIndex].title}
                 </h2>
 
-                {/* Steamアイコンリンク */}
+                {/* Steamリンク */}
                 <Tooltip title="Steamで開く">
                   <Link
                     href={`https://store.steampowered.com/app/${nodes[selectedIndex].steamGameId}/`}
@@ -320,7 +320,41 @@ const GameSearchPanel = (props: Props) => {
                   </Link>
                 </Tooltip>
               </div>
-              
+
+              {/* 価格 */}
+              <div className="flex items-center text-sm space-x-1">
+                <span className="font-medium">価格:</span>
+                {nodes[selectedIndex].salePrice &&
+                parseInt(nodes[selectedIndex].salePrice, 10) <
+                  nodes[selectedIndex].price ? (
+                  <span className="flex items-center space-x-1">
+                    <span className="line-through text-gray-400">
+                      ¥{nodes[selectedIndex].price}
+                    </span>
+                    <span className="text-red-500">
+                      ¥{nodes[selectedIndex].salePrice}
+                    </span>
+                    <span className="flex items-center text-green-500">
+                      <LocalOfferIcon fontSize="small" className="mr-0.5" />
+                      {Math.round(
+                        ((nodes[selectedIndex].price -
+                          parseInt(nodes[selectedIndex].salePrice, 10)) /
+                          nodes[selectedIndex].price) *
+                          100
+                      )}
+                      % OFF
+                    </span>
+                  </span>
+                ) : (
+                  <span>
+                    {nodes[selectedIndex].price
+                      ? `¥${nodes[selectedIndex].price}`
+                      : "無料"}
+                  </span>
+                )}
+              </div>
+
+              {/* ゲーム説明文 */}
               <div>
                 {nodes[selectedIndex].shortDetails && (
                   <div className="text-white text-sm mt-1">
@@ -345,7 +379,6 @@ const GameSearchPanel = (props: Props) => {
                     </div>
                   )}
               </div>
-
             </div>
           </div>
           <ReviewCloud steamData={steamAllData[selectedIndex]} />
