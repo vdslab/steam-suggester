@@ -319,17 +319,6 @@ const GameSearchPanel = (props: Props) => {
                     <OpenInNewIcon fontSize="small" />
                   </Link>
                 </Tooltip>
-
-                <button
-                  className="bg-gray-600 hover:bg-gray-500 text-white rounded ml-4"
-                  onClick={() =>
-                    router.push(
-                      `/desktop/details?steam_id=${nodes[selectedIndex].steamGameId}&twitch_id=${nodes[selectedIndex].twitchGameId}`
-                    )
-                  }
-                >
-                  詳細へ(デバッグ用)
-                </button>
               </div>
               
               <div>
