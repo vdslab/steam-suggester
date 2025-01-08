@@ -66,18 +66,47 @@ const GameSearchPanel = (props: Props) => {
       {selectedIndex !== -1 && nodes[selectedIndex] ? (
         <div className="rounded-lg" ref={selectedDetailRef}>
           {/* ゲーム詳細内容 */}
-          <div className="flex flex-col space-y-2">
-            {/* ゲーム画像 */}
+          <div className="flex flex-col">
+            {/* 画像とアイコンのコンテナ */}
             {nodes[selectedIndex].imgURL && (
-              <Image
-                src={nodes[selectedIndex].imgURL}
-                alt={nodes[selectedIndex].title}
-                width={600}
-                height={400}
-                style={{ borderRadius: "4px" }}
-                className="object-cover rounded mb-2"
-              />
+              <div className="relative">
+                <Image
+                  src={nodes[selectedIndex].imgURL}
+                  alt={nodes[selectedIndex].title}
+                  width={600}
+                  height={400}
+                  style={{ borderRadius: "4px" }}
+                  className="object-cover rounded mb-2"
+                />
+                {/* 画像右下 */}
+                <div className="absolute bottom-2 right-2 flex items-center space-x-1 z-10">
+                  {/* デバイスサポート */}
+                  {nodes[selectedIndex].device.windows && (
+                    <Tooltip title="Windows対応">
+                      <WindowsIcon size={20} />
+                    </Tooltip>
+                  )}
+                  {nodes[selectedIndex].device.mac && (
+                    <Tooltip title="Mac対応">
+                      <AppleIcon className="text-white h-5 w-5" />
+                    </Tooltip>
+                  )}
+
+                  {/* マルチプレイヤー情報 */}
+                  {nodes[selectedIndex].isSinglePlayer && (
+                    <Tooltip title="Single Player">
+                      <PersonIcon className="text-white h-5 w-5" />
+                    </Tooltip>
+                  )}
+                  {nodes[selectedIndex].isMultiPlayer && (
+                    <Tooltip title="Multiplayer">
+                      <GroupIcon className="text-white h-5 w-5" />
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
             )}
+
             <div className="px-2">
               <div className="flex items-center">
                 {/* ゲームタイトル */}
@@ -144,33 +173,6 @@ const GameSearchPanel = (props: Props) => {
                     )}
                   </span>
                 </div>
-              </div>
-
-              {/* アイコン表示 */}
-              <div className="flex items-center space-x-1 mt-1 mb-2">
-                {/* デバイスサポート */}
-                {nodes[selectedIndex].device.windows && (
-                  <Tooltip title="Windows対応">
-                    <WindowsIcon size={20} />
-                  </Tooltip>
-                )}
-                {nodes[selectedIndex].device.mac && (
-                  <Tooltip title="Mac対応">
-                    <AppleIcon className="text-white h-5 w-5" />
-                  </Tooltip>
-                )}
-
-                {/* マルチプレイヤー情報 */}
-                {nodes[selectedIndex].isSinglePlayer && (
-                  <Tooltip title="Single Player">
-                    <PersonIcon className="text-white h-5 w-5" />
-                  </Tooltip>
-                )}
-                {nodes[selectedIndex].isMultiPlayer && (
-                  <Tooltip title="Multiplayer">
-                    <GroupIcon className="text-white h-5 w-5" />
-                  </Tooltip>
-                )}
               </div>
 
               {/* ゲーム説明文 */}
