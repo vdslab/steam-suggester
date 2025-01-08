@@ -71,6 +71,9 @@ const Network = (props: Props) => {
 
   const [progress, setProgress] = useState(0);
 
+  // Sidebarが開いているかどうかを管理する状態
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+
   // Refを使用して副作用の実行を制御
   const hasFetchedInitialData = useRef(false);
 
@@ -139,7 +142,11 @@ const Network = (props: Props) => {
   }, [selectedIndex]);
 
   const togglePanel = (panelName: string) => {
-    setOpenPanel((prevPanel) => (prevPanel === panelName ? null : panelName));
+    setOpenPanel((prevPanel) => {
+      const newPanel = prevPanel === panelName ? null : panelName;
+      setIsSidebarOpen(newPanel !== null); // Sidebarが開いているかどうかを更新
+      return newPanel;
+    });
     setTourRun(false);
   };
 
@@ -260,7 +267,9 @@ const Network = (props: Props) => {
         {/* 検索バー */}
         <div
           id="search-container"
-          className="absolute top-4 left-4 z-30 p-4 rounded-lg bg-gray-800 bg-opacity-75 backdrop-filter backdrop-blur-sm"
+          className={`absolute top-4 left-0 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ${
+            isSidebarOpen ? "ml-72" : "ml-8" // Sidebarの幅に応じてマージンを変更
+          }`}
         >
           {/* 検索フォーム */}
           <div className="flex flex-col">
