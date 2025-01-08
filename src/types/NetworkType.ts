@@ -62,6 +62,7 @@ export type NodeType = {
   totalViews?: number;
   activeUsers?: number;
   similarGames?: string[];
+  featureVector?: number[];
 }
 
 export type LinkType = {

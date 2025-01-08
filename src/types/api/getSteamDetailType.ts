@@ -24,6 +24,7 @@ export type SteamDetailsDataType = {
   music: number;
 
   similarGames: string[];
+  featureVector: number[];
 }
 
 export type SteamDetailApiType = {
