@@ -53,7 +53,11 @@ const Network = (props: Props) => {
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
+  // openPanelを他のパネルのみに使用
   const [openPanel, setOpenPanel] = useState<string | null>(null);
+  // GameSearchPanel専用の状態
+  const [isGameSearchOpen, setIsGameSearchOpen] = useState<boolean>(false);
+
   const { tourRun, setTourRun } = useTour();
 
   const [progress, setProgress] = useState(0);
@@ -113,7 +117,7 @@ const Network = (props: Props) => {
       setCenterX((nodes[selectedIndex].x ?? 0) - 150);
       setCenterY((nodes[selectedIndex].y ?? 0) + 100);
       // ノードが選択されたら GameSearchPanel を開く
-      setOpenPanel("gameSearch");
+      setIsGameSearchOpen(true);
     }
   }, [selectedIndex]);
 
@@ -127,6 +131,7 @@ const Network = (props: Props) => {
       const newState = !prev;
       if (newState) {
         setOpenPanel(null);
+        setIsGameSearchOpen(false); // ツアー開始時に GameSearchPanel も閉じる
       }
       return newState;
     });
@@ -136,15 +141,14 @@ const Network = (props: Props) => {
     return <Loading />;
   }
 
-  // 簡易サーチボタン(保留)
+  // GameSearchPanelを独立して管理する関数
   const handleGameSearchClick = () => {
-    setOpenPanel((prevPanel) =>
-      prevPanel === "gameSearch" ? null : "gameSearch"
-    );
+    setIsGameSearchOpen((prev) => !prev);
     setTourRun(false);
   };
+
   const handleGameSearchClose = () => {
-    setOpenPanel(null);
+    setIsGameSearchOpen(false);
   };
 
   return (
@@ -155,6 +159,8 @@ const Network = (props: Props) => {
         togglePanel={togglePanel}
         tourRun={tourRun}
         toggleTourRun={toggleTourRun}
+        // GameSearchPanelのトグルをSidebarに追加
+        onGameSearchToggle={handleGameSearchClick}
       />
 
       {/* メインコンテンツ */}
@@ -182,7 +188,7 @@ const Network = (props: Props) => {
         )}
 
         {/* GameSearchPanel */}
-        {openPanel === "gameSearch" && (
+        {isGameSearchOpen && (
           <div className="w-1/4 z-20 absolute top-0 right-0">
             <GameSearchPanel
               nodes={nodes}
@@ -190,6 +196,7 @@ const Network = (props: Props) => {
               setSelectedIndex={setSelectedIndex}
               setIsNetworkLoading={setIsNetworkLoading}
               steamListData={steamListData}
+              onClose={handleGameSearchClose} // クローズハンドラを追加
             />
           </div>
         )}
