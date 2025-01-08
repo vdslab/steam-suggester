@@ -24,6 +24,11 @@ import ReviewCloud from "../charts/ReviewCloud";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 
+// 追加するアイコン
+import BuildIcon from "@mui/icons-material/Build";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+
 type Props = {
   nodes: NodeType[];
   selectedIndex: number;
@@ -302,8 +307,8 @@ const GameSearchPanel = (props: Props) => {
               />
             )}
             <div className="px-2">
-              <div className="flex">
-                {/*flexデバッグ用 */}
+              <div className="flex items-center">
+                {/* ゲームタイトル */}
                 <h2 className="text-white text-xl font-semibold">
                   {nodes[selectedIndex].title}
                 </h2>
@@ -321,36 +326,78 @@ const GameSearchPanel = (props: Props) => {
                 </Tooltip>
               </div>
 
-              {/* 価格 */}
-              <div className="flex items-center text-sm space-x-1">
-                <span className="font-medium">価格:</span>
-                {nodes[selectedIndex].salePrice &&
-                parseInt(nodes[selectedIndex].salePrice, 10) <
-                  nodes[selectedIndex].price ? (
-                  <span className="flex items-center space-x-1">
-                    <span className="line-through text-gray-400">
-                      ¥{nodes[selectedIndex].price}
-                    </span>
-                    <span className="text-red-500">
-                      ¥{nodes[selectedIndex].salePrice}
-                    </span>
-                    <span className="flex items-center text-green-500">
-                      <LocalOfferIcon fontSize="small" className="mr-0.5" />
-                      {Math.round(
-                        ((nodes[selectedIndex].price -
-                          parseInt(nodes[selectedIndex].salePrice, 10)) /
-                          nodes[selectedIndex].price) *
-                          100
-                      )}
-                      % OFF
-                    </span>
+              {/* 開発者、発売日、価格 */}
+              <div className="flex items-center text-xs space-x-4 mt-1 mb-2">
+                {/* 開発者 */}
+                <div className="flex items-center">
+                  <BuildIcon fontSize="small" className="text-gray-400 mr-1" />
+                  <span className="text-gray-300">
+                    {nodes[selectedIndex].developerName}
                   </span>
-                ) : (
-                  <span>
-                    {nodes[selectedIndex].price
-                      ? `¥${nodes[selectedIndex].price}`
-                      : "無料"}
+                </div>
+
+                {/* 発売日 */}
+                <div className="flex items-center">
+                  <CalendarTodayIcon
+                    fontSize="small"
+                    className="text-gray-400 mr-1"
+                  />
+                  <span className="text-gray-300">
+                    {nodes[selectedIndex].releaseDate}
                   </span>
+                </div>
+
+                {/* 価格 */}
+                <div className="flex items-center">
+                  <AttachMoneyIcon
+                    fontSize="small"
+                    className="text-gray-400 mr-1"
+                  />
+                  <span className="text-gray-300">
+                    {nodes[selectedIndex].salePrice &&
+                    parseInt(nodes[selectedIndex].salePrice, 10) <
+                      nodes[selectedIndex].price ? (
+                      <>
+                        <span className="line-through text-gray-400">
+                          ¥{nodes[selectedIndex].price}
+                        </span>
+                        <span className="text-red-500 ml-1">
+                          ¥{nodes[selectedIndex].salePrice}
+                        </span>
+                      </>
+                    ) : nodes[selectedIndex].price ? (
+                      `¥${nodes[selectedIndex].price}`
+                    ) : (
+                      "無料"
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* アイコン表示 */}
+              <div className="flex items-center space-x-1 mt-1 mb-2">
+                {/* デバイスサポート */}
+                {nodes[selectedIndex].device.windows && (
+                  <Tooltip title="Windows対応">
+                    <WindowsIcon size={20} />
+                  </Tooltip>
+                )}
+                {nodes[selectedIndex].device.mac && (
+                  <Tooltip title="Mac対応">
+                    <AppleIcon className="text-white h-5 w-5" />
+                  </Tooltip>
+                )}
+
+                {/* マルチプレイヤー情報 */}
+                {nodes[selectedIndex].isSinglePlayer && (
+                  <Tooltip title="Single Player">
+                    <PersonIcon className="text-white h-5 w-5" />
+                  </Tooltip>
+                )}
+                {nodes[selectedIndex].isMultiPlayer && (
+                  <Tooltip title="Multiplayer">
+                    <GroupIcon className="text-white h-5 w-5" />
+                  </Tooltip>
                 )}
               </div>
 
@@ -381,7 +428,16 @@ const GameSearchPanel = (props: Props) => {
               </div>
             </div>
           </div>
-          <ReviewCloud steamData={steamAllData[selectedIndex]} />
+
+          {/* レビュー分析タイトルの追加 */}
+          <div className="px-2 mt-4">
+            <h3 className="text-white text-lg font-semibold mb-2">
+              レビュー分析
+            </h3>
+            <ReviewCloud steamData={steamAllData[selectedIndex]} />
+          </div>
+
+          {/* Populatityコンポーネント */}
           <Popularity nodes={nodes} selectedIndex={selectedIndex} />
         </div>
       ) : (
