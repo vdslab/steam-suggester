@@ -25,7 +25,7 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 
 import BuildIcon from "@mui/icons-material/Build";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import CurrencyYenIcon from "@mui/icons-material/CurrencyYen";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 
 type Props = {
@@ -112,7 +112,14 @@ const GameSearchPanel = (props: Props) => {
               <div className="flex items-center">
                 {/* ゲームタイトル */}
                 <h2 className="text-white text-xl font-semibold">
-                  {nodes[selectedIndex].title}
+                  <Link
+                    href={`https://store.steampowered.com/app/${nodes[selectedIndex].steamGameId}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-2 text-white hover:underline"
+                  >
+                    {nodes[selectedIndex].title}
+                  </Link>
                 </h2>
 
                 {/* Steamリンク */}
@@ -159,7 +166,7 @@ const GameSearchPanel = (props: Props) => {
                 {/* 価格 */}
                 <div className="flex items-center">
                   <Tooltip title="価格">
-                    <AttachMoneyIcon
+                    <CurrencyYenIcon
                       fontSize="small"
                       className="text-gray-400 mr-1"
                     />
@@ -170,14 +177,14 @@ const GameSearchPanel = (props: Props) => {
                       nodes[selectedIndex].price ? (
                       <>
                         <span className="line-through text-gray-400">
-                          ¥{nodes[selectedIndex].price}
+                          {nodes[selectedIndex].price}
                         </span>
                         <span className="text-red-500 ml-1">
-                          ¥{nodes[selectedIndex].salePrice}
+                          {nodes[selectedIndex].salePrice}
                         </span>
                       </>
                     ) : nodes[selectedIndex].price ? (
-                      `¥${nodes[selectedIndex].price}`
+                      `${nodes[selectedIndex].price}`
                     ) : (
                       "無料"
                     )}
