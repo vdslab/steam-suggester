@@ -30,10 +30,10 @@ const ToggleDisplay: React.FC<Props> = ({ nodes, selectedIndex }) => {
         indicatorColor="primary"
         sx={{
           "& .MuiTab-root": {
-            color: "white", // Default text color for tabs
+            color: "white",
           },
           "& .Mui-selected": {
-            color: "primary.main", // Text color for selected tab
+            color: "primary.main",
           },
         }}
       >
