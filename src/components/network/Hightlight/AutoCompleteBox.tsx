@@ -8,11 +8,12 @@ type Props = {
   searchList: string[];
   AddSelectedList: (event: any, value: string | null) => void;
   placeholder: string;
+  noOptionsText: string;
 }
 
 const AutoCompleteBox = (props: Props) => {
 
-  const { searchQuery, setSearchQuery, searchList, AddSelectedList, placeholder} = props;
+  const { searchQuery, setSearchQuery, searchList, AddSelectedList, placeholder, noOptionsText} = props;
 
   return (
     <div className="flex flex-col">
@@ -36,8 +37,8 @@ const AutoCompleteBox = (props: Props) => {
             color: "white", // ラベルの文字色
           },
           "& .MuiAutocomplete-option": {
-            color: "black", // ドロップダウン内の候補の文字色
-            backgroundColor: "white", // ドロップダウンの背景色
+            color: "white", // ドロップダウン内の候補の文字色
+            backgroundColor: "black", // ドロップダウンの背景色
             "&:hover": {
               backgroundColor: "#f0f0f0", // ホバー時の背景色
             },
@@ -48,13 +49,14 @@ const AutoCompleteBox = (props: Props) => {
         renderInput={(params) => (
           <TextField
             {...params}
-            label={placeholder}
+            placeholder={placeholder}
             variant="outlined"
             size="small"
             autoComplete="off"
           />
         )}
         onChange={AddSelectedList}
+        noOptionsText={noOptionsText}
       />
     </div>
   )

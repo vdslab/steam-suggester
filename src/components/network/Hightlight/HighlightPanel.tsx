@@ -7,6 +7,8 @@ import { TAG_LIST } from "@/constants/TAG_LIST";
 import CancelIcon from "@mui/icons-material/Cancel";
 import IconButton from "@mui/material/IconButton";
 import AutoCompleteBox from "@/components/network/Hightlight/AutoCompleteBox";
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import Button from "@mui/material/Button";
 
 type Props = {
   selectedTags: string[];
@@ -55,12 +57,19 @@ const HighlightPanel = (props: Props) => {
       </p>
 
       <div>
+        {/* 全解除 */}
+        <Button onClick={() => setSelectedTags([])} variant="outlined" startIcon={<RefreshOutlinedIcon />} sx={{ mb: 2 }}>
+          <span className="text-blue">リセット</span>
+        </Button>
+        
+        {/* タグ検索 */}
         <AutoCompleteBox
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           searchList={searchList}
           AddSelectedList={AddSelectedTags}
           placeholder="タグを入力"
+          noOptionsText="該当するタグが見つかりません"
         />
 
         {/* 選択中のジャンル */}

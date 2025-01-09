@@ -19,6 +19,9 @@ type Props = {
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
   steamListData: SteamListType[];
   steamAllData: SteamDetailsDataType[];
+  setOpenPanel: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedTags: string[];
+  setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 const GameSearchPanel = (props: Props) => {
@@ -28,7 +31,10 @@ const GameSearchPanel = (props: Props) => {
     selectedIndex,
     setSelectedIndex,
     setIsNetworkLoading,
-    steamAllData
+    steamAllData,
+    setOpenPanel,
+    selectedTags,
+    setSelectedTags,
   } = props;
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>(
@@ -174,6 +180,12 @@ const GameSearchPanel = (props: Props) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const addSelectedTags = (newTag:string) => {
+    if(selectedTags.includes(newTag)) return;
+    setSelectedTags([...selectedTags, newTag]);
+    setOpenPanel("highlight");
+  }
 
   return (
     <div className="flex-1 bg-gray-800 rounded-l-lg p-0 shadow-md flex flex-col space-y-0 overflow-y-scroll h-full relative">
@@ -325,7 +337,8 @@ const GameSearchPanel = (props: Props) => {
                       {nodes[selectedIndex].tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded inline-block whitespace-nowrap select-none"
+                          className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded inline-block whitespace-nowrap select-none cursor-pointer"
+                          onClick={() => addSelectedTags(tag)}
                         >
                           {tag}
                         </span>

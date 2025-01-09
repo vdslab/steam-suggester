@@ -65,7 +65,14 @@ const GenreFilter = (props: Props) => {
         <label htmlFor="master-checkbox" className="select-none cursor-pointer ml-2 text-white">全選択</label>
       </div>
 
-      <AutoCompleteBox searchQuery={searchQuery} setSearchQuery={setSearchQuery} searchList={selectedList} AddSelectedList={handleGenreSelect} placeholder="ジャンルを入力"/>
+      <AutoCompleteBox
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchList={selectedList}
+        AddSelectedList={handleGenreSelect}
+        placeholder="ジャンルを入力"
+        noOptionsText="該当するジャンルはありません"
+      />
 
       {/* 選択中のジャンル */}
       <div className="flex flex-wrap mt-2">
