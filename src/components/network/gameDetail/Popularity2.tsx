@@ -110,159 +110,190 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
     return { value: `${arrow}${change.toFixed(2)}%`, color };
   };
 
+  // ヘルパー関数: データが存在し、最新のカウントが0でないかをチェック
+  const hasValidData = (data: any[], key: string) => {
+    return data.length > 0 && (data[data.length - 1][key] || 0) > 0;
+  };
+
   return (
     <div className="flex flex-col space-y-2">
       {/* Steamレビュー数 */}
       <div className="relative border border-gray-500 p-2 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
-        <ResponsiveContainer width="25%" height={50}>
-          <AreaChart data={steamData}>
-            <XAxis dataKey="date" hide />
-            <YAxis hide />
-            <Tooltip
-              contentStyle={{
-                padding: "4px",
-                backgroundColor: "#222",
-                borderRadius: "4px",
-              }}
-              labelStyle={{ fontSize: "8px", color: "#aaa" }}
-              itemStyle={{ fontSize: "8px", color: "#fff" }}
-              labelFormatter={(value) => formatDate(value)}
-            />
-            <Area
-              type="monotone"
-              dataKey="count"
-              stroke={STEAM_COLOR_RANGE[0]}
-              fill={STEAM_COLOR_RANGE[0]}
-              fillOpacity={1}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-        <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
-          <div className="font-medium">Steamレビュー:</div>
-          <div className="font-semibold">
-            {steamData[steamData.length - 1]?.count} 件
-            {steamData.length > 1 && (
-              <span
-                className="ml-2 text-sm font-semibold"
-                style={{
-                  color: calculateChangeRate(
-                    steamData[steamData.length - 1]?.count,
-                    steamData[steamData.length - 2]?.count
-                  ).color,
-                }}
-              >
-                {
-                  calculateChangeRate(
-                    steamData[steamData.length - 1]?.count,
-                    steamData[steamData.length - 2]?.count
-                  ).value
-                }
-              </span>
-            )}
+        {hasValidData(steamData, "count") ? (
+          <>
+            <ResponsiveContainer width="25%" height={50}>
+              <AreaChart data={steamData}>
+                <XAxis dataKey="date" hide />
+                <YAxis hide />
+                <Tooltip
+                  contentStyle={{
+                    padding: "4px",
+                    backgroundColor: "#222",
+                    borderRadius: "4px",
+                  }}
+                  labelStyle={{ fontSize: "8px", color: "#aaa" }}
+                  itemStyle={{ fontSize: "8px", color: "#fff" }}
+                  labelFormatter={(value) => formatDate(value)}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  stroke={STEAM_COLOR_RANGE[0]}
+                  fill={STEAM_COLOR_RANGE[0]}
+                  fillOpacity={1}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+            <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
+              <div className="font-medium">Steamレビュー:</div>
+              <div className="font-semibold">
+                {steamData[steamData.length - 1]?.count} 件
+                {steamData.length > 1 && (
+                  <span
+                    className="ml-2 text-sm font-semibold"
+                    style={{
+                      color: calculateChangeRate(
+                        steamData[steamData.length - 1]?.count,
+                        steamData[steamData.length - 2]?.count
+                      ).color,
+                    }}
+                  >
+                    {
+                      calculateChangeRate(
+                        steamData[steamData.length - 1]?.count,
+                        steamData[steamData.length - 2]?.count
+                      ).value
+                    }
+                  </span>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-white">
+            データがありません
           </div>
-        </div>
+        )}
       </div>
 
       {/* Twitch視聴数 */}
       <div className="relative border border-gray-500 p-2 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
-        <ResponsiveContainer width="25%" height={50}>
-          <AreaChart data={twitchData}>
-            <XAxis dataKey="date" hide />
-            <YAxis hide />
-            <Tooltip
-              contentStyle={{
-                padding: "4px",
-                backgroundColor: "#222",
-                borderRadius: "4px",
-              }}
-              labelStyle={{ fontSize: "8px", color: "#aaa" }}
-              itemStyle={{ fontSize: "8px", color: "#fff" }}
-              labelFormatter={(value) => formatDate(value)}
-            />
-            <Area
-              type="monotone"
-              dataKey="count"
-              stroke={TWITCH_COLOR_RANGE[0]}
-              fill={TWITCH_COLOR_RANGE[0]}
-              fillOpacity={1}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-        <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
-          <div className="font-medium">Twitch視聴:</div>
-          <div className="font-semibold">
-            {twitchData[twitchData.length - 1]?.count} 人
-            {twitchData.length > 1 && (
-              <span
-                className="ml-2 text-sm font-semibold"
-                style={{
-                  color: calculateChangeRate(
-                    twitchData[twitchData.length - 1]?.count,
-                    twitchData[twitchData.length - 2]?.count
-                  ).color,
-                }}
-              >
-                {
-                  calculateChangeRate(
-                    twitchData[twitchData.length - 1]?.count,
-                    twitchData[twitchData.length - 2]?.count
-                  ).value
-                }
-              </span>
-            )}
+        {hasValidData(twitchData, "count") ? (
+          <>
+            <ResponsiveContainer width="25%" height={50}>
+              <AreaChart data={twitchData}>
+                <XAxis dataKey="date" hide />
+                <YAxis hide />
+                <Tooltip
+                  contentStyle={{
+                    padding: "4px",
+                    backgroundColor: "#222",
+                    borderRadius: "4px",
+                  }}
+                  labelStyle={{ fontSize: "8px", color: "#aaa" }}
+                  itemStyle={{ fontSize: "8px", color: "#fff" }}
+                  labelFormatter={(value) => formatDate(value)}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  stroke={TWITCH_COLOR_RANGE[0]}
+                  fill={TWITCH_COLOR_RANGE[0]}
+                  fillOpacity={1}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+            <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
+              <div className="font-medium">Twitch視聴:</div>
+              <div className="font-semibold">
+                {twitchData[twitchData.length - 1]?.count} 人
+                {twitchData.length > 1 && (
+                  <span
+                    className="ml-2 text-sm font-semibold"
+                    style={{
+                      color: calculateChangeRate(
+                        twitchData[twitchData.length - 1]?.count,
+                        twitchData[twitchData.length - 2]?.count
+                      ).color,
+                    }}
+                  >
+                    {
+                      calculateChangeRate(
+                        twitchData[twitchData.length - 1]?.count,
+                        twitchData[twitchData.length - 2]?.count
+                      ).value
+                    }
+                  </span>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-white">
+            データがありません
           </div>
-        </div>
+        )}
       </div>
 
       {/* アクティブユーザー数 */}
       <div className="relative border border-gray-500 p-2 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
-        <ResponsiveContainer width="25%" height={50}>
-          <AreaChart data={activeUsersData}>
-            <XAxis dataKey="date" hide />
-            <YAxis hide />
-            <Tooltip
-              contentStyle={{
-                padding: "4px",
-                backgroundColor: "#222",
-                borderRadius: "4px",
-              }}
-              labelStyle={{ fontSize: "8px", color: "#aaa" }}
-              itemStyle={{ fontSize: "8px", color: "#fff" }}
-              labelFormatter={(value) => formatDate(value)}
-            />
-            <Area
-              type="monotone"
-              dataKey="active_user"
-              stroke={STEAM_COLOR_RANGE[0]}
-              fill={STEAM_COLOR_RANGE[0]}
-              fillOpacity={1}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-        <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
-          <div className="font-medium">アクティブユーザー:</div>
-          <div className="font-semibold">
-            {activeUsersData[activeUsersData.length - 1]?.active_user} 人
-            {activeUsersData.length > 1 && (
-              <span
-                className="ml-2 text-sm font-semibold"
-                style={{
-                  color: calculateChangeRate(
-                    activeUsersData[activeUsersData.length - 1]?.active_user,
-                    activeUsersData[activeUsersData.length - 2]?.active_user
-                  ).color,
-                }}
-              >
-                {
-                  calculateChangeRate(
-                    activeUsersData[activeUsersData.length - 1]?.active_user,
-                    activeUsersData[activeUsersData.length - 2]?.active_user
-                  ).value
-                }
-              </span>
-            )}
+        {hasValidData(activeUsersData, "active_user") ? (
+          <>
+            <ResponsiveContainer width="25%" height={50}>
+              <AreaChart data={activeUsersData}>
+                <XAxis dataKey="date" hide />
+                <YAxis hide />
+                <Tooltip
+                  contentStyle={{
+                    padding: "4px",
+                    backgroundColor: "#222",
+                    borderRadius: "4px",
+                  }}
+                  labelStyle={{ fontSize: "8px", color: "#aaa" }}
+                  itemStyle={{ fontSize: "8px", color: "#fff" }}
+                  labelFormatter={(value) => formatDate(value)}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="active_user"
+                  stroke={STEAM_COLOR_RANGE[0]}
+                  fill={STEAM_COLOR_RANGE[0]}
+                  fillOpacity={1}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+            <div className="flex-1 flex items-center justify-between ml-4 text-sm text-white">
+              <div className="font-medium">アクティブユーザー:</div>
+              <div className="font-semibold">
+                {activeUsersData[activeUsersData.length - 1]?.active_user} 人
+                {activeUsersData.length > 1 && (
+                  <span
+                    className="ml-2 text-sm font-semibold"
+                    style={{
+                      color: calculateChangeRate(
+                        activeUsersData[activeUsersData.length - 1]
+                          ?.active_user,
+                        activeUsersData[activeUsersData.length - 2]?.active_user
+                      ).color,
+                    }}
+                  >
+                    {
+                      calculateChangeRate(
+                        activeUsersData[activeUsersData.length - 1]
+                          ?.active_user,
+                        activeUsersData[activeUsersData.length - 2]?.active_user
+                      ).value
+                    }
+                  </span>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-white">
+            データがありません
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
