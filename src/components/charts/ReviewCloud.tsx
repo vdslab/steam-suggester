@@ -22,9 +22,6 @@ const fixedValueGenerator = () => 0.5;
 
 const ReviewCloud = (props: Props) => {
   const { reviewData } = props;
-  if (!reviewData || Object.keys(reviewData).length === 0) {
-    return <div className="text-white">レビューがありません</div>;
-  }
 
   const [words, setWords] = useState<WordData[]>([]);
 
@@ -46,6 +43,10 @@ const ReviewCloud = (props: Props) => {
     range: [10, 100],
   });
   const fontSizeSetter = (datum: WordData) => fontScale(datum.value);
+
+  if (!reviewData || Object.keys(reviewData).length === 0) {
+    return <div className="text-white">レビューがありません</div>;
+  }
 
 
   return (
