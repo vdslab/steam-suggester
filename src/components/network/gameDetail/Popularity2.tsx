@@ -118,7 +118,7 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
   return (
     <div className="flex flex-col space-y-2">
       {/* Steamレビュー数 */}
-      <div className="relative border border-gray-500 p-2 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
+      <div className="relative border border-gray-500 p-1 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
         {hasValidData(steamData, "count") ? (
           <>
             <ResponsiveContainer width="25%" height={50}>
@@ -177,7 +177,7 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
       </div>
 
       {/* Twitch視聴数 */}
-      <div className="relative border border-gray-500 p-2 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
+      <div className="relative border border-gray-500 p-1 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
         {hasValidData(twitchData, "count") ? (
           <>
             <ResponsiveContainer width="25%" height={50}>
@@ -236,7 +236,7 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
       </div>
 
       {/* アクティブユーザー数 */}
-      <div className="relative border border-gray-500 p-2 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
+      <div className="relative border border-gray-500 p-1 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-gray-800 flex items-center">
         {hasValidData(activeUsersData, "active_user") ? (
           <>
             <ResponsiveContainer width="25%" height={50}>

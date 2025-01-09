@@ -132,7 +132,12 @@ const GameSearchPanel = (props: Props) => {
               <div className="flex items-center text-xs space-x-4 mt-1 mb-2">
                 {/* 開発者 */}
                 <div className="flex items-center">
-                  <BuildIcon fontSize="small" className="text-gray-400 mr-1" />
+                  <Tooltip title="開発者">
+                    <BuildIcon
+                      fontSize="small"
+                      className="text-gray-400 mr-1"
+                    />
+                  </Tooltip>
                   <span className="text-gray-300">
                     {nodes[selectedIndex].developerName}
                   </span>
@@ -140,10 +145,12 @@ const GameSearchPanel = (props: Props) => {
 
                 {/* 発売日 */}
                 <div className="flex items-center">
-                  <CalendarTodayIcon
-                    fontSize="small"
-                    className="text-gray-400 mr-1"
-                  />
+                  <Tooltip title="発売日">
+                    <CalendarTodayIcon
+                      fontSize="small"
+                      className="text-gray-400 mr-1"
+                    />
+                  </Tooltip>
                   <span className="text-gray-300">
                     {nodes[selectedIndex].releaseDate}
                   </span>
@@ -151,10 +158,12 @@ const GameSearchPanel = (props: Props) => {
 
                 {/* 価格 */}
                 <div className="flex items-center">
-                  <AttachMoneyIcon
-                    fontSize="small"
-                    className="text-gray-400 mr-1"
-                  />
+                  <Tooltip title="価格">
+                    <AttachMoneyIcon
+                      fontSize="small"
+                      className="text-gray-400 mr-1"
+                    />
+                  </Tooltip>
                   <span className="text-gray-300">
                     {nodes[selectedIndex].salePrice &&
                     parseInt(nodes[selectedIndex].salePrice, 10) <
@@ -207,8 +216,9 @@ const GameSearchPanel = (props: Props) => {
           {/* レビュー分析タイトルの追加 */}
           <div className="px-2 mt-2">
             <h3 className="text-white text-lg font-semibold mb-2 flex items-center">
-              <RateReviewIcon className="mr-1" /> {/* 追加 */}
+              <RateReviewIcon className="mr-1" />
               レビュー分析
+              <HelpTooltip title="ゲームレビュー文に多く含まれた単語ほど、大きく表示されます。" />
             </h3>
             <ReviewCloud steamData={steamAllData[selectedIndex]} />
           </div>
