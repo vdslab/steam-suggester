@@ -11,7 +11,6 @@ import { useState, useEffect } from "react";
 import FilterButtonGroup from "./FilterButtonGroup";
 import Panel from "../Panel";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import CategoryIcon from "@mui/icons-material/Category";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DevicesIcon from "@mui/icons-material/Devices";
@@ -107,21 +106,9 @@ const SelectParameter: React.FC<Props> = ({ filter, setFilter, setIsNetworkLoadi
       icon={<FilterListIcon className="mr-2 text-white" />}
     >
       <div className="flex flex-col h-full">
-        
-        {/* ジャンルフィルター */}
-      <Section title="ジャンル" icon={<CategoryIcon />}>
-        <label className="flex items-center mb-2">
-          <input
-            type="checkbox"
-            className="form-checkbox h-5 w-5 text-gray-600"
-            checked={areAllCategoriesSelected}
-            onChange={handleMasterCheckboxChange}
-          />
-          <span className="ml-2 text-white">全選択</span>
-        </label>
-        <GenreFilter filter={filter} localFilter={localFilter} setLocalFilter={setLocalFilter} />
 
-      </Section>
+        {/* ジャンルフィルター */}  
+      <GenreFilter filter={filter} localFilter={localFilter} setLocalFilter={setLocalFilter} />
 
         {/* 価格フィルター */}
         <Section title="価格" icon={<AttachMoneyIcon />}>

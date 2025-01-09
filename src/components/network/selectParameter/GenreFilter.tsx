@@ -1,7 +1,10 @@
 import { Filter } from "@/types/api/FilterType";
-import { TextField, IconButton, Autocomplete } from "@mui/material";
 import { useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
+import AutoCompleteBox from "@/components/network/Hightlight/AutoCompleteBox";
+import Section from "../Section";
+import CategoryIcon from "@mui/icons-material/Category";
+import IconButton from "@mui/material/IconButton";
 
 type Props = {
   filter: Filter;
@@ -13,13 +16,15 @@ const GenreFilter = (props: Props) => {
   const { filter, localFilter, setLocalFilter } = props;
 
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [areAllCategoriesSelected, setAreAllCategoriesSelected] = useState<boolean>(false);
 
   // 入力値に基づく候補のフィルタリング
-  const data = Object.keys(filter.Genres).filter(
+  const selectedList = Object.keys(filter.Genres).filter(
     (key) =>
       !localFilter.Genres[key] && key.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // ジャンルの選択の追加
   const handleGenreSelect = (event: any, value: string | null) => {
     if (value) {
       setLocalFilter({
@@ -30,56 +35,37 @@ const GenreFilter = (props: Props) => {
     }
   };
 
+  // カテゴリーの全選択/全解除
+  const handleMasterCheckboxChange = () => {
+    const newStatus = !areAllCategoriesSelected;
+    const newCategories: { [key: string]: boolean } = {};
+    for (const key in localFilter.Genres) {
+      newCategories[key] = newStatus;
+    }
+    setLocalFilter({
+      ...localFilter,
+      Genres: newCategories,
+    });
+    setAreAllCategoriesSelected(newStatus);
+  };
+  
+
   return (
-    <div>
-      <div className="flex flex-col">
-        <Autocomplete
-          disablePortal
-          options={data}
-          sx={{
-            width: 300,
-            "& .MuiInputBase-root": {
-              color: "white", // 文字の色
-              borderColor: "white", // 入力フィールドの枠線の色
-              backgroundColor: "#374151"
-            },
-            "& .MuiOutlinedInput-root": {
-              // "& fieldset": {
-              //   borderColor: "gray", // フォーカスしていない状態の枠線の色
-              // },
-              // "&:hover fieldset": {
-              //   borderColor: "white", // ホバー時の枠線の色
-              // },
-              "&.Mui-focused fieldset": {
-                borderColor: "white", // フォーカス時の枠線の色
-                borderWidth: 1, // フォーカス時の枠線の太さ
-              },
-            },
-            "& .MuiInputLabel-root": {
-              color: "white", // ラベルの文字色
-            },
-            "& .MuiAutocomplete-option": {
-              color: "black", // ドロップダウン内の候補の文字色
-              backgroundColor: "white", // ドロップダウンの背景色
-              "&:hover": {
-                backgroundColor: "#f0f0f0", // ホバー時の背景色
-              },
-            },
-          }}
-          inputValue={searchQuery}
-          onInputChange={(event, newInputValue) => setSearchQuery(newInputValue)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="検索"
-              variant="outlined"
-              size="small"
-              autoComplete="off"
-            />
-          )}
-          onChange={handleGenreSelect}
+    <Section title="ジャンル" icon={<CategoryIcon />}>
+
+      {/* 全選択 */}
+      <div className="flex items-center mb-2">
+        <input
+          id="master-checkbox"
+          type="checkbox"
+          className="h-5 w-5 text-gray-600"
+          checked={areAllCategoriesSelected}
+          onChange={handleMasterCheckboxChange}
         />
+        <label htmlFor="master-checkbox" className="select-none cursor-pointer ml-2 text-white">全選択</label>
       </div>
+
+      <AutoCompleteBox searchQuery={searchQuery} setSearchQuery={setSearchQuery} searchList={selectedList} AddSelectedList={handleGenreSelect} placeholder="ジャンルを入力"/>
 
       {/* 選択中のジャンル */}
       <div className="flex flex-wrap mt-2">
@@ -87,7 +73,7 @@ const GenreFilter = (props: Props) => {
           value && (
             <span
               key={key}
-              className="bg-blue-600 text-xs text-white px-2 py-1 rounded mr-2 mb-2 flex items-center"
+              className="bg-blue-500 text-xs text-white px-3 py-1 rounded-full mr-2 mb-2 flex items-center shadow-lg transition-all duration-200"
             >
               {key}
               <IconButton
@@ -105,7 +91,7 @@ const GenreFilter = (props: Props) => {
           )
         ))}
       </div>
-    </div>
+    </Section>
   );
 };
 

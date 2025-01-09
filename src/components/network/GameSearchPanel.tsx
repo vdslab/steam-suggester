@@ -1,23 +1,12 @@
-/* GameSearchPanel.tsx */
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
 import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { NodeType, SteamListType } from "@/types/NetworkType";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SearchIcon from "@mui/icons-material/Search";
-import Section from "./Section";
-import HelpTooltip from "./HelpTooltip";
-import AppleIcon from "@mui/icons-material/Apple";
-import PersonIcon from "@mui/icons-material/Person";
-import GroupIcon from "@mui/icons-material/Group";
 import Tooltip from "@mui/material/Tooltip";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import WindowsIcon from "@/components/common/WindowsIcon";
-import ToggleDisplay from "./ToggleDisplay";
 import Link from "next/link";
 import Popularity from "./Popularity2";
 import ReviewCloud from "../charts/ReviewCloud";
@@ -41,7 +30,6 @@ const GameSearchPanel = (props: Props) => {
     setIsNetworkLoading,
     steamAllData
   } = props;
-  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>(
     []
@@ -337,7 +325,7 @@ const GameSearchPanel = (props: Props) => {
                       {nodes[selectedIndex].tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded inline-block whitespace-nowrap cursor-pointer select-none"
+                          className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded inline-block whitespace-nowrap select-none"
                         >
                           {tag}
                         </span>
