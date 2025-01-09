@@ -46,14 +46,11 @@ const Network = () => {
   const [isSteamListOpen, setIsSteamListOpen] = useState<boolean>(false);
   const { tourRun, setTourRun } = useTour();
 
-  const [progress, setProgress] = useState(0);
-
   // Refを使用して副作用の実行を制御
   const hasFetchedInitialData = useRef(false);
   
   const initialNodes = async (filter: Filter, gameIds: string[], slider: SliderSettings) => {
-    setProgress(0);
-    const result = await createNetwork(filter, gameIds, slider, setProgress);
+    const result = await createNetwork(filter, gameIds, slider);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -68,7 +65,6 @@ const Network = () => {
     }
     setNodes(nodes);
     setLinks(links);
-    setProgress(100);
     hasFetchedInitialData.current = false; 
   };
 
@@ -191,7 +187,7 @@ const Network = () => {
             />
           </div>
         ) : (
-          <ProgressBar progress={progress} />
+          <ProgressBar progress={0} />
         )}
 
         {/* フィルターパネル */}

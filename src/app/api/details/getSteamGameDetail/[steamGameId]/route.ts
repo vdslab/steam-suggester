@@ -89,7 +89,7 @@ export async function GET(req: Request, { params }: Params) {
       story: gameDetailData.story,
       music: gameDetailData.music,
       similarGames: similarGames,
-      featureVector: gameDetailData.feature_vector
+      featureVector: gameDetailData.feature_vector || []
     };
 
     return NextResponse.json(formattedResult);

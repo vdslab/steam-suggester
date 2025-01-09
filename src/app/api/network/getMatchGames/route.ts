@@ -100,7 +100,7 @@ export async function GET() {
         story: item.story,
         music: item.music,
         similarGames: similarGames,
-        featureVector: item.feature_vector,
+        featureVector: item.feature_vector || [],
       };
     });
 
