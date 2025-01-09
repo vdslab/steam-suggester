@@ -374,7 +374,6 @@ const Network = (props: Props) => {
               setSelectedIndex={setSelectedIndex}
               setIsNetworkLoading={setIsNetworkLoading}
               steamListData={steamListData}
-              steamAllData={steamAllData}
               setOpenPanel={setOpenPanel}
               selectedTags={selectedTags}
               setSelectedTags={setSelectedTags}

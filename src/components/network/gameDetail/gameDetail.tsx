@@ -29,7 +29,6 @@ type Props = {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
   steamListData: SteamListType[];
-  steamAllData: SteamDetailsDataType[];
   setOpenPanel: React.Dispatch<React.SetStateAction<string | null>>;
   selectedTags: string[];
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
@@ -42,7 +41,6 @@ const GameSearchPanel = (props: Props) => {
     selectedIndex,
     setSelectedIndex,
     setIsNetworkLoading,
-    steamAllData,
     setOpenPanel,
     selectedTags,
     setSelectedTags,
@@ -234,7 +232,7 @@ const GameSearchPanel = (props: Props) => {
               レビュー分析
               <HelpTooltip title="ゲームレビュー文に多く含まれた単語ほど、大きく表示されます。" />
             </h3>
-            <ReviewCloud steamData={steamAllData[selectedIndex]} />
+            <ReviewCloud reviewData={nodes[selectedIndex].review} />
           </div>
 
           {/* Populatityコンポーネント */}
