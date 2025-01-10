@@ -53,7 +53,11 @@ export type NodeType = {
   developerName: string;
   salePrice: string;
   playTime: string;
-  review: { [word: string]: number };
+  review: {
+    "name": string,
+    "score": number,
+    "tfidf": number,
+   }[];
   difficulty: number;
   graphics: number;
   story: number;
@@ -62,6 +66,7 @@ export type NodeType = {
   totalViews?: number;
   activeUsers?: number;
   similarGames?: string[];
+  featureVector?: number[];
 }
 
 export type LinkType = {

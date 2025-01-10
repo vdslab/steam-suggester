@@ -33,8 +33,3 @@ export type TwitchClipType = {
   image: string;
   title: string;
 };
-
-export type TwitchViews = {
-  get_date: string;
-  total_views: number;
-}
