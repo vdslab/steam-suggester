@@ -9,9 +9,11 @@ import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 type Props = {
   nodes: NodeType[];
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
+  userAddedGames: string[];
+  setUserAddedGames: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex }) => {
+const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames, setUserAddedGames }) => {
   // ランキング順にソート
   const sortedNodes = [...nodes].sort(
     (a, b) => (b.circleScale ?? 0) - (a.circleScale ?? 0)
@@ -38,18 +40,21 @@ const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex }) => {
         <HelpTooltip title="人気のゲームランキングです。" />
       </div>
       <ul>
-        {sortedNodes.map((node, index) => (
-          <li
-            key={node.steamGameId}
-            className="flex items-center mb-2 cursor-pointer hover:bg-gray-700 p-2 rounded"
-            onClick={() => setSelectedIndex(node.index)}
-          >
-            <span className={`${selectColor(index + 1).rankColor} mr-2`}>
-              {index + 1}位
-            </span>
-            <span className="text-white">{node.title}</span>
-          </li>
-        ))}
+        {sortedNodes.map((node, index) => {
+          const titleColor = userAddedGames.find((gameId: string) => gameId === node.steamGameId) ? "yellow-300" : "white";
+          return (
+            <li
+              key={node.steamGameId}
+              className="flex items-center mb-2 cursor-pointer hover:bg-gray-700 p-2 rounded"
+              onClick={() => setSelectedIndex(node.index)}
+            >
+              <span className={`${selectColor(index + 1).rankColor} mr-2`}>
+                {index + 1}位
+              </span>
+              <span className={`text-${titleColor}`}>{node.title}</span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

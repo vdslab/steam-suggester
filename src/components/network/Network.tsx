@@ -516,7 +516,12 @@ const Network = (props: Props) => {
               : "hidden"
           }`}
         >
-          <Leaderboard nodes={nodes} setSelectedIndex={setSelectedIndex} />
+          <Leaderboard
+            nodes={nodes}
+            setSelectedIndex={setSelectedIndex}
+            userAddedGames={userAddedGames}
+            setUserAddedGames={setUserAddedGames}
+          />
         </div>
 
         {/* Tourコンポーネント */}
