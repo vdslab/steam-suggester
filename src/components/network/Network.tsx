@@ -87,6 +87,8 @@ const Network = (props: Props) => {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
 
+  const [prevAddedGameId, setPrevAddedGameId] = useState<string>("");
+
   const initialNodes = async (
     filter: Filter,
     gameIds: string[],
@@ -106,11 +108,17 @@ const Network = (props: Props) => {
       (node1: NodeType, node2: NodeType) =>
         (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
     );
-    if (buffNodes.length > 0) {
+    const index = buffNodes.findIndex((node: NodeType) => node.steamGameId === prevAddedGameId);
+    if (buffNodes.length > 0 && index === -1) {
       setCenterX((buffNodes[0]?.x ?? 0) - 150);
       setCenterY((buffNodes[0]?.y ?? 0) + 100);
       setSelectedIndex(-1);
+    } else if (index !== -1) {
+      setCenterX((buffNodes[index]?.x ?? 0) - 150);
+      setCenterY((buffNodes[index]?.y ?? 0) + 100);
+      setSelectedIndex(index);
     }
+    setPrevAddedGameId("");
     setNodes(nodes);
     setLinks(links);
     hasFetchedInitialData.current = false; 
@@ -210,10 +218,10 @@ const Network = (props: Props) => {
     ) {
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
+      setSearchQuery("");
       (async () => {
         await changeGameIdData(newUserAddedGames);
-        setSearchQuery("");
-        setIsNetworkLoading(true);
+        setPrevAddedGameId(steamGameId);
       })();
     }
   };
@@ -230,6 +238,12 @@ const Network = (props: Props) => {
       setIsNetworkLoading(true);
     })();
   };
+
+  useEffect(() => {
+    if (prevAddedGameId) {
+      setIsNetworkLoading(true);
+    }
+  }, [prevAddedGameId]);
 
   // 外部クリックを検出してフォーカスを解除
   useEffect(() => {
