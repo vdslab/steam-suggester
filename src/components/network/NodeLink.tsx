@@ -59,8 +59,8 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
 
       const initialTransform = d3.zoomIdentity
         .translate(
-          window.innerWidth / 2 - window.innerWidth / 5 - centerX,
-          window.innerHeight / 2 - centerY
+          window.innerWidth / 2 - window.innerWidth / 7 - centerX,
+          window.innerHeight * 3 / 5 - centerY
         )
         .scale(1);
       svg
