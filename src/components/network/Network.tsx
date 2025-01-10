@@ -7,7 +7,7 @@ import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
 import StreamedList from "./streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
-import Loading from "@/app/desktop/loading";
+import Loading from "@/app/loading";
 import {
   LinkType,
   NodeType,
@@ -27,7 +27,7 @@ import SteamList from "./steamList/SteamList";
 import HelpTooltip from "./HelpTooltip";
 import Tour from "./Tour";
 import ProgressBar from "./ProgressBar";
-import SimilaritySettings from "./SimilaritySettings/SimilaritySettings";
+import SimilaritySettings from "./similaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./Leaderboard";
 import GameDetailPanel from "./gameDetail/gameDetail";
@@ -35,7 +35,7 @@ import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import UserAvatar from "./steamList/UserAvatar";
 import { HomeHeader } from "../common/Headers";
-import HighlightPanel from "./Hightlight/HighlightPanel";
+import HighlightPanel from "./highlight/HighlightPanel";
 
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
