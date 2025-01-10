@@ -39,48 +39,61 @@ const Sidebar: React.FC<Props> = ({
           <LeaderboardOutlinedIcon />
           <span className="text-xs mt-1">ランキング</span>
         </button>
-        {/* 区切り線 */}
-        <div className="w-full border-t border-gray-700 my-2"></div>
-        {/* Steamリストボタン */}
-        <button
-          onClick={() => togglePanel("steamList")}
-          className={`${buttonClasses(openPanel === "steamList")} step4`}
-        >
-          <SportsEsportsOutlinedIcon />
-          <span className="text-xs mt-1">Steam連携</span>
-        </button>
-        {/* 強調表示ボタン */}
-        <button
-          onClick={() => togglePanel("highlight")}
-          className={`${buttonClasses(openPanel === "highlight")} `}
-        >
-          <HighlightOutlinedIcon />
-          <span className="text-xs mt-1">強調表示</span>
-        </button>
-        {/* Streamerボタン */}
-        <button
-          onClick={() => togglePanel("streamer")}
-          className={`${buttonClasses(openPanel === "streamer")} step2`}
-        >
-          <LiveTvOutlinedIcon />
-          <span className="text-xs mt-1">配信者</span>
-        </button>
-        {/* 類似度ボタン */}
-        <button
-          onClick={() => togglePanel("similarity")}
-          className={`${buttonClasses(openPanel === "similarity")} step3`}
-        >
-          <TuneOutlinedIcon />
-          <span className="text-xs mt-1">類似度設定</span>
-        </button>
-        {/* フィルターボタン */}
-        <button
-          onClick={() => togglePanel("filter")}
-          className={`${buttonClasses(openPanel === "filter")} step1`}
-        >
-          <FilterListOutlinedIcon />
-          <span className="text-xs mt-1">フィルター</span>
-        </button>
+
+        {/* 「ゲームを探す」カテゴリ */}
+        <div className="w-full flex flex-col items-center space-y-2">
+          {/* 区切り線 */}
+          <div className="w-full border-t border-gray-600"></div>
+          <h3 className="text-xs uppercase text-gray-400 mb-2">ゲームを探す</h3>
+          {/* Steamリストボタン */}
+          <button
+            onClick={() => togglePanel("steamList")}
+            className={`${buttonClasses(openPanel === "steamList")} step4`}
+          >
+            <SportsEsportsOutlinedIcon />
+            <span className="text-xs mt-1">Steam連携</span>
+          </button>
+          {/* 強調表示ボタン */}
+          <button
+            onClick={() => togglePanel("highlight")}
+            className={`${buttonClasses(openPanel === "highlight")}`}
+          >
+            <HighlightOutlinedIcon />
+            <span className="text-xs mt-1">強調表示</span>
+          </button>
+          {/* Streamerボタン */}
+          <button
+            onClick={() => togglePanel("streamer")}
+            className={`${buttonClasses(openPanel === "streamer")} step2`}
+          >
+            <LiveTvOutlinedIcon />
+            <span className="text-xs mt-1">配信者</span>
+          </button>
+        </div>
+
+        {/* 「ゲームを絞る」カテゴリ */}
+        <div className="w-full flex flex-col items-center space-y-2">
+          {/* 区切り線 */}
+          <div className="w-full border-t border-gray-600"></div>
+
+          <h3 className="text-xs uppercase text-gray-400 mb-2">ゲームを絞る</h3>
+          {/* 類似度ボタン */}
+          <button
+            onClick={() => togglePanel("similarity")}
+            className={`${buttonClasses(openPanel === "similarity")} step3`}
+          >
+            <TuneOutlinedIcon />
+            <span className="text-xs mt-1">類似度設定</span>
+          </button>
+          {/* フィルターボタン */}
+          <button
+            onClick={() => togglePanel("filter")}
+            className={`${buttonClasses(openPanel === "filter")} step1`}
+          >
+            <FilterListOutlinedIcon />
+            <span className="text-xs mt-1">フィルター</span>
+          </button>
+        </div>
       </div>
 
       {/* ツアーボタン */}

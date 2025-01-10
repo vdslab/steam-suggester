@@ -107,7 +107,10 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
     const color = change > 0 ? "green" : "red";
     const arrow = change > 0 ? "↑" : "↓";
 
-    return { value: `${arrow}${change.toFixed(2)}%`, color };
+    // 四捨五入して小数点を表示しない
+    const roundedChange = Math.abs(Math.round(change));
+
+    return { value: `${arrow}${roundedChange}%`, color };
   };
 
   // ヘルパー関数: データが存在し、最新のカウントが0でないかをチェック
@@ -144,13 +147,18 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
                 />
               </AreaChart>
             </ResponsiveContainer>
-            <div className="flex-1 flex items-center justify-between ml-2 text-sm text-white">
-              <div className="font-medium">Steamレビュー:</div>
-              <div className="font-semibold">
-                {steamData[steamData.length - 1]?.count} 件
+            <div className="flex-1 flex items-center justify-between ml-2 text-sm text-white flex-nowrap">
+              <div className="font-medium whitespace-nowrap">
+                Steamレビュー:
+              </div>
+              <div className="font-semibold flex items-center">
+                <span className="w-16 text-right tabular-nums">
+                  {steamData[steamData.length - 1]?.count}
+                </span>
+                <span className="ml-1">件</span>
                 {steamData.length > 1 && (
                   <span
-                    className="ml-2 text-sm font-semibold"
+                    className="ml-2 text-sm font-semibold whitespace-nowrap"
                     style={{
                       color: calculateChangeRate(
                         steamData[steamData.length - 1]?.count,
@@ -203,13 +211,16 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
                 />
               </AreaChart>
             </ResponsiveContainer>
-            <div className="flex-1 flex items-center justify-between ml-2 text-sm text-white">
-              <div className="font-medium">Twitch視聴:</div>
-              <div className="font-semibold">
-                {twitchData[twitchData.length - 1]?.count} 人
+            <div className="flex-1 flex items-center justify-between ml-2 text-sm text-white flex-nowrap">
+              <div className="font-medium whitespace-nowrap">Twitch視聴:</div>
+              <div className="font-semibold flex items-center">
+                <span className="w-16 text-right tabular-nums">
+                  {twitchData[twitchData.length - 1]?.count}
+                </span>
+                <span className="ml-1">人</span>
                 {twitchData.length > 1 && (
                   <span
-                    className="ml-2 text-sm font-semibold"
+                    className="ml-2 text-sm font-semibold whitespace-nowrap"
                     style={{
                       color: calculateChangeRate(
                         twitchData[twitchData.length - 1]?.count,
@@ -262,13 +273,18 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
                 />
               </AreaChart>
             </ResponsiveContainer>
-            <div className="flex-1 flex items-center justify-between ml-2 text-sm text-white">
-              <div className="font-medium">アクティブユーザー:</div>
-              <div className="font-semibold">
-                {activeUsersData[activeUsersData.length - 1]?.active_user} 人
+            <div className="flex-1 flex items-center justify-between ml-2 text-sm text-white flex-nowrap">
+              <div className="font-medium whitespace-nowrap">
+                アクティブユーザー:
+              </div>
+              <div className="font-semibold flex items-center">
+                <span className="w-16 text-right tabular-nums">
+                  {activeUsersData[activeUsersData.length - 1]?.active_user}
+                </span>
+                <span className="ml-1">人</span>
                 {activeUsersData.length > 1 && (
                   <span
-                    className="ml-2 text-sm font-semibold"
+                    className="ml-2 text-sm font-semibold whitespace-nowrap"
                     style={{
                       color: calculateChangeRate(
                         activeUsersData[activeUsersData.length - 1]

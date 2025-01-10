@@ -40,7 +40,6 @@ import HighlightPanel from "./Hightlight/HighlightPanel";
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 
-
 type Props = {
   steamAllData: SteamDetailsDataType[];
   steamListData: SteamListType[];
@@ -264,13 +263,16 @@ const Network = (props: Props) => {
 
       {/* メインコンテンツ */}
       <div className="flex-1 relative bg-gray-900 overflow-hidden z-10">
-        <HomeHeader />
+        <HomeHeader
+          isSidebarOpen={isSidebarOpen}
+          isSearchOpen={isFocused && searchQuery !== ""}
+        />
 
         {/* 検索バー */}
         <div
           id="search-container"
           className={`absolute top-4 left-0 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ${
-            isSidebarOpen ? "ml-72" : "ml-8" // Sidebarの幅に応じてマージンを変更
+            isSidebarOpen ? "ml-[21%]" : "ml-8"
           }`}
         >
           {/* 検索フォーム */}
@@ -416,7 +418,10 @@ const Network = (props: Props) => {
         {/* 強調表示パネル */}
         {openPanel === "highlight" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <HighlightPanel selectedTags={selectedTags} setSelectedTags={setSelectedTags}/>
+            <HighlightPanel
+              selectedTags={selectedTags}
+              setSelectedTags={setSelectedTags}
+            />
           </div>
         )}
 

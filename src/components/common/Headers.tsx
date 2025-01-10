@@ -14,11 +14,29 @@ export const DetailsHeader = () => {
     </div>
   );
 };
+export const HomeHeader = ({
+  isSidebarOpen,
+  isSearchOpen,
+}: {
+  isSidebarOpen: boolean;
+  isSearchOpen: boolean;
+}) => {
+  // クラスを条件に応じて動的に変更
+  const paddingClass = (() => {
+    // if (isSidebarOpen && isSearchOpen) return "pl-[20%]";
+    if (isSidebarOpen) return "pl-[15%]";
+    // if (isSearchOpen) return "pl-[5%]";
+    return "";
+  })();
 
-export const HomeHeader = () => {
   return (
-    <header className="absolute top-0 left-0 w-full h-[8vh] bg-gradient-to-b from-gray-800 to-transparent text-white flex items-center justify-center z-10 select-none">
-      <h1 className="text-4xl font-bold">Steam Suggester</h1>
+    <header
+      className={`absolute top-0 left-0 w-full h-[8vh] bg-gradient-to-b from-gray-800 to-transparent text-white flex items-center justify-center z-10 select-none transition-all duration-300 ${paddingClass} 
+        lg:h-[6vh] lg:text-2xl xl:h-[6vh] xl:text-3xl`}
+    >
+      <h1 className="font-bold text-4xl sm:text-2xl lg:text-4xl">
+        Steam Suggester
+      </h1>
     </header>
   );
 };
