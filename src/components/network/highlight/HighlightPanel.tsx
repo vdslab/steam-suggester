@@ -26,6 +26,7 @@ const HighlightPanel = (props: Props) => {
       key.toLowerCase().includes(searchQuery.toLowerCase())
   ))];
 
+
   const AddSelectedTags = (event: any, value: string | null) => {
     if (value) {
       setSelectedTags([
