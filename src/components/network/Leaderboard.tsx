@@ -5,6 +5,7 @@ import React from "react";
 import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "./HelpTooltip";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 
 type Props = {
   nodes: NodeType[];
@@ -41,17 +42,36 @@ const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames,
       </div>
       <ul>
         {sortedNodes.map((node, index) => {
-          const titleColor = userAddedGames.find((gameId: string) => gameId === node.steamGameId) ? "yellow-300" : "white";
+          const isUserAdded = userAddedGames.find(
+            (gameId: string) => gameId === node.steamGameId
+          );
+          const titleColor = isUserAdded ? "yellow-300" : "white";
+
           return (
             <li
               key={node.steamGameId}
-              className="flex items-center mb-2 cursor-pointer hover:bg-gray-700 p-2 rounded"
+              className="flex items-center justify-between mb-2 cursor-pointer hover:bg-gray-700 p-2 rounded"
               onClick={() => setSelectedIndex(node.index)}
             >
-              <span className={`${selectColor(index + 1).rankColor} mr-2`}>
-                {index + 1}位
-              </span>
-              <span className={`text-${titleColor}`}>{node.title}</span>
+              {/* ランクとタイトル */}
+              <div className="flex items-center">
+                <span className={`${selectColor(index + 1).rankColor} mr-2`}>
+                  {index + 1}位
+                </span>
+                <span className={`text-${titleColor}`}>{node.title}</span>
+              </div>
+
+              {/* ゴミ箱アイコン */}
+              {isUserAdded && (
+                <div
+                  className="flex items-center justify-center p-1 hover:bg-red-500 rounded cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <DeleteOutlineOutlinedIcon />
+                </div>
+              )}
             </li>
           );
         })}
