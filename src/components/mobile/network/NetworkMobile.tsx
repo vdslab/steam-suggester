@@ -178,6 +178,7 @@ const NetworkMobile = (props: Props) => {
             streamerIds={streamerIds}
             selectedIndex={selectedIndex}
             openPanel={openPanel}
+            selectedTags={[]}
           />
         </div>
 

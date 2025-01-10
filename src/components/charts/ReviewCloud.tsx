@@ -1,38 +1,42 @@
-'use client';
-
-import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
+'use client'
+import { Suspense, useEffect, useState } from "react";
 import { scaleLog } from "@visx/scale";
-import Wordcloud from '@visx/wordcloud/lib/Wordcloud';
-import { Text } from '@visx/text';
+import Wordcloud from "@visx/wordcloud/lib/Wordcloud";
+import { Text } from "@visx/text";
 import { useScreenSize } from "@visx/responsive";
+import { CircularProgress } from "@mui/material";
 
 type Props = {
-  steamData: SteamDetailsDataType
-}
+  reviewData: { [word: string]: number };
+};
 
 type WordData = {
   text: string;
   value: number;
-}
+};
 
-const colors = ['#143059', '#2F6B9A', '#82a6c2'];
+const colors = ["#143059", "#2F6B9A", "#82a6c2"];
 
-// [0,1]で指定される固定値を返すジェネレータ
-// この固定値を使用すると毎回同じレイアウトが生成される
+// 固定値ジェネレータ
 const fixedValueGenerator = () => 0.5;
 
+const ReviewCloud = (props: Props) => {
+  const { reviewData } = props;
 
-const ReviewCloud = (props:Props) => {
+  const [words, setWords] = useState<WordData[]>([]);
 
-  const { steamData } = props;
-
-  // 画面サイズを取得
+  // 画面サイズ取得
   const { width, height } = useScreenSize({ debounceTime: 150 });
 
-  const words = Object.entries(steamData.review).map(([text, value]) => ({
-    text,
-    value,
-  }));
+  // レビューを処理してワードクラウド用データを準備
+  useEffect(() => {
+    const filteredData = Object.entries(reviewData).sort((a, b) => b[1] - a[1]).slice(0, 100);
+    const data = filteredData.map(([text, value]) => ({
+      text,
+      value,
+    }));
+    setWords(data);
+  }, [reviewData]);
 
   const fontScale = scaleLog({
     domain: [Math.min(...words.map((w) => w.value)), Math.max(...words.map((w) => w.value))],
@@ -40,16 +44,17 @@ const ReviewCloud = (props:Props) => {
   });
   const fontSizeSetter = (datum: WordData) => fontScale(datum.value);
 
-  if(Object.keys(steamData.review).length === 0) {
-    return <div>レビューがありません</div>
+  if (!reviewData || Object.keys(reviewData).length === 0) {
+    return <div className="text-white">レビューがありません</div>;
   }
 
+
   return (
-    <div className="select-none ">
+    <Suspense fallback={<CircularProgress />}>
       <Wordcloud
         words={words}
-        width={width/2}
-        height={height/2}
+        width={width / 5}
+        height={height / 4}
         fontSize={fontSizeSetter}
         padding={2}
         rotate={0}
@@ -60,7 +65,7 @@ const ReviewCloud = (props:Props) => {
             <Text
               key={w.text}
               fill={colors[i % colors.length]}
-              textAnchor={'middle'}
+              textAnchor={"middle"}
               transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
               fontSize={w.size}
               fontFamily={w.font}
@@ -70,8 +75,8 @@ const ReviewCloud = (props:Props) => {
           ))
         }
       </Wordcloud>
-    </div>
-  )
-}
+    </Suspense>
+  );
+};
 
 export default ReviewCloud;

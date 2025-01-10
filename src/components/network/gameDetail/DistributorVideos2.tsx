@@ -1,6 +1,6 @@
 "use client";
 
-import ClipSlideshow from "../distributorVideos/ClipSlideshow";
+import ClipSlideshow from "../../distributorVideos/ClipSlideshow";
 import CircularProgress from "@mui/material/CircularProgress";
 import useSWR from "swr";
 

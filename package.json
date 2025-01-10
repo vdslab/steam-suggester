@@ -35,6 +35,7 @@
     "react-dom": "^18.3.1",
     "react-joyride": "^2.9.3",
     "react-range": "^1.8.14",
+    "recharts": "^2.15.0",
     "string-similarity-js": "^2.1.4",
     "swr": "^2.2.5"
   },

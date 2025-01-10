@@ -15,9 +15,8 @@ export default async function Page() {
   const steamListData: SteamListType[] = await steamListRes.json();
 
   return (
-    <>
-      <HomeHeader />
+    <div className="flex flex-col h-screen">
       <Network steamAllData={steamAllData} steamListData={steamListData} />
-    </>
+    </div>
   );
 }

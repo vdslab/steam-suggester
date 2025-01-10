@@ -20,7 +20,7 @@ const ToggleDisplay: React.FC<Props> = ({ nodes, selectedIndex }) => {
   };
 
   return (
-    <Box sx={{ width: "100%", mt: 4 }}>
+    <Box sx={{ width: "100%", mt: 0 }}>
       {/* タブ付きナビゲーションバー */}
       <Tabs
         value={activeTab}
@@ -30,10 +30,10 @@ const ToggleDisplay: React.FC<Props> = ({ nodes, selectedIndex }) => {
         indicatorColor="primary"
         sx={{
           "& .MuiTab-root": {
-            color: "white", // Default text color for tabs
+            color: "white",
           },
           "& .Mui-selected": {
-            color: "primary.main", // Text color for selected tab
+            color: "primary.main",
           },
         }}
       >
