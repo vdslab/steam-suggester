@@ -20,11 +20,12 @@ const HighlightPanel = (props: Props) => {
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const searchList: string[] = Object.values(TAG_LIST).flat().filter(
+  const searchList: string[] = [...new Set(Object.values(TAG_LIST).flat().filter(
     (key) =>
       !selectedTags.includes(key) &&
       key.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ))];
+
 
   const AddSelectedTags = (event: any, value: string | null) => {
     if (value) {

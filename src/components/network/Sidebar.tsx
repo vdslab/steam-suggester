@@ -65,6 +65,8 @@ const Sidebar: React.FC<Props> = ({
           <LiveTvOutlinedIcon />
           <span className="text-xs mt-1">配信者</span>
         </button>
+        {/* 区切り線 */}
+        <div className="w-full border-t border-gray-700 my-2"></div>
         {/* 類似度ボタン */}
         <button
           onClick={() => togglePanel("similarity")}
