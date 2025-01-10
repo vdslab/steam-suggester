@@ -35,10 +35,11 @@ import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import UserAvatar from "./steamList/UserAvatar";
 import { HomeHeader } from "../common/Headers";
+import HighlightPanel from "./Hightlight/HighlightPanel";
 
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import DeleteIcon from "@mui/icons-material/Delete";
+
 
 type Props = {
   steamAllData: SteamDetailsDataType[];
@@ -55,6 +56,7 @@ const Network = (props: Props) => {
   const [links, setLinks] = useState<LinkType[]>([]);
   const [centerX, setCenterX] = useState<number>(0);
   const [centerY, setCenterY] = useState<number>(0);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
@@ -372,7 +374,9 @@ const Network = (props: Props) => {
               setSelectedIndex={setSelectedIndex}
               setIsNetworkLoading={setIsNetworkLoading}
               steamListData={steamListData}
-              steamAllData={steamAllData}
+              setOpenPanel={setOpenPanel}
+              selectedTags={selectedTags}
+              setSelectedTags={setSelectedTags}
             />
           </div>
         )}
@@ -392,6 +396,7 @@ const Network = (props: Props) => {
               setSelectedIndex={setSelectedIndex}
               streamerIds={streamerIds}
               openPanel={openPanel}
+              selectedTags={selectedTags}
             />
           </div>
         ) : (
@@ -406,6 +411,12 @@ const Network = (props: Props) => {
               setFilter={setFilter}
               setIsNetworkLoading={setIsNetworkLoading}
             />
+          </div>
+        )}
+        {/* 強調表示パネル */}
+        {openPanel === "highlight" && (
+          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
+            <HighlightPanel selectedTags={selectedTags} setSelectedTags={setSelectedTags}/>
           </div>
         )}
 

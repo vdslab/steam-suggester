@@ -13,6 +13,7 @@ type NodeLinkProps = {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   streamerIds: StreamerListType[];
   openPanel: string | null;
+  selectedTags: string[];
 };
 
 type ZoomableSVGProps = {
@@ -93,6 +94,7 @@ const NodeLink = (props: NodeLinkProps) => {
     setSelectedIndex,
     streamerIds = [],
     openPanel,
+    selectedTags,
   } = props;
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
@@ -177,6 +179,47 @@ const NodeLink = (props: NodeLinkProps) => {
                           fill="transparent"
                           strokeDasharray={`${angleStep} ${360 - angleStep}`}
                           strokeDashoffset={-angleStart}
+                        />
+                      </g>
+                    );
+                  })}
+              </g>
+            );
+          })}
+        {nodes.length !== 0 &&
+          nodes.map((node: NodeType, i: number) => {
+
+            return (
+              <g
+                className={`brightness-${
+                  hoveredIndex === node.index ? "125" : "100"
+                }`}
+                transform={`translate(${node.x},${node.y})`}
+                onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
+                onMouseLeave={() => setHoveredIndex(-1)}
+                onClick={() => setSelectedIndex(node.index)}
+                key={i}
+              >
+                <Icon
+                  title={node.title}
+                  imgURL={node.imgURL}
+                  index={node.index ?? i}
+                  steamGameId={node.steamGameId}
+                  twitchGameId={node.twitchGameId}
+                  circleScale={node.circleScale ?? 1}
+                  suggestValue={node.suggestValue}
+                />
+                {openPanel === 'highlight' && node.tags?.filter(tag => selectedTags.includes(tag)).map((value, index) => {
+                    return (
+                      <g transform={`scale(${node.circleScale})`} key={index}>
+                        <circle
+                          key={index}
+                          cx="0"
+                          cy="0"
+                          r="17" // 半径
+                          stroke="red"
+                          strokeWidth="1.5"
+                          fill="transparent"
                         />
                       </g>
                     );

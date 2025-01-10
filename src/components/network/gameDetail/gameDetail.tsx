@@ -4,25 +4,20 @@
 import { useEffect, useRef } from "react";
 import { NodeType, SteamListType } from "@/types/NetworkType";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SearchIcon from "@mui/icons-material/Search";
-import Section from "../Section";
 import HelpTooltip from "../HelpTooltip";
-import AppleIcon from "@mui/icons-material/Apple";
-import PersonIcon from "@mui/icons-material/Person";
-import GroupIcon from "@mui/icons-material/Group";
+
 import Tooltip from "@mui/material/Tooltip";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import WindowsIcon from "@/components/common/WindowsIcon";
-import ToggleDisplay from "./ToggleDisplay";
 import Link from "next/link";
 import Popularity from "./Popularity2";
 import ReviewCloud from "../../charts/ReviewCloud";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 
+// Icons
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import WindowsIcon from "@/components/common/WindowsIcon";
+import AppleIcon from "@mui/icons-material/Apple";
+import PersonIcon from "@mui/icons-material/Person";
+import GroupIcon from "@mui/icons-material/Group";
 import BuildIcon from "@mui/icons-material/Build";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CurrencyYenIcon from "@mui/icons-material/CurrencyYen";
@@ -34,7 +29,9 @@ type Props = {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
   steamListData: SteamListType[];
-  steamAllData: SteamDetailsDataType[];
+  setOpenPanel: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedTags: string[];
+  setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 const GameSearchPanel = (props: Props) => {
@@ -44,9 +41,10 @@ const GameSearchPanel = (props: Props) => {
     selectedIndex,
     setSelectedIndex,
     setIsNetworkLoading,
-    steamAllData,
+    setOpenPanel,
+    selectedTags,
+    setSelectedTags,
   } = props;
-  const router = useRouter();
 
   // Ref for the selected game detail
   const selectedDetailRef = useRef<HTMLDivElement | null>(null);
@@ -60,6 +58,12 @@ const GameSearchPanel = (props: Props) => {
       });
     }
   }, [selectedIndex]);
+
+  const addSelectedTags = (newTag:string) => {
+    if(selectedTags.includes(newTag)) return;
+    setSelectedTags([...selectedTags, newTag]);
+    setOpenPanel("highlight");
+  }
 
   return (
     <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 overflow-y-scroll h-full relative">
@@ -210,6 +214,7 @@ const GameSearchPanel = (props: Props) => {
                         <span
                           key={index}
                           className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded inline-block whitespace-nowrap cursor-pointer select-none"
+                          onClick={() => addSelectedTags(tag)}
                         >
                           {tag}
                         </span>
@@ -227,7 +232,7 @@ const GameSearchPanel = (props: Props) => {
               レビュー分析
               <HelpTooltip title="ゲームレビュー文に多く含まれた単語ほど、大きく表示されます。" />
             </h3>
-            <ReviewCloud steamData={steamAllData[selectedIndex]} />
+            <ReviewCloud reviewData={nodes[selectedIndex].review} />
           </div>
 
           {/* Populatityコンポーネント */}
