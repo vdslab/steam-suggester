@@ -159,6 +159,7 @@ const NodeLink = (props: NodeLinkProps) => {
                   circleScale={node.circleScale ?? 1}
                   suggestValue={node.suggestValue}
                   isHovered={isHovered}
+                  selectedIndex={selectedIndex}
                 />
                 {/* 色付きセグメントを描画 配信者による強調 */}
                 {openPanel === "streamer" &&

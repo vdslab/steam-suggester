@@ -7,6 +7,7 @@ export type IconType = {
   circleScale: number;
   suggestValue: number;
   isHovered: boolean;
+  selectedIndex: number;
 }
 
 export type SteamListType = {
