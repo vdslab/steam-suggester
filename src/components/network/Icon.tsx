@@ -1,7 +1,7 @@
 import { IconType } from "@/types/NetworkType";
 
 const Icon = (props: IconType) => {
-  const { imgURL, index, circleScale, suggestValue } = props;
+  const { imgURL, index, circleScale, suggestValue, isHovered } = props;
 
   // const blurAmount = (suggestValue > 0.5 ? suggestValue : 0) * 10;
 
@@ -35,6 +35,10 @@ const Icon = (props: IconType) => {
         x={-37.5}
         y={-30}
         clipPath={`url(#clip-${index})`}
+        style={{
+          filter: isHovered ? "brightness(1.5)" : "brightness(1)",
+          transition: "filter 0.3s ease",
+        }}
       />
     </g>
   );

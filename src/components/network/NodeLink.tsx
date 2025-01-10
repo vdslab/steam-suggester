@@ -140,12 +140,9 @@ const NodeLink = (props: NodeLinkProps) => {
             // それぞれの色を等間隔で分けるための角度計算
             const angleStep =
               streamerColors.length > 0 ? 360 / streamerColors.length : 0;
-
+            const isHovered = node.index === hoveredIndex;
             return (
               <g
-                className={`brightness-${
-                  hoveredIndex === node.index ? "125" : "100"
-                }`}
                 transform={`translate(${node.x},${node.y})`}
                 onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
                 onMouseLeave={() => setHoveredIndex(-1)}
@@ -160,6 +157,7 @@ const NodeLink = (props: NodeLinkProps) => {
                   twitchGameId={node.twitchGameId}
                   circleScale={node.circleScale ?? 1}
                   suggestValue={node.suggestValue}
+                  isHovered={isHovered}
                 />
                 {/* 色付きセグメントを描画 配信者による強調 */}
                 {openPanel === "streamer" &&
@@ -189,11 +187,9 @@ const NodeLink = (props: NodeLinkProps) => {
         {nodes.length !== 0 &&
           nodes.map((node: NodeType, i: number) => {
             const isHighlight = selectedTags.length ? selectedTags.every((tag) => node.tags?.includes(tag)) : false;
+            const isHovered = node.index === hoveredIndex;
             return (
               <g
-                className={`brightness-${
-                  hoveredIndex === node.index ? "125" : "100"
-                }`}
                 transform={`translate(${node.x},${node.y})`}
                 onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
                 onMouseLeave={() => setHoveredIndex(-1)}
@@ -208,6 +204,7 @@ const NodeLink = (props: NodeLinkProps) => {
                   twitchGameId={node.twitchGameId}
                   circleScale={node.circleScale ?? 1}
                   suggestValue={node.suggestValue}
+                  isHovered={isHovered}
                 />
                 {openPanel === 'highlight' && isHighlight && (
                   <g transform={`scale(${node.circleScale})`}>

@@ -6,6 +6,7 @@ export type IconType = {
   twitchGameId: string;
   circleScale: number;
   suggestValue: number;
+  isHovered: boolean;
 }
 
 export type SteamListType = {
