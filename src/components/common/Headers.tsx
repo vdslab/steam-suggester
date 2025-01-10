@@ -4,7 +4,7 @@ import { SteamIconButton } from "./Buttons";
 
 export const DetailsHeader = () => {
   return (
-    <div className="h-[8dvh] leading-[8dvh] bg-stone-950 border-b-2 border-gray-700 flex text-3xl text-white space-x-5 pl-8 justify-between">
+    <div className="h-[8dvh] leading-[8dvh] bg-stone-950 border-b-2 border-gray-700 flex text-3xl text-white space-x-5 pl-8 justify-between select-none">
       <Link href="/" className="font-semibold">
         Steam Suggester
       </Link>
@@ -17,7 +17,7 @@ export const DetailsHeader = () => {
 
 export const HomeHeader = () => {
   return (
-    <header className="absolute top-0 left-0 w-full h-[8vh] bg-gradient-to-b from-gray-800 to-transparent text-white flex items-center justify-center z-10">
+    <header className="absolute top-0 left-0 w-full h-[8vh] bg-gradient-to-b from-gray-800 to-transparent text-white flex items-center justify-center z-10 select-none">
       <h1 className="text-4xl font-bold">Steam Suggester</h1>
     </header>
   );

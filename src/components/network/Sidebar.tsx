@@ -1,12 +1,12 @@
 "use client";
 
-import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
-import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
-import LiveTvOutlinedIcon from '@mui/icons-material/LiveTvOutlined';
-import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
-import LeaderboardOutlinedIcon from '@mui/icons-material/LeaderboardOutlined';
-import HighlightOutlinedIcon from '@mui/icons-material/HighlightOutlined';
-import TourOutlinedIcon from '@mui/icons-material/TourOutlined';
+import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
+import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
+import LiveTvOutlinedIcon from "@mui/icons-material/LiveTvOutlined";
+import SportsEsportsOutlinedIcon from "@mui/icons-material/SportsEsportsOutlined";
+import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
+import HighlightOutlinedIcon from "@mui/icons-material/HighlightOutlined";
+import TourOutlinedIcon from "@mui/icons-material/TourOutlined";
 
 // 共通のボタンクラス
 export const buttonClasses = (isActive: boolean) =>
@@ -30,7 +30,32 @@ const Sidebar: React.FC<Props> = ({
   return (
     <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4 z-10">
       {/* 上部ボタン群 */}
-      <div className="flex flex-col items-center space-y-4 flex-grow">
+      <div className="flex flex-col items-center space-y-4 flex-grow select-none">
+        {/* Steamリストボタン */}
+        <button
+          onClick={() => togglePanel("steamList")}
+          className={`${buttonClasses(openPanel === "steamList")} step4`}
+        >
+          <SportsEsportsOutlinedIcon />
+          <span className="text-xs mt-1">Steam連携</span>
+        </button>
+        {/* 強調表示ボタン */}
+        <button
+          onClick={() => togglePanel("highlight")}
+          className={`${buttonClasses(openPanel === "highlight")} `}
+        >
+          <HighlightOutlinedIcon />
+          <span className="text-xs mt-1">強調表示</span>
+        </button>
+        {/* Streamerボタン */}
+        <button
+          onClick={() => togglePanel("streamer")}
+          className={`${buttonClasses(openPanel === "streamer")} step2`}
+        >
+          <LiveTvOutlinedIcon />
+          <span className="text-xs mt-1">配信者</span>
+        </button>
+        <div className="w-full border-t border-gray-700 my-2"></div>
         {/* 類似度ボタン */}
         <button
           onClick={() => togglePanel("similarity")}
@@ -47,22 +72,6 @@ const Sidebar: React.FC<Props> = ({
           <FilterListOutlinedIcon />
           <span className="text-xs mt-1">フィルター</span>
         </button>
-        {/* Streamerボタン */}
-        <button
-          onClick={() => togglePanel("streamer")}
-          className={`${buttonClasses(openPanel === "streamer")} step2`}
-        >
-          <LiveTvOutlinedIcon />
-          <span className="text-xs mt-1">配信者</span>
-        </button>
-        {/* Steamリストボタン */}
-        <button
-          onClick={() => togglePanel("steamList")}
-          className={`${buttonClasses(openPanel === "steamList")} step4`}
-        >
-          <SportsEsportsOutlinedIcon />
-          <span className="text-xs mt-1">Steam連携</span>
-        </button>
         {/* ランキングボタン */}
         <button
           onClick={() => togglePanel("ranking")}
@@ -70,15 +79,6 @@ const Sidebar: React.FC<Props> = ({
         >
           <LeaderboardOutlinedIcon />
           <span className="text-xs mt-1">ランキング</span>
-        </button>
-
-        {/* 強調表示ボタン */}
-        <button
-          onClick={() => togglePanel("highlight")}
-          className={`${buttonClasses(openPanel === "highlight")} `}
-        >
-          <HighlightOutlinedIcon />
-          <span className="text-xs mt-1">強調表示</span>
         </button>
       </div>
 
