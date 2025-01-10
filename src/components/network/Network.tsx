@@ -27,7 +27,6 @@ import SteamList from "./steamList/SteamList";
 import HelpTooltip from "./HelpTooltip";
 import Tour from "./Tour";
 import ProgressBar from "./ProgressBar";
-import SimilaritySettings from "./similaritySettings/SimilaritySettings";
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./Leaderboard";
 import GameDetailPanel from "./gameDetail/gameDetail";
@@ -39,6 +38,7 @@ import HighlightPanel from "./highlight/HighlightPanel";
 
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import SimilaritySettings from "./similaritySettings/SimilaritySettings";
 
 
 type Props = {
