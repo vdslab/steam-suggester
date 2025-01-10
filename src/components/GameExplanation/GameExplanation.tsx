@@ -1,48 +1,26 @@
 /* components/GameExplanation/GameExplanation.tsx */
-'use client';
-
-import { useState, useEffect } from "react";
+"use client";
 import Image from "next/image";
-import InfoIcon from '@mui/icons-material/Info';
-import StarIcon from '@mui/icons-material/Star';
-import LanguageIcon from '@mui/icons-material/Language';
-import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
-import Tooltip from '@mui/material/Tooltip';
-import AppleIcon from '@mui/icons-material/Apple';
-import PersonIcon from '@mui/icons-material/Person';
-import GroupIcon from '@mui/icons-material/Group';
-import CircularProgress from '@mui/material/CircularProgress';
+import StarIcon from "@mui/icons-material/Star";
+import LanguageIcon from "@mui/icons-material/Language";
+import DeveloperModeIcon from "@mui/icons-material/DeveloperMode";
+import Tooltip from "@mui/material/Tooltip";
+import AppleIcon from "@mui/icons-material/Apple";
+import PersonIcon from "@mui/icons-material/Person";
+import GroupIcon from "@mui/icons-material/Group";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
-import fetchWithCache from "@/hooks/fetchWithCache";
+import WindowsIcon from "../common/WindowsIcon";
 
 type Props = {
   steamGameId: string;
+  steamDetailData: SteamDetailsDataType;
 };
 
-const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
-  const [node, setNode] = useState<SteamDetailsDataType | null>(null);
-  const [error, setError] = useState<string | null>(null);
+const GameExplanation = ({ steamGameId, steamDetailData }: Props) => {
 
-  useEffect(() => {
-    const fetchGameData = async () => {
-      try {
-        const data = await fetchWithCache(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
-        setNode(data);
-      } catch (err) {
-        console.error(err);
-        setError("ゲームデータの取得中にエラーが発生しました。");
-      }
-    };
-
-    fetchGameData();
-  }, []);
-
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
-
-  if (!node) {
+  if (!steamDetailData) {
     return (
       <div className="flex justify-center items-center h-full">
         <CircularProgress />
@@ -50,49 +28,63 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
     );
   }
 
+  const {
+    imgURL,
+    title,
+    shortDetails,
+    genres,
+    tags,
+    device,
+    isSinglePlayer,
+    isMultiPlayer,
+    developerName,
+    releaseDate,
+    salePrice,
+    price,
+    playTime,
+  } = steamDetailData;
+
   return (
     <div className="rounded-lg overflow-hidden border border-gray-400 bg-gray-800 p-4">
-      {/* ゲーム画像 */}
-      <Image
-        src={node.imgURL}
-        alt={`${node.title} Header`}
-        width={1000}
-        height={500}
-        className="w-full h-auto rounded"
-        priority
-      />
-
       {/* Short Details */}
       <div className="flex items-start mt-2">
-        <InfoIcon className="mt-1 mr-2 text-white" />
+        <Image
+          src={imgURL}
+          alt={`${title} Header`}
+          width={1000}
+          height={500}
+          className="w-1/2 h-auto rounded mr-2"
+          priority
+        />
         <div className="p-1 short-details-scrollbar">
-          <p className="text-sm text-gray-300">{node.shortDetails}</p>
+          <p className="text-sm text-gray-300">{shortDetails}</p>
         </div>
       </div>
 
       {/* Genres */}
-      {node.genres && node.genres.length > 0 && (
+      {genres && genres.length > 0 && (
         <div className="flex items-center space-x-2 text-white overflow-x-auto h-8 mt-4 genres-scrollbar">
           <strong>ジャンル:</strong>
           <div className="flex space-x-2 items-center">
-            {node.genres.map((genre, index) => (
+            {genres.map((genre, index) => (
               <span
                 key={index}
-                className="bg-blue-600 text-xs text-white px-2 py-1 rounded flex-shrink-0 flex items-center"
+                className="bg-blue-600 text-xs text-white px-2 py-1 mr-1 rounded whitespace-nowrap"
+                title={genre}
               >
                 {genre}
               </span>
             ))}
           </div>
         </div>
-      )}
+    )}
 
       {/* 詳細ジャンル */}
-      {node.tags && node.tags.length > 0 && (
+      {tags && tags.length > 0 && (
         <div className="text-white mt-2">
-          <strong>詳細ジャンル:</strong>
+          <strong>タグ:</strong>
           <div className="items-center mt-1">
-            {node.tags.map((tag, index) => (
+            {tags.map((tag, index) => (
               <span
                 key={index}
                 className="bg-green-600 text-xs text-white px-2 py-1 mr-1 rounded whitespace-nowrap"
@@ -107,24 +99,24 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
 
       {/* デバイスサポート */}
       <div className="flex items-center space-x-2 mt-2">
-        {node.device.windows && (
+        {device.windows && (
           <Tooltip title="Windows対応">
-            <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 40 40" width="20px" height="20px"><path d="M26 6H42V22H26zM38 42H26V26h16v12C42 40.209 40.209 42 38 42zM22 22H6V10c0-2.209 1.791-4 4-4h12V22zM6 26H22V42H6z" fill="white"/></svg>
+            <WindowsIcon size={20}/>
           </Tooltip>
         )}
-        {node.device.mac && (
+        {device.mac && (
           <Tooltip title="Mac対応">
             <AppleIcon className="text-white h-5 w-5" />
           </Tooltip>
         )}
 
-      {/* マルチプレイヤー情報 */}
-        {node.isSinglePlayer && (
+        {/* マルチプレイヤー情報 */}
+        {isSinglePlayer && (
           <Tooltip title="Single Player">
             <PersonIcon className="text-white h-5 w-5" />
           </Tooltip>
         )}
-        {node.isMultiPlayer && (
+        {isMultiPlayer && (
           <Tooltip title="Multiplayer">
             <GroupIcon className="text-white h-5 w-5" />
           </Tooltip>
@@ -134,26 +126,30 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
       {/* Developer & Release Date */}
       <div className="flex items-center mt-4">
         <DeveloperModeIcon className="mr-2 text-white" />
-        <span className="text-sm text-gray-300">開発者: {node.developerName}</span>
+        <span className="text-sm text-gray-300">デベロッパー: {developerName}</span>
       </div>
       <div className="flex items-center mt-1">
         <LanguageIcon className="mr-2 text-white" />
-        <span className="text-sm text-gray-300">発売日: {node.releaseDate}</span>
+        <span className="text-sm text-gray-300">発売日: {releaseDate}</span>
       </div>
 
       {/* 価格 */}
       <div className="flex items-center mt-2">
         <StarIcon className="mr-2 text-yellow-500" />
-        <span className="text-sm text-gray-300"><strong>価格:</strong></span>
-        {node.salePrice && parseInt(node.salePrice, 10) < node.price ? (
+        <span className="text-sm text-gray-300">
+          <strong>価格:</strong>
+        </span>
+        {salePrice && parseInt(salePrice, 10) < price ? (
           <>
-            <span className="line-through text-gray-400 ml-2">¥{node.price}</span>
-            <span className="text-red-500 ml-2">¥{node.salePrice}</span>
-            <span className="text-white ml-2">{Math.round((parseInt(node.salePrice, 10) / node.price) * 100)}%Off</span>
+            <span className="line-through text-gray-400 ml-2">¥{price}</span>
+            <span className="text-red-500 ml-2">¥{salePrice}</span>
+            <span className="text-white ml-2">
+              {Math.round((parseInt(salePrice, 10) / price) * 100)}%Off
+            </span>
           </>
         ) : (
           <span className="text-sm ml-2 text-gray-300">
-            {node.price > 0 ? `¥${node.price}` : "無料"}
+            {price > 0 ? `¥${price}` : "無料"}
           </span>
         )}
       </div>
@@ -161,23 +157,11 @@ const GameExplanation: React.FC<Props> = ({ steamGameId }) => {
       {/* Play Time */}
       <div className="flex items-center mt-2">
         <StarIcon className="mr-2 text-yellow-500" />
-        <span className="text-sm text-gray-300">プレイ時間: {node.playTime} 時間</span>
+        <span className="text-sm text-gray-300">
+          平均プレイ時間: {playTime} 時間
+        </span>
       </div>
 
-      {/* Reviews */}
-      {/* {node.review && (
-        <div className="space-y-1 mt-2">
-          <span className="text-sm font-semibold text-gray-300">レビュー:</span>
-          <div className="flex flex-wrap">
-            {Object.entries(node.review).map(([key, value]) => (
-              <div key={key} className="flex items-center mr-2 mb-1">
-                <StarIcon className="text-yellow-400 mr-1" />
-                <span className="text-xs text-gray-300">{key}: {Math.round(value * 100)}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };

@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { STEAM_COLOR_RANGE, TWITCH_COLOR_RANGE } from "@/constants/STYLES";
 import StackedAreaChart from "./StackedAreaChart";
-import Headline from "../common/Headline";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -61,31 +60,34 @@ const Popularity: React.FC<Props> = ({ twitchGameId, steamGameId }) => {
 
   return (
     <div>
-      <Headline txt="流行度" />
       {steamData && twitchData ? (
         <div className="flex flex-col space-y-4">
           {/* Steamレビュー数 */}
           <div className="border border-gray-500 p-3">
             <div className="text-white pb-3">Steamレビュー数</div>
-            <StackedAreaChart
-              data={steamData}
-              width={200}
-              height={150}
-              colorRange={STEAM_COLOR_RANGE}
-              labelTxt={{ bottom: 'レビュー日（月/日）', left: 'レビュー数（件）' }}
-            />
+            <div className="w-full">
+              <StackedAreaChart
+                data={steamData}
+                width={600}
+                height={300}
+                colorRange={STEAM_COLOR_RANGE}
+                labelTxt={{ bottom: 'レビュー日（月/日）', left: 'レビュー数（件）' }}
+              />
+            </div>
           </div>
 
           {/* Twitch視聴数 */}
           <div className="border border-gray-500 p-3">
             <div className="text-white pb-3">Twitch視聴数</div>
-            <StackedAreaChart
-              data={twitchData}
-              width={200}
-              height={150}
-              colorRange={TWITCH_COLOR_RANGE}
-              labelTxt={{ bottom: "視聴日（月/日）", left: "視聴数（人）" }} 
-            />
+            <div className="w-full">
+              <StackedAreaChart
+                data={twitchData}
+                width={600}
+                height={300}
+                colorRange={TWITCH_COLOR_RANGE}
+                labelTxt={{ bottom: "視聴日（月/日）", left: "視聴数（人）" }} 
+              />
+            </div>
           </div>
         </div>
       ) : (

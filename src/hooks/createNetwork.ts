@@ -29,13 +29,11 @@ export function cosineSimilarity(vecA: number[], vecB: number[]): number {
 }
 
 const createNetwork = async (
+  data: SteamDetailsDataType[],
   filter: Filter,
   gameIds: string[],
   slider: SliderSettings
-): Promise<{ nodes: NodeType[]; links: LinkType[] }> => {
-  const data: SteamDetailsDataType[] = await fetchWithCache(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`
-  );
+): Promise<{ nodes: NodeType[]; links: LinkType[]; }> => {
   const slicedData = data.slice(0, GAME_COUNT);
 
   // 追加で取得が必要なゲーム詳細情報を取得
