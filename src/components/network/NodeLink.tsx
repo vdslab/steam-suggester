@@ -188,7 +188,7 @@ const NodeLink = (props: NodeLinkProps) => {
           })}
         {nodes.length !== 0 &&
           nodes.map((node: NodeType, i: number) => {
-
+            const isHighlight = selectedTags.every((tag) => node.tags?.includes(tag));
             return (
               <g
                 className={`brightness-${
@@ -209,21 +209,18 @@ const NodeLink = (props: NodeLinkProps) => {
                   circleScale={node.circleScale ?? 1}
                   suggestValue={node.suggestValue}
                 />
-                {openPanel === 'highlight' && node.tags?.filter(tag => selectedTags.includes(tag)).map((value, index) => {
-                    return (
-                      <g transform={`scale(${node.circleScale})`} key={index}>
-                        <circle
-                          key={index}
-                          cx="0"
-                          cy="0"
-                          r="17" // 半径
-                          stroke="red"
-                          strokeWidth="1.5"
-                          fill="transparent"
-                        />
-                      </g>
-                    );
-                  })}
+                {openPanel === 'highlight' && isHighlight && (
+                  <g transform={`scale(${node.circleScale})`}>
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="17"
+                      stroke="red"
+                      strokeWidth="1.5"
+                      fill="transparent"
+                    />
+                  </g>
+                )}
               </g>
             );
           })}
