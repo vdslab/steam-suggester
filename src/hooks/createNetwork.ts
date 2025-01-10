@@ -1,11 +1,11 @@
 import * as d3 from "d3";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
-import { SimilarGameType, NodeType, LinkType } from "@/types/NetworkType";
+import { NodeType, LinkType } from "@/types/NetworkType";
 import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 import fetchWithCache from "./fetchWithCache";
 
-const k = 4;
+const k = 3;
 
 const getRandomCoordinates = (range: number): { x: number; y: number } => {
   const x = Math.random() * range - range / 2;
@@ -16,21 +16,25 @@ const getRandomCoordinates = (range: number): { x: number; y: number } => {
 const jaccardSimilarity = (setA: Set<string>, setB: Set<string>): number => {
   const intersection = new Set([...setA].filter((x) => setB.has(x)));
   const union = new Set([...setA, ...setB]);
-  return union.size === 0 ? 0 : intersection.size / union.size;
+  return union.size === 0 ? -2 : Math.max(Math.min(intersection.size / union.size, 1), 0);
 };
 
+export function cosineSimilarity(vecA: number[], vecB: number[]): number {
+  if (vecA.length === 0 || vecB.length === 0) return -2; 
+  const dotProduct = vecA.reduce((acc, val, idx) => acc + val * vecB[idx], 0);
+  const magnitudeA = Math.sqrt(vecA.reduce((acc, val) => acc + val * val, 0));
+  const magnitudeB = Math.sqrt(vecB.reduce((acc, val) => acc + val * val, 0));
+  if (magnitudeA === 0 || magnitudeB === 0) return 0;
+  return dotProduct / (magnitudeA * magnitudeB);
+}
 
 const createNetwork = async (
   data: SteamDetailsDataType[],
   filter: Filter,
   gameIds: string[],
-  slider: SliderSettings,
-  onProgress?: (progress: number) => void,
-): Promise<{ nodes: NodeType[]; links: LinkType[]; similarGames: SimilarGameType }> => {
-  if (onProgress) onProgress(0);
-
+  slider: SliderSettings
+): Promise<{ nodes: NodeType[]; links: LinkType[]; }> => {
   const slicedData = data.slice(0, GAME_COUNT);
-  if (onProgress) onProgress(20);
 
   // 追加で取得が必要なゲーム詳細情報を取得
   const promises = gameIds
@@ -43,15 +47,9 @@ const createNetwork = async (
       } catch (error) {
         console.error(error);
       }
-
-      if (onProgress) {
-        const progress = 20 + ((index + 1) / array.length) * 20;
-        onProgress(progress);
-      }
     });
 
   await Promise.all(promises);
-  if (onProgress) onProgress(40);
 
   // フィルターに合致したノード群を抽出
   const rawNodes = slicedData.filter((item) => {
@@ -82,26 +80,28 @@ const createNetwork = async (
   });
 
   if (nodes.length === 0) {
-    return { nodes, links: [], similarGames: {} };
+    return { nodes, links: [] };
   }
-  if (onProgress) onProgress(60);
 
-  // 類似度行列を計算（Jaccard類似度）
+  // 類似度行列を計算
   const similarityMatrix: number[][] = [];
   for (let i = 0; i < nodes.length; i++) {
     similarityMatrix[i] = [];
     const setA = new Set(nodes[i].tags ?? []);
     for (let j = 0; j < nodes.length; j++) {
       if (i === j || !nodes[i].similarGames?.find((id) => id === nodes[j].steamGameId)) {
-        similarityMatrix[i][j] = 0;
+        similarityMatrix[i][j] = -2;
         continue;
       }
-      const setB = new Set(nodes[j].tags ?? []);
-      const similarity = jaccardSimilarity(setA, setB);
+      let similarity = cosineSimilarity(nodes[i].featureVector as number[], nodes[j].featureVector as number[]);
+      if(similarity === -2) {
+        const setA = new Set(nodes[i].tags ?? []);
+        const setB = new Set(nodes[j].tags ?? []);
+        similarity = jaccardSimilarity(setA, setB);
+      }
       similarityMatrix[i][j] = similarity;
     }
   }
-  if (onProgress) onProgress(70);
 
   const links: LinkType[] = [];
   const connectionCounts = new Map<number, number>(); // 各ノードの接続数を追跡
@@ -119,7 +119,7 @@ const createNetwork = async (
     let addedLinks = 0; // 追加したリンクの数をカウント
 
     for (const { similarity, targetIndex } of similarities) {
-      if (addedLinks >= k || similarity === 0) break; // k本以上の接続を許可しない
+      if (addedLinks >= k || similarity === -2) break; // k本以上の接続を許可しない
 
       // 接続済みのペアをスキップ
       const linkKey = `${Math.min(sourceIndex, targetIndex)}-${Math.max(sourceIndex, targetIndex)}`;
@@ -155,7 +155,7 @@ const createNetwork = async (
 
   const simulation = d3
     .forceSimulation<NodeType>(nodes)
-    .force("charge", d3.forceManyBody<NodeType>().strength(-400))
+    .force("charge", d3.forceManyBody<NodeType>().strength(-200))
     .force("center", d3.forceCenter(0, 0).strength(0.05))
     .force(
       "collide",
@@ -166,20 +166,14 @@ const createNetwork = async (
     .force(
       "link",
       d3.forceLink<NodeType, LinkType>(links)
-        .id((d) => d.index)
+        .id((d) => d.index.toString())
         .distance((link) => {
           const sourceNode = link.source as NodeType;
           const targetNode = link.target as NodeType;
           const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
-          return 150 - similarity * 75;
+          return 130 - similarity * 100;
         })
-        // .strength((link) => {
-        //   const sourceNode = link.source as NodeType;
-        //   const targetNode = link.target as NodeType;
-        //   const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
-        //   console.log(1 + similarity * 2);
-        //   return 1 + similarity * 2;
-        // })
+        .strength(1)
     )
     .force(
       "radial",
@@ -189,41 +183,14 @@ const createNetwork = async (
       "cluster",
       d3.forceManyBody<NodeType>()
         .strength((node) => -25 * (node.circleScale ?? 1))
-    )
+    );
 
   while (simulation.alpha() > 0.01) {
     simulation.tick();
   }
   simulation.stop();
 
-  if (onProgress) onProgress(90);
-
-  // 類似ゲーム一覧の生成
-  const similarGames: SimilarGameType = {};
-  nodes.forEach((sourceNode) => {
-    const sourceId = sourceNode.steamGameId;
-    similarGames[sourceId] = [];
-
-    links.forEach((link) => {
-      const targetNode =
-        link.source.index === sourceNode.index
-          ? link.target
-          : link.target.index === sourceNode.index
-          ? link.source
-          : null;
-
-      if (targetNode) {
-        similarGames[sourceId].push({
-          steamGameId: targetNode.steamGameId,
-          twitchGameId: targetNode.twitchGameId,
-        });
-      }
-    });
-  });
-
-  if (onProgress) onProgress(100);
-
-  return { nodes, links, similarGames };
+  return { nodes, links };
 };
 
 export default createNetwork;

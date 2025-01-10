@@ -17,13 +17,18 @@ export type SteamDetailsDataType = {
   developerName: string;
   salePrice: string;
   playTime: string;
-  review: { [word: string]: number };
+  review: {
+    "name": string,
+    "score": number,
+    "tfidf": number,
+   }[];
   difficulty: number;
   graphics: number;
   story: number;
   music: number;
 
   similarGames: string[];
+  featureVector: number[];
 }
 
 export type SteamDetailApiType = {

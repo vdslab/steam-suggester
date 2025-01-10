@@ -58,7 +58,7 @@ const Network = (props: Props) => {
   const [centerY, setCenterY] = useState<number>(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   const [isNetworkLoading, setIsNetworkLoading] = useState(true);
 
@@ -97,8 +97,7 @@ const Network = (props: Props) => {
       steamAllData,
       filter,
       gameIds,
-      slider,
-      setProgress
+      slider
     );
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
@@ -114,8 +113,7 @@ const Network = (props: Props) => {
     }
     setNodes(nodes);
     setLinks(links);
-    setProgress(100);
-    hasFetchedInitialData.current = false;
+    hasFetchedInitialData.current = false; 
   };
 
   useEffect(() => {
@@ -400,7 +398,7 @@ const Network = (props: Props) => {
             />
           </div>
         ) : (
-          <ProgressBar progress={progress} />
+          <ProgressBar progress={0} />
         )}
 
         {/* フィルターパネル */}

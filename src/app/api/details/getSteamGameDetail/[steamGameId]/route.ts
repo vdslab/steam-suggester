@@ -38,7 +38,8 @@ export async function GET(req: Request, { params }: Params) {
           sd.graphics,
           sd.story,
           sd.music,
-          sd.similar_games
+          sd.similar_games,
+          sd.feature_vector
       FROM 
           steam_game_data sd
       WHERE 
@@ -87,7 +88,8 @@ export async function GET(req: Request, { params }: Params) {
       graphics: gameDetailData.graphics,
       story: gameDetailData.story,
       music: gameDetailData.music,
-      similarGames: similarGames
+      similarGames: similarGames,
+      featureVector: gameDetailData.feature_vector || []
     };
 
     return NextResponse.json(formattedResult);

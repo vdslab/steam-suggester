@@ -1,4 +1,3 @@
-import { HomeHeader } from "@/components/common/Headers";
 import Network from "@/components/network/Network";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { SteamListType } from "@/types/NetworkType";
