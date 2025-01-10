@@ -31,6 +31,16 @@ const Sidebar: React.FC<Props> = ({
     <div className="w-24 bg-gray-800 text-white flex flex-col items-center py-4 space-y-4 z-10">
       {/* 上部ボタン群 */}
       <div className="flex flex-col items-center space-y-4 flex-grow select-none">
+        {/* ランキングボタン */}
+        <button
+          onClick={() => togglePanel("ranking")}
+          className={`${buttonClasses(openPanel === "ranking")} step5`}
+        >
+          <LeaderboardOutlinedIcon />
+          <span className="text-xs mt-1">ランキング</span>
+        </button>
+        {/* 区切り線 */}
+        <div className="w-full border-t border-gray-700 my-2"></div>
         {/* Steamリストボタン */}
         <button
           onClick={() => togglePanel("steamList")}
@@ -55,7 +65,6 @@ const Sidebar: React.FC<Props> = ({
           <LiveTvOutlinedIcon />
           <span className="text-xs mt-1">配信者</span>
         </button>
-        <div className="w-full border-t border-gray-700 my-2"></div>
         {/* 類似度ボタン */}
         <button
           onClick={() => togglePanel("similarity")}
@@ -71,14 +80,6 @@ const Sidebar: React.FC<Props> = ({
         >
           <FilterListOutlinedIcon />
           <span className="text-xs mt-1">フィルター</span>
-        </button>
-        {/* ランキングボタン */}
-        <button
-          onClick={() => togglePanel("ranking")}
-          className={`${buttonClasses(openPanel === "ranking")} step5`}
-        >
-          <LeaderboardOutlinedIcon />
-          <span className="text-xs mt-1">ランキング</span>
         </button>
       </div>
 
