@@ -6,9 +6,9 @@ import { Text } from "@visx/text";
 import { useScreenSize } from "@visx/responsive";
 import { CircularProgress } from "@mui/material";
 
-type Props = {
-  reviewData: { [word: string]: number };
-};
+// type Props = {
+//   reviewData: { [word: string]: number };
+// };
 
 type WordData = {
   text: string;
@@ -20,7 +20,7 @@ const colors = ["#143059", "#2F6B9A", "#82a6c2"];
 // 固定値ジェネレータ
 const fixedValueGenerator = () => 0.5;
 
-const ReviewCloud = (props: Props) => {
+const ReviewCloud = (props: any) => {
   const { reviewData } = props;
 
   const [words, setWords] = useState<WordData[]>([]);
@@ -30,12 +30,12 @@ const ReviewCloud = (props: Props) => {
 
   // レビューを処理してワードクラウド用データを準備
   useEffect(() => {
-    const filteredData = Object.entries(reviewData).sort((a, b) => b[1] - a[1]).slice(0, 100);
-    const data = filteredData.map(([text, value]) => ({
-      text,
-      value,
-    }));
-    setWords(data);
+    // const filteredData = Object.entries(reviewData).sort((a, b) => b[1] - a[1]).slice(0, 100);
+    // const data = filteredData.map(([text, value]) => ({
+    //   text,
+    //   value,
+    // }));
+    // setWords(data);
   }, [reviewData]);
 
   const fontScale = scaleLog({

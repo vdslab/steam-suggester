@@ -58,7 +58,7 @@ const Network = (props: Props) => {
   const [centerY, setCenterY] = useState<number>(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   const [isNetworkLoading, setIsNetworkLoading] = useState(true);
 
