@@ -405,7 +405,11 @@ const Network = (props: Props) => {
         {/* フィルターパネル */}
         <div
           className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "filter" ? "translate-x-0" : "-translate-x-full"
+            openPanel === "filter"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
           }`}
         >
           <SelectParameter
@@ -418,7 +422,11 @@ const Network = (props: Props) => {
         {/* 強調表示パネル */}
         <div
           className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "highlight" ? "translate-x-0" : "-translate-x-full"
+            openPanel === "highlight"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
           }`}
         >
           <HighlightPanel
@@ -430,7 +438,11 @@ const Network = (props: Props) => {
         {/* StreamerListパネル */}
         <div
           className={`absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "streamer" ? "translate-x-0" : "-translate-x-full"
+            openPanel === "streamer"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
           }`}
         >
           <Panel
@@ -453,7 +465,11 @@ const Network = (props: Props) => {
         {/* 類似度パネル */}
         <div
           className={`absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "similarity" ? "translate-x-0" : "-translate-x-full"
+            openPanel === "similarity"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
           }`}
         >
           <Panel
@@ -476,7 +492,11 @@ const Network = (props: Props) => {
         {/* Steam連携パネル */}
         <div
           className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "steamList" ? "translate-x-0" : "-translate-x-full"
+            openPanel === "steamList"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
           }`}
         >
           <SteamList
@@ -489,7 +509,11 @@ const Network = (props: Props) => {
         {/* ランキングパネル */}
         <div
           className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "ranking" ? "translate-x-0" : "-translate-x-full"
+            openPanel === "ranking"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
           }`}
         >
           <Leaderboard nodes={nodes} setSelectedIndex={setSelectedIndex} />
