@@ -267,9 +267,10 @@ const Network = (props: Props) => {
         {/* 検索バー */}
         <div
           id="search-container"
-          className={`absolute top-4 left-0 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ${
-            isSidebarOpen ? "ml-72" : "ml-8" // Sidebarの幅に応じてマージンを変更
-          }`}
+          className={`absolute top-4 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ease-in-out`}
+          style={{
+            marginLeft: isSidebarOpen ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
+          }}
         >
           {/* 検索フォーム */}
           <div className="flex flex-col">
