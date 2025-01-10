@@ -141,6 +141,7 @@ const NodeLink = (props: NodeLinkProps) => {
             const angleStep =
               streamerColors.length > 0 ? 360 / streamerColors.length : 0;
             const isHovered = node.index === hoveredIndex;
+            const isHighlight = selectedTags.length ? selectedTags.every((tag) => node.tags?.includes(tag)) : false;
             return (
               <g
                 transform={`translate(${node.x},${node.y})`}
@@ -180,32 +181,8 @@ const NodeLink = (props: NodeLinkProps) => {
                         />
                       </g>
                     );
-                  })}
-              </g>
-            );
-          })}
-        {nodes.length !== 0 &&
-          nodes.map((node: NodeType, i: number) => {
-            const isHighlight = selectedTags.length ? selectedTags.every((tag) => node.tags?.includes(tag)) : false;
-            const isHovered = node.index === hoveredIndex;
-            return (
-              <g
-                transform={`translate(${node.x},${node.y})`}
-                onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
-                onMouseLeave={() => setHoveredIndex(-1)}
-                onClick={() => setSelectedIndex(node.index)}
-                key={i}
-              >
-                <Icon
-                  title={node.title}
-                  imgURL={node.imgURL}
-                  index={node.index ?? i}
-                  steamGameId={node.steamGameId}
-                  twitchGameId={node.twitchGameId}
-                  circleScale={node.circleScale ?? 1}
-                  suggestValue={node.suggestValue}
-                  isHovered={isHovered}
-                />
+                })}
+
                 {openPanel === 'highlight' && isHighlight && (
                   <g transform={`scale(${node.circleScale})`}>
                     <circle
