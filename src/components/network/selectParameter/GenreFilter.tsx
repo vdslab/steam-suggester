@@ -1,7 +1,7 @@
 import { Filter } from "@/types/api/FilterType";
 import { useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
-import AutoCompleteBox from "@/components/network/Hightlight/AutoCompleteBox";
+import AutoCompleteBox from "@/components/network/highlight/AutoCompleteBox";
 import Section from "../Section";
 import CategoryIcon from "@mui/icons-material/Category";
 import IconButton from "@mui/material/IconButton";

@@ -35,7 +35,7 @@ import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import UserAvatar from "./steamList/UserAvatar";
 import { HomeHeader } from "../common/Headers";
-import HighlightPanel from "./Hightlight/HighlightPanel";
+import HighlightPanel from "./highlight/HighlightPanel";
 
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";

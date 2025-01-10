@@ -6,7 +6,7 @@ import HighlightOutlinedIcon from '@mui/icons-material/HighlightOutlined';
 import { TAG_LIST } from "@/constants/TAG_LIST";
 import CancelIcon from "@mui/icons-material/Cancel";
 import IconButton from "@mui/material/IconButton";
-import AutoCompleteBox from "@/components/network/Hightlight/AutoCompleteBox";
+import AutoCompleteBox from "@/components/network/highlight/AutoCompleteBox";
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import Button from "@mui/material/Button";
 
