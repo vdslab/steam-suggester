@@ -4,7 +4,7 @@
 import React from "react";
 import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "./HelpTooltip";
-import LeaderboardIcon from "@mui/icons-material/Leaderboard";
+import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 
 type Props = {
@@ -36,7 +36,7 @@ const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames,
   return (
     <div className="p-4">
       <div className="flex items-center mb-4">
-        <LeaderboardIcon className="text-white mr-2" />
+        <LeaderboardOutlinedIcon className="text-white mr-2" />
         <h2 className="text-xl font-semibold">ランキング</h2>
         <HelpTooltip title="人気のゲームランキングです。" />
       </div>
