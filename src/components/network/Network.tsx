@@ -521,6 +521,7 @@ const Network = (props: Props) => {
             setSelectedIndex={setSelectedIndex}
             userAddedGames={userAddedGames}
             setUserAddedGames={setUserAddedGames}
+            setIsNetworkLoading={setIsNetworkLoading}
           />
         </div>
 

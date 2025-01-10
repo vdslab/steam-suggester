@@ -6,15 +6,17 @@ import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "./HelpTooltip";
 import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { changeGameIdData } from "@/hooks/indexedDB";
 
 type Props = {
   nodes: NodeType[];
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   userAddedGames: string[];
   setUserAddedGames: React.Dispatch<React.SetStateAction<string[]>>;
+  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames, setUserAddedGames }) => {
+const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames, setUserAddedGames, setIsNetworkLoading }) => {
   // ランキング順にソート
   const sortedNodes = [...nodes].sort(
     (a, b) => (b.circleScale ?? 0) - (a.circleScale ?? 0)
@@ -67,6 +69,12 @@ const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames,
                   className="flex items-center justify-center p-1 hover:bg-red-500 rounded cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
+                    const newUserAddedGames = userAddedGames.filter((gameId: string) => gameId !== node.steamGameId);
+                    setUserAddedGames(newUserAddedGames);
+                    (async () => {
+                      await changeGameIdData(newUserAddedGames);
+                      setIsNetworkLoading(true);
+                    })();
                   }}
                 >
                   <DeleteOutlineOutlinedIcon />
