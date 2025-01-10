@@ -5,11 +5,6 @@ import { SteamListType } from "@/types/NetworkType";
 export default async function Page() {
   try {
     // データ取得
-    const matchRes = await fetch(
-      `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`
-    );
-    const steamAllData: SteamDetailsDataType[] = await matchRes.json();
-
     const steamListRes = await fetch(
       `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`
     );
@@ -17,7 +12,7 @@ export default async function Page() {
 
     return (
       <div className="flex flex-col h-screen">
-        <Network steamAllData={steamAllData} steamListData={steamListData} />
+        <Network steamListData={steamListData} />
       </div>
     );
   } catch (error) {

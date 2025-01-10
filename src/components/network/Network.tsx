@@ -8,6 +8,7 @@ import { Filter, SliderSettings } from "@/types/api/FilterType";
 import StreamedList from "./streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/loading";
+import Error from "@/app/error";
 import {
   LinkType,
   NodeType,
@@ -39,15 +40,18 @@ import HighlightPanel from "./highlight/HighlightPanel";
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import SimilaritySettings from "./similaritySettings/SimilaritySettings";
+import { fetcher } from "../common/Fetcher";
+import useSWR from "swr";
 
 
 type Props = {
-  steamAllData: SteamDetailsDataType[];
   steamListData: SteamListType[];
 };
 
 const Network = (props: Props) => {
-  const { steamAllData, steamListData } = props;
+  const { steamListData } = props;
+
+  const { data: steamAllData, error } = useSWR<SteamDetailsDataType[]>(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`, fetcher);
 
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
   const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
@@ -71,13 +75,8 @@ const Network = (props: Props) => {
 
   const { tourRun, setTourRun } = useTour();
 
-  const [progress, setProgress] = useState(0);
-
   // Sidebarが開いているかどうかを管理する状態
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-
-  // Refを使用して副作用の実行を制御
-  const hasFetchedInitialData = useRef(false);
 
   // 検索関連の状態
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -92,7 +91,6 @@ const Network = (props: Props) => {
     gameIds: string[],
     slider: SliderSettings
   ) => {
-    setProgress(0);
     const result = await createNetwork(
       steamAllData,
       filter,
@@ -113,12 +111,10 @@ const Network = (props: Props) => {
     }
     setNodes(nodes);
     setLinks(links);
-    hasFetchedInitialData.current = false; 
   };
 
   useEffect(() => {
-    if (isNetworkLoading && !hasFetchedInitialData.current) {
-      hasFetchedInitialData.current = true; // フラグを立てる
+    if (isNetworkLoading && steamAllData) {
       (async () => {
         const filterData = (await getFilterData()) ?? DEFAULT_FILTER;
         const gameIds = (await getGameIdData()) ?? [];
@@ -129,7 +125,7 @@ const Network = (props: Props) => {
         setIsNetworkLoading(false);
       })();
     }
-  }, [isNetworkLoading]);
+  }, [isNetworkLoading, steamAllData]);
 
   // 選択されたノードが変更されたときに中心座標を更新
   useEffect(() => {
@@ -246,8 +242,12 @@ const Network = (props: Props) => {
     };
   }, []);
 
-  if (isNetworkLoading) {
+  if (isNetworkLoading || !steamAllData) {
     return <Loading />;
+  }
+
+  if (error) {
+    return <Error error={error} reset={() => setIsNetworkLoading(true)} />;
   }
 
   return (
