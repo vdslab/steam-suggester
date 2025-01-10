@@ -188,7 +188,7 @@ const NodeLink = (props: NodeLinkProps) => {
           })}
         {nodes.length !== 0 &&
           nodes.map((node: NodeType, i: number) => {
-            const isHighlight = selectedTags.every((tag) => node.tags?.includes(tag));
+            const isHighlight = selectedTags.length ? selectedTags.every((tag) => node.tags?.includes(tag)) : false;
             return (
               <g
                 className={`brightness-${
