@@ -109,6 +109,12 @@ const Network = (props: Props) => {
   };
 
   useEffect(() => {
+    if (prevAddedGameId) {
+      setIsNetworkLoading(true);
+    }
+  }, [prevAddedGameId]);
+
+  useEffect(() => {
     if (isNetworkLoading && steamAllData) {
       (async () => {
         const filterData = (await getFilterData()) ?? DEFAULT_FILTER;
@@ -189,6 +195,7 @@ const Network = (props: Props) => {
           setIsNetworkLoading={setIsNetworkLoading}
           steamListData={steamListData}
           openPanel={openPanel}
+          setPrevAddedGameId={setPrevAddedGameId}
         />
 
         {/* ゲーム詳細表示 */}

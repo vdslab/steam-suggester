@@ -17,6 +17,7 @@ type SearchGamesProps = {
   setIsNetworkLoading: (value: boolean) => void;
   steamListData: SteamListType[];
   openPanel: string | null;
+  setPrevAddedGameId: React.Dispatch<React.SetStateAction<string>>;
 };
 
 
@@ -28,6 +29,7 @@ const SearchGames = ({
     setIsNetworkLoading,
     steamListData,
     openPanel,
+    setPrevAddedGameId
 }: SearchGamesProps) => {
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -87,14 +89,14 @@ const SearchGames = ({
   const handleGameAdd= (steamGameId: string) => {
     if (
       !userAddedGames.includes(steamGameId) &&
-      !nodes.some((node:any) => node.steamGameId === steamGameId)
+      !nodes.some((node: NodeType) => node.steamGameId === steamGameId)
     ) {
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
+      setSearchQuery("");
       (async () => {
         await changeGameIdData(newUserAddedGames);
-        setSearchQuery("");
-        setIsNetworkLoading(true);
+        setPrevAddedGameId(steamGameId);
       })();
     }
   };
