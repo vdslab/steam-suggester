@@ -127,9 +127,10 @@ const SearchGames = ({
   return (
     <div
       id="search-container"
-      className={`absolute top-4 left-0 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ${
-        openPanel != null ? "ml-72" : "ml-8" // Sidebarの幅に応じてマージンを変更
-      }`}
+      className={`absolute top-4 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ease-in-out`}
+      style={{
+        marginLeft: openPanel ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
+      }}
     >
       {/* 検索フォーム */}
       <div className="flex flex-col">

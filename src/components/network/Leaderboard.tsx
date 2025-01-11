@@ -48,7 +48,7 @@ const Leaderboard: React.FC<Props> = ({ nodes, selectedIndex, setSelectedIndex, 
           const isUserAdded = userAddedGames.find(
             (gameId: string) => gameId === node.steamGameId
           );
-          const titleColor = isUserAdded ? "yellow-300" : "white";
+          const titleColor = isUserAdded ? "green-300" : "white";
   
           const isSelected = selectedIndex === node.index; // 選択状態を判定
   
