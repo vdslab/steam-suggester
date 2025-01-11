@@ -83,6 +83,15 @@ const GameSearchPanel = (props: Props) => {
                   style={{ borderRadius: "4px" }}
                   className="object-cover rounded mb-2"
                 />
+                {/* 画像右上 */}
+                <div
+                  className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 bg-black bg-opacity-50 rounded-full cursor-pointer z-20 transition-transform duration-200 hover:bg-opacity-75 hover:scale-110"
+                  onClick={() => setSelectedIndex(-1)}
+                >
+                  <span className="text-white text-xl font-bold transition-colors duration-200 hover:text-red-400">
+                    ×
+                  </span>
+                </div>
                 {/* 画像右下 */}
                 <div className="absolute bottom-2 right-2 flex items-center space-x-1 z-10">
                   {/* デバイスサポート */}
