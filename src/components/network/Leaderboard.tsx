@@ -10,13 +10,14 @@ import { changeGameIdData } from "@/hooks/indexedDB";
 
 type Props = {
   nodes: NodeType[];
+  selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   userAddedGames: string[];
   setUserAddedGames: React.Dispatch<React.SetStateAction<string[]>>;
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames, setUserAddedGames, setIsNetworkLoading }) => {
+const Leaderboard: React.FC<Props> = ({ nodes, selectedIndex, setSelectedIndex, userAddedGames, setUserAddedGames, setIsNetworkLoading }) => {
   // ランキング順にソート
   const sortedNodes = [...nodes].sort(
     (a, b) => (b.circleScale ?? 0) - (a.circleScale ?? 0)
@@ -48,11 +49,15 @@ const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames,
             (gameId: string) => gameId === node.steamGameId
           );
           const titleColor = isUserAdded ? "yellow-300" : "white";
-
+  
+          const isSelected = selectedIndex === node.index; // 選択状態を判定
+  
           return (
             <li
               key={node.steamGameId}
-              className="flex items-center justify-between mb-2 cursor-pointer hover:bg-gray-700 p-2 rounded"
+              className={`flex items-center justify-between mb-2 cursor-pointer p-2 rounded ${
+                isSelected ? "bg-blue-700 text-white" : "hover:bg-gray-700"
+              }`}
               onClick={() => setSelectedIndex(node.index)}
             >
               {/* ランクとタイトル */}
@@ -62,14 +67,16 @@ const Leaderboard: React.FC<Props> = ({ nodes, setSelectedIndex, userAddedGames,
                 </span>
                 <span className={`text-${titleColor}`}>{node.title}</span>
               </div>
-
+  
               {/* ゴミ箱アイコン */}
               {isUserAdded && (
                 <div
                   className="flex items-center justify-center p-1 hover:bg-red-500 rounded cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    const newUserAddedGames = userAddedGames.filter((gameId: string) => gameId !== node.steamGameId);
+                    const newUserAddedGames = userAddedGames.filter(
+                      (gameId: string) => gameId !== node.steamGameId
+                    );
                     setUserAddedGames(newUserAddedGames);
                     (async () => {
                       await changeGameIdData(newUserAddedGames);

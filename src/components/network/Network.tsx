@@ -532,6 +532,7 @@ const Network = (props: Props) => {
         >
           <Leaderboard
             nodes={nodes}
+            selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
             userAddedGames={userAddedGames}
             setUserAddedGames={setUserAddedGames}
