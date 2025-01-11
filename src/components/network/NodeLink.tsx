@@ -6,6 +6,7 @@ import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
+import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 
 type NodeLinkProps = {
   nodes: NodeType[];
@@ -113,6 +114,7 @@ const NodeLink = (props: NodeLinkProps) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
     fetcher,
+    { refreshInterval: ISR_FETCH_INTERVAL },
   );
 
   // フレンドの所有ゲームを取得
@@ -121,6 +123,7 @@ const NodeLink = (props: NodeLinkProps) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
     fetcher,
+    { refreshInterval: ISR_FETCH_INTERVAL },
   );
 
   const findHoveredNode = (index: number) => {
