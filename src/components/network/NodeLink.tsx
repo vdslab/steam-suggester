@@ -3,6 +3,9 @@ import { useState, useEffect, useRef, ReactNode } from "react";
 import * as d3 from "d3";
 import Icon from "./Icon";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
+import { useSession } from "next-auth/react";
+import useSWR from "swr";
+import { fetcher } from "../common/Fetcher";
 
 type NodeLinkProps = {
   nodes: NodeType[];
@@ -95,9 +98,30 @@ const NodeLink = (props: NodeLinkProps) => {
     streamerIds = [],
     openPanel,
     selectedTags,
+
   } = props;
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
+
+  const { data: session, status } = useSession();
+
+  const steamId = session?.user?.email ? session.user.email.split('@')[0] : null;
+
+  // 自分の所有ゲームを取得
+  const { data: myOwnGames, error: myGamesError } = useSWR<GetSteamOwnedGamesResponse[]>(
+    status === 'authenticated' && steamId
+      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
+      : null,
+    fetcher,
+  );
+
+  // フレンドの所有ゲームを取得
+  const { data: friendsOwnGames, error: friendsGamesError } = useSWR<GetFriendGamesResponse[]>(
+    status === 'authenticated' && steamId
+      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
+      : null,
+    fetcher,
+  );
 
   const findHoveredNode = (index: number) => {
     return nodes.find((node: NodeType) => node.index === index);
@@ -220,6 +244,62 @@ const NodeLink = (props: NodeLinkProps) => {
                       fill="transparent"
                     />
                   </g>
+                )}
+              </g>
+            );
+          })}
+        {nodes.length !== 0 &&
+          nodes.map((node: NodeType, i: number) => {
+            const isMyOwned = myOwnGames && myOwnGames.some((value) => node.title === value.title);
+            const isFriedOwned = friendsOwnGames && friendsOwnGames.some((value) => node.title === value.gameName);
+            return (
+              <g
+                className={`brightness-${
+                  hoveredIndex === node.index ? "125" : "100"
+                }`}
+                transform={`translate(${node.x},${node.y})`}
+                onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
+                onMouseLeave={() => setHoveredIndex(-1)}
+                onClick={() => setSelectedIndex(node.index)}
+                key={i}
+              >
+                <Icon
+                  title={node.title}
+                  imgURL={node.imgURL}
+                  index={node.index ?? i}
+                  steamGameId={node.steamGameId}
+                  twitchGameId={node.twitchGameId}
+                  circleScale={node.circleScale ?? 1}
+                  suggestValue={node.suggestValue}
+                />
+                {openPanel === 'steamList' && (
+                  <g transform={`scale(${node.circleScale})`}>
+                  {isMyOwned && isFriedOwned ? (
+                    <>
+                      <path
+                        d="M 0,0 m -17,0 a 17,17 0 0,1 34,0"
+                        fill="transparent"
+                        stroke="blue"
+                        strokeWidth="1.5"
+                      />
+                      <path
+                        d="M 0,0 m -17,0 a 17,17 0 0,0 34,0"
+                        fill="transparent"
+                        stroke="green"
+                        strokeWidth="1.5"
+                      />
+                    </>
+                  ) : (
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="17"
+                      stroke={isMyOwned ? 'blue' : isFriedOwned ? 'green' : 'none'}
+                      strokeWidth="1.5"
+                      fill="transparent"
+                    />
+                  )}
+                </g>
                 )}
               </g>
             );

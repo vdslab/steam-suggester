@@ -19,7 +19,6 @@ import {
   getFilterData,
   getGameIdData,
   getSliderData,
-  changeGameIdData,
 } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
@@ -33,12 +32,8 @@ import Leaderboard from "./Leaderboard";
 import GameDetailPanel from "./gameDetail/gameDetail";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
-import UserAvatar from "./steamList/UserAvatar";
 import { HomeHeader } from "../common/Headers";
 import HighlightPanel from "./highlight/HighlightPanel";
-
-import SearchIcon from "@mui/icons-material/Search";
-import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import SimilaritySettings from "./similaritySettings/SimilaritySettings";
 import { fetcher } from "../common/Fetcher";
 import useSWR from "swr";
@@ -285,7 +280,6 @@ const Network = (props: Props) => {
         {openPanel === "steamList" && (
           <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
             <SteamList
-              steamAllData={steamAllData}
               nodes={nodes}
               setSelectedIndex={setSelectedIndex}
             />
