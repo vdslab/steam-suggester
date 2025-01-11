@@ -206,10 +206,6 @@ const Network = (props: Props) => {
 
         {!isNetworkLoading ? (
           <div className="absolute inset-0">
-            <div className="absolute top-0 right-4 z-10">
-              {/* ユーザーアイコン */}
-              <UserAvatar />
-            </div>
             <NodeLink
               nodes={nodes}
               links={links}
