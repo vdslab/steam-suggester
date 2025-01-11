@@ -226,7 +226,7 @@ const NodeLink = (props: NodeLinkProps) => {
                   </g>
                 )}
 
-                {openPanel === 'steamList' && (
+                {openPanel === 'steamList' && !myGamesError && !friendsGamesError && (
                   <g transform={`scale(${node.circleScale})`}>
                     {isMyOwned && isFriedOwned ? (
                       <>
