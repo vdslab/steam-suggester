@@ -17,6 +17,7 @@ type SearchGamesProps = {
   setIsNetworkLoading: (value: boolean) => void;
   steamListData: SteamListType[];
   openPanel: string | null;
+  setPrevAddedGameId: React.Dispatch<React.SetStateAction<string>>;
 };
 
 
@@ -28,6 +29,7 @@ const SearchGames = ({
     setIsNetworkLoading,
     steamListData,
     openPanel,
+    setPrevAddedGameId
 }: SearchGamesProps) => {
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -87,14 +89,14 @@ const SearchGames = ({
   const handleGameAdd= (steamGameId: string) => {
     if (
       !userAddedGames.includes(steamGameId) &&
-      !nodes.some((node:any) => node.steamGameId === steamGameId)
+      !nodes.some((node: NodeType) => node.steamGameId === steamGameId)
     ) {
       const newUserAddedGames = [...userAddedGames, steamGameId];
       setUserAddedGames(newUserAddedGames);
+      setSearchQuery("");
       (async () => {
         await changeGameIdData(newUserAddedGames);
-        setSearchQuery("");
-        setIsNetworkLoading(true);
+        setPrevAddedGameId(steamGameId);
       })();
     }
   };
@@ -125,9 +127,10 @@ const SearchGames = ({
   return (
     <div
       id="search-container"
-      className={`absolute top-4 left-0 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ${
-        openPanel != null ? "ml-72" : "ml-8" // Sidebarの幅に応じてマージンを変更
-      }`}
+      className={`absolute top-4 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ease-in-out`}
+      style={{
+        marginLeft: openPanel ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
+      }}
     >
       {/* 検索フォーム */}
       <div className="flex flex-col">

@@ -73,6 +73,8 @@ const Network = (props: Props) => {
 
   const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
 
+  const [prevAddedGameId, setPrevAddedGameId] = useState<string>("");
+
   const initialNodes = async (
     filter: Filter,
     gameIds: string[],
@@ -91,14 +93,26 @@ const Network = (props: Props) => {
       (node1: NodeType, node2: NodeType) =>
         (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
     );
-    if (buffNodes.length > 0) {
+    const index = buffNodes.findIndex((node: NodeType) => node.steamGameId === prevAddedGameId);
+    if (buffNodes.length > 0 && index === -1) {
       setCenterX((buffNodes[0]?.x ?? 0) - 150);
       setCenterY((buffNodes[0]?.y ?? 0) + 100);
       setSelectedIndex(-1);
+    } else if (index !== -1) {
+      setCenterX((buffNodes[index]?.x ?? 0) - 150);
+      setCenterY((buffNodes[index]?.y ?? 0) + 100);
+      setSelectedIndex(index);
     }
+    setPrevAddedGameId("");
     setNodes(nodes);
     setLinks(links);
   };
+
+  useEffect(() => {
+    if (prevAddedGameId) {
+      setIsNetworkLoading(true);
+    }
+  }, [prevAddedGameId]);
 
   useEffect(() => {
     if (isNetworkLoading && steamAllData) {
@@ -181,6 +195,7 @@ const Network = (props: Props) => {
           setIsNetworkLoading={setIsNetworkLoading}
           steamListData={steamListData}
           openPanel={openPanel}
+          setPrevAddedGameId={setPrevAddedGameId}
         />
 
         {/* ゲーム詳細表示 */}
@@ -218,80 +233,127 @@ const Network = (props: Props) => {
         )}
 
         {/* フィルターパネル */}
-        {openPanel === "filter" && (
-          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <SelectParameter
-              filter={filter}
-              setFilter={setFilter}
-              setIsNetworkLoading={setIsNetworkLoading}
-            />
-          </div>
-        )}
+        <div
+          className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
+            openPanel === "filter"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
+          }`}
+        >
+          <SelectParameter
+            filter={filter}
+            setFilter={setFilter}
+            setIsNetworkLoading={setIsNetworkLoading}
+          />
+        </div>
+
         {/* 強調表示パネル */}
-        {openPanel === "highlight" && (
-          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <HighlightPanel selectedTags={selectedTags} setSelectedTags={setSelectedTags}/>
-          </div>
-        )}
+        <div
+          className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
+            openPanel === "highlight"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
+          }`}
+        >
+          <HighlightPanel
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+          />
+        </div>
 
         {/* StreamerListパネル */}
-        {openPanel === "streamer" && (
-          <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <Panel
-              title={
-                <div className="flex items-center">
-                  <span>配信者</span>
-                  <HelpTooltip title="配信者を追加すると配信者が配信したゲームのアイコンに枠が表示されます。また、アイコンをクリックすると配信者のページに飛べます" />
-                </div>
-              }
-              icon={<LiveTvIcon className="mr-2 text-white" />}
-            >
-              <StreamedList
-                nodes={nodes}
-                streamerIds={streamerIds}
-                setStreamerIds={setStreamerIds}
-              />
-            </Panel>
-          </div>
-        )}
+        <div
+          className={`absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
+            openPanel === "streamer"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
+          }`}
+        >
+          <Panel
+            title={
+              <div className="flex items-center">
+                <span>配信者</span>
+                <HelpTooltip title="配信者を追加すると配信者が配信したゲームのアイコンに枠が表示されます。また、アイコンをクリックすると配信者のページに飛べます" />
+              </div>
+            }
+            icon={<LiveTvIcon className="mr-2 text-white" />}
+          >
+            <StreamedList
+              nodes={nodes}
+              streamerIds={streamerIds}
+              setStreamerIds={setStreamerIds}
+            />
+          </Panel>
+        </div>
 
-        {/* 類似度 */}
-        {openPanel === "similarity" && (
-          <div className="absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <Panel
-              title={
-                <div className="flex items-center">
-                  <span>類似度設定</span>
-                  <HelpTooltip title="ゲーム間の類似度計算における重みを調整できます。" />
-                </div>
-              }
-              icon={<TuneIcon className="mr-2 text-white" />}
-            >
-              <SimilaritySettings
-                slider={slider}
-                setSlider={setSlider}
-                setIsNetworkLoading={setIsNetworkLoading}
-              />
-            </Panel>
-          </div>
-        )}
+        {/* 類似度パネル */}
+        <div
+          className={`absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
+            openPanel === "similarity"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
+          }`}
+        >
+          <Panel
+            title={
+              <div className="flex items-center">
+                <span>類似度設定</span>
+                <HelpTooltip title="ゲーム間の類似度計算における重みを調整できます。" />
+              </div>
+            }
+            icon={<TuneIcon className="mr-2 text-white" />}
+          >
+            <SimilaritySettings
+              slider={slider}
+              setSlider={setSlider}
+              setIsNetworkLoading={setIsNetworkLoading}
+            />
+          </Panel>
+        </div>
 
         {/* Steam連携パネル */}
-        {openPanel === "steamList" && (
-          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <SteamList
-              nodes={nodes}
-              setSelectedIndex={setSelectedIndex}
-            />
-          </div>
-        )}
+        <div
+          className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
+            openPanel === "steamList"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
+          }`}
+        >
+          <SteamList
+            nodes={nodes}
+            setSelectedIndex={setSelectedIndex}
+          />
+        </div>
 
         {/* ランキングパネル */}
-        {openPanel === "ranking" && (
-          <div className="absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300">
-            <Leaderboard nodes={nodes} setSelectedIndex={setSelectedIndex} />
-          </div>
-        )}
+        <div
+          className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
+            openPanel === "ranking"
+              ? "translate-x-0"
+              : openPanel === null
+              ? "-translate-x-full"
+              : "hidden"
+          }`}
+        >
+          <Leaderboard
+            nodes={nodes}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            userAddedGames={userAddedGames}
+            setUserAddedGames={setUserAddedGames}
+            setIsNetworkLoading={setIsNetworkLoading}
+          />
+        </div>
 
         {/* Tourコンポーネント */}
         <Tour run={tourRun} setRun={setTourRun} />

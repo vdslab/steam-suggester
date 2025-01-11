@@ -42,6 +42,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error(error);
-    return new NextResponse(JSON.stringify({ error: 'Failed to fetch friends games' }), { status: 500 });
+    return new NextResponse(JSON.stringify({ error: 'Failed to fetch owned games' }), { status: 500 });
   }
 }
