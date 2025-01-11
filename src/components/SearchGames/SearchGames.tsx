@@ -70,6 +70,7 @@ const SearchGames = ({
             (item2: SteamListType) => item2.steamGameId === item1.steamGameId
           )
       )
+      .filter((game) => game.title !== "Apex")
     );
 
     const filteredSteam = allSteamList
@@ -178,7 +179,7 @@ const SearchGames = ({
                       handleDeleteGame={handleGameDelete}
                       setIsFocused={setIsFocused}
                       startIcon={`${game.index + 1}位`}
-                      endIcon={<IconButton><DeleteForeverOutlinedIcon /></IconButton>}
+                      endIcon={userAddedGames.includes(game.steamGameId) ? <IconButton><DeleteForeverOutlinedIcon /></IconButton> : null}
                     />
                   ) : (
                     <SearchItemManager
