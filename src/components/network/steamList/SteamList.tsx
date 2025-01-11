@@ -9,11 +9,12 @@ import Panel from '../Panel';
 import Section from '../Section';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Image from 'next/image';
-import { Avatar, AvatarGroup, IconButton } from '@mui/material';
+import { Alert, Avatar, AvatarGroup, Button, IconButton } from '@mui/material';
 import { fetcher } from '@/components/common/Fetcher';
 import SearchIcon from '@mui/icons-material/Search';
 import { NodeType } from '@/types/NetworkType';
 import HelpTooltip from '../HelpTooltip';
+import { ISR_FETCH_INTERVAL } from '@/constants/DetailsConstants';
 
 type Props = {
   nodes: NodeType[];
@@ -35,6 +36,7 @@ const SteamList = (props:Props) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
     fetcher,
+    { refreshInterval: ISR_FETCH_INTERVAL },
   );
 
   // フレンドの所有ゲームを取得
@@ -43,6 +45,7 @@ const SteamList = (props:Props) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
     fetcher,
+    { refreshInterval: ISR_FETCH_INTERVAL },
   );
 
   if (status === 'loading' || !session) {
@@ -54,19 +57,16 @@ const SteamList = (props:Props) => {
         <div className="flex justify-center items-center h-full">
           <div style={{ textAlign: 'center' }}>
             <h2>Steamでログインしてゲームを表示</h2>
-            <button
+            <Button
               onClick={() => signIn('steam')}
-              style={{
-                padding: '10px 20px',
-                fontSize: '16px',
-                borderRadius: '5px',
-                color: '#0066c0',
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              variant="outlined"
+              sx={{ margin: '1rem' }}
             >
               Steamでログイン
-            </button>
+            </Button>
+            <Alert variant="filled" severity="info">
+               表示するにはSteamプロフィールの公開設定を公開にしてください。
+            </Alert>
           </div>
         </div>
       </Panel>
