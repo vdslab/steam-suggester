@@ -213,15 +213,41 @@ const NodeLink = (props: NodeLinkProps) => {
                     );
                 })}
 
-                {openPanel === 'highlight' && isHighlight && (
+                {openPanel === "highlight" && isHighlight && (
                   <g transform={`scale(${node.circleScale})`}>
+                    {/* グラデーション定義 */}
+                    <defs>
+                      <linearGradient id={`strong-gradient-${node.index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#ff0000" /> {/* 明るい赤 */}
+                        <stop offset="50%" stopColor="#ff4d4d" /> {/* 少し薄い赤 */}
+                        <stop offset="100%" stopColor="#ff9999" /> {/* 淡い赤 */}
+                      </linearGradient>
+                    </defs>
+
+                    {/* 内側の回転する円 */}
                     <circle
                       cx="0"
                       cy="0"
                       r="17"
-                      stroke="red"
-                      strokeWidth="1.5"
+                      stroke={`url(#strong-gradient-${node.index})`}
+                      strokeWidth="3"
                       fill="transparent"
+                      style={{
+                        animation: "fastRotate 1.5s linear infinite",
+                      }}
+                    />
+
+                    {/* 外側の波動のような円 */}
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="17"
+                      stroke="rgba(255, 77, 77, 0.5)"
+                      strokeWidth="2"
+                      fill="transparent"
+                      style={{
+                        animation: "waveExpand 2s ease-out infinite",
+                      }}
                     />
                   </g>
                 )}
