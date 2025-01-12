@@ -5,7 +5,7 @@ import React from "react";
 import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "./HelpTooltip";
 import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { changeGameIdData } from "@/hooks/indexedDB";
 
 type Props = {
@@ -17,7 +17,14 @@ type Props = {
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Leaderboard: React.FC<Props> = ({ nodes, selectedIndex, setSelectedIndex, userAddedGames, setUserAddedGames, setIsNetworkLoading }) => {
+const Leaderboard: React.FC<Props> = ({
+  nodes,
+  selectedIndex,
+  setSelectedIndex,
+  userAddedGames,
+  setUserAddedGames,
+  setIsNetworkLoading,
+}) => {
   // ランキング順にソート
   const sortedNodes = [...nodes].sort(
     (a, b) => (b.circleScale ?? 0) - (a.circleScale ?? 0)
@@ -49,9 +56,9 @@ const Leaderboard: React.FC<Props> = ({ nodes, selectedIndex, setSelectedIndex, 
             (gameId: string) => gameId === node.steamGameId
           );
           const titleColor = isUserAdded ? "green-300" : "white";
-  
+
           const isSelected = selectedIndex === node.index; // 選択状態を判定
-  
+
           return (
             <li
               key={node.steamGameId}
@@ -67,7 +74,7 @@ const Leaderboard: React.FC<Props> = ({ nodes, selectedIndex, setSelectedIndex, 
                 </span>
                 <span className={`text-${titleColor}`}>{node.title}</span>
               </div>
-  
+
               {/* ゴミ箱アイコン */}
               {isUserAdded && (
                 <div

@@ -64,7 +64,7 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
       const initialTransform = d3.zoomIdentity
         .translate(
           window.innerWidth / 2 - window.innerWidth / 7 - centerX,
-          window.innerHeight * 3 / 5 - centerY
+          (window.innerHeight * 3) / 5 - centerY
         )
         .scale(1);
       svg
@@ -99,31 +99,36 @@ const NodeLink = (props: NodeLinkProps) => {
     streamerIds = [],
     openPanel,
     selectedTags,
-
   } = props;
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
 
   const { data: session, status } = useSession();
 
-  const steamId = session?.user?.email ? session.user.email.split('@')[0] : null;
+  const steamId = session?.user?.email
+    ? session.user.email.split("@")[0]
+    : null;
 
   // 自分の所有ゲームを取得
-  const { data: myOwnGames, error: myGamesError } = useSWR<GetSteamOwnedGamesResponse[]>(
-    status === 'authenticated' && steamId
+  const { data: myOwnGames, error: myGamesError } = useSWR<
+    GetSteamOwnedGamesResponse[]
+  >(
+    status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
     fetcher,
-    { refreshInterval: ISR_FETCH_INTERVAL },
+    { refreshInterval: ISR_FETCH_INTERVAL }
   );
 
   // フレンドの所有ゲームを取得
-  const { data: friendsOwnGames, error: friendsGamesError } = useSWR<GetFriendGamesResponse[]>(
-    status === 'authenticated' && steamId
+  const { data: friendsOwnGames, error: friendsGamesError } = useSWR<
+    GetFriendGamesResponse[]
+  >(
+    status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
     fetcher,
-    { refreshInterval: ISR_FETCH_INTERVAL },
+    { refreshInterval: ISR_FETCH_INTERVAL }
   );
 
   const findHoveredNode = (index: number) => {
@@ -168,9 +173,15 @@ const NodeLink = (props: NodeLinkProps) => {
             const angleStep =
               streamerColors.length > 0 ? 360 / streamerColors.length : 0;
             const isHovered = node.index === hoveredIndex;
-            const isHighlight = selectedTags.length ? selectedTags.every((tag) => node.tags?.includes(tag)) : false;
-            const isMyOwned = myOwnGames && myOwnGames.some((value) => node.title === value.title);
-            const isFriedOwned = friendsOwnGames && friendsOwnGames.some((value) => node.title === value.gameName);
+            const isHighlight = selectedTags.length
+              ? selectedTags.every((tag) => node.tags?.includes(tag))
+              : false;
+            const isMyOwned =
+              myOwnGames &&
+              myOwnGames.some((value) => node.title === value.title);
+            const isFriedOwned =
+              friendsOwnGames &&
+              friendsOwnGames.some((value) => node.title === value.gameName);
             return (
               <g
                 transform={`translate(${node.x},${node.y})`}
@@ -211,16 +222,25 @@ const NodeLink = (props: NodeLinkProps) => {
                         />
                       </g>
                     );
-                })}
+                  })}
 
                 {openPanel === "highlight" && isHighlight && (
                   <g transform={`scale(${node.circleScale})`}>
                     {/* グラデーション定義 */}
                     <defs>
-                      <linearGradient id={`strong-gradient-${node.index}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#ff0000" /> {/* 明るい赤 */}
-                        <stop offset="50%" stopColor="#ff4d4d" /> {/* 少し薄い赤 */}
-                        <stop offset="100%" stopColor="#ff9999" /> {/* 淡い赤 */}
+                      <linearGradient
+                        id={`strong-gradient-${node.index}`}
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stopColor="#ff0000" />{" "}
+                        {/* 明るい赤 */}
+                        <stop offset="50%" stopColor="#ff4d4d" />{" "}
+                        {/* 少し薄い赤 */}
+                        <stop offset="100%" stopColor="#ff9999" />{" "}
+                        {/* 淡い赤 */}
                       </linearGradient>
                     </defs>
 
@@ -252,35 +272,39 @@ const NodeLink = (props: NodeLinkProps) => {
                   </g>
                 )}
 
-                {openPanel === 'steamList' && !myGamesError && !friendsGamesError && (
-                  <g transform={`scale(${node.circleScale})`}>
-                    {isMyOwned && isFriedOwned ? (
-                      <>
-                        <path
-                          d="M 0,0 m -17,0 a 17,17 0 0,1 34,0"
-                          fill="transparent"
-                          stroke="blue"
+                {openPanel === "steamList" &&
+                  !myGamesError &&
+                  !friendsGamesError && (
+                    <g transform={`scale(${node.circleScale})`}>
+                      {isMyOwned && isFriedOwned ? (
+                        <>
+                          <path
+                            d="M 0,0 m -17,0 a 17,17 0 0,1 34,0"
+                            fill="transparent"
+                            stroke="blue"
+                            strokeWidth="1.5"
+                          />
+                          <path
+                            d="M 0,0 m -17,0 a 17,17 0 0,0 34,0"
+                            fill="transparent"
+                            stroke="green"
+                            strokeWidth="1.5"
+                          />
+                        </>
+                      ) : (
+                        <circle
+                          cx="0"
+                          cy="0"
+                          r="17"
+                          stroke={
+                            isMyOwned ? "blue" : isFriedOwned ? "green" : "none"
+                          }
                           strokeWidth="1.5"
-                        />
-                        <path
-                          d="M 0,0 m -17,0 a 17,17 0 0,0 34,0"
                           fill="transparent"
-                          stroke="green"
-                          strokeWidth="1.5"
                         />
-                      </>
-                    ) : (
-                      <circle
-                        cx="0"
-                        cy="0"
-                        r="17"
-                        stroke={isMyOwned ? 'blue' : isFriedOwned ? 'green' : 'none'}
-                        strokeWidth="1.5"
-                        fill="transparent"
-                      />
-                    )}
-                  </g>
-                )}
+                      )}
+                    </g>
+                  )}
               </g>
             );
           })}

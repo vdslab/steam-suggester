@@ -32,16 +32,19 @@ export async function GET(req: Request, { params }: Params) {
       return NextResponse.json([]);
     }
 
-    const activeUsers:GetActiveUserResponse[] = result.rows.map((row) => {
+    const activeUsers: GetActiveUserResponse[] = result.rows.map((row) => {
       return {
         get_date: row.get_date,
-        active_user: row.active_user
-        };
+        active_user: row.active_user,
+      };
     });
 
     return NextResponse.json(activeUsers);
   } catch (error) {
     console.error("Error fetching game details:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

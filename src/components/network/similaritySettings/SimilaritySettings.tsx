@@ -25,7 +25,7 @@ const Slider: React.FC<SliderProps> = ({
   domain,
   values,
   onChange,
-  valueFormatter
+  valueFormatter,
 }) => {
   const [min, max] = domain;
   const currentValue = values[0];
@@ -52,25 +52,51 @@ const Slider: React.FC<SliderProps> = ({
   );
 };
 
-const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) => {
+const SimilaritySettings = ({
+  slider,
+  setSlider,
+  setIsNetworkLoading,
+}: Props) => {
   const [genreWeight, setGenreWeight] = useState<number>(slider.genreWeight);
-  const [graphicWeight, setGraphicWeight] = useState<number>(slider.graphicWeight);
-  const [playstyleWeight, setPlaystyleWeight] = useState<number>(slider.playstyleWeight);
+  const [graphicWeight, setGraphicWeight] = useState<number>(
+    slider.graphicWeight
+  );
+  const [playstyleWeight, setPlaystyleWeight] = useState<number>(
+    slider.playstyleWeight
+  );
   const [reviewWeight, setReviewWeight] = useState<number>(slider.reviewWeight);
 
-  const [isDetailMode, setIsDetailMode] = useState<boolean>(slider.isDetailMode);
+  const [isDetailMode, setIsDetailMode] = useState<boolean>(
+    slider.isDetailMode
+  );
 
-  const [subGenreWeight, setSubGenreWeight] = useState<number>(slider.subGenreWeight / 2);
-  const [systemWeight, setSystemWeight] = useState<number>(slider.systemWeight / 2);
-  const [visualWeight, setVisualWeight] = useState<number>(slider.visualWeight / 2);
-  const [worldviewWeight, setWorldviewWeight] = useState<number>(slider.worldviewWeight / 2);
+  const [subGenreWeight, setSubGenreWeight] = useState<number>(
+    slider.subGenreWeight / 2
+  );
+  const [systemWeight, setSystemWeight] = useState<number>(
+    slider.systemWeight / 2
+  );
+  const [visualWeight, setVisualWeight] = useState<number>(
+    slider.visualWeight / 2
+  );
+  const [worldviewWeight, setWorldviewWeight] = useState<number>(
+    slider.worldviewWeight / 2
+  );
 
-  const [difficultyWeight, setDifficultyWeight] = useState<number>(slider.difficultyWeight);
-  const [playtimeWeight, setPlaytimeWeight] = useState<number>(slider.playstyleWeight);
+  const [difficultyWeight, setDifficultyWeight] = useState<number>(
+    slider.difficultyWeight
+  );
+  const [playtimeWeight, setPlaytimeWeight] = useState<number>(
+    slider.playstyleWeight
+  );
   const [priceWeight, setPriceWeight] = useState<number>(slider.priceWeight);
-  const [developerWeight, setDeveloperWeight] = useState<number>(slider.developerWeight);
+  const [developerWeight, setDeveloperWeight] = useState<number>(
+    slider.developerWeight
+  );
   const [deviceWeight, setDeviceWeight] = useState<number>(slider.deviceWeight);
-  const [releaseDateWeight, setReleaseDateWeight] = useState<number>(slider.releaseDateWeight);
+  const [releaseDateWeight, setReleaseDateWeight] = useState<number>(
+    slider.releaseDateWeight
+  );
 
   const handleDetailModeToggle = () => {
     setIsDetailMode(!isDetailMode);
@@ -93,7 +119,7 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
       priceWeight,
       developerWeight,
       deviceWeight,
-      releaseDateWeight
+      releaseDateWeight,
     };
     setSlider(sliderData);
     await changeSliderData(sliderData);
@@ -107,7 +133,7 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
           <div className="mb-4">
             <label className="text-white block mb-2">ゲームジャンル</label>
             <Slider
-              domain={[0,100]}
+              domain={[0, 100]}
               values={[genreWeight]}
               onChange={(val) => setGenreWeight(val[0])}
             />
@@ -116,13 +142,13 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
           <div className="mb-4">
             <label className="text-white block mb-2">ジャンル</label>
             <Slider
-              domain={[0,100]}
+              domain={[0, 100]}
               values={[subGenreWeight]}
               onChange={(val) => setSubGenreWeight(val[0])}
             />
             <label className="text-white block mt-4 mb-2">システム</label>
             <Slider
-              domain={[0,100]}
+              domain={[0, 100]}
               values={[systemWeight]}
               onChange={(val) => setSystemWeight(val[0])}
             />
@@ -133,7 +159,7 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
           <div className="mb-4">
             <label className="text-white block mb-2">グラフィック</label>
             <Slider
-              domain={[0,100]}
+              domain={[0, 100]}
               values={[graphicWeight]}
               onChange={(val) => setGraphicWeight(val[0])}
             />
@@ -142,13 +168,13 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
           <div className="mb-4">
             <label className="text-white block mb-2">ビジュアル</label>
             <Slider
-              domain={[0,100]}
+              domain={[0, 100]}
               values={[visualWeight]}
               onChange={(val) => setVisualWeight(val[0])}
             />
             <label className="text-white block mt-4 mb-2">世界観</label>
             <Slider
-              domain={[0,100]}
+              domain={[0, 100]}
               values={[worldviewWeight]}
               onChange={(val) => setWorldviewWeight(val[0])}
             />
@@ -158,7 +184,7 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
         <div className="mb-4">
           <label className="text-white block mb-2">プレイスタイル</label>
           <Slider
-            domain={[0,100]}
+            domain={[0, 100]}
             values={[playstyleWeight]}
             onChange={(val) => setPlaystyleWeight(val[0])}
           />
@@ -167,7 +193,7 @@ const SimilaritySettings = ({ slider, setSlider, setIsNetworkLoading }: Props) =
         <div className="mb-4">
           <label className="text-white block mb-2">レビュー（評判）</label>
           <Slider
-            domain={[0,100]}
+            domain={[0, 100]}
             values={[reviewWeight]}
             onChange={(val) => setReviewWeight(val[0])}
           />

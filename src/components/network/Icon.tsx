@@ -1,7 +1,8 @@
 import { IconType } from "@/types/NetworkType";
 
 const Icon = (props: IconType) => {
-  const { imgURL, index, circleScale, suggestValue, isHovered, selectedIndex } = props;
+  const { imgURL, index, circleScale, suggestValue, isHovered, selectedIndex } =
+    props;
 
   return (
     <g
@@ -15,7 +16,13 @@ const Icon = (props: IconType) => {
         </clipPath>
         {/* chat要素なので一時的にコメントアウト */}
         {selectedIndex === index && (
-          <filter id={`glow-${index}`} x="-50%" y="-50%" width="200%" height="200%">
+          <filter
+            id={`glow-${index}`}
+            x="-50%"
+            y="-50%"
+            width="200%"
+            height="200%"
+          >
             <feGaussianBlur in="SourceAlpha" stdDeviation={5} result="blur" />
             <feOffset dx="0" dy="0" result="offsetBlur" />
             <feFlood floodColor="rgba(173, 216, 230, 1)" result="color" />

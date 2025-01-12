@@ -9,7 +9,12 @@ type Props = {
   hasDivider?: boolean; // 区切り線
 };
 
-const Section: React.FC<Props> = ({ title, icon, children, hasDivider = true }) => {
+const Section: React.FC<Props> = ({
+  title,
+  icon,
+  children,
+  hasDivider = true,
+}) => {
   return (
     <div className="space-y-4">
       <h3 className="text-gray-200 text-md font-medium flex items-center">

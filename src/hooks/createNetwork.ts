@@ -16,11 +16,13 @@ const getRandomCoordinates = (range: number): { x: number; y: number } => {
 const jaccardSimilarity = (setA: Set<string>, setB: Set<string>): number => {
   const intersection = new Set([...setA].filter((x) => setB.has(x)));
   const union = new Set([...setA, ...setB]);
-  return union.size === 0 ? -2 : Math.max(Math.min(intersection.size / union.size, 1), 0);
+  return union.size === 0
+    ? -2
+    : Math.max(Math.min(intersection.size / union.size, 1), 0);
 };
 
 export function cosineSimilarity(vecA: number[], vecB: number[]): number {
-  if (vecA.length === 0 || vecB.length === 0) return -2; 
+  if (vecA.length === 0 || vecB.length === 0) return -2;
   const dotProduct = vecA.reduce((acc, val, idx) => acc + val * vecB[idx], 0);
   const magnitudeA = Math.sqrt(vecA.reduce((acc, val) => acc + val * val, 0));
   const magnitudeB = Math.sqrt(vecB.reduce((acc, val) => acc + val * val, 0));
@@ -33,8 +35,7 @@ const createNetwork = async (
   filter: Filter,
   gameIds: string[],
   slider: SliderSettings
-): Promise<{ nodes: NodeType[]; links: LinkType[]; }> => {
-
+): Promise<{ nodes: NodeType[]; links: LinkType[] }> => {
   if (!data || data === undefined) {
     return { nodes: [], links: [] };
   }
@@ -58,7 +59,7 @@ const createNetwork = async (
   // フィルターに合致したノード群を抽出
   const rawNodes = slicedData.filter((item) => {
     const isInGenresFilter = item.genres.find((genre) => {
-      return filter.Genres[genre]
+      return filter.Genres[genre];
     });
     return (
       isInGenresFilter &&
@@ -66,7 +67,8 @@ const createNetwork = async (
       item.price <= filter.Price.endPrice &&
       ((item.isSinglePlayer && filter.Mode.isSinglePlayer) ||
         (item.isMultiPlayer && filter.Mode.isMultiPlayer)) &&
-      ((item.device.windows && filter.Device.windows) || (item.device.mac && filter.Device.mac))
+      ((item.device.windows && filter.Device.windows) ||
+        (item.device.mac && filter.Device.mac))
     );
   });
 
@@ -93,12 +95,18 @@ const createNetwork = async (
     similarityMatrix[i] = [];
     const setA = new Set(nodes[i].tags ?? []);
     for (let j = 0; j < nodes.length; j++) {
-      if (i === j || !nodes[i].similarGames?.find((id) => id === nodes[j].steamGameId)) {
+      if (
+        i === j ||
+        !nodes[i].similarGames?.find((id) => id === nodes[j].steamGameId)
+      ) {
         similarityMatrix[i][j] = -2;
         continue;
       }
-      let similarity = cosineSimilarity(nodes[i].featureVector as number[], nodes[j].featureVector as number[]);
-      if(similarity === -2) {
+      let similarity = cosineSimilarity(
+        nodes[i].featureVector as number[],
+        nodes[j].featureVector as number[]
+      );
+      if (similarity === -2) {
         const setA = new Set(nodes[i].tags ?? []);
         const setB = new Set(nodes[j].tags ?? []);
         similarity = jaccardSimilarity(setA, setB);
@@ -126,7 +134,10 @@ const createNetwork = async (
       if (addedLinks >= k || similarity === -2) break; // k本以上の接続を許可しない
 
       // 接続済みのペアをスキップ
-      const linkKey = `${Math.min(sourceIndex, targetIndex)}-${Math.max(sourceIndex, targetIndex)}`;
+      const linkKey = `${Math.min(sourceIndex, targetIndex)}-${Math.max(
+        sourceIndex,
+        targetIndex
+      )}`;
       if (usedConnections.has(linkKey)) continue;
 
       // 両ノードが最大5本までの接続を持っている場合はスキップ
@@ -146,7 +157,6 @@ const createNetwork = async (
     }
   });
 
-
   // ノードサイズ等をスケーリング
   const sizeScale = d3
     .scaleSqrt()
@@ -163,29 +173,30 @@ const createNetwork = async (
     .force("center", d3.forceCenter(0, 0).strength(0.05))
     .force(
       "collide",
-      d3.forceCollide<NodeType>()
+      d3
+        .forceCollide<NodeType>()
         .radius((d) => (d.circleScale ?? 1) * 30)
         .iterations(3)
     )
     .force(
       "link",
-      d3.forceLink<NodeType, LinkType>(links)
+      d3
+        .forceLink<NodeType, LinkType>(links)
         .id((d) => d.index.toString())
         .distance((link) => {
           const sourceNode = link.source as NodeType;
           const targetNode = link.target as NodeType;
-          const similarity = similarityMatrix[sourceNode.index][targetNode.index] || 0;
+          const similarity =
+            similarityMatrix[sourceNode.index][targetNode.index] || 0;
           return 130 - similarity * 100;
         })
         .strength(1)
     )
-    .force(
-      "radial",
-      d3.forceRadial(800).strength(0.1)
-    )
+    .force("radial", d3.forceRadial(800).strength(0.1))
     .force(
       "cluster",
-      d3.forceManyBody<NodeType>()
+      d3
+        .forceManyBody<NodeType>()
         .strength((node) => -25 * (node.circleScale ?? 1))
     );
 

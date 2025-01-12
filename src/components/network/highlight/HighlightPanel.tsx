@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import Panel from "../Panel";
-import HighlightOutlinedIcon from '@mui/icons-material/HighlightOutlined';
+import HighlightOutlinedIcon from "@mui/icons-material/HighlightOutlined";
 import { TAG_LIST } from "@/constants/TAG_LIST";
 import CancelIcon from "@mui/icons-material/Cancel";
 import IconButton from "@mui/material/IconButton";
 import AutoCompleteBox from "@/components/network/highlight/AutoCompleteBox";
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import Button from "@mui/material/Button";
 
 type Props = {
@@ -20,27 +20,27 @@ const HighlightPanel = (props: Props) => {
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const searchList: string[] = [...new Set(Object.values(TAG_LIST).flat().filter(
-    (key) =>
-      !selectedTags.includes(key) &&
-      key.toLowerCase().includes(searchQuery.toLowerCase())
-  ))];
-
+  const searchList: string[] = [
+    ...new Set(
+      Object.values(TAG_LIST)
+        .flat()
+        .filter(
+          (key) =>
+            !selectedTags.includes(key) &&
+            key.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    ),
+  ];
 
   const AddSelectedTags = (event: any, value: string | null) => {
     if (value) {
-      setSelectedTags([
-        ...selectedTags,
-        value
-      ]);
+      setSelectedTags([...selectedTags, value]);
       setSearchQuery("");
     }
   };
 
   const deleteSelectedTags = (value: string) => {
-    setSelectedTags([
-      ...selectedTags.filter((tag: string) => tag !== value)
-    ]);
+    setSelectedTags([...selectedTags.filter((tag: string) => tag !== value)]);
   };
 
   return (
@@ -59,10 +59,15 @@ const HighlightPanel = (props: Props) => {
 
       <div>
         {/* 全解除 */}
-        <Button onClick={() => setSelectedTags([])} variant="outlined" startIcon={<RefreshOutlinedIcon />} sx={{ mb: 2 }}>
+        <Button
+          onClick={() => setSelectedTags([])}
+          variant="outlined"
+          startIcon={<RefreshOutlinedIcon />}
+          sx={{ mb: 2 }}
+        >
           <span className="text-blue">リセット</span>
         </Button>
-        
+
         {/* タグ検索 */}
         <AutoCompleteBox
           searchQuery={searchQuery}
@@ -75,22 +80,23 @@ const HighlightPanel = (props: Props) => {
 
         {/* 選択中のジャンル */}
         <div className="flex flex-wrap mt-2">
-          {selectedTags.map((value: string) => (
-            value && (
-              <span
-                key={value}
-                className="bg-blue-500 text-xs text-white px-3 py-1 rounded-full mr-2 mb-2 flex items-center shadow-lg transition-all duration-200"
-              >
-                {value}
-                <IconButton
-                  onClick={() => deleteSelectedTags(value)}
-                  sx={{ p: 0 }}
+          {selectedTags.map(
+            (value: string) =>
+              value && (
+                <span
+                  key={value}
+                  className="bg-blue-500 text-xs text-white px-3 py-1 rounded-full mr-2 mb-2 flex items-center shadow-lg transition-all duration-200"
                 >
-                  <CancelIcon sx={{ color: "white", fontSize: 14 }} />
-                </IconButton>
-              </span>
-            )
-          ))}
+                  {value}
+                  <IconButton
+                    onClick={() => deleteSelectedTags(value)}
+                    sx={{ p: 0 }}
+                  >
+                    <CancelIcon sx={{ color: "white", fontSize: 14 }} />
+                  </IconButton>
+                </span>
+              )
+          )}
         </div>
       </div>
     </Panel>

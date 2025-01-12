@@ -14,7 +14,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
           ></div>
         </div>
 
-        <div className="text-white text-lg mt-2">{`${progress.toFixed(1)}%`}</div>
+        <div className="text-white text-lg mt-2">{`${progress.toFixed(
+          1
+        )}%`}</div>
       </div>
     </div>
   );

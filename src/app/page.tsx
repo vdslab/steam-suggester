@@ -10,7 +10,9 @@ export default async function Page() {
 
   return (
     <div className="flex flex-col h-screen">
-      <Providers><Network steamListData={steamListData} /></Providers>
+      <Providers>
+        <Network steamListData={steamListData} />
+      </Providers>
     </div>
   );
 }

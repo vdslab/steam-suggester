@@ -59,11 +59,11 @@ const GameSearchPanel = (props: Props) => {
     }
   }, [selectedIndex]);
 
-  const addSelectedTags = (newTag:string) => {
-    if(selectedTags.includes(newTag)) return;
+  const addSelectedTags = (newTag: string) => {
+    if (selectedTags.includes(newTag)) return;
     setSelectedTags([...selectedTags, newTag]);
     setOpenPanel("highlight");
-  }
+  };
 
   return (
     <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 overflow-y-scroll h-full relative">

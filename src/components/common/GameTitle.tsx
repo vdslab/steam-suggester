@@ -1,21 +1,20 @@
-'use client'
+"use client";
 import { DetailsPropsType } from "@/types/DetailsType";
 import Link from "next/link";
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import fetchWithCache from '@/hooks/fetchWithCache';
-import { useState, useEffect } from 'react';
-import { SteamDetailsDataType } from '@/types/api/getSteamDetailType';
-
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import fetchWithCache from "@/hooks/fetchWithCache";
+import { useState, useEffect } from "react";
+import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
 const GameTitle = ({ steamGameId }: DetailsPropsType) => {
-
-  const [ data, setData ] = useState<SteamDetailsDataType | null>(null);
+  const [data, setData] = useState<SteamDetailsDataType | null>(null);
 
   useEffect(() => {
-
     const fetchGameData = async () => {
       try {
-        const data = await fetchWithCache(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`);
+        const data = await fetchWithCache(
+          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${steamGameId}`
+        );
         setData(data);
       } catch (err: any) {
         console.error(err);

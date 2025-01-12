@@ -16,12 +16,14 @@ const GenreFilter = (props: Props) => {
   const { filter, localFilter, setLocalFilter } = props;
 
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [areAllCategoriesSelected, setAreAllCategoriesSelected] = useState<boolean>(false);
+  const [areAllCategoriesSelected, setAreAllCategoriesSelected] =
+    useState<boolean>(false);
 
   // 入力値に基づく候補のフィルタリング
   const selectedList = Object.keys(filter.Genres).filter(
     (key) =>
-      !localFilter.Genres[key] && key.toLowerCase().includes(searchQuery.toLowerCase())
+      !localFilter.Genres[key] &&
+      key.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // ジャンルの選択の追加
@@ -48,11 +50,9 @@ const GenreFilter = (props: Props) => {
     });
     setAreAllCategoriesSelected(newStatus);
   };
-  
 
   return (
     <Section title="ジャンル" icon={<CategoryIcon />}>
-
       {/* 全選択 */}
       <div className="flex items-center mb-2">
         <input
@@ -62,7 +62,12 @@ const GenreFilter = (props: Props) => {
           checked={areAllCategoriesSelected}
           onChange={handleMasterCheckboxChange}
         />
-        <label htmlFor="master-checkbox" className="select-none cursor-pointer ml-2 text-white">全選択</label>
+        <label
+          htmlFor="master-checkbox"
+          className="select-none cursor-pointer ml-2 text-white"
+        >
+          全選択
+        </label>
       </div>
 
       <AutoCompleteBox
@@ -76,27 +81,28 @@ const GenreFilter = (props: Props) => {
 
       {/* 選択中のジャンル */}
       <div className="flex flex-wrap mt-2">
-        {Object.entries(localFilter.Genres).map(([key, value]) => (
-          value && (
-            <span
-              key={key}
-              className="bg-blue-500 text-xs text-white px-3 py-1 rounded-full mr-2 mb-2 flex items-center shadow-lg transition-all duration-200"
-            >
-              {key}
-              <IconButton
-                onClick={() =>
-                  setLocalFilter({
-                    ...localFilter,
-                    Genres: { ...localFilter.Genres, [key]: false },
-                  })
-                }
-                sx={{ p: 0 }}
+        {Object.entries(localFilter.Genres).map(
+          ([key, value]) =>
+            value && (
+              <span
+                key={key}
+                className="bg-blue-500 text-xs text-white px-3 py-1 rounded-full mr-2 mb-2 flex items-center shadow-lg transition-all duration-200"
               >
-                <CancelIcon sx={{ color: "white", fontSize: 14 }} />
-              </IconButton>
-            </span>
-          )
-        ))}
+                {key}
+                <IconButton
+                  onClick={() =>
+                    setLocalFilter({
+                      ...localFilter,
+                      Genres: { ...localFilter.Genres, [key]: false },
+                    })
+                  }
+                  sx={{ p: 0 }}
+                >
+                  <CancelIcon sx={{ color: "white", fontSize: 14 }} />
+                </IconButton>
+              </span>
+            )
+        )}
       </div>
     </Section>
   );

@@ -56,7 +56,9 @@ export async function GET(req: Request, { params }: Params) {
     const gameDetailData = result.rows[0];
 
     let similarGames: string[] = [];
-    similarGames = [...new Set(gameDetailData.similar_games["released"] as string[])];
+    similarGames = [
+      ...new Set(gameDetailData.similar_games["released"] as string[]),
+    ];
 
     const formattedResult: SteamDetailsDataType = {
       // マッチ度で使用
@@ -89,12 +91,15 @@ export async function GET(req: Request, { params }: Params) {
       story: gameDetailData.story,
       music: gameDetailData.music,
       similarGames: similarGames,
-      featureVector: gameDetailData.feature_vector || []
+      featureVector: gameDetailData.feature_vector || [],
     };
 
     return NextResponse.json(formattedResult);
   } catch (error) {
     console.error("Error fetching game details:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

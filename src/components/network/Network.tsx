@@ -15,11 +15,7 @@ import {
   SteamListType,
   StreamerListType,
 } from "@/types/NetworkType";
-import {
-  getFilterData,
-  getGameIdData,
-  getSliderData,
-} from "@/hooks/indexedDB";
+import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
 import Sidebar from "./Sidebar";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./Panel";
@@ -39,7 +35,6 @@ import { fetcher } from "../common/Fetcher";
 import useSWR from "swr";
 import SearchGames from "../SearchGames/SearchGames";
 
-
 type Props = {
   steamListData: SteamListType[];
 };
@@ -47,7 +42,10 @@ type Props = {
 const Network = (props: Props) => {
   const { steamListData } = props;
 
-  const { data: steamAllData, error } = useSWR<SteamDetailsDataType[]>(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`, fetcher);
+  const { data: steamAllData, error } = useSWR<SteamDetailsDataType[]>(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
+    fetcher
+  );
 
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
   const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
@@ -80,12 +78,7 @@ const Network = (props: Props) => {
     gameIds: string[],
     slider: SliderSettings
   ) => {
-    const result = await createNetwork(
-      steamAllData,
-      filter,
-      gameIds,
-      slider
-    );
+    const result = await createNetwork(steamAllData, filter, gameIds, slider);
     const nodes = result?.nodes ?? [];
     const links = result?.links ?? [];
     const buffNodes = nodes.concat();
@@ -93,7 +86,9 @@ const Network = (props: Props) => {
       (node1: NodeType, node2: NodeType) =>
         (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
     );
-    const index = buffNodes.findIndex((node: NodeType) => node.steamGameId === prevAddedGameId);
+    const index = buffNodes.findIndex(
+      (node: NodeType) => node.steamGameId === prevAddedGameId
+    );
     if (buffNodes.length > 0 && index === -1) {
       setCenterX((buffNodes[0]?.x ?? 0) - 150);
       setCenterY((buffNodes[0]?.y ?? 0) + 100);
@@ -163,7 +158,6 @@ const Network = (props: Props) => {
       setUserAddedGames(res ?? []);
     })();
   }, []);
-
 
   if (isNetworkLoading || !steamAllData) {
     return <Loading />;
@@ -329,10 +323,7 @@ const Network = (props: Props) => {
               : "hidden"
           }`}
         >
-          <SteamList
-            nodes={nodes}
-            setSelectedIndex={setSelectedIndex}
-          />
+          <SteamList nodes={nodes} setSelectedIndex={setSelectedIndex} />
         </div>
 
         {/* ランキングパネル */}

@@ -1,30 +1,33 @@
-'use client';
-import React, { useRef, useState, useMemo, useEffect } from 'react';
-import { Brush } from '@visx/brush';
-import { Bounds } from '@visx/brush/lib/types';
-import BaseBrush, { BaseBrushState, UpdateBrush } from '@visx/brush/lib/BaseBrush';
-import { PatternLines } from '@visx/pattern';
-import { Group } from '@visx/group';
-import { LinearGradient } from '@visx/gradient';
-import { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle';
-import AreaChart from './AreaChat';
-import { GetTwitchAllReviewsResponse } from '@/types/api/getTwitchAllReviewsType';
-import useSWR from 'swr';
-import { fetcher } from '../common/Fetcher';
-import CircularProgress from '@mui/material/CircularProgress';
-import useBrushScales from '@/hooks/useBrushScales';
+"use client";
+import React, { useRef, useState, useMemo, useEffect } from "react";
+import { Brush } from "@visx/brush";
+import { Bounds } from "@visx/brush/lib/types";
+import BaseBrush, {
+  BaseBrushState,
+  UpdateBrush,
+} from "@visx/brush/lib/BaseBrush";
+import { PatternLines } from "@visx/pattern";
+import { Group } from "@visx/group";
+import { LinearGradient } from "@visx/gradient";
+import { BrushHandleRenderProps } from "@visx/brush/lib/BrushHandle";
+import AreaChart from "./AreaChat";
+import { GetTwitchAllReviewsResponse } from "@/types/api/getTwitchAllReviewsType";
+import useSWR from "swr";
+import { fetcher } from "../common/Fetcher";
+import CircularProgress from "@mui/material/CircularProgress";
+import useBrushScales from "@/hooks/useBrushScales";
 
 // Initialize some variables
 const brushMargin = { top: 10, bottom: 15, left: 80, right: 20 };
 const chartSeparation = 30;
-const PATTERN_ID = 'brush_pattern3';
-const GRADIENT_ID = 'brush_gradient3';
-export const accentColor = '#262d97'; //ブラシのパターンの色
-export const background = '#6441a5'; //グラフの背景色
-export const background2 = '#b39cd2'; //グラフの塗りつぶし色
+const PATTERN_ID = "brush_pattern3";
+const GRADIENT_ID = "brush_gradient3";
+export const accentColor = "#262d97"; //ブラシのパターンの色
+export const background = "#6441a5"; //グラフの背景色
+export const background2 = "#b39cd2"; //グラフの塗りつぶし色
 const selectedBrushStyle = {
   fill: `url(#${PATTERN_ID})`,
-  stroke: 'white',
+  stroke: "white",
 };
 const MIN_DATA_LENGTH = 7;
 
@@ -50,10 +53,14 @@ function TwitchViewsBrushChart({
   },
   twitchGameId,
 }: BrushProps) {
+  const { data, error } = useSWR<GetTwitchAllReviewsResponse[]>(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchAllViews/${twitchGameId}`,
+    fetcher
+  );
 
-  const { data, error } = useSWR<GetTwitchAllReviewsResponse[]>(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchAllViews/${twitchGameId}`, fetcher);
-
-  const [filteredStock, setFilteredStock] = useState<GetTwitchAllReviewsResponse[]>([]);
+  const [filteredStock, setFilteredStock] = useState<
+    GetTwitchAllReviewsResponse[]
+  >([]);
   const brushRef = useRef<BaseBrush | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -64,7 +71,7 @@ function TwitchViewsBrushChart({
     if (data) {
       setFilteredStock(data);
     }
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       // モバイル端末を判定
       setIsMobile(/Mobi|Android/i.test(window.navigator.userAgent));
     }
@@ -74,14 +81,17 @@ function TwitchViewsBrushChart({
     if (!domain) return;
 
     // モバイルデバイスではスクロールを防ぐ
-    window.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+    window.addEventListener("touchmove", (e) => e.preventDefault(), {
+      passive: false,
+    });
 
     const { x0, x1, y0, y1 } = domain;
-    const stockCopy = data?.filter((s) => {
-      const x = getDate(s).getTime();
-      const y = getStockValue(s);
-      return x > x0 && x < x1 && y > y0 && y < y1;
-    }) || [];
+    const stockCopy =
+      data?.filter((s) => {
+        const x = getDate(s).getTime();
+        const y = getStockValue(s);
+        return x > x0 && x < x1 && y > y0 && y < y1;
+      }) || [];
     setFilteredStock(stockCopy);
   };
 
@@ -94,10 +104,28 @@ function TwitchViewsBrushChart({
   const xMax = Math.max(width - margin.left - margin.right, 0);
   const yMax = Math.max(topChartHeight, 0);
   const xBrushMax = Math.max(width - brushMargin.left - brushMargin.right, 0);
-  const yBrushMax = Math.max(bottomChartHeight - brushMargin.top - brushMargin.bottom, 0);
+  const yBrushMax = Math.max(
+    bottomChartHeight - brushMargin.top - brushMargin.bottom,
+    0
+  );
 
   // scales
-  const { dateScale, stockScale, brushDateScale, brushStockScale, initialBrushPosition } = useBrushScales({ data, filteredStock, xMax, yMax, xBrushMax, yBrushMax, getDate, getStockValue });
+  const {
+    dateScale,
+    stockScale,
+    brushDateScale,
+    brushStockScale,
+    initialBrushPosition,
+  } = useBrushScales({
+    data,
+    filteredStock,
+    xMax,
+    yMax,
+    xBrushMax,
+    yBrushMax,
+    getDate,
+    getStockValue,
+  });
 
   const handleClearClick = () => {
     if (brushRef?.current) {
@@ -111,7 +139,7 @@ function TwitchViewsBrushChart({
       const updater: UpdateBrush = (prevBrush) => {
         const newExtent = brushRef.current!.getExtent(
           initialBrushPosition.start,
-          initialBrushPosition.end,
+          initialBrushPosition.end
         );
 
         const newState: BaseBrushState = {
@@ -146,8 +174,20 @@ function TwitchViewsBrushChart({
   return (
     <div>
       <svg width={width} height={height}>
-        <LinearGradient id={GRADIENT_ID} from={background} to={background2} rotate={45} />
-        <rect x={0} y={0} width={width} height={height} fill={`url(#${GRADIENT_ID})`} rx={14} />
+        <LinearGradient
+          id={GRADIENT_ID}
+          from={background}
+          to={background2}
+          rotate={45}
+        />
+        <rect
+          x={0}
+          y={0}
+          width={width}
+          height={height}
+          fill={`url(#${GRADIENT_ID})`}
+          rx={14}
+        />
         <AreaChart
           data={filteredStock}
           width={width}
@@ -179,7 +219,7 @@ function TwitchViewsBrushChart({
             width={8}
             stroke={accentColor}
             strokeWidth={1}
-            orientation={['diagonal']}
+            orientation={["diagonal"]}
           />
           <Brush
             xScale={brushDateScale}
@@ -189,7 +229,7 @@ function TwitchViewsBrushChart({
             margin={brushMargin}
             handleSize={8}
             innerRef={brushRef}
-            resizeTriggerAreas={['left', 'right']}
+            resizeTriggerAreas={["left", "right"]}
             brushDirection="horizontal"
             initialBrushPosition={initialBrushPosition}
             onChange={onBrushChange}
@@ -220,7 +260,7 @@ function BrushHandle({ x, height, isBrushActive }: BrushHandleRenderProps) {
         d="M -4.5 0.5 L 3.5 0.5 L 3.5 15.5 L -4.5 15.5 L -4.5 0.5 M -1.5 4 L -1.5 12 M 0.5 4 L 0.5 12"
         stroke="#999999"
         strokeWidth="1"
-        style={{ cursor: 'ew-resize' }}
+        style={{ cursor: "ew-resize" }}
       />
     </Group>
   );

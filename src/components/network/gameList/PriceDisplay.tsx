@@ -1,9 +1,10 @@
-import { NodeType } from "@/types/NetworkType"
+import { NodeType } from "@/types/NetworkType";
 
 const PriceDisplay = ({ node }: { node: NodeType }) => {
   return (
     <>
-      <strong>価格:</strong> {node.price ? (
+      <strong>価格:</strong>{" "}
+      {node.price ? (
         Number(node.salePrice) !== Number(node.price) ? (
           <span className="flex items-center space-x-2">
             <s className="text-gray-400">{`${node.price}円`}</s>
@@ -16,7 +17,7 @@ const PriceDisplay = ({ node }: { node: NodeType }) => {
         <span className="text-green-500">無料</span>
       )}
     </>
-  )
-}
+  );
+};
 
-export default PriceDisplay
+export default PriceDisplay;

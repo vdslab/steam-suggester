@@ -10,7 +10,10 @@ type Props = {
 const HelpTooltip: React.FC<Props> = ({ title, className }) => {
   return (
     <Tooltip title={title} arrow>
-      <HelpOutlineIcon className={`text-gray-400 ml-2 ${className}`} style={{ cursor: "pointer" }} />
+      <HelpOutlineIcon
+        className={`text-gray-400 ml-2 ${className}`}
+        style={{ cursor: "pointer" }}
+      />
     </Tooltip>
   );
 };

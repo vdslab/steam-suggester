@@ -18,10 +18,10 @@ export type SteamDetailsDataType = {
   salePrice: string;
   playTime: string;
   review: {
-    "name": string,
-    "score": number,
-    "tfidf": number,
-   }[];
+    name: string;
+    score: number;
+    tfidf: number;
+  }[];
   difficulty: number;
   graphics: number;
   story: number;
@@ -29,7 +29,7 @@ export type SteamDetailsDataType = {
 
   similarGames: string[];
   featureVector: number[];
-}
+};
 
 export type SteamDetailApiType = {
   type: string;
@@ -74,90 +74,87 @@ export type SteamDetailApiType = {
 };
 
 export type SteamCategoryType = {
-  id: number,
-  description: string
-}
+  id: number;
+  description: string;
+};
 
 export type SteamDeviceType = {
-  windows: boolean,
-  mac: boolean,
-  linux?: boolean
-}
+  windows: boolean;
+  mac: boolean;
+  linux?: boolean;
+};
 
 export type SteamPackageGroupType = {
-  name: string,
-  title: string,
-  description: string,
-  selection_text: string,
-  save_text: string,
-  display_type: number,
-  is_recurring_subscription: string,
+  name: string;
+  title: string;
+  description: string;
+  selection_text: string;
+  save_text: string;
+  display_type: number;
+  is_recurring_subscription: string;
   subs: {
-    packageid: number,
-    percent_savings_text: string,
-    percent_savings: number,
-    option_text: string,
-    option_description: string,
-    can_get_free_license: string,
-    is_free_license: boolean,
-    price_in_cents_with_discount: number
-  }[]
-}
+    packageid: number;
+    percent_savings_text: string;
+    percent_savings: number;
+    option_text: string;
+    option_description: string;
+    can_get_free_license: string;
+    is_free_license: boolean;
+    price_in_cents_with_discount: number;
+  }[];
+};
 
 export type SteamPriceOverviewType = {
-  currency: string,
-  initial: number,
-  final: number,
-  discount_percent: number
-}
-
-
-
+  currency: string;
+  initial: number;
+  final: number;
+  discount_percent: number;
+};
 
 // 使用してない型
 type SteamPcRequestType = {
-  minimum: string,
-  recommended: string
-}
+  minimum: string;
+  recommended: string;
+};
 type SteamMetacriticType = {
-  score: number,
-  url: string
-}
+  score: number;
+  url: string;
+};
 type SteamScreenshotType = {
-  id: number,
-  path_thumbnail: string,
-  path_full: string
-}
+  id: number;
+  path_thumbnail: string;
+  path_full: string;
+};
 type SteamMoviesType = {
-  id: number,
-  name: string,
-  thumbnail: string,
+  id: number;
+  name: string;
+  thumbnail: string;
   webm: {
-    "480": string,
-    max: string
-  },
-  highlight: boolean
-}
+    "480": string;
+    max: string;
+  };
+  highlight: boolean;
+};
 type SteamAchievementType = {
-  total: number,
+  total: number;
   highlighted: {
-    name: string,
-    path: string
-  }[]
-}
+    name: string;
+    path: string;
+  }[];
+};
 type SteamReleaseDateType = {
-  coming_soon: boolean,
-  date: string
-}
+  coming_soon: boolean;
+  date: string;
+};
 type SteamSupportInfoType = {
-  url: string,
-  email: string
-}
+  url: string;
+  email: string;
+};
 type SteamContentDescriptorType = {
-  ids: number[],
-  notes: string
-}
+  ids: number[];
+  notes: string;
+};
 type SteamRatingType = {
-  id: number,
-  percent: number
-}
+  id: number;
+  percent: number;
+};

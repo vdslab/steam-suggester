@@ -1,14 +1,14 @@
 import { SteamListType } from "@/types/NetworkType";
 
 type Props = {
-  game:SteamListType;
+  game: SteamListType;
   handleSelectGame?: (game: SteamListType) => void;
   handleAddGame?: (steamGameId: string) => void;
   handleDeleteGame?: (steamGameId: string) => void;
   setIsFocused: React.Dispatch<React.SetStateAction<boolean>>;
   startIcon: any;
   endIcon?: any;
-}
+};
 
 const SearchItemManager = ({
   game,
@@ -18,8 +18,7 @@ const SearchItemManager = ({
   setIsFocused,
   startIcon,
   endIcon,
-}:Props) => {
-
+}: Props) => {
   return (
     <div className="flex items-center justify-between">
       <div
@@ -53,7 +52,7 @@ const SearchItemManager = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default SearchItemManager
+export default SearchItemManager;

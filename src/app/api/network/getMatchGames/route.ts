@@ -12,8 +12,8 @@ export async function GET() {
     const startDate = new Date(today);
     startDate.setDate(startDate.getDate() - 7);
 
-    const endDateString = endDate.toISOString().split('T')[0];
-    const startDateString = startDate.toISOString().split('T')[0];
+    const endDateString = endDate.toISOString().split("T")[0];
+    const startDateString = startDate.toISOString().split("T")[0];
 
     const query = `
       SELECT 
@@ -65,10 +65,14 @@ export async function GET() {
     `;
 
     // クエリ実行時のパラメータ
-    const { rows } = await PG_POOL.query(query, [startDateString, endDateString, COUNT]);
+    const { rows } = await PG_POOL.query(query, [
+      startDateString,
+      endDateString,
+      COUNT,
+    ]);
 
     // クエリ結果をマッピング
-    const result = rows.map(item => {
+    const result = rows.map((item) => {
       let similarGames: string[] = [];
       similarGames = [...new Set(item.similar_games["released"] as string[])];
 
@@ -105,9 +109,11 @@ export async function GET() {
     });
 
     return NextResponse.json(result);
-
   } catch (error) {
     console.error("Error fetching top games:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

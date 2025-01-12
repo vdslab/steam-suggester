@@ -138,9 +138,12 @@ const SelectParameter: React.FC<Props> = ({
       icon={<FilterListIcon className="mr-2 text-white" />}
     >
       <div className="flex flex-col h-full">
-
-        {/* ジャンルフィルター */}  
-      <GenreFilter filter={filter} localFilter={localFilter} setLocalFilter={setLocalFilter} />
+        {/* ジャンルフィルター */}
+        <GenreFilter
+          filter={filter}
+          localFilter={localFilter}
+          setLocalFilter={setLocalFilter}
+        />
 
         {/* 価格フィルター */}
         <Section title="価格" icon={<AttachMoneyIcon />}>

@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { changeGameIdData } from "@/hooks/indexedDB";
 import { SteamListType, NodeType } from "@/types/NetworkType";
 import SearchItemManager from "./SearchItemManager";
 
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { IconButton } from "@mui/material";
@@ -20,20 +19,20 @@ type SearchGamesProps = {
   setPrevAddedGameId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-
 const SearchGames = ({
-    setSelectedIndex,
-    userAddedGames,
-    setUserAddedGames,
-    nodes,
-    setIsNetworkLoading,
-    steamListData,
-    openPanel,
-    setPrevAddedGameId
+  setSelectedIndex,
+  userAddedGames,
+  setUserAddedGames,
+  nodes,
+  setIsNetworkLoading,
+  steamListData,
+  openPanel,
+  setPrevAddedGameId,
 }: SearchGamesProps) => {
-
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
+  const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>(
+    []
+  );
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
   // 外部クリックを検出してフォーカスを解除
@@ -66,13 +65,14 @@ const SearchGames = ({
     );
 
     allSteamList.push(
-      ...steamListData.filter(
-        (item1: SteamListType) =>
-          !allSteamList.find(
-            (item2: SteamListType) => item2.steamGameId === item1.steamGameId
-          )
-      )
-      .filter((game) => game.title !== "Apex")
+      ...steamListData
+        .filter(
+          (item1: SteamListType) =>
+            !allSteamList.find(
+              (item2: SteamListType) => item2.steamGameId === item1.steamGameId
+            )
+        )
+        .filter((game) => game.title !== "Apex")
     );
 
     const filteredSteam = allSteamList
@@ -86,7 +86,7 @@ const SearchGames = ({
   }, [searchQuery, userAddedGames, nodes, steamListData]);
 
   // ゲームを追加する処理
-  const handleGameAdd= (steamGameId: string) => {
+  const handleGameAdd = (steamGameId: string) => {
     if (
       !userAddedGames.includes(steamGameId) &&
       !nodes.some((node: NodeType) => node.steamGameId === steamGameId)
@@ -101,7 +101,6 @@ const SearchGames = ({
     }
   };
 
-  
   // ゲームを削除する処理
   const handleGameDelete = (steamGameId: string) => {
     const newUserAddedGames = userAddedGames.filter(
@@ -121,8 +120,7 @@ const SearchGames = ({
       setSearchQuery(game.title);
       setIsFocused(false);
     }
-  }
-
+  };
 
   return (
     <div
@@ -142,9 +140,7 @@ const SearchGames = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
             className={`w-full p-2 pl-8 text-black border-2 border-gray-200 focus:outline-none transition duration-300 ease-in-out ${
-              isFocused &&
-              searchQuery !== "" &&
-              filteredSteamList.length > 0
+              isFocused && searchQuery !== "" && filteredSteamList.length > 0
                 ? "rounded-t-lg"
                 : "rounded-lg"
             }`}
@@ -169,36 +165,40 @@ const SearchGames = ({
         )}
 
         {/* ゲーム追加候補表示 */}
-        {isFocused &&
-          searchQuery !== "" &&
-          filteredSteamList.length > 0 && (
-            <div className="bg-white text-black rounded-b-lg max-h-60 overflow-y-auto cursor-pointer">
-              {filteredSteamList.map((game:SteamListType) => (
-                <div key={"filteredSteamList" + game.steamGameId}>
-                  {typeof game.index === "number" ? (
-                    <SearchItemManager
-                      game={game}
-                      handleSelectGame={handleGameSelect}
-                      handleDeleteGame={handleGameDelete}
-                      setIsFocused={setIsFocused}
-                      startIcon={`${game.index + 1}位`}
-                      endIcon={userAddedGames.includes(game.steamGameId) ? <IconButton><DeleteForeverOutlinedIcon /></IconButton> : null}
-                    />
-                  ) : (
-                    <SearchItemManager
-                      game={game}
-                      handleAddGame={handleGameAdd}
-                      setIsFocused={setIsFocused}
-                      startIcon={<PlaylistAddIcon />}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+        {isFocused && searchQuery !== "" && filteredSteamList.length > 0 && (
+          <div className="bg-white text-black rounded-b-lg max-h-60 overflow-y-auto cursor-pointer">
+            {filteredSteamList.map((game: SteamListType) => (
+              <div key={"filteredSteamList" + game.steamGameId}>
+                {typeof game.index === "number" ? (
+                  <SearchItemManager
+                    game={game}
+                    handleSelectGame={handleGameSelect}
+                    handleDeleteGame={handleGameDelete}
+                    setIsFocused={setIsFocused}
+                    startIcon={`${game.index + 1}位`}
+                    endIcon={
+                      userAddedGames.includes(game.steamGameId) ? (
+                        <IconButton>
+                          <DeleteForeverOutlinedIcon />
+                        </IconButton>
+                      ) : null
+                    }
+                  />
+                ) : (
+                  <SearchItemManager
+                    game={game}
+                    handleAddGame={handleGameAdd}
+                    setIsFocused={setIsFocused}
+                    startIcon={<PlaylistAddIcon />}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SearchGames
+export default SearchGames;
