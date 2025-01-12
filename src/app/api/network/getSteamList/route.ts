@@ -13,12 +13,11 @@ export async function GET() {
     const result: SteamListType[] = rows.map((data) => {
       return {
         steamGameId: data.steam_game_id,
-        title: data.game_title
-      }
+        title: data.game_title,
+      };
     });
 
     return NextResponse.json(result);
-
   } catch (error) {
     console.error("Error fetching top games:", error);
     return NextResponse.error();

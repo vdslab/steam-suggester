@@ -4,4 +4,4 @@ export type GetTwitchAllReviewsResponse = {
   game_title?: string;
   twitch_id?: string;
   steam_id?: string;
-}
+};

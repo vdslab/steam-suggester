@@ -70,10 +70,16 @@ export async function GET(req: Request, { params }: Params) {
   try {
     // チャンネル情報取得
     const channelRes = await fetch(
-      `${YOUTUBE_API_BASE}/channels?part=snippet,contentDetails&id=${encodeURIComponent(userId)}&key=${apiKey}`
+      `${YOUTUBE_API_BASE}/channels?part=snippet,contentDetails&id=${encodeURIComponent(
+        userId
+      )}&key=${apiKey}`
     );
     if (!channelRes.ok) {
-      console.error("Error fetching channel data:", channelRes.status, await channelRes.text());
+      console.error(
+        "Error fetching channel data:",
+        channelRes.status,
+        await channelRes.text()
+      );
       return NextResponse.error();
     }
 
@@ -90,18 +96,26 @@ export async function GET(req: Request, { params }: Params) {
     const thumbnail = channel.snippet.thumbnails.default.url;
     const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
 
-
     if (!uploadsPlaylistId) {
       console.error("Uploads playlist ID not found");
-      return NextResponse.json({ error: "Uploads playlist ID not found" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Uploads playlist ID not found" },
+        { status: 500 }
+      );
     }
 
     // 現在配信中の情報を取得
     const liveStreamRes = await fetch(
-      `${YOUTUBE_API_BASE}/search?part=snippet&channelId=${encodeURIComponent(userId)}&eventType=live&type=video&key=${apiKey}`
+      `${YOUTUBE_API_BASE}/search?part=snippet&channelId=${encodeURIComponent(
+        userId
+      )}&eventType=live&type=video&key=${apiKey}`
     );
     if (!liveStreamRes.ok) {
-      console.error("Error fetching live stream data:", liveStreamRes.status, await liveStreamRes.text());
+      console.error(
+        "Error fetching live stream data:",
+        liveStreamRes.status,
+        await liveStreamRes.text()
+      );
       return NextResponse.error();
     }
 
@@ -115,10 +129,16 @@ export async function GET(req: Request, { params }: Params) {
       if (liveVideoId) {
         // 動画の詳細情報を取得
         const liveVideoRes = await fetch(
-          `${YOUTUBE_API_BASE}/videos?part=snippet&id=${encodeURIComponent(liveVideoId)}&key=${apiKey}`
+          `${YOUTUBE_API_BASE}/videos?part=snippet&id=${encodeURIComponent(
+            liveVideoId
+          )}&key=${apiKey}`
         );
         if (!liveVideoRes.ok) {
-          console.error("Error fetching live video details:", liveVideoRes.status, await liveVideoRes.text());
+          console.error(
+            "Error fetching live video details:",
+            liveVideoRes.status,
+            await liveVideoRes.text()
+          );
           return NextResponse.error();
         }
 
@@ -130,7 +150,9 @@ export async function GET(req: Request, { params }: Params) {
           // ゲームカテゴリ名を取得
           if (categoryId) {
             const categoryRes = await fetch(
-              `${YOUTUBE_API_BASE}/videoCategories?part=snippet&id=${encodeURIComponent(categoryId)}&key=${apiKey}`
+              `${YOUTUBE_API_BASE}/videoCategories?part=snippet&id=${encodeURIComponent(
+                categoryId
+              )}&key=${apiKey}`
             );
             if (categoryRes.ok) {
               const categoryData = await categoryRes.json();
@@ -139,7 +161,11 @@ export async function GET(req: Request, { params }: Params) {
                 currentStreamGames.add(categoryName);
               }
             } else {
-              console.warn("Error fetching category data:", categoryRes.status, await categoryRes.text());
+              console.warn(
+                "Error fetching category data:",
+                categoryRes.status,
+                await categoryRes.text()
+              );
             }
           }
         }
@@ -166,7 +192,11 @@ export async function GET(req: Request, { params }: Params) {
 
       const videosRes = await fetch(playlistItemsUrl);
       if (!videosRes.ok) {
-        console.error("Error fetching videos data:", videosRes.status, await videosRes.text());
+        console.error(
+          "Error fetching videos data:",
+          videosRes.status,
+          await videosRes.text()
+        );
         return NextResponse.error();
       }
 
@@ -174,7 +204,10 @@ export async function GET(req: Request, { params }: Params) {
 
       if (!videosData.items || !Array.isArray(videosData.items)) {
         console.error("Invalid videos data structure");
-        return NextResponse.json({ error: "Invalid videos data structure" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Invalid videos data structure" },
+          { status: 500 }
+        );
       }
 
       const videoIds = videosData.items
@@ -185,10 +218,16 @@ export async function GET(req: Request, { params }: Params) {
       if (videoIds) {
         // 動画ごとの詳細情報を取得
         const detailsRes = await fetch(
-          `${YOUTUBE_API_BASE}/videos?part=snippet&id=${encodeURIComponent(videoIds)}&key=${apiKey}`
+          `${YOUTUBE_API_BASE}/videos?part=snippet&id=${encodeURIComponent(
+            videoIds
+          )}&key=${apiKey}`
         );
         if (!detailsRes.ok) {
-          console.error("Error fetching video details:", detailsRes.status, await detailsRes.text());
+          console.error(
+            "Error fetching video details:",
+            detailsRes.status,
+            await detailsRes.text()
+          );
           return NextResponse.error();
         }
 
@@ -207,18 +246,20 @@ export async function GET(req: Request, { params }: Params) {
       name: streamerName,
       id: streamerId,
       customUrl: customUrl,
-      platform: 'youtube',
-      color: 'defaultColor',
-      thumbnail: thumbnail || 'default',
-      viewer_count: 'default',
+      platform: "youtube",
+      color: "defaultColor",
+      thumbnail: thumbnail || "default",
+      viewer_count: "default",
       streamId: Array.from(currentStreamGames),
       videoId: Array.from(pastVideosGames),
     };
 
-
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching YouTube data:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

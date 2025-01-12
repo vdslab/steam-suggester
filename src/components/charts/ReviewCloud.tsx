@@ -1,11 +1,11 @@
-'use client';
+"use client";
 import { Suspense, useEffect, useState } from "react";
 import { scaleLog } from "@visx/scale";
 import Wordcloud from "@visx/wordcloud/lib/Wordcloud";
 import { Text } from "@visx/text";
 import { useScreenSize } from "@visx/responsive";
 import { CircularProgress } from "@mui/material";
-import d3Cloud from 'd3-cloud';
+import d3Cloud from "d3-cloud";
 
 type Props = {
   reviewData: {
@@ -18,10 +18,10 @@ type Props = {
 type WordData = {
   text: string;
   value: number;
-  score: number;  // スコアを追加
+  score: number; // スコアを追加
 };
 
-const getColorByScore = (score: number) => {
+export const getColorByScore = (score: number) => {
   // スコアが1のときに青、-1のときに赤になるように補完
   const blue = "#4a90e2";
   const red = "#d14b56";
@@ -39,14 +39,19 @@ const getColorByScore = (score: number) => {
   const blueRGBNew2 = parseInt(blue.slice(5, 7), 16);
 
   // 赤と青の間で線形補完
-  const r = Math.round(redRGB + ratio * (blueRGBNew - redRGB)).toString(16).padStart(2, "0");
-  const g = Math.round(greenRGB + ratio * (greenRGBNew - greenRGB)).toString(16).padStart(2, "0");
-  const b = Math.round(blueRGB + ratio * (blueRGBNew2 - blueRGB)).toString(16).padStart(2, "0");
+  const r = Math.round(redRGB + ratio * (blueRGBNew - redRGB))
+    .toString(16)
+    .padStart(2, "0");
+  const g = Math.round(greenRGB + ratio * (greenRGBNew - greenRGB))
+    .toString(16)
+    .padStart(2, "0");
+  const b = Math.round(blueRGB + ratio * (blueRGBNew2 - blueRGB))
+    .toString(16)
+    .padStart(2, "0");
 
   // 変換したRGB値を使って色を作成
   return `#${r}${g}${b}`;
 };
-
 
 // 固定値ジェネレータ
 const fixedValueGenerator = () => 0.5;
@@ -75,7 +80,10 @@ const ReviewCloud = (props: Props) => {
   }, [reviewData]);
 
   const fontScale = scaleLog({
-    domain: [Math.min(...words.map((w) => w.value)), Math.max(...words.map((w) => w.value))],
+    domain: [
+      Math.min(...words.map((w) => w.value)),
+      Math.max(...words.map((w) => w.value)),
+    ],
     range: [10, 100],
   });
 
@@ -97,8 +105,8 @@ const ReviewCloud = (props: Props) => {
         random={fixedValueGenerator}
       >
         {(cloudWords) =>
-          cloudWords.map((w:d3Cloud.Word) => {
-            const wordData = words.find(word => word.text === w.text);
+          cloudWords.map((w: d3Cloud.Word) => {
+            const wordData = words.find((word) => word.text === w.text);
             return (
               <Text
                 key={w.text}

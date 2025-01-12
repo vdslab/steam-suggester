@@ -1,54 +1,54 @@
 type Friends = {
-  steamid: string,
-  relationship: string,
-  friend_since: number
+  steamid: string;
+  relationship: string;
+  friend_since: number;
 };
 
 type GetFriendListResponse = {
   friendslist: {
-    friends: Friends[]
-  }
+    friends: Friends[];
+  };
 };
 
 type GetOwnedGamesResponse = {
   response: {
-    game_count: number,
-    games: FriendsGames[]
-  }
+    game_count: number;
+    games: FriendsGames[];
+  };
 };
 
 type FriendsGames = {
-  appid: string,
-  playtime_forever: number,
+  appid: string;
+  playtime_forever: number;
 };
 
 type GetFriendGamesResponse = {
   friends: {
-    name: string,
-    avatar: string
-  }[],
-  gameName: string
+    name: string;
+    avatar: string;
+  }[];
+  gameName: string;
 };
 
 type GetPlayerSummariesResponse = {
   response: {
-    players: Player[]
-  }
+    players: Player[];
+  };
 };
 
 type Player = {
-  steamid: string,
-  communityvisibilitystate: number,
-  profilestate: number,
-  personaname: string,
-  profileurl: string,
-  avatar: string,
-  avatarmedium: string,
-  avatarfull: string,
-  avatarhash: string,
-  lastlogoff: number,
-  personastate: number,
-  primaryclanid: string,
-  timecreated: number,
-  personastateflags: number
+  steamid: string;
+  communityvisibilitystate: number;
+  profilestate: number;
+  personaname: string;
+  profileurl: string;
+  avatar: string;
+  avatarmedium: string;
+  avatarfull: string;
+  avatarhash: string;
+  lastlogoff: number;
+  personastate: number;
+  primaryclanid: string;
+  timecreated: number;
+  personastateflags: number;
 };

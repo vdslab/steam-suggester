@@ -8,22 +8,22 @@ export type IconType = {
   suggestValue: number;
   isHovered: boolean;
   selectedIndex: number;
-}
+};
 
 export type SteamListType = {
   steamGameId: string;
   title: string;
   index?: number;
-}
+};
 
 export type StreamerListType = {
   name: string;
   id: string;
   customUrl: string;
-  platform: 'twitch' | 'youtube';
+  platform: "twitch" | "youtube";
   color: string;
   thumbnail: string;
-  viewer_count: number | 'default';
+  viewer_count: number | "default";
   streamId: string[];
   videoId: string[];
 };
@@ -56,10 +56,10 @@ export type NodeType = {
   salePrice: string;
   playTime: string;
   review: {
-    "name": string,
-    "score": number,
-    "tfidf": number,
-   }[];
+    name: string;
+    score: number;
+    tfidf: number;
+  }[];
   difficulty: number;
   graphics: number;
   story: number;
@@ -69,18 +69,18 @@ export type NodeType = {
   activeUsers?: number;
   similarGames?: string[];
   featureVector?: number[];
-}
+};
 
 export type LinkType = {
   source: NodeType;
   target: NodeType;
   index?: number;
   distance?: number;
-}
+};
 
 export type SimilarGameType = {
   [key: string]: {
     steamGameId: string;
     twitchGameId: string;
-  }[]
-}
+  }[];
+};

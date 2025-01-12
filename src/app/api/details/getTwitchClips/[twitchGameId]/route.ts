@@ -1,5 +1,9 @@
 import TwitchToken from "@/app/api/TwitchToken";
-import { TwitchClipApiType, TwitchClipDataType, TwitchClipType } from "@/types/api/getTwitchClipType";
+import {
+  TwitchClipApiType,
+  TwitchClipDataType,
+  TwitchClipType,
+} from "@/types/api/getTwitchClipType";
 import { NextResponse } from "next/server";
 
 type Params = {
@@ -16,8 +20,7 @@ export async function GET(req: Request, { params }: Params) {
   // 一ヶ月前の日付を取得
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-  const startedAtRFC3339 = oneMonthAgo.toISOString();// RFC3339形式に変換
-
+  const startedAtRFC3339 = oneMonthAgo.toISOString(); // RFC3339形式に変換
 
   try {
     // TwitchのAPIにアクセスするためのトークンを取得
@@ -26,10 +29,10 @@ export async function GET(req: Request, { params }: Params) {
     // TwitchのAPIにアクセスするためのヘッダーを作成
     const headers = new Headers();
     if (process.env.TWITCH_CLIENT_ID && token) {
-      headers.append('Client-ID', process.env.TWITCH_CLIENT_ID);
-      headers.append('Authorization', `Bearer ${token}`);
+      headers.append("Client-ID", process.env.TWITCH_CLIENT_ID);
+      headers.append("Authorization", `Bearer ${token}`);
     } else {
-      return NextResponse.error()
+      return NextResponse.error();
     }
 
     // 英語のクリップが多すぎるから５０件取得
@@ -38,8 +41,8 @@ export async function GET(req: Request, { params }: Params) {
       {
         headers: headers,
       }
-    )
-    const data:TwitchClipApiType  = await res.json()
+    );
+    const data: TwitchClipApiType = await res.json();
 
     // 同じ配信者のクリップを除外、日本語のクリップを取得、３件に制限
     // 日本語のクリップで3件に満たない場合、英語のクリップを追加
@@ -51,27 +54,32 @@ export async function GET(req: Request, { params }: Params) {
         seenCreatorIds.add(clip.broadcaster_id);
         return true;
       }
-    })
-    const japaneseUniqueClips = uniqueClips.filter((clip: TwitchClipDataType) => clip.language === 'ja');
+    });
+    const japaneseUniqueClips = uniqueClips.filter(
+      (clip: TwitchClipDataType) => clip.language === "ja"
+    );
     const japaneseUniqueClipsLimited = japaneseUniqueClips.slice(0, ClipCount);
-    if(japaneseUniqueClipsLimited.length !== ClipCount) {
-      const englishUniqueClips = uniqueClips.filter((clip: TwitchClipDataType) => clip.language !== 'ja').slice(0, ClipCount-japaneseUniqueClips.length);
+    if (japaneseUniqueClipsLimited.length !== ClipCount) {
+      const englishUniqueClips = uniqueClips
+        .filter((clip: TwitchClipDataType) => clip.language !== "ja")
+        .slice(0, ClipCount - japaneseUniqueClips.length);
       japaneseUniqueClipsLimited.push(...englishUniqueClips);
     }
-    const resultClips:TwitchClipType[] = japaneseUniqueClipsLimited.map((clip: TwitchClipDataType) => {
-      return ({
-        id: clip.id,
-        url: clip.url,
-        embedUrl: clip.embed_url,
-        image: clip.thumbnail_url,
-        title: clip.title,
-      })
-    })
+    const resultClips: TwitchClipType[] = japaneseUniqueClipsLimited.map(
+      (clip: TwitchClipDataType) => {
+        return {
+          id: clip.id,
+          url: clip.url,
+          embedUrl: clip.embed_url,
+          image: clip.thumbnail_url,
+          title: clip.title,
+        };
+      }
+    );
 
-    return NextResponse.json(resultClips)
-
+    return NextResponse.json(resultClips);
   } catch (error) {
-    console.error('Error fetching clips:', error)
-    return NextResponse.error()
+    console.error("Error fetching clips:", error);
+    return NextResponse.error();
   }
 }

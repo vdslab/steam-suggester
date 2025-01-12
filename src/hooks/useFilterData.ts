@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getFilterData } from '@/hooks/indexedDB';
+import { useState, useEffect } from "react";
+import { getFilterData } from "@/hooks/indexedDB";
 
 export function useFilterData() {
   const [filterData, setFilterData] = useState<{
@@ -17,7 +17,9 @@ export function useFilterData() {
       try {
         const data = await getFilterData();
         if (data) {
-          const genres = Object.keys(data.Genres).filter((genre) => data.Genres[genre]);
+          const genres = Object.keys(data.Genres).filter(
+            (genre) => data.Genres[genre]
+          );
           const priceRange = {
             startPrice: data.Price.startPrice,
             endPrice: data.Price.endPrice,
@@ -28,7 +30,9 @@ export function useFilterData() {
           const devices = [];
           if (data.Device.windows) devices.push("Windows");
           if (data.Device.mac) devices.push("Mac");
-          const playtimes = Object.keys(data.Playtime).filter((time) => data.Playtime[time]);
+          const playtimes = Object.keys(data.Playtime).filter(
+            (time) => data.Playtime[time]
+          );
 
           setFilterData({ genres, priceRange, modes, devices, playtimes });
         } else {

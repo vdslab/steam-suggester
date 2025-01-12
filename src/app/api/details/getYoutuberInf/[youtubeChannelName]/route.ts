@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-// import { getCachedData, setCachedData } from "../../../../lib/cache"; 
+// import { getCachedData, setCachedData } from "../../../../lib/cache";
 import { StreamerListType } from "@/types/NetworkType";
 
 const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
@@ -23,10 +23,16 @@ export async function GET(req: Request, { params }: Params) {
   try {
     // 部分一致でチャンネル検索
     const channelRes = await fetch(
-      `${YOUTUBE_API_BASE}/search?part=snippet&type=channel&q=${encodeURIComponent(channelName)}&maxResults=${MAX_RESULTS}&key=${apiKey}`
+      `${YOUTUBE_API_BASE}/search?part=snippet&type=channel&q=${encodeURIComponent(
+        channelName
+      )}&maxResults=${MAX_RESULTS}&key=${apiKey}`
     );
     if (!channelRes.ok) {
-      console.error("Error fetching channel data:", channelRes.status, await channelRes.text());
+      console.error(
+        "Error fetching channel data:",
+        channelRes.status,
+        await channelRes.text()
+      );
       return NextResponse.error();
     }
 
@@ -36,22 +42,26 @@ export async function GET(req: Request, { params }: Params) {
       return NextResponse.json({ error: "No channels found" }, { status: 404 });
     }
 
-    const result: StreamerListType[] = channelData.items.map((channel: any) => ({
-      name: channel.snippet.channelTitle,
-      id: channel.id.channelId,
-      customUrl: 'default',
-      platform: 'youtube',
-      color: 'default',
-      thumbnail: channel.snippet.thumbnails.default.url || "default",
-      viewer_count: 'default',
-      streamId: ['default'],
-      videoId: ['default'],
-    }));
-
+    const result: StreamerListType[] = channelData.items.map(
+      (channel: any) => ({
+        name: channel.snippet.channelTitle,
+        id: channel.id.channelId,
+        customUrl: "default",
+        platform: "youtube",
+        color: "default",
+        thumbnail: channel.snippet.thumbnails.default.url || "default",
+        viewer_count: "default",
+        streamId: ["default"],
+        videoId: ["default"],
+      })
+    );
 
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching YouTube data:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

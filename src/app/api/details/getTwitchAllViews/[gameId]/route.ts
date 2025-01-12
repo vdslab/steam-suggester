@@ -1,6 +1,6 @@
 import { PG_POOL } from "@/constants/PG_POOL";
 import { GetTwitchAllReviewsResponse } from "@/types/api/getTwitchAllReviewsType";
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 type Params = {
   params: {
@@ -9,9 +9,8 @@ type Params = {
 };
 
 export async function GET(req: Request, params: Params) {
-
   const twitch_id = params.params.gameId;
-  
+
   try {
     const client = await PG_POOL.connect();
     const query = `
@@ -32,10 +31,10 @@ export async function GET(req: Request, params: Params) {
     if (result.rows.length === 0) {
       return NextResponse.json([]);
     }
-    
-    const data: GetTwitchAllReviewsResponse[] = result.rows.map(row => ({
+
+    const data: GetTwitchAllReviewsResponse[] = result.rows.map((row) => ({
       get_date: row.get_date,
-      total_views: row.total_views
+      total_views: row.total_views,
     }));
 
     const formatDate = (date: Date) => date.toISOString().split("T")[0];
@@ -54,15 +53,17 @@ export async function GET(req: Request, params: Params) {
 
     // 結果データを構築
     const filledData = allDates.map((date) => {
-      const existing = data.find((item) => formatDate(new Date(item.get_date)) === date);
-      return existing ? existing : { get_date: `${date}T00:00:00.000Z`, total_views: 0 };
+      const existing = data.find(
+        (item) => formatDate(new Date(item.get_date)) === date
+      );
+      return existing
+        ? existing
+        : { get_date: `${date}T00:00:00.000Z`, total_views: 0 };
     });
 
-
-    return NextResponse.json(filledData)
-
+    return NextResponse.json(filledData);
   } catch (error) {
-    console.error('Error fetching twitch views:', error)
-    return NextResponse.error()
+    console.error("Error fetching twitch views:", error);
+    return NextResponse.error();
   }
 }
