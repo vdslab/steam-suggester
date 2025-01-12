@@ -1,19 +1,18 @@
+"use client";
 
-'use client'
-
-import { useEffect } from 'react'
+import { useEffect } from "react";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error
-  reset: () => void
+  error: Error;
+  reset: () => void;
 }) {
   useEffect(() => {
     // エラーログをコンソールに出力
-    console.error(error)
-  }, [error])
+    console.error(error);
+  }, [error]);
 
   return (
     <div>
@@ -21,5 +20,5 @@ export default function Error({
       <p>{error.message}</p>
       <button onClick={() => reset()}>再試行する</button>
     </div>
-  )
+  );
 }

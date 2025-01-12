@@ -1,16 +1,16 @@
 export type Filter = {
-  Genres: { [key: string]: boolean};
-  Price: { startPrice: number, endPrice: number };
+  Genres: { [key: string]: boolean };
+  Price: { startPrice: number; endPrice: number };
   Mode: {
-    isSinglePlayer: boolean,
-    isMultiPlayer: boolean
+    isSinglePlayer: boolean;
+    isMultiPlayer: boolean;
   };
   Device: {
-      windows: boolean,
-      mac: boolean
+    windows: boolean;
+    mac: boolean;
   };
   Playtime: { [key: string]: boolean };
-}
+};
 
 export type SliderSettings = {
   id: string;

@@ -1,24 +1,24 @@
-import React from 'react';
-import { Group } from '@visx/group';
-import { AreaClosed } from '@visx/shape';
-import { AxisLeft, AxisBottom, AxisScale } from '@visx/axis';
-import { LinearGradient } from '@visx/gradient';
-import { curveMonotoneX } from '@visx/curve';
+import React from "react";
+import { Group } from "@visx/group";
+import { AreaClosed } from "@visx/shape";
+import { AxisLeft, AxisBottom, AxisScale } from "@visx/axis";
+import { LinearGradient } from "@visx/gradient";
+import { curveMonotoneX } from "@visx/curve";
 
 // Initialize some variables
-const axisColor = '#fff';
+const axisColor = "#fff";
 const axisBottomTickLabelProps = {
-  textAnchor: 'middle' as const,
-  fontFamily: 'Arial',
+  textAnchor: "middle" as const,
+  fontFamily: "Arial",
   fontSize: 10,
   fill: axisColor,
 };
 const axisLeftTickLabelProps = {
-  dx: '-0.25em',
-  dy: '0.25em',
-  fontFamily: 'Arial',
+  dx: "-0.25em",
+  dy: "0.25em",
+  fontFamily: "Arial",
   fontSize: 10,
-  textAnchor: 'end' as const,
+  textAnchor: "end" as const,
   fill: axisColor,
 };
 
@@ -50,8 +50,8 @@ export default function AreaChart({
   top?: number;
   left?: number;
   children?: React.ReactNode;
-  getDate: (d:any) => Date;
-  getStockValue: (d:any) => number;
+  getDate: (d: any) => Date;
+  getStockValue: (d: any) => number;
 }) {
   if (width < 10) return null;
   return (

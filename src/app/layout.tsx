@@ -6,12 +6,20 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Steam Suggester",
-  description: "TwitchとSteamを組み合わせたゲーム提案を可視化するウェブサイト。最適なゲーム体験を見つけよう！",
-  keywords: ["Steam", "Twitch", "Game Network", "Game Recommendations", "Visualization"],
+  description:
+    "TwitchとSteamを組み合わせたゲーム提案を可視化するウェブサイト。最適なゲーム体験を見つけよう！",
+  keywords: [
+    "Steam",
+    "Twitch",
+    "Game Network",
+    "Game Recommendations",
+    "Visualization",
+  ],
   openGraph: {
     type: "website",
     title: "Steam Suggester",
-    description: "TwitchとSteamを組み合わせたゲーム提案を可視化するウェブサイト。最適なゲーム体験を見つけよう！",
+    description:
+      "TwitchとSteamを組み合わせたゲーム提案を可視化するウェブサイト。最適なゲーム体験を見つけよう！",
     url: process.env.NEXT_PUBLIC_CURRENT_URL,
     siteName: "Steam Suggester",
     locale: "ja_JP",
@@ -22,7 +30,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  
 };
 
 export default function RootLayout({
@@ -32,9 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

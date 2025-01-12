@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { max, extent } from '@visx/vendor/d3-array';
-import { scaleTime, scaleLinear } from '@visx/scale';
+import { max, extent } from "@visx/vendor/d3-array";
+import { scaleTime, scaleLinear } from "@visx/scale";
 
 type Props = {
   data: any;
@@ -27,9 +27,12 @@ const useBrushScales = ({
     () =>
       scaleTime<number>({
         range: [0, xMax],
-        domain: extent(filteredStock, getDate) as [Date, Date] || [new Date(), new Date()],
+        domain: (extent(filteredStock, getDate) as [Date, Date]) || [
+          new Date(),
+          new Date(),
+        ],
       }),
-    [xMax, filteredStock],
+    [xMax, filteredStock]
   );
 
   const stockScale = useMemo(
@@ -39,16 +42,19 @@ const useBrushScales = ({
         domain: [0, max(filteredStock, getStockValue) || 1],
         nice: true,
       }),
-    [yMax, filteredStock],
+    [yMax, filteredStock]
   );
 
   const brushDateScale = useMemo(
     () =>
       scaleTime<number>({
         range: [0, xBrushMax],
-        domain: extent(data || [], getDate) as [Date, Date] || [new Date(), new Date()],
+        domain: (extent(data || [], getDate) as [Date, Date]) || [
+          new Date(),
+          new Date(),
+        ],
       }),
-    [xBrushMax, data],
+    [xBrushMax, data]
   );
 
   const brushStockScale = useMemo(
@@ -58,7 +64,7 @@ const useBrushScales = ({
         domain: [0, max(data || [], getStockValue) || 1],
         nice: true,
       }),
-    [yBrushMax, data],
+    [yBrushMax, data]
   );
 
   const initialBrushPosition = useMemo(() => {

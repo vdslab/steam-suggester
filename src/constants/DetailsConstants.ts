@@ -1,1 +1,1 @@
-export const ISR_FETCH_INTERVAL = 86400
+export const ISR_FETCH_INTERVAL = 86400;

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const useTour = () => {
   const [tourRun, setTourRun] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const hasVisited = localStorage.getItem('hasVisited');
+    if (typeof window !== "undefined") {
+      const hasVisited = localStorage.getItem("hasVisited");
       return !hasVisited;
     }
     return false;
@@ -11,7 +11,7 @@ const useTour = () => {
 
   useEffect(() => {
     if (!tourRun) {
-      localStorage.setItem('hasVisited', 'true');
+      localStorage.setItem("hasVisited", "true");
     }
   }, [tourRun]);
 

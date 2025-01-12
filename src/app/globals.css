@@ -99,3 +99,27 @@ body {
     #a57e65 90% 100%
   );
 }
+
+/* 内側の円が速く回転 */
+@keyframes fastRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 外側の波動のような広がり */
+@keyframes waveExpand {
+  0% {
+    r: 17;
+    opacity: 0.8;
+    stroke-width: 2;
+  }
+  100% {
+    r: 30;
+    opacity: 0;
+    stroke-width: 1;
+  }
+}
