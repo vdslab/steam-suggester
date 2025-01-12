@@ -4,7 +4,6 @@ import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import DeleteIcon from "@mui/icons-material/Delete";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
-import LiveTvIcon from "@mui/icons-material/LiveTv";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonIcon from "@mui/icons-material/Person";
 import { NodeType, StreamerListType } from "@/types/NetworkType";
@@ -14,7 +13,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import Image from "next/image";
-import Panel from "../Panel";
 import Section from "../Section";
 import Button from "@mui/material/Button";
 

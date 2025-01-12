@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Section from "../Section";
 import TuneIcon from "@mui/icons-material/Tune";
-import InfoIcon from "@mui/icons-material/Info";
 
 import { changeSliderData, getSliderData } from "@/hooks/indexedDB";
 import { SliderSettings } from "@/types/api/FilterType";

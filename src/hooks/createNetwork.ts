@@ -93,7 +93,6 @@ const createNetwork = async (
   const similarityMatrix: number[][] = [];
   for (let i = 0; i < nodes.length; i++) {
     similarityMatrix[i] = [];
-    const setA = new Set(nodes[i].tags ?? []);
     for (let j = 0; j < nodes.length; j++) {
       if (
         i === j ||

@@ -1,8 +1,7 @@
-/* GameSearchPanel.tsx */
 "use client";
 
 import { useEffect, useRef } from "react";
-import { NodeType, SteamListType } from "@/types/NetworkType";
+import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
 import HelpTooltip from "../HelpTooltip";
 
@@ -10,7 +9,6 @@ import Tooltip from "@mui/material/Tooltip";
 import Link from "next/link";
 import Popularity from "./Popularity2";
 import ReviewCloud from "../../charts/ReviewCloud";
-import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 
 // Icons
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
@@ -27,8 +25,6 @@ type Props = {
   nodes: NodeType[];
   selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  steamListData: SteamListType[];
   setOpenPanel: React.Dispatch<React.SetStateAction<string | null>>;
   selectedTags: string[];
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
@@ -36,11 +32,9 @@ type Props = {
 
 const GameSearchPanel = (props: Props) => {
   const {
-    steamListData,
     nodes,
     selectedIndex,
     setSelectedIndex,
-    setIsNetworkLoading,
     setOpenPanel,
     selectedTags,
     setSelectedTags,

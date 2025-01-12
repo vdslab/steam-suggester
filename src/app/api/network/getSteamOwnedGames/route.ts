@@ -20,10 +20,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const friendsResponse = await fetch(
+    const ownedGamesResponse = await fetch(
       `http://api.steampowered.com/IPlayerService/GetOwnedGames/v1?key=${apiKey}&steamId=${steamId}`
     );
-    const data: GetOwnedGamesResponse = await friendsResponse.json();
+    const data: GetOwnedGamesResponse = await ownedGamesResponse.json();
     const games = data.response.games;
 
     const client = await PG_POOL.connect();

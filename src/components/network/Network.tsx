@@ -1,4 +1,3 @@
-/* Network.tsx */
 "use client";
 import { useEffect, useState, useRef } from "react";
 import NodeLink from "./NodeLink";
@@ -199,8 +198,6 @@ const Network = (props: Props) => {
               nodes={nodes}
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
-              setIsNetworkLoading={setIsNetworkLoading}
-              steamListData={steamListData}
               setOpenPanel={setOpenPanel}
               selectedTags={selectedTags}
               setSelectedTags={setSelectedTags}

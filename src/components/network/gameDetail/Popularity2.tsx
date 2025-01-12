@@ -1,4 +1,3 @@
-/* Popularity2.tsx */
 "use client";
 import React, { useState, useEffect } from "react";
 import {
@@ -11,9 +10,10 @@ import {
 } from "recharts";
 import { STEAM_COLOR_RANGE, TWITCH_COLOR_RANGE } from "@/constants/STYLES";
 import CircularProgress from "@mui/material/CircularProgress";
+import { NodeType } from "@/types/NetworkType";
 
 type Props = {
-  nodes: any[];
+  nodes: NodeType[];
   selectedIndex: number;
 };
 

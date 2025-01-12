@@ -1,4 +1,3 @@
-/* UserAvatar.tsx */
 "use client";
 const UserAvatar: React.FC = () => {
   return (
