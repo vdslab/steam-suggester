@@ -21,7 +21,7 @@ type WordData = {
   score: number; // スコアを追加
 };
 
-const getColorByScore = (score: number) => {
+export const getColorByScore = (score: number) => {
   // スコアが1のときに青、-1のときに赤になるように補完
   const blue = "#4a90e2";
   const red = "#d14b56";
