@@ -2,7 +2,7 @@
 
 import React from "react";
 import { NodeType } from "@/types/NetworkType";
-import HelpTooltip from "./HelpTooltip";
+import HelpTooltip from "../../common/HelpTooltip";
 import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { changeGameIdData } from "@/hooks/indexedDB";

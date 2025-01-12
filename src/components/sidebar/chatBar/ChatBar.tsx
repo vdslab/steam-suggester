@@ -1,4 +1,3 @@
-/* ChatBar.tsx */
 "use client";
 
 import { NodeType } from "@/types/NetworkType";

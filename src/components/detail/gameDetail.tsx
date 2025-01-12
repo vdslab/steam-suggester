@@ -3,12 +3,12 @@
 import { useEffect, useRef } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
-import HelpTooltip from "../HelpTooltip";
+import HelpTooltip from "../common/HelpTooltip";
 
 import Tooltip from "@mui/material/Tooltip";
 import Link from "next/link";
 import Popularity from "./Popularity2";
-import ReviewCloud from "../../charts/ReviewCloud";
+import ReviewCloud from "../charts/ReviewCloud";
 
 // Icons
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";

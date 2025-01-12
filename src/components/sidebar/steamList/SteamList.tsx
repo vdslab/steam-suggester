@@ -5,7 +5,7 @@ import useSWR from "swr";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonIcon from "@mui/icons-material/Person";
-import Panel from "../Panel";
+import Panel from "../../common/Panel";
 import Section from "../Section";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Image from "next/image";
@@ -13,7 +13,7 @@ import { Alert, Avatar, AvatarGroup, Button, IconButton } from "@mui/material";
 import { fetcher } from "@/components/common/Fetcher";
 import SearchIcon from "@mui/icons-material/Search";
 import { NodeType } from "@/types/NetworkType";
-import HelpTooltip from "../HelpTooltip";
+import HelpTooltip from "../../common/HelpTooltip";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 
 type Props = {

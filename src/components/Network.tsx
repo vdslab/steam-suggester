@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import NodeLink from "./NodeLink";
-import SelectParameter from "./selectParameter/SelectParameter";
+import NodeLink from "./nodelink/NodeLink";
+import SelectParameter from "./sidebar/selectParameter/SelectParameter";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
-import StreamedList from "./streamedList/StreamedList";
+import StreamedList from "./sidebar/streamedList/StreamedList";
 import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/loading";
 import Error from "@/app/error";
@@ -15,24 +15,24 @@ import {
   StreamerListType,
 } from "@/types/NetworkType";
 import { getFilterData, getGameIdData, getSliderData } from "@/hooks/indexedDB";
-import Sidebar from "./Sidebar";
+import Sidebar from "./sidebar/Sidebar";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
-import Panel from "./Panel";
-import SteamList from "./steamList/SteamList";
-import HelpTooltip from "./HelpTooltip";
-import Tour from "./Tour";
-import ProgressBar from "./ProgressBar";
+import Panel from "./common/Panel";
+import SteamList from "./sidebar/steamList/SteamList";
+import HelpTooltip from "./common/HelpTooltip";
+import Tour from "./sidebar/Tour";
+import ProgressBar from "./common/ProgressBar";
 import TuneIcon from "@mui/icons-material/Tune";
-import Leaderboard from "./Leaderboard";
-import GameDetailPanel from "./gameDetail/gameDetail";
+import Leaderboard from "./sidebar/leaderboard/Leaderboard";
+import GameDetailPanel from "./detail/gameDetail";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
-import { HomeHeader } from "../common/Headers";
-import HighlightPanel from "./highlight/HighlightPanel";
-import SimilaritySettings from "./similaritySettings/SimilaritySettings";
-import { fetcher } from "../common/Fetcher";
+import { HomeHeader } from "./common/Headers";
+import HighlightPanel from "./sidebar/highlight/HighlightPanel";
+import SimilaritySettings from "./sidebar/similaritySettings/SimilaritySettings";
+import { fetcher } from "./common/Fetcher";
 import useSWR from "swr";
-import SearchGames from "../SearchGames/SearchGames";
+import SearchGames from "./sidebar/searchGames/SearchGames";
 
 type Props = {
   steamListData: SteamListType[];

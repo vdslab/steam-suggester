@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Panel from "../Panel";
+import Panel from "../../common/Panel";
 import HighlightOutlinedIcon from "@mui/icons-material/HighlightOutlined";
 import { TAG_LIST } from "@/constants/TAG_LIST";
 import CancelIcon from "@mui/icons-material/Cancel";
 import IconButton from "@mui/material/IconButton";
-import AutoCompleteBox from "@/components/network/highlight/AutoCompleteBox";
+import AutoCompleteBox from "@/components/sidebar/highlight/AutoCompleteBox";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import Button from "@mui/material/Button";
 

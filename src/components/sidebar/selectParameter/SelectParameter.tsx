@@ -9,13 +9,13 @@ import { changeFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
 import { useState, useEffect } from "react";
 import FilterButtonGroup from "./FilterButtonGroup";
-import Panel from "../Panel";
+import Panel from "../../common/Panel";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DevicesIcon from "@mui/icons-material/Devices";
 import Section from "../Section";
-import HelpTooltip from "../HelpTooltip";
+import HelpTooltip from "../../common/HelpTooltip";
 import GenreFilter from "./GenreFilter";
 
 type Props = {
