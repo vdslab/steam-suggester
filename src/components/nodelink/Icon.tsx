@@ -23,7 +23,7 @@ const Icon = (props: IconType) => {
             width="200%"
             height="200%"
           >
-            <feGaussianBlur in="SourceAlpha" stdDeviation={5} result="blur" />
+            <feGaussianBlur in="SourceAlpha" stdDeviation={10} result="blur" />
             <feOffset dx="0" dy="0" result="offsetBlur" />
             <feFlood floodColor="rgba(173, 216, 230, 1)" result="color" />
             <feComposite in="color" in2="blur" operator="in" result="glow" />
@@ -43,7 +43,10 @@ const Icon = (props: IconType) => {
         y={-30}
         clipPath={`url(#clip-${index})`}
         style={{
-          filter: isHovered ? "brightness(1.5)" : "brightness(1)",
+          filter:
+            isHovered || selectedIndex === index
+              ? "brightness(1.5)"
+              : "brightness(1)",
           transition: "filter 0.3s ease",
         }}
       />
