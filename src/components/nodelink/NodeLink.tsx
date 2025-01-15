@@ -169,7 +169,7 @@ const NodeLink = (props: NodeLinkProps) => {
                   stroke: isHovered ? "orange" : isSelected ? "cyan" : "white",
                   strokeWidth:
                     isHovered || isSelected
-                      ? "2.5"
+                      ? Math.max(linkScale(link.similarity as number), 0.1) + 1
                       : Math.max(linkScale(link.similarity as number), 0.1),
                 }}
               />
