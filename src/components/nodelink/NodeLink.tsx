@@ -142,6 +142,8 @@ const NodeLink = (props: NodeLinkProps) => {
     return isSourceSelected || isTargetSelected;
   });
 
+  const linkScale = d3.scaleLinear().domain([0, 50, 100]).range([0, 0.1, 2]);
+
   return (
     <ZoomableSVG centerX={centerX} centerY={centerY}>
       <>
@@ -163,7 +165,10 @@ const NodeLink = (props: NodeLinkProps) => {
                 y2={link.target.y}
                 style={{
                   stroke: isHovered || isSelected ? "cyan" : "white",
-                  strokeWidth: isHovered || isSelected ? "2" : "0.3",
+                  strokeWidth:
+                    isHovered || isSelected
+                      ? "2.5"
+                      : Math.max(linkScale(link.similarity as number), 0.1),
                 }}
               />
             );
