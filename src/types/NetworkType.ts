@@ -8,6 +8,7 @@ export type IconType = {
   suggestValue: number;
   isHovered: boolean;
   selectedIndex: number;
+  similarGamesLinkList: LinkType[];
 };
 
 export type SteamListType = {
@@ -76,6 +77,8 @@ export type LinkType = {
   target: NodeType;
   index?: number;
   distance?: number;
+  similarity?: number;
+  elementScores?: number[];
 };
 
 export type SimilarGameType = {

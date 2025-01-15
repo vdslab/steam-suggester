@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useEffect, useRef, ReactNode, useMemo } from "react";
 import * as d3 from "d3";
 import Icon from "./Icon";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import Popup from "./Popup";
 
 type NodeLinkProps = {
   nodes: NodeType[];
@@ -135,14 +136,50 @@ const NodeLink = (props: NodeLinkProps) => {
     return nodes.find((node: NodeType) => node.index === index);
   };
 
+  const similarGamesLinkList = links.filter((link: LinkType) => {
+    const isSourceSelected = link.source.index === selectedIndex;
+    const isTargetSelected = link.target.index === selectedIndex;
+    return isSourceSelected || isTargetSelected;
+  });
+
+  const linkScale = d3.scaleLinear().domain([0, 50, 100]).range([0, 0.1, 2]);
+
+  const popups = useMemo(() => {
+    if (similarGamesLinkList.length === 0) return null;
+
+    return similarGamesLinkList.map((link: LinkType) => {
+      const gameIndex =
+        link.source.index === selectedIndex
+          ? link.target.index
+          : link.source.index;
+      const node: NodeType = nodes[gameIndex];
+      const isHovered = gameIndex === hoveredIndex;
+
+      if (!isHovered) return null;
+
+      // 一意なキーを生成（Linkにidがある場合はそれを使用）
+      const uniqueKey = link.index
+        ? `popup-${link.index}`
+        : `popup-${link.source.index}-${link.target.index}`;
+
+      return (
+        <g key={uniqueKey} transform={`translate(${node.x},${node.y})`}>
+          <Popup node={node} link={link} />
+        </g>
+      );
+    });
+  }, [similarGamesLinkList, selectedIndex, hoveredIndex, nodes]);
+
   return (
     <ZoomableSVG centerX={centerX} centerY={centerY}>
       <>
         {links.length !== 0 &&
           links.map((link: LinkType, i: number) => {
             const isHovered =
-              link.source.index === hoveredIndex ||
-              link.target.index === hoveredIndex;
+              (link.source.index === hoveredIndex &&
+                link.target.index === selectedIndex) ||
+              (link.source.index === selectedIndex &&
+                link.target.index === hoveredIndex);
             const isSelected =
               link.source.index === selectedIndex ||
               link.target.index === selectedIndex;
@@ -155,8 +192,11 @@ const NodeLink = (props: NodeLinkProps) => {
                 x2={link.target.x}
                 y2={link.target.y}
                 style={{
-                  stroke: isHovered || isSelected ? "cyan" : "white",
-                  strokeWidth: isHovered || isSelected ? "2" : "0.3",
+                  stroke: isHovered ? "orange" : isSelected ? "cyan" : "white",
+                  strokeWidth:
+                    isHovered || isSelected
+                      ? Math.max(linkScale(link.similarity as number), 0.1) + 1
+                      : Math.max(linkScale(link.similarity as number), 0.1),
                 }}
               />
             );
@@ -200,6 +240,7 @@ const NodeLink = (props: NodeLinkProps) => {
                   suggestValue={node.suggestValue}
                   isHovered={isHovered}
                   selectedIndex={selectedIndex}
+                  similarGamesLinkList={similarGamesLinkList}
                 />
                 {/* 色付きセグメントを描画 配信者による強調 */}
                 {openPanel === "streamer" &&
@@ -276,38 +317,177 @@ const NodeLink = (props: NodeLinkProps) => {
                   !myGamesError &&
                   !friendsGamesError && (
                     <g transform={`scale(${node.circleScale})`}>
-                      {isMyOwned && isFriedOwned ? (
+                      {/* 自分＆フレンドが所有しているゲーム */}
+                      {isMyOwned && isFriedOwned && (
                         <>
-                          <path
-                            d="M 0,0 m -17,0 a 17,17 0 0,1 34,0"
+                          {/* グラデーション定義 */}
+                          <defs>
+                            <linearGradient
+                              id={`green-gradient-${node.index}`}
+                              x1="0%"
+                              y1="0%"
+                              x2="100%"
+                              y2="100%"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="rgba(0, 255, 0, 0.8)"
+                              />
+                              <stop
+                                offset="50%"
+                                stopColor="rgba(0, 255, 0, 0.5)"
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="rgba(0, 255, 0, 0.3)"
+                              />
+                            </linearGradient>
+                          </defs>
+
+                          {/* 内側の回転する円 */}
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="17"
+                            stroke={`url(#green-gradient-${node.index})`}
+                            strokeWidth="3"
                             fill="transparent"
-                            stroke="blue"
-                            strokeWidth="1.5"
+                            style={{
+                              animation: "fastRotate 1.5s linear infinite",
+                            }}
                           />
-                          <path
-                            d="M 0,0 m -17,0 a 17,17 0 0,0 34,0"
+
+                          {/* 緑の波動 */}
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="17"
+                            stroke="rgba(0, 255, 0, 0.5)"
+                            strokeWidth="2"
                             fill="transparent"
-                            stroke="green"
-                            strokeWidth="1.5"
+                            style={{
+                              animation: "waveExpand 2.5s ease-out infinite",
+                            }}
                           />
                         </>
-                      ) : (
-                        <circle
-                          cx="0"
-                          cy="0"
-                          r="17"
-                          stroke={
-                            isMyOwned ? "blue" : isFriedOwned ? "green" : "none"
-                          }
-                          strokeWidth="1.5"
-                          fill="transparent"
-                        />
+                      )}
+
+                      {/* 自分が所有しているゲーム */}
+                      {isMyOwned && !isFriedOwned && (
+                        <>
+                          {/* グラデーション定義 */}
+                          <defs>
+                            <linearGradient
+                              id={`blue-gradient-${node.index}`}
+                              x1="0%"
+                              y1="0%"
+                              x2="100%"
+                              y2="100%"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="rgba(0, 0, 255, 0.8)"
+                              />
+                              <stop
+                                offset="50%"
+                                stopColor="rgba(0, 0, 255, 0.5)"
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="rgba(0, 0, 255, 0.3)"
+                              />
+                            </linearGradient>
+                          </defs>
+
+                          {/* 内側の回転する円 */}
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="17"
+                            stroke={`url(#blue-gradient-${node.index})`}
+                            strokeWidth="3"
+                            fill="transparent"
+                            style={{
+                              animation: "fastRotate 1.5s linear infinite",
+                            }}
+                          />
+
+                          {/* 青の波動 */}
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="17"
+                            stroke="rgba(0, 0, 255, 0.5)"
+                            strokeWidth="2"
+                            fill="transparent"
+                            style={{
+                              animation: "waveExpand 2.5s ease-out infinite",
+                            }}
+                          />
+                        </>
+                      )}
+
+                      {/* フレンドが所有しているゲーム */}
+                      {!isMyOwned && isFriedOwned && (
+                        <>
+                          {/* グラデーション定義 */}
+                          <defs>
+                            <linearGradient
+                              id={`yellow-gradient-${node.index}`}
+                              x1="0%"
+                              y1="0%"
+                              x2="100%"
+                              y2="100%"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="rgba(255, 255, 0, 0.8)"
+                              />
+                              <stop
+                                offset="50%"
+                                stopColor="rgba(255, 255, 0, 0.5)"
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="rgba(255, 255, 0, 0.3)"
+                              />
+                            </linearGradient>
+                          </defs>
+
+                          {/* 内側の回転する円 */}
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="17"
+                            stroke={`url(#yellow-gradient-${node.index})`}
+                            strokeWidth="3"
+                            fill="transparent"
+                            style={{
+                              animation: "fastRotate 1.5s linear infinite",
+                            }}
+                          />
+
+                          {/* 黄の波動 */}
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="17"
+                            stroke="rgba(255, 255, 0, 0.5)"
+                            strokeWidth="2"
+                            fill="transparent"
+                            style={{
+                              animation: "waveExpand 2.5s ease-out infinite",
+                            }}
+                          />
+                        </>
                       )}
                     </g>
                   )}
               </g>
             );
           })}
+
+        {popups}
         {hoveredIndex !== -1 && findHoveredNode(hoveredIndex) && (
           <g
             transform={`translate(${findHoveredNode(hoveredIndex)?.x},${
