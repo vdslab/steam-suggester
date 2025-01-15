@@ -457,6 +457,25 @@ const NodeLink = (props: NodeLinkProps) => {
               </g>
             );
           })}
+
+        {similarGamesLinkList.length !== 0 &&
+          similarGamesLinkList.map((link: LinkType, index: number) => {
+            const gameIndex =
+              link.source.index === selectedIndex
+                ? link.target.index
+                : link.source.index;
+            const node: NodeType = nodes[gameIndex];
+            const isHovered = gameIndex === hoveredIndex;
+            return (
+              <g key={index}>
+                {isHovered && (
+                  <g transform={`translate(${node.x},${node.y})`}>
+                    <Popup node={node} link={link} />
+                  </g>
+                )}
+              </g>
+            );
+          })}
         {hoveredIndex !== -1 && findHoveredNode(hoveredIndex) && (
           <g
             transform={`translate(${findHoveredNode(hoveredIndex)?.x},${
@@ -489,25 +508,6 @@ const NodeLink = (props: NodeLinkProps) => {
             </g>
           </g>
         )}
-
-        {similarGamesLinkList.length !== 0 &&
-          similarGamesLinkList.map((link: LinkType, index: number) => {
-            const gameIndex =
-              link.source.index === selectedIndex
-                ? link.target.index
-                : link.source.index;
-            const node: NodeType = nodes[gameIndex];
-            const isHovered = gameIndex === hoveredIndex;
-            return (
-              <g key={index}>
-                {isHovered && (
-                  <g transform={`translate(${node.x},${node.y})`}>
-                    <Popup node={node} link={link} />
-                  </g>
-                )}
-              </g>
-            );
-          })}
       </>
     </ZoomableSVG>
   );
