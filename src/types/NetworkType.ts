@@ -8,6 +8,7 @@ export type IconType = {
   suggestValue: number;
   isHovered: boolean;
   selectedIndex: number;
+  similarGamesLinkList: LinkType[];
 };
 
 export type SteamListType = {

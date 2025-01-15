@@ -150,8 +150,10 @@ const NodeLink = (props: NodeLinkProps) => {
         {links.length !== 0 &&
           links.map((link: LinkType, i: number) => {
             const isHovered =
-              link.source.index === hoveredIndex ||
-              link.target.index === hoveredIndex;
+              (link.source.index === hoveredIndex &&
+                link.target.index === selectedIndex) ||
+              (link.source.index === selectedIndex &&
+                link.target.index === hoveredIndex);
             const isSelected =
               link.source.index === selectedIndex ||
               link.target.index === selectedIndex;
@@ -164,7 +166,7 @@ const NodeLink = (props: NodeLinkProps) => {
                 x2={link.target.x}
                 y2={link.target.y}
                 style={{
-                  stroke: isHovered || isSelected ? "cyan" : "white",
+                  stroke: isHovered ? "orange" : isSelected ? "cyan" : "white",
                   strokeWidth:
                     isHovered || isSelected
                       ? "2.5"
@@ -212,6 +214,7 @@ const NodeLink = (props: NodeLinkProps) => {
                   suggestValue={node.suggestValue}
                   isHovered={isHovered}
                   selectedIndex={selectedIndex}
+                  similarGamesLinkList={similarGamesLinkList}
                 />
                 {/* 色付きセグメントを描画 配信者による強調 */}
                 {openPanel === "streamer" &&
