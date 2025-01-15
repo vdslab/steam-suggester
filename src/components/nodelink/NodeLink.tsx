@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useEffect, useRef, ReactNode, useMemo } from "react";
 import * as d3 from "d3";
 import Icon from "./Icon";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
@@ -143,6 +143,32 @@ const NodeLink = (props: NodeLinkProps) => {
   });
 
   const linkScale = d3.scaleLinear().domain([0, 50, 100]).range([0, 0.1, 2]);
+
+  const popups = useMemo(() => {
+    if (similarGamesLinkList.length === 0) return null;
+
+    return similarGamesLinkList.map((link: LinkType) => {
+      const gameIndex =
+        link.source.index === selectedIndex
+          ? link.target.index
+          : link.source.index;
+      const node: NodeType = nodes[gameIndex];
+      const isHovered = gameIndex === hoveredIndex;
+
+      if (!isHovered) return null;
+
+      // 一意なキーを生成（Linkにidがある場合はそれを使用）
+      const uniqueKey = link.index
+        ? `popup-${link.index}`
+        : `popup-${link.source.index}-${link.target.index}`;
+
+      return (
+        <g key={uniqueKey} transform={`translate(${node.x},${node.y})`}>
+          <Popup node={node} link={link} />
+        </g>
+      );
+    });
+  }, [similarGamesLinkList, selectedIndex, hoveredIndex, nodes]);
 
   return (
     <ZoomableSVG centerX={centerX} centerY={centerY}>
@@ -461,24 +487,7 @@ const NodeLink = (props: NodeLinkProps) => {
             );
           })}
 
-        {similarGamesLinkList.length !== 0 &&
-          similarGamesLinkList.map((link: LinkType, index: number) => {
-            const gameIndex =
-              link.source.index === selectedIndex
-                ? link.target.index
-                : link.source.index;
-            const node: NodeType = nodes[gameIndex];
-            const isHovered = gameIndex === hoveredIndex;
-            return (
-              <g key={index}>
-                {isHovered && (
-                  <g transform={`translate(${node.x},${node.y})`}>
-                    <Popup node={node} link={link} />
-                  </g>
-                )}
-              </g>
-            );
-          })}
+        {popups}
         {hoveredIndex !== -1 && findHoveredNode(hoveredIndex) && (
           <g
             transform={`translate(${findHoveredNode(hoveredIndex)?.x},${

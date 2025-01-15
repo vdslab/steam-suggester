@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 import { LinkType, NodeType } from "@/types/NetworkType";
 import TagCloud from "../charts/TagCloud";
 import { TAG_LIST } from "@/constants/TAG_LIST";
@@ -9,42 +9,61 @@ type Props = {
   link: LinkType;
 };
 
-const Popup: React.FC<Props> = ({ node, link }) => {
-  const FLAT_TAG_LIST = Object.values(TAG_LIST).flat();
+const Popup: React.FC<Props> = React.memo(({ node, link }) => {
+  // FLAT_TAG_LIST は定数なので useMemo を使用してメモ化
+  const FLAT_TAG_LIST = useMemo(() => Object.values(TAG_LIST).flat(), []);
 
   if (!node.featureVector) {
     return null;
   }
 
-  const commonTagList = [...new Set(link.source.tags.concat(link.target.tags))];
+  // 共通タグリストの生成をメモ化
+  const commonTagList = useMemo(() => {
+    return [...new Set([...link.source.tags, ...link.target.tags])];
+  }, [link.source.tags, link.target.tags]);
 
-  const rawData = FLAT_TAG_LIST.map((tag: string, index: number) => ({
-    text: tag,
-    value: (link.elementScores as number[])[index],
-  }));
+  // rawData の生成をメモ化
+  const rawData = useMemo(() => {
+    return FLAT_TAG_LIST.map((tag: string, index: number) => ({
+      text: tag,
+      value: (link.elementScores as number[])[index],
+    }));
+  }, [FLAT_TAG_LIST, link.elementScores]);
 
-  const seenTags = new Set();
-  const tagData = rawData.filter((item) => {
-    if (seenTags.has(item.text) || !commonTagList.includes(item.text)) {
-      return false;
-    } else {
-      seenTags.add(item.text);
-      return true;
-    }
-  });
+  // tagData の生成をメモ化
+  const tagData = useMemo(() => {
+    const seenTags = new Set<string>();
+    return rawData.filter((item) => {
+      if (seenTags.has(item.text) || !commonTagList.includes(item.text)) {
+        return false;
+      } else {
+        seenTags.add(item.text);
+        return true;
+      }
+    });
+  }, [rawData, commonTagList]);
 
-  const popupWidth = 400;
-  const popupHeight = 500;
+  // 類似度スコアに基づく色をメモ化
+  const similarityColor = useMemo(() => {
+    return `hsl(${((link.similarity as number) / 100) * 120}, 100%, 50%)`;
+  }, [link.similarity]);
 
-  const offsetX = (node.circleScale as number) * 20;
-  const offsetY = -popupHeight / 2;
-
-  const imageWidth = popupWidth / 3;
-
-  // 類似度スコアに基づく色を設定
-  const similarityColor = `hsl(${
-    ((link.similarity as number) / 100) * 120
-  }, 100%, 50%)`;
+  // ポップアップのサイズとオフセットをメモ化
+  const { popupWidth, popupHeight, offsetX, offsetY, imageWidth } =
+    useMemo(() => {
+      const width = 400;
+      const height = 500;
+      const offsetX = (node.circleScale as number) * 20;
+      const offsetY = -height / 2;
+      const imgWidth = width / 3;
+      return {
+        popupWidth: width,
+        popupHeight: height,
+        offsetX,
+        offsetY,
+        imageWidth: imgWidth,
+      };
+    }, [node.circleScale]);
 
   return (
     <g transform={`translate(${offsetX}, ${offsetY})`}>
@@ -152,6 +171,6 @@ const Popup: React.FC<Props> = ({ node, link }) => {
       </g>
     </g>
   );
-};
+});
 
 export default Popup;
