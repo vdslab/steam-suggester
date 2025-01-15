@@ -76,6 +76,8 @@ export type LinkType = {
   target: NodeType;
   index?: number;
   distance?: number;
+  similarity?: number;
+  elementScores?: number[];
 };
 
 export type SimilarGameType = {

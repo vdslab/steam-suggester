@@ -4,8 +4,17 @@ import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { NodeType, LinkType } from "@/types/NetworkType";
 import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 import fetchWithCache from "./fetchWithCache";
+import { TAG_LIST } from "@/constants/TAG_LIST";
 
 const k = 3;
+
+const FLAT_TAG_LIST_LENGTH = Object.values(TAG_LIST).flat().length;
+const emptyElementScores = new Array(FLAT_TAG_LIST_LENGTH).fill(0);
+
+type MatrixType = {
+  similarity: number;
+  elementScores: number[];
+};
 
 const getRandomCoordinates = (range: number): { x: number; y: number } => {
   const x = Math.random() * range - range / 2;
@@ -21,13 +30,32 @@ const jaccardSimilarity = (setA: Set<string>, setB: Set<string>): number => {
     : Math.max(Math.min(intersection.size / union.size, 1), 0);
 };
 
-export function cosineSimilarity(vecA: number[], vecB: number[]): number {
-  if (vecA.length === 0 || vecB.length === 0) return -2;
+export function cosineSimilarityWithDetails(
+  vecA: number[],
+  vecB: number[]
+): MatrixType {
+  if (vecA.length === 0 || vecB.length === 0) {
+    return { similarity: -2, elementScores: [] };
+  }
+
   const dotProduct = vecA.reduce((acc, val, idx) => acc + val * vecB[idx], 0);
   const magnitudeA = Math.sqrt(vecA.reduce((acc, val) => acc + val * val, 0));
   const magnitudeB = Math.sqrt(vecB.reduce((acc, val) => acc + val * val, 0));
-  if (magnitudeA === 0 || magnitudeB === 0) return 0;
-  return dotProduct / (magnitudeA * magnitudeB);
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return { similarity: 0, elementScores: vecA.map(() => 0) }; // 大きさが0のベクトルの場合
+  }
+
+  const similarity = dotProduct / (magnitudeA * magnitudeB);
+
+  // 各要素ごとの類似スコアを計算
+  const elementScores = vecA.map((val, idx) => {
+    const normalizedA = val / magnitudeA;
+    const normalizedB = vecB[idx] / magnitudeB;
+    return normalizedA * normalizedB; // 正規化された値の積
+  });
+
+  return { similarity, elementScores };
 }
 
 const createNetwork = async (
@@ -90,7 +118,8 @@ const createNetwork = async (
   }
 
   // 類似度行列を計算
-  const similarityMatrix: number[][] = [];
+  const similarityMatrix: MatrixType[][] = [];
+
   for (let i = 0; i < nodes.length; i++) {
     similarityMatrix[i] = [];
     for (let j = 0; j < nodes.length; j++) {
@@ -98,19 +127,23 @@ const createNetwork = async (
         i === j ||
         !nodes[i].similarGames?.find((id) => id === nodes[j].steamGameId)
       ) {
-        similarityMatrix[i][j] = -2;
+        similarityMatrix[i][j] = {
+          similarity: -2,
+          elementScores: emptyElementScores,
+        };
         continue;
       }
-      let similarity = cosineSimilarity(
+      const similarityObject = cosineSimilarityWithDetails(
         nodes[i].featureVector as number[],
         nodes[j].featureVector as number[]
       );
-      if (similarity === -2) {
+      if (similarityObject.similarity === -2) {
         const setA = new Set(nodes[i].tags ?? []);
         const setB = new Set(nodes[j].tags ?? []);
-        similarity = jaccardSimilarity(setA, setB);
+        similarityObject.similarity = jaccardSimilarity(setA, setB);
+        similarityObject.elementScores = emptyElementScores;
       }
-      similarityMatrix[i][j] = similarity;
+      similarityMatrix[i][j] = similarityObject;
     }
   }
 
@@ -123,14 +156,19 @@ const createNetwork = async (
 
     // 類似度の降順にソート
     const similarities = similarityMatrix[sourceIndex]
-      .map((similarity, targetIndex) => ({ similarity, targetIndex }))
+      .map((similarityObject, targetIndex) => ({
+        similarityObject,
+        targetIndex,
+      }))
       .filter((d) => d.targetIndex !== sourceIndex)
-      .sort((a, b) => b.similarity - a.similarity);
+      .sort(
+        (a, b) => b.similarityObject.similarity - a.similarityObject.similarity
+      );
 
     let addedLinks = 0; // 追加したリンクの数をカウント
 
-    for (const { similarity, targetIndex } of similarities) {
-      if (addedLinks >= k || similarity === -2) break; // k本以上の接続を許可しない
+    for (const { similarityObject, targetIndex } of similarities) {
+      if (addedLinks >= k || similarityObject.similarity === -2) break; // k本以上の接続を許可しない
 
       // 接続済みのペアをスキップ
       const linkKey = `${Math.min(sourceIndex, targetIndex)}-${Math.max(
@@ -145,7 +183,12 @@ const createNetwork = async (
       if (sourceConnections >= k || targetConnections >= k) continue;
 
       // 接続を作成
-      links.push({ source: nodes[sourceIndex], target: nodes[targetIndex] });
+      links.push({
+        source: nodes[sourceIndex],
+        target: nodes[targetIndex],
+        similarity: similarityObject.similarity,
+        elementScores: similarityObject.elementScores,
+      });
       usedConnections.add(linkKey);
 
       // 接続数を更新
@@ -186,7 +229,8 @@ const createNetwork = async (
           const sourceNode = link.source as NodeType;
           const targetNode = link.target as NodeType;
           const similarity =
-            similarityMatrix[sourceNode.index][targetNode.index] || 0;
+            similarityMatrix[sourceNode.index][targetNode.index].similarity ||
+            0;
           return 130 - similarity * 100;
         })
         .strength(1)
@@ -203,6 +247,15 @@ const createNetwork = async (
     simulation.tick();
   }
   simulation.stop();
+
+  const similarityScale = d3
+    .scaleLinear()
+    .domain(d3.extent(links, (link) => link.similarity) as [number, number])
+    .range([0, 100]);
+
+  links.forEach((link) => {
+    link.similarity = Math.round(similarityScale(link.similarity as number));
+  });
 
   return { nodes, links };
 };

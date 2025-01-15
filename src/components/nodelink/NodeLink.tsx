@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
 import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import Popup from "./Popup";
 
 type NodeLinkProps = {
   nodes: NodeType[];
@@ -134,6 +135,12 @@ const NodeLink = (props: NodeLinkProps) => {
   const findHoveredNode = (index: number) => {
     return nodes.find((node: NodeType) => node.index === index);
   };
+
+  const similarGamesLinkList = links.filter((link: LinkType) => {
+    const isSourceSelected = link.source.index === selectedIndex;
+    const isTargetSelected = link.target.index === selectedIndex;
+    return isSourceSelected || isTargetSelected;
+  });
 
   return (
     <ZoomableSVG centerX={centerX} centerY={centerY}>
@@ -477,6 +484,25 @@ const NodeLink = (props: NodeLinkProps) => {
             </g>
           </g>
         )}
+
+        {similarGamesLinkList.length !== 0 &&
+          similarGamesLinkList.map((link: LinkType, index: number) => {
+            const gameIndex =
+              link.source.index === selectedIndex
+                ? link.target.index
+                : link.source.index;
+            const node: NodeType = nodes[gameIndex];
+            const isHovered = gameIndex === hoveredIndex;
+            return (
+              <g key={index}>
+                {isHovered && (
+                  <g transform={`translate(${node.x},${node.y})`}>
+                    <Popup node={node} link={link} />
+                  </g>
+                )}
+              </g>
+            );
+          })}
       </>
     </ZoomableSVG>
   );
