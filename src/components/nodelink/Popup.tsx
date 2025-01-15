@@ -9,6 +9,11 @@ type Props = {
   link: LinkType;
 };
 
+const truncateText = (text: string, maxLength: number): string => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 3) + "...";
+};
+
 const Popup: React.FC<Props> = React.memo(({ node, link }) => {
   // FLAT_TAG_LIST は定数なので useMemo を使用してメモ化
   const FLAT_TAG_LIST = useMemo(() => Object.values(TAG_LIST).flat(), []);
@@ -64,6 +69,8 @@ const Popup: React.FC<Props> = React.memo(({ node, link }) => {
         imageWidth: imgWidth,
       };
     }, [node.circleScale]);
+
+  const maxTitleLength = 18;
 
   return (
     <g transform={`translate(${offsetX}, ${offsetY})`}>
@@ -123,7 +130,7 @@ const Popup: React.FC<Props> = React.memo(({ node, link }) => {
               textAnchor="middle"
               dominantBaseline="middle"
             >
-              {link.source.title}
+              {truncateText(link.source.title, maxTitleLength)}
             </text>
           </g>
           {/* 右側のゲーム画像とタイトル */}
@@ -143,7 +150,7 @@ const Popup: React.FC<Props> = React.memo(({ node, link }) => {
               textAnchor="middle"
               dominantBaseline="middle"
             >
-              {link.target.title}
+              {truncateText(link.target.title, maxTitleLength)}
             </text>
           </g>
         </g>
