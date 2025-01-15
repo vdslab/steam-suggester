@@ -9,18 +9,16 @@ type Props = {
   link: LinkType;
 };
 
+// トランケーション関数の定義
 const truncateText = (text: string, maxLength: number): string => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength - 3) + "...";
 };
 
-const Popup: React.FC<Props> = React.memo(({ node, link }) => {
+const PopupComponent: React.FC<Props> = ({ node, link }) => {
+  // 早期リターン前にすべてのHooksを呼び出す
   // FLAT_TAG_LIST は定数なので useMemo を使用してメモ化
   const FLAT_TAG_LIST = useMemo(() => Object.values(TAG_LIST).flat(), []);
-
-  if (!node.featureVector) {
-    return null;
-  }
 
   // 共通タグリストの生成をメモ化
   const commonTagList = useMemo(() => {
@@ -70,7 +68,13 @@ const Popup: React.FC<Props> = React.memo(({ node, link }) => {
       };
     }, [node.circleScale]);
 
-  const maxTitleLength = 18;
+  // featureVector がない場合は早期リターン
+  if (!node.featureVector) {
+    return null;
+  }
+
+  // タイトルの最大文字数を定義
+  const maxTitleLength = 18; // 必要に応じて調整
 
   return (
     <g transform={`translate(${offsetX}, ${offsetY})`}>
@@ -178,6 +182,10 @@ const Popup: React.FC<Props> = React.memo(({ node, link }) => {
       </g>
     </g>
   );
-});
+};
+
+// React.memo でラップし、displayName を設定
+const Popup = React.memo(PopupComponent);
+Popup.displayName = "Popup";
 
 export default Popup;
