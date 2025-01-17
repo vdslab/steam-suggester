@@ -129,23 +129,12 @@ body {
   cursor: pointer;
 }
 
-/* ホバー時に少し拡大し、透明度を上げる */
-.edge-score-group:hover {
-  transform: scale(1.2);
-}
-
 /* スコアテキストのスタイル */
 .edge-score {
   fill: white;
   font-size: 12px;
   text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black,
     1px 1px 0 black;
-  pointer-events: none;
-  user-select: none;
-}
-
-/* エッジスコアのグループにホバー時のフィードバック */
-.edge-score-group:hover .edge-score {
-  fill: white;
-  font-weight: bold;
+  pointer-events: none; /* マウスイベントを受け取らない */
+  user-select: none; /* テキストの選択を防ぐ */
 }

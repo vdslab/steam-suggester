@@ -536,48 +536,55 @@ const NodeLink = (props: NodeLinkProps) => {
                   link.target.index === selectedIndex) ||
                 (link.source.index === selectedIndex &&
                   link.target.index === hoveredIndex);
-              const isSelected =
-                link.source.index === selectedIndex ||
-                link.target.index === selectedIndex;
 
-              // エッジの中点を計算
+              // エッジ中点計算にノードの半径を考慮
               const sourceX = link.source.x as number;
               const sourceY = link.source.y as number;
               const targetX = link.target.x as number;
               const targetY = link.target.y as number;
-              const midX = (sourceX + targetX) / 2;
-              const midY = (sourceY + targetY) / 2;
+
+              const sourceRadius = 17 * (link.source.circleScale ?? 1);
+              const targetRadius = 17 * (link.target.circleScale ?? 1);
+
+              // ベクトル方向を計算
               const deltaX = targetX - sourceX;
               const deltaY = targetY - sourceY;
-              const angleRad = Math.atan2(deltaY, deltaX);
-              const angleDeg = (angleRad * 180) / Math.PI;
+              const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+
+              // 正規化
+              const normalizedX = deltaX / distance;
+              const normalizedY = deltaY / distance;
+
+              // ノードの端から端までの位置を調整
+              const adjustedSourceX = sourceX + normalizedX * sourceRadius;
+              const adjustedSourceY = sourceY + normalizedY * sourceRadius;
+              const adjustedTargetX = targetX - normalizedX * targetRadius;
+              const adjustedTargetY = targetY - normalizedY * targetRadius;
+
+              // ノードの端の中間地点
+              const midX = (adjustedSourceX + adjustedTargetX) / 2;
+              const midY = (adjustedSourceY + adjustedTargetY) / 2;
 
               return (
-                <g
-                  key={`selected-${i}`}
-                  transform={`translate(${midX}, ${midY})`}
-                >
-                  {/* エッジ線 */}
+                <g key={`selected-${i}`}>
+                  {/* エッジ表示 */}
                   <line
-                    className="link selected-link"
-                    x1={-deltaX / 2}
-                    y1={-deltaY / 2}
-                    x2={deltaX / 2}
-                    y2={deltaY / 2}
+                    x1={sourceX}
+                    y1={sourceY}
+                    x2={targetX}
+                    y2={targetY}
                     style={{
                       stroke: isHovered ? "orange" : "cyan",
                       strokeWidth:
                         Math.max(linkScale(link.similarity as number), 0.1) + 1,
                     }}
-                    onMouseEnter={() => setHoveredIndex(-1)} // 必要に応じて修正
-                    onMouseLeave={() => setHoveredIndex(-1)} // 必要に応じて修正
                   />
 
-                  {/* similarity スコアの表示 */}
+                  {/* エッジスコアの表示 */}
                   {link.similarity !== undefined && (
                     <g
                       className="edge-score-group"
-                      // ホバーイベントを円全体に適用
+                      transform={`translate(${midX}, ${midY})`}
                     >
                       {/* 背景の円形 */}
                       <circle
@@ -586,10 +593,9 @@ const NodeLink = (props: NodeLinkProps) => {
                         r={12} // 半径
                         stroke={isHovered ? "orange" : "cyan"} // エッジの色に合わせる
                         strokeWidth={2}
-                        fill={colorScale(link.similarity)} // スコアに基づく色
-                        className="edge-score-background"
+                        fill={colorScale(link.similarity)} // スコアに
                       />
-                      {/* スコアテキストを水平に表示 */}
+                      {/* similarity スコアの表示 */}
                       <text
                         x={0}
                         y={4} // テキストの中央寄せ調整
