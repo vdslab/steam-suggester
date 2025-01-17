@@ -56,8 +56,8 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
     useMemo(() => {
       const width = 400;
       const height = 500;
-      const offsetX = (node.circleScale as number) * 20;
-      const offsetY = -height / 2;
+      const offsetX = -width / 2;
+      const offsetY = -height - 30;
       const imgWidth = width / 3;
       return {
         popupWidth: width,
