@@ -123,3 +123,41 @@ body {
     stroke-width: 1;
   }
 }
+
+/* エッジスコアのグループ全体 */
+.edge-score-group {
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.8;
+}
+
+/* ホバー時に少し拡大し、透明度を上げる */
+.edge-score-group:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+/* 背景矩形のスタイル */
+.edge-score-background {
+  pointer-events: none; /* 背景矩形がマウスイベントを受け取らないように */
+}
+
+/* スコアテキストのスタイル */
+.edge-score {
+  fill: cyan;
+  font-size: 12px;
+  pointer-events: none; /* テキスト自体はマウスイベントを受け取らない */
+  user-select: none; /* テキストの選択を防ぐ */
+}
+
+/* エッジスコアのグループにホバー時のフィードバック */
+.edge-score-group:hover .edge-score {
+  fill: white;
+  font-weight: bold;
+}
+
+/* 選択エッジのスタイル強調 */
+.selected-link {
+  stroke: cyan;
+  stroke-width: 2px;
+}
