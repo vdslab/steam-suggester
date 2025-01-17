@@ -25,6 +25,12 @@ const ASPECT_RATIO = 16 / 9; // 必要に応じて変更
 const VIDEO_X = -VIDEO_WIDTH / 2; // 中央に配置
 const VIDEO_Y = -(VIDEO_WIDTH / ASPECT_RATIO) / 2; // 縦幅の半分をマイナス
 
+const DEFAULT_TOOLTIP = {
+  index: -1,
+  x: 0,
+  y: 0,
+};
+
 type NodeLinkProps = {
   nodes: NodeType[];
   links: LinkType[];
@@ -41,6 +47,12 @@ type ZoomableSVGProps = {
   children: ReactNode;
   centerX: number;
   centerY: number;
+};
+
+type TooltipType = {
+  index: number;
+  x: number;
+  y: number;
 };
 
 const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
@@ -119,6 +131,7 @@ const NodeLink = (props: NodeLinkProps) => {
   } = props;
 
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
+  const [tooltip, setTooltip] = useState<TooltipType>(DEFAULT_TOOLTIP);
 
   const { data: session, status } = useSession();
 
@@ -586,26 +599,42 @@ const NodeLink = (props: NodeLinkProps) => {
                       className="edge-score-group"
                       transform={`translate(${midX}, ${midY})`}
                     >
-                      {/* 背景の円形 */}
-                      <circle
-                        cx={0}
-                        cy={0}
-                        r={12} // 半径
-                        stroke={isHovered ? "orange" : "cyan"} // エッジの色に合わせる
-                        strokeWidth={2}
-                        fill={colorScale(link.similarity)} // スコアに
-                      />
-                      {/* similarity スコアの表示 */}
-                      <text
-                        x={0}
-                        y={4} // テキストの中央寄せ調整
-                        textAnchor="middle"
-                        fill="#fff" // 白色に変更
-                        fontSize="12px"
-                        className="edge-score"
+                      <g
+                        onMouseEnter={() =>
+                          setTooltip({
+                            index: i,
+                            x: midX,
+                            y: midY,
+                          })
+                        }
+                        onMouseLeave={() => setTooltip(DEFAULT_TOOLTIP)}
                       >
-                        {link.similarity}
-                      </text>
+                        {/* 背景の円形 */}
+                        <circle
+                          cx={0}
+                          cy={0}
+                          r={15} // 半径
+                          stroke={isHovered ? "orange" : "cyan"} // エッジの色に合わせる
+                          strokeWidth={
+                            Math.max(
+                              linkScale(link.similarity as number),
+                              0.1
+                            ) + 1
+                          }
+                          fill={colorScale(link.similarity)} // スコアに
+                        />
+                        {/* similarity スコアの表示 */}
+                        <text
+                          x={0}
+                          y={4} // テキストの中央寄せ調整
+                          textAnchor="middle"
+                          fill="#fff" // 白色に変更
+                          fontSize="12px"
+                          className="edge-score"
+                        >
+                          {link.similarity}
+                        </text>
+                      </g>
                     </g>
                   )}
                 </g>
@@ -906,16 +935,27 @@ const NodeLink = (props: NodeLinkProps) => {
             );
           })}
 
-        {popups}
-        {/* VideoInSVG コンポーネントの追加 */}
-        {/* <VideoInSVG
-          webmUrl={VIDEO_URLS.webm}
-          mp4Url={VIDEO_URLS.mp4}
-          x={VIDEO_X}
-          y={VIDEO_Y}
-          width={VIDEO_WIDTH}
-          aspectRatio={ASPECT_RATIO} // 必要に応じて指定（デフォルトは16:9）
-        /> */}
+        {tooltip.index !== -1 && (
+          <g>
+            {selectedLinks.map((link, index) => {
+              if (index !== tooltip.index) return null;
+              const gameIndex =
+                link.source.index === selectedIndex
+                  ? link.target.index
+                  : link.source.index;
+              const node: NodeType = nodes[gameIndex];
+              return (
+                <g
+                  transform={`translate(${tooltip.x},${tooltip.y})`}
+                  key={`tooltip-${index}`}
+                >
+                  <Popup node={node} link={link} />
+                </g>
+              );
+            })}
+          </g>
+        )}
+
         {/* Hovered Node Title の表示 */}
         {hoveredIndex !== -1 && findHoveredNode(hoveredIndex) && (
           <g
