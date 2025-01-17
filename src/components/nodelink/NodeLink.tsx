@@ -168,6 +168,12 @@ const NodeLink = (props: NodeLinkProps) => {
 
   const linkScale = d3.scaleLinear().domain([0, 50, 100]).range([0, 0.1, 2]);
 
+  // similarity スコアに基づく色スケールの定義
+  const colorScale = d3
+    .scaleLinear<string>()
+    .domain([0, 50, 100]) // スコアの範囲に応じて調整
+    .range(["red", "yellow", "green"]);
+
   const popups = useMemo(() => {
     if (selectedLinks.length === 0) return null;
 
@@ -521,83 +527,85 @@ const NodeLink = (props: NodeLinkProps) => {
             );
           })}
 
-        {/* ノードの上に選択エッジとスコアを描画 */}
-        {selectedLinks.length > 0 &&
-          selectedLinks.map((link: LinkType, i: number) => {
-            const isHovered =
-              (link.source.index === hoveredIndex &&
-                link.target.index === selectedIndex) ||
-              (link.source.index === selectedIndex &&
-                link.target.index === hoveredIndex);
-            const isSelected =
-              link.source.index === selectedIndex ||
-              link.target.index === selectedIndex;
+        {/* 選択エッジとスコアを描画 */}
+        <g className="selected-edges">
+          {selectedLinks.length > 0 &&
+            selectedLinks.map((link: LinkType, i: number) => {
+              const isHovered =
+                (link.source.index === hoveredIndex &&
+                  link.target.index === selectedIndex) ||
+                (link.source.index === selectedIndex &&
+                  link.target.index === hoveredIndex);
+              const isSelected =
+                link.source.index === selectedIndex ||
+                link.target.index === selectedIndex;
 
-            // 中点と垂直方向へのオフセットの計算
-            const sourceX = link.source.x as number;
-            const sourceY = link.source.y as number;
-            const targetX = link.target.x as number;
-            const targetY = link.target.y as number;
-            const midX = (sourceX + targetX) / 2;
-            const midY = (sourceY + targetY) / 2;
-            const deltaX = targetX - sourceX;
-            const deltaY = targetY - sourceY;
-            const angleRad = Math.atan2(deltaY, deltaX);
-            const offset = 25; // テキストをエッジからオフセットするピクセル数を増加
-            const perpAngleRad = angleRad + Math.PI / 2; // エッジに垂直な角度
-            const offsetX = Math.cos(perpAngleRad) * offset;
-            const offsetY = Math.sin(perpAngleRad) * offset;
-            const labelX = midX + offsetX;
-            const labelY = midY + offsetY;
+              // エッジの中点を計算
+              const sourceX = link.source.x as number;
+              const sourceY = link.source.y as number;
+              const targetX = link.target.x as number;
+              const targetY = link.target.y as number;
+              const midX = (sourceX + targetX) / 2;
+              const midY = (sourceY + targetY) / 2;
+              const deltaX = targetX - sourceX;
+              const deltaY = targetY - sourceY;
+              const angleRad = Math.atan2(deltaY, deltaX);
+              const angleDeg = (angleRad * 180) / Math.PI;
 
-            return (
-              <g key={`selected-${i}`}>
-                <line
-                  className="link selected-link"
-                  x1={sourceX}
-                  y1={sourceY}
-                  x2={targetX}
-                  y2={targetY}
-                  style={{
-                    stroke: isHovered ? "orange" : "cyan",
-                    strokeWidth:
-                      Math.max(linkScale(link.similarity as number), 0.1) + 1,
-                  }}
-                />
-                {/* similarity スコアの表示 */}
-                {link.similarity !== undefined && (
-                  <g
-                    className="edge-score-group"
-                    transform={`translate(${labelX}, ${labelY})`}
-                  >
-                    {/* 背景の矩形 */}
-                    <rect
-                      x={-15}
-                      y={-10}
-                      width={30}
-                      height={20}
-                      rx={5}
-                      ry={5}
-                      fill="rgba(0, 0, 0, 0.6)"
-                      className="edge-score-background"
-                    />
-                    {/* スコアテキスト */}
-                    <text
-                      x={0}
-                      y={5}
-                      textAnchor="middle"
-                      alignmentBaseline="middle"
-                      fill="cyan"
-                      fontSize="12px"
-                      className="edge-score"
+              return (
+                <g
+                  key={`selected-${i}`}
+                  transform={`translate(${midX}, ${midY})`}
+                >
+                  {/* エッジ線 */}
+                  <line
+                    className="link selected-link"
+                    x1={-deltaX / 2}
+                    y1={-deltaY / 2}
+                    x2={deltaX / 2}
+                    y2={deltaY / 2}
+                    style={{
+                      stroke: isHovered ? "orange" : "cyan",
+                      strokeWidth:
+                        Math.max(linkScale(link.similarity as number), 0.1) + 1,
+                    }}
+                    onMouseEnter={() => setHoveredIndex(-1)} // 必要に応じて修正
+                    onMouseLeave={() => setHoveredIndex(-1)} // 必要に応じて修正
+                  />
+
+                  {/* similarity スコアの表示 */}
+                  {link.similarity !== undefined && (
+                    <g
+                      className="edge-score-group"
+                      // ホバーイベントを円全体に適用
                     >
-                      {link.similarity}
-                    </text>
-                  </g>
-                )}
-              </g>
-            );
-          })}
+                      {/* 背景の円形 */}
+                      <circle
+                        cx={0}
+                        cy={0}
+                        r={12} // 半径
+                        stroke={isHovered ? "orange" : "cyan"} // エッジの色に合わせる
+                        strokeWidth={2}
+                        fill={colorScale(link.similarity)} // スコアに基づく色
+                        className="edge-score-background"
+                      />
+                      {/* スコアテキストを水平に表示 */}
+                      <text
+                        x={0}
+                        y={4} // テキストの中央寄せ調整
+                        textAnchor="middle"
+                        fill="#fff" // 白色に変更
+                        fontSize="12px"
+                        className="edge-score"
+                      >
+                        {link.similarity}
+                      </text>
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+        </g>
 
         {/* 選択されているノード及びそれとつながっているノードを描画 */}
         {nodes.length !== 0 &&
