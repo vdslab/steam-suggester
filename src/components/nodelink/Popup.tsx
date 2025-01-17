@@ -76,6 +76,26 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
   // タイトルの最大文字数を定義
   const maxTitleLength = 18; // 必要に応じて調整
 
+  const leftImgUrl =
+    (link.source.x as number) - (link.target.x as number) < 0
+      ? link.source.imgURL
+      : link.target.imgURL;
+
+  const rightImgUrl =
+    (link.source.x as number) - (link.target.x as number) < 0
+      ? link.target.imgURL
+      : link.source.imgURL;
+
+  const leftTitle =
+    (link.source.x as number) - (link.target.x as number) < 0
+      ? link.source.title
+      : link.target.title;
+
+  const rightTitle =
+    (link.source.x as number) - (link.target.x as number) < 0
+      ? link.target.title
+      : link.source.title;
+
   return (
     <g transform={`translate(${offsetX}, ${offsetY})`}>
       <g>
@@ -120,7 +140,7 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
           {/* 左側のゲーム画像とタイトル */}
           <g>
             <image
-              href={link.source.imgURL}
+              href={leftImgUrl}
               x={10}
               y={30}
               width={imageWidth}
@@ -134,13 +154,13 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
               textAnchor="middle"
               dominantBaseline="middle"
             >
-              {truncateText(link.source.title, maxTitleLength)}
+              {truncateText(leftTitle, maxTitleLength)}
             </text>
           </g>
           {/* 右側のゲーム画像とタイトル */}
           <g>
             <image
-              href={link.target.imgURL}
+              href={rightImgUrl}
               x={popupWidth - imageWidth - 10}
               y={30}
               width={imageWidth}
@@ -154,7 +174,7 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
               textAnchor="middle"
               dominantBaseline="middle"
             >
-              {truncateText(link.target.title, maxTitleLength)}
+              {truncateText(rightTitle, maxTitleLength)}
             </text>
           </g>
         </g>
