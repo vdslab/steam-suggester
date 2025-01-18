@@ -97,7 +97,7 @@ export async function GET(req: Request, { params }: Params) {
       featureVector: gameDetailData.feature_vector || [],
       background: gameDetailData.background || "",
       screenshots: gameDetailData.screenshots || [],
-      mp4_movies: gameDetailData.mp4_movies || [],
+      mp4Movies: gameDetailData.mp4_movies || [],
     };
 
     return NextResponse.json(formattedResult);
