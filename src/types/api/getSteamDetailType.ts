@@ -31,7 +31,7 @@ export type SteamDetailsDataType = {
   featureVector: number[];
   background: string;
   screenshots: string[];
-  mp4_movies: string[];
+  mp4Movies: string[];
 };
 
 export type SteamDetailApiType = {

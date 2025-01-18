@@ -10,9 +10,6 @@ import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import Popup from "./Popup";
 import GameTooltip from "./GameTooltip";
 
-const VIDEO_URL =
-  "http://video.akamai.steamstatic.com/store_trailers/257076425/movie_max.mp4?t=1732533132";
-
 const DEFAULT_TOOLTIP = {
   index: -1,
   x: 0,
@@ -962,7 +959,14 @@ const NodeLink = (props: NodeLinkProps) => {
           {/* ホバー時のツールチップを追加 */}
           {hoveredIndex !== -1 && (
             <GameTooltip
-              videoUrl={VIDEO_URL}
+              videoUrls={
+                nodes.find((node) => node.index === hoveredIndex)?.mp4Movies ||
+                []
+              }
+              screenshots={
+                nodes.find((node) => node.index === hoveredIndex)
+                  ?.screenshots || []
+              }
               imgURL={
                 nodes.find((node) => node.index === hoveredIndex)?.imgURL || ""
               }

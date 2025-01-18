@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 type GameTooltipProps = {
-  videoUrl: string;
+  videoUrls: string[];
+  screenshots: string[];
   imgURL: string;
   x: number;
   y: number;
@@ -15,7 +16,8 @@ type GameTooltipProps = {
 };
 
 const GameTooltip: React.FC<GameTooltipProps> = ({
-  videoUrl,
+  videoUrls,
+  screenshots,
   imgURL,
   x,
   y,
@@ -29,18 +31,32 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
   const size = 250;
   const halfSize = size / 2;
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [useIframe, setUseIframe] = React.useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0); // スライドショーの現在のインデックス
 
-  const iframeUrl = `${videoUrl}?controls=0&autoplay=1&mute=1&loop=1`;
+  const hasVideos = videoUrls.length > 0;
+  const videoUrl = hasVideos ? videoUrls[0] : "";
 
-  // アニメーションを適用
+  // スライドショーのタイマー
+  useEffect(() => {
+    if (!hasVideos && screenshots.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % screenshots.length);
+      }, 3000); // 3秒ごとに切り替え
+      return () => clearInterval(interval);
+    }
+  }, [hasVideos, screenshots]);
+
+  // マウント時のズームアウトアニメーション
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
+      // 初期状態
       container.style.transform = "scale(0.8)";
       container.style.opacity = "0";
+
+      // アニメーションをトリガー
       requestAnimationFrame(() => {
-        container.style.transition = "transform 0.2s ease, opacity 0.2s ease";
+        container.style.transition = "transform 0.3s ease, opacity 0.3s ease";
         container.style.transform = "scale(1)";
         container.style.opacity = "1";
       });
@@ -78,15 +94,16 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
             boxSizing: "border-box",
           }}
         >
-          {/* 動画セクション */}
+          {/* 動画またはスライドショーセクション */}
           <div
             style={{
               width: "100%",
               height: "50%",
               position: "relative",
+              overflow: "hidden",
             }}
           >
-            {!useIframe ? (
+            {hasVideos ? (
               <video
                 src={videoUrl}
                 autoPlay
@@ -98,19 +115,35 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
                   height: "100%",
                   objectFit: "cover",
                 }}
-                onError={() => setUseIframe(true)} // エラー時にiframeにフォールバック
               />
             ) : (
-              <iframe
-                src={iframeUrl}
-                title="Game Video"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  border: "none",
-                }}
-                allow="autoplay"
-              ></iframe>
+              screenshots.length > 0 && (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  {screenshots.map((screenshot, idx) => (
+                    <img
+                      key={idx}
+                      src={screenshot}
+                      alt="Game Screenshot"
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: `${(idx - currentSlide) * 100}%`,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        transition: "left 0.5s ease",
+                      }}
+                    />
+                  ))}
+                </div>
+              )
             )}
           </div>
 

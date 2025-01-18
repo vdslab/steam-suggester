@@ -62,7 +62,7 @@ export async function GET() {
           sd.genres, sd.tags, sd.short_details, sd.release_date, sd.developer_name,
           sd.sale_price, sd.play_time, sd.review_text, sd.difficulty, sd.graphics,
           sd.story, sd.music, sd.similar_games, sd.feature_vector,
-          sd.background, sd.screenshots, sd.mp4_movies,
+          sd.background, sd.screenshots, sd.mp4_movies
       ORDER BY
           SUM(sa.active_user) DESC
       LIMIT $3;
@@ -111,7 +111,7 @@ export async function GET() {
         featureVector: item.feature_vector || [],
         background: item.background || "",
         screenshots: item.screenshots || [],
-        mp4_movies: item.mp4_movies || [],
+        mp4Movies: item.mp4_movies || [],
       };
     });
 
