@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import Icon from "./Icon";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
@@ -168,32 +168,6 @@ const NodeLink = (props: NodeLinkProps) => {
     .scaleLinear<string>()
     .domain([0, 50, 100]) // スコアの範囲に応じて調整
     .range(["red", "yellow", "green"]);
-
-  const popups = useMemo(() => {
-    if (selectedLinks.length === 0) return null;
-
-    return selectedLinks.map((link: LinkType) => {
-      const gameIndex =
-        link.source.index === selectedIndex
-          ? link.target.index
-          : link.source.index;
-      const node: NodeType = nodes[gameIndex];
-      const isHovered = gameIndex === hoveredIndex;
-
-      if (!isHovered) return null;
-
-      // 一意なキーを生成（Linkにidがある場合はそれを使用）
-      const uniqueKey = link.index
-        ? `popup-${link.index}`
-        : `popup-${link.source.index}-${link.target.index}`;
-
-      return (
-        <g key={uniqueKey} transform={`translate(${node.x},${node.y})`}>
-          <Popup node={node} link={link} />
-        </g>
-      );
-    });
-  }, [selectedLinks, selectedIndex, hoveredIndex, nodes]);
 
   // 背景変更を適用
   useEffect(() => {
