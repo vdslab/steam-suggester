@@ -70,6 +70,9 @@ export type NodeType = {
   activeUsers?: number;
   similarGames?: string[];
   featureVector?: number[];
+  background?: string;
+  screenshots?: string[];
+  mp4Movies?: string[];
 };
 
 export type LinkType = {

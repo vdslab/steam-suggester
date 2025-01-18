@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
 import HelpTooltip from "../common/HelpTooltip";
@@ -61,6 +61,24 @@ const GameSearchPanel = (props: Props) => {
     setOpenPanel("highlight");
   };
 
+  const [currentSlide, setCurrentSlide] = useState(0); // 現在のスライドインデックス
+  const screenshots = [
+    nodes[selectedIndex].imgURL,
+    nodes[selectedIndex].screenshots,
+  ].flat();
+  // スライドショーの自動切り替え
+  useEffect(() => {
+    if (selectedIndex !== -1 && screenshots.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prevSlide) => {
+          const screenshots = nodes[selectedIndex].screenshots || [];
+          return (prevSlide + 1) % screenshots.length;
+        });
+      }, 2000); // 2秒ごとに切り替え
+      return () => clearInterval(interval); // クリーンアップ
+    }
+  }, [selectedIndex, nodes]);
+
   return (
     <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 overflow-y-scroll h-full relative">
       {/* 選択されたゲームの詳細表示 */}
@@ -69,17 +87,31 @@ const GameSearchPanel = (props: Props) => {
           {/* ゲーム詳細内容 */}
           <div className="flex flex-col">
             {/* 画像とアイコンのコンテナ */}
-            {nodes[selectedIndex].imgURL && (
+            {/* スライドショー */}
+            {screenshots && (
               <div className="relative">
-                <Image
-                  src={nodes[selectedIndex].imgURL}
-                  alt={nodes[selectedIndex].title}
-                  width={600}
-                  height={400}
-                  style={{ borderRadius: "4px" }}
-                  className="object-cover rounded mb-2"
-                />
-                {/* 画像右上 */}
+                {screenshots.map((screenshot, index) => (
+                  <Image
+                    key={index}
+                    src={screenshot as string}
+                    alt={`${nodes[selectedIndex].title} screenshot ${
+                      index + 1
+                    }`}
+                    width={600}
+                    height={400}
+                    style={{
+                      borderRadius: "4px",
+                      opacity: currentSlide === index ? 1 : 0,
+                      transition: "opacity 0.5s ease-in-out",
+                      position:
+                        currentSlide === index ? "relative" : "absolute",
+                      top: 0,
+                      left: 0,
+                    }}
+                    className="object-cover rounded mb-2"
+                  />
+                ))}
+                {/* 画像右上に閉じるボタン */}
                 <div
                   className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 bg-black bg-opacity-50 rounded-full cursor-pointer z-20 transition-transform duration-200 hover:bg-opacity-75 hover:scale-110"
                   onClick={() => setSelectedIndex(-1)}
@@ -87,32 +119,6 @@ const GameSearchPanel = (props: Props) => {
                   <span className="text-white text-xl font-bold transition-colors duration-200 hover:text-red-400">
                     ×
                   </span>
-                </div>
-                {/* 画像右下 */}
-                <div className="absolute bottom-2 right-2 flex items-center space-x-1 z-10">
-                  {/* デバイスサポート */}
-                  {nodes[selectedIndex].device.windows && (
-                    <Tooltip title="Windows対応">
-                      <WindowsIcon size={20} />
-                    </Tooltip>
-                  )}
-                  {nodes[selectedIndex].device.mac && (
-                    <Tooltip title="Mac対応">
-                      <AppleIcon className="text-white h-5 w-5" />
-                    </Tooltip>
-                  )}
-
-                  {/* マルチプレイヤー情報 */}
-                  {nodes[selectedIndex].isSinglePlayer && (
-                    <Tooltip title="Single Player">
-                      <PersonIcon className="text-white h-5 w-5" />
-                    </Tooltip>
-                  )}
-                  {nodes[selectedIndex].isMultiPlayer && (
-                    <Tooltip title="Multiplayer">
-                      <GroupIcon className="text-white h-5 w-5" />
-                    </Tooltip>
-                  )}
                 </div>
               </div>
             )}

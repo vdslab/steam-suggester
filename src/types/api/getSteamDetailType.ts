@@ -29,6 +29,9 @@ export type SteamDetailsDataType = {
 
   similarGames: string[];
   featureVector: number[];
+  background: string;
+  screenshots: string[];
+  mp4Movies: string[];
 };
 
 export type SteamDetailApiType = {

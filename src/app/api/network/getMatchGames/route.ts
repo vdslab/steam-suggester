@@ -41,6 +41,9 @@ export async function GET() {
           sd.music,
           sd.similar_games,
           sd.feature_vector,
+          sd.background,
+          sd.screenshots,
+          sd.mp4_movies,
           SUM(gv.total_views) AS total_views,
           COALESCE(SUM(sa.active_user), 0) AS total_active_users
       FROM 
@@ -58,7 +61,8 @@ export async function GET() {
           sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
           sd.genres, sd.tags, sd.short_details, sd.release_date, sd.developer_name,
           sd.sale_price, sd.play_time, sd.review_text, sd.difficulty, sd.graphics,
-          sd.story, sd.music, sd.similar_games, sd.feature_vector
+          sd.story, sd.music, sd.similar_games, sd.feature_vector,
+          sd.background, sd.screenshots, sd.mp4_movies
       ORDER BY
           SUM(sa.active_user) DESC
       LIMIT $3;
@@ -105,6 +109,9 @@ export async function GET() {
         music: item.music,
         similarGames: similarGames,
         featureVector: item.feature_vector || [],
+        background: item.background || "",
+        screenshots: item.screenshots || [],
+        mp4Movies: item.mp4_movies || [],
       };
     });
 

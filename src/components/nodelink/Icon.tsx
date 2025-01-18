@@ -72,7 +72,14 @@ const Icon = (props: IconType) => {
         y={-30}
         clipPath={`url(#clip-${index})`}
         style={{
-          filter: isHovered || isSelected ? "brightness(1.5)" : "brightness(1)",
+          filter:
+            isHovered || isSelected
+              ? "brightness(1.5)"
+              : isSimilarGames
+              ? "brightness(1.0)"
+              : selectedIndex === -1
+              ? "brightness(1.0)"
+              : "brightness(0.5)",
           transition: "filter 0.3s ease",
         }}
       />
