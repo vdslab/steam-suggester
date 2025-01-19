@@ -639,7 +639,7 @@ const NodeLink = (props: NodeLinkProps) => {
                               fontSize="12px"
                               className="edge-score"
                             >
-                              {link.similarity}
+                              {link.similarity}%
                             </text>
                           </g>
                         </g>
