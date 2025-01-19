@@ -32,7 +32,7 @@ import SimilaritySettings from "./sidebar/similaritySettings/SimilaritySettings"
 import { fetcher } from "./common/Fetcher";
 import useSWR from "swr";
 import SearchGames from "./sidebar/searchGames/SearchGames";
-import GameDetail from "./detail/gameDetail";
+import GameDetail from "./detail/GameDetail";
 
 type Props = {
   steamListData: SteamListType[];

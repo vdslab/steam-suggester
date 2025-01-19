@@ -20,9 +20,9 @@ const DistributorVideos = (props: Props) => {
     fetcher,
   );
 
-  if (error) return <div>データの取得中にエラーが発生しました。</div>;
+  if (error) return <div style={{ textAlign: 'center' }}>データの取得中にエラーが発生しました。</div>;
 
-  if (!data) return <CircularProgress />;
+  if (!data) return <div style={{ textAlign: 'center' }}><CircularProgress /></div>;
 
   return (
     <div className="mt-4">
