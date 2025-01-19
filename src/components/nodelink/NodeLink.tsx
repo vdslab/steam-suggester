@@ -6,9 +6,9 @@ import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
 import Popup from "./Popup";
 import GameTooltip from "./GameTooltip";
+import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 
 const DEFAULT_TOOLTIP = {
   index: -1,
@@ -132,8 +132,7 @@ const NodeLink = (props: NodeLinkProps) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
-    fetcher,
-    { refreshInterval: ISR_FETCH_INTERVAL }
+    fetcher, CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -143,8 +142,7 @@ const NodeLink = (props: NodeLinkProps) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
-    fetcher,
-    { refreshInterval: ISR_FETCH_INTERVAL }
+    fetcher, CACHE_UPDATE_EVERY_24H
   );
 
   // 選択されたエッジのリスト

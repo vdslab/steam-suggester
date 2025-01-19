@@ -12,16 +12,13 @@ import ReviewCloud, { getColorByScore } from "../charts/ReviewCloud";
 
 // Icons
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import WindowsIcon from "@/components/common/WindowsIcon";
-import AppleIcon from "@mui/icons-material/Apple";
-import PersonIcon from "@mui/icons-material/Person";
-import GroupIcon from "@mui/icons-material/Group";
 import BuildIcon from "@mui/icons-material/Build";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CurrencyYenIcon from "@mui/icons-material/CurrencyYen";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
+import DistributorVideos from "./Clips/DistributorVideos";
 
 type Props = {
   nodes: NodeType[];
@@ -262,8 +259,11 @@ const GameSearchPanel = (props: Props) => {
             <ReviewCloud reviewData={nodes[selectedIndex].review} />
           </div>
 
-          {/* Populatityコンポーネント */}
           <Popularity nodes={nodes} selectedIndex={selectedIndex} />
+
+          <DistributorVideos
+            twitchGameId={nodes[selectedIndex].twitchGameId}
+          />
         </div>
       ) : (
         <div className="text-white text-center pt-24">
