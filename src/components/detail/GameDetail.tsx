@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 import { useEffect, useRef, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
@@ -63,6 +62,18 @@ const GameDetail = (props: Props) => {
     nodes[selectedIndex].imgURL,
     nodes[selectedIndex].screenshots,
   ].flat();
+
+  const [minHeight, setMinHeight] = useState<number | null>(null);
+
+  // 画像の高さを取得して最小の高さを設定
+  useEffect(() => {
+    if (screenshots.length > 0) {
+      const imgElements = document.querySelectorAll(".screenshot-img");
+      const heights = Array.from(imgElements).map((img) => img.clientHeight);
+      setMinHeight(Math.min(...heights));
+    }
+  }, [screenshots]);
+
   // スライドショーの自動切り替え
   useEffect(() => {
     if (selectedIndex !== -1 && screenshots.length > 1) {
@@ -95,7 +106,7 @@ const GameDetail = (props: Props) => {
                       index + 1
                     }`}
                     width={600}
-                    height={400}
+                    height={minHeight || 400} // 最小の高さに設定
                     style={{
                       borderRadius: "4px",
                       opacity: currentSlide === index ? 1 : 0,
@@ -105,7 +116,7 @@ const GameDetail = (props: Props) => {
                       top: 0,
                       left: 0,
                     }}
-                    className="object-cover rounded mb-2"
+                    className="object-cover rounded mb-2 screenshot-img"
                   />
                 ))}
                 {/* 画像右上に閉じるボタン */}
