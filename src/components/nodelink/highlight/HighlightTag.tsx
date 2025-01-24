@@ -1,15 +1,21 @@
 type PropsType = {
-  isHighlight: boolean;
+  tags: string[];
+  selectedTags: string[];
   circleScale: number | undefined;
   index: number;
 };
 
 const HighlightTag = (props: PropsType) => {
-  const { isHighlight, circleScale, index } = props;
+  const { tags, selectedTags, circleScale, index } = props;
+
+  const isHighlight = selectedTags.length
+    ? selectedTags.every((tag) => tags.includes(tag))
+    : false;
+
   return (
     <g>
       {isHighlight && (
-        <g transform={`scale(${circleScale && 1})`}>
+        <g transform={`scale(${circleScale ?? 1})`}>
           {/* グラデーション定義 */}
           <defs>
             <linearGradient

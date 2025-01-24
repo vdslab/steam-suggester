@@ -253,9 +253,6 @@ const NodeLink = (props: NodeLinkProps) => {
                   return;
 
                 const isHovered = node.index === hoveredIndex;
-                const isHighlight = selectedTags.length
-                  ? selectedTags.every((tag) => node.tags?.includes(tag))
-                  : false;
                 return (
                   <g
                     transform={`translate(${node.x},${node.y})`}
@@ -292,7 +289,8 @@ const NodeLink = (props: NodeLinkProps) => {
 
                     {openPanel === "highlight" && (
                       <HighlightTag
-                        isHighlight={isHighlight}
+                        tags={node.tags || []}
+                        selectedTags={selectedTags}
                         circleScale={node.circleScale}
                         index={node.index}
                       />
@@ -431,9 +429,6 @@ const NodeLink = (props: NodeLinkProps) => {
                   return;
 
                 const isHovered = node.index === hoveredIndex;
-                const isHighlight = selectedTags.length
-                  ? selectedTags.every((tag) => node.tags?.includes(tag))
-                  : false;
                 return (
                   <g
                     transform={`translate(${node.x},${node.y})`}
@@ -470,7 +465,8 @@ const NodeLink = (props: NodeLinkProps) => {
 
                     {openPanel === "highlight" && (
                       <HighlightTag
-                        isHighlight={isHighlight}
+                        tags={node.tags || []}
+                        selectedTags={selectedTags}
                         circleScale={node.circleScale}
                         index={node.index}
                       />
