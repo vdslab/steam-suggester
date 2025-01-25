@@ -4,7 +4,7 @@ let db: IDBDatabase;
 let dbInitialized: Promise<IDBDatabase>;
 
 if (typeof window !== "undefined") {
-  const request: IDBOpenDBRequest = indexedDB.open("steamNetwork", 3); // バージョン3にアップ
+  const request: IDBOpenDBRequest = indexedDB.open("steamNetwork", 5); // バージョン5にアップ
 
   request.onupgradeneeded = function (event: IDBVersionChangeEvent) {
     db = (event.target as IDBOpenDBRequest).result;

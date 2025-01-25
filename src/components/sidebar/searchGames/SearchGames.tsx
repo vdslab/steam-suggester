@@ -65,14 +65,12 @@ const SearchGames = ({
     );
 
     allSteamList.push(
-      ...steamListData
-        .filter(
-          (item1: SteamListType) =>
-            !allSteamList.find(
-              (item2: SteamListType) => item2.steamGameId === item1.steamGameId
-            )
-        )
-        .filter((game) => game.title !== "Apex")
+      ...steamListData.filter(
+        (item1: SteamListType) =>
+          !allSteamList.find(
+            (item2: SteamListType) => item2.steamGameId === item1.steamGameId
+          )
+      )
     );
 
     const filteredSteam = allSteamList
