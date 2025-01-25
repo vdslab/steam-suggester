@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import { StreamerListType } from "@/types/NetworkType";
 
 type PropsType = {
@@ -6,17 +7,22 @@ type PropsType = {
   circleScale: number | undefined;
 };
 
-const HighlightStreamer = (props: PropsType) => {
-  const { streamerIds, twitchGameId, circleScale } = props;
+const HighlightStreamer: React.FC<PropsType> = ({
+  streamerIds,
+  twitchGameId,
+  circleScale,
+}) => {
+  const streamerColors = useMemo(() => {
+    return streamerIds
+      .filter((game: StreamerListType) =>
+        game.videoId.some((id) => id === twitchGameId)
+      )
+      .map((game: { color: string }) => game.color);
+  }, [streamerIds, twitchGameId]);
 
-  const streamerColors = streamerIds
-    .filter((game: StreamerListType) =>
-      game.videoId.some((id) => id === twitchGameId)
-    )
-    .map((game: { color: string }) => game.color); // 配信者の色をすべて取得
-
-  // それぞれの色を等間隔で分けるための角度計算
-  const angleStep = streamerColors.length > 0 ? 360 / streamerColors.length : 0;
+  const angleStep = useMemo(() => {
+    return streamerColors.length > 0 ? 360 / streamerColors.length : 0;
+  }, [streamerColors]);
 
   return (
     <g>
@@ -43,4 +49,27 @@ const HighlightStreamer = (props: PropsType) => {
   );
 };
 
-export default HighlightStreamer;
+// カスタム比較関数を使用してReact.memoでラップ
+export default React.memo(HighlightStreamer, (prevProps, nextProps) => {
+  if (prevProps.twitchGameId !== nextProps.twitchGameId) return false;
+  if (prevProps.circleScale !== nextProps.circleScale) return false;
+
+  if (prevProps.streamerIds.length !== nextProps.streamerIds.length)
+    return false;
+
+  for (let i = 0; i < prevProps.streamerIds.length; i++) {
+    const prevStreamer = prevProps.streamerIds[i];
+    const nextStreamer = nextProps.streamerIds[i];
+
+    if (prevStreamer.color !== nextStreamer.color) return false;
+
+    if (prevStreamer.videoId.length !== nextStreamer.videoId.length)
+      return false;
+
+    for (let j = 0; j < prevStreamer.videoId.length; j++) {
+      if (prevStreamer.videoId[j] !== nextStreamer.videoId[j]) return false;
+    }
+  }
+
+  return true;
+});
