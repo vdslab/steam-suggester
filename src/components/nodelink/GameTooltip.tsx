@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import Image from "next/image";
 
 type GameTooltipProps = {
   videoUrls: string[];
@@ -127,20 +128,26 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
                   }}
                 >
                   {screenshots.map((screenshot, idx) => (
-                    <img
+                    <div
                       key={idx}
-                      src={screenshot}
-                      alt="Game Screenshot"
                       style={{
                         position: "absolute",
                         top: 0,
                         left: `${(idx - currentSlide) * 100}%`,
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
                         transition: "left 0.5s ease",
                       }}
-                    />
+                    >
+                      <Image
+                        src={screenshot}
+                        alt="Game Screenshot"
+                        fill
+                        style={{
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
                   ))}
                 </div>
               )
@@ -153,15 +160,15 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
               position: "relative",
               left: "0",
               width: "60%",
+              height: "30%",
               transform: "translateY(-50%)",
             }}
           >
-            <img
+            <Image
               src={imgURL}
               alt="Game Thumbnail"
+              fill
               style={{
-                width: "100%",
-                height: "100%",
                 objectFit: "cover",
               }}
             />
