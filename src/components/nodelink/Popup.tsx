@@ -54,10 +54,10 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
   // ポップアップのサイズとオフセットをメモ化
   const { popupWidth, popupHeight, offsetX, offsetY, imageWidth } =
     useMemo(() => {
-      const width = 400;
-      const height = 500;
-      const offsetX = (node.circleScale as number) * 20;
-      const offsetY = -height / 2;
+      const width = 300;
+      const height = 400;
+      const offsetX = -width / 2;
+      const offsetY = -height - 30;
       const imgWidth = width / 3;
       return {
         popupWidth: width,
@@ -74,7 +74,27 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
   }
 
   // タイトルの最大文字数を定義
-  const maxTitleLength = 18; // 必要に応じて調整
+  const maxTitleLength = 15; // 必要に応じて調整
+
+  const leftImgUrl =
+    (link.source.x as number) - (link.target.x as number) < 0
+      ? link.source.imgURL
+      : link.target.imgURL;
+
+  const rightImgUrl =
+    (link.source.x as number) - (link.target.x as number) < 0
+      ? link.target.imgURL
+      : link.source.imgURL;
+
+  const leftTitle =
+    (link.source.x as number) - (link.target.x as number) < 0
+      ? link.source.title
+      : link.target.title;
+
+  const rightTitle =
+    (link.source.x as number) - (link.target.x as number) < 0
+      ? link.target.title
+      : link.source.title;
 
   return (
     <g transform={`translate(${offsetX}, ${offsetY})`}>
@@ -96,7 +116,7 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
         </text>
         <text
           x={popupWidth / 2}
-          y={popupHeight / 6 - 10}
+          y={popupHeight / 6 - 5}
           fontSize="32px"
           fontWeight="bold"
           fill={similarityColor}
@@ -120,7 +140,7 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
           {/* 左側のゲーム画像とタイトル */}
           <g>
             <image
-              href={link.source.imgURL}
+              href={leftImgUrl}
               x={10}
               y={30}
               width={imageWidth}
@@ -134,13 +154,13 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
               textAnchor="middle"
               dominantBaseline="middle"
             >
-              {truncateText(link.source.title, maxTitleLength)}
+              {truncateText(leftTitle, maxTitleLength)}
             </text>
           </g>
           {/* 右側のゲーム画像とタイトル */}
           <g>
             <image
-              href={link.target.imgURL}
+              href={rightImgUrl}
               x={popupWidth - imageWidth - 10}
               y={30}
               width={imageWidth}
@@ -154,21 +174,21 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
               textAnchor="middle"
               dominantBaseline="middle"
             >
-              {truncateText(link.target.title, maxTitleLength)}
+              {truncateText(rightTitle, maxTitleLength)}
             </text>
           </g>
         </g>
         {/* 仕切り線 */}
         <line
           x1={0}
-          y1={popupHeight / 3 - 40}
+          y1={popupHeight / 3 - 28}
           x2={popupWidth}
-          y2={popupHeight / 3 - 40}
+          y2={popupHeight / 3 - 28}
           stroke="#ccc"
           strokeWidth={0.2}
         />
         {/* 類似している要因のラベル */}
-        <text x={10} y={popupHeight / 3 - 14} fontSize="18px" fill="white">
+        <text x={10} y={popupHeight / 3 - 7} fontSize="18px" fill="white">
           <tspan fontWeight="bold">類似している要素:</tspan>
         </text>
         {/* ワードクラウドの表示 */}

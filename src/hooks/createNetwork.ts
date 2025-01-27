@@ -89,11 +89,15 @@ const createNetwork = async (
     const isInGenresFilter = item.genres.find((genre) => {
       return filter.Genres[genre];
     });
+
+    const isSinglePlayer =
+      !item.isSinglePlayer && !item.isMultiPlayer ? true : item.isSinglePlayer;
+
     return (
       isInGenresFilter &&
       filter.Price.startPrice <= item.price &&
       item.price <= filter.Price.endPrice &&
-      ((item.isSinglePlayer && filter.Mode.isSinglePlayer) ||
+      ((isSinglePlayer && filter.Mode.isSinglePlayer) ||
         (item.isMultiPlayer && filter.Mode.isMultiPlayer)) &&
       ((item.device.windows && filter.Device.windows) ||
         (item.device.mac && filter.Device.mac))

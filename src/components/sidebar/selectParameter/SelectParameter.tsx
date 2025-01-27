@@ -58,8 +58,8 @@ const SelectParameter: React.FC<Props> = ({
     field: "startPrice" | "endPrice",
     value: number
   ) => {
-    // 10000を超えないように
-    if (value > 10000) value = 10000;
+    // 100000を超えないように
+    if (value > 100000) value = 100000;
     if (value < 0) value = 0;
 
     // 先頭ゼロ除去
@@ -162,7 +162,7 @@ const SelectParameter: React.FC<Props> = ({
             <input
               type="number"
               min="0"
-              max="10000"
+              max="100000"
               value={localFilter.Price.startPrice}
               onChange={(e) =>
                 handlePriceChange("startPrice", Number(e.target.value))
@@ -177,7 +177,7 @@ const SelectParameter: React.FC<Props> = ({
             <input
               type="number"
               min="0"
-              max="10000"
+              max="100000"
               value={localFilter.Price.endPrice}
               onChange={(e) =>
                 handlePriceChange("endPrice", Number(e.target.value))
@@ -186,7 +186,7 @@ const SelectParameter: React.FC<Props> = ({
               className={`w-1/2 px-3 py-2 bg-gray-700 text-white rounded ${
                 isFreeChecked ? "opacity-50 cursor-not-allowed" : ""
               }`}
-              placeholder="10000"
+              placeholder="100000"
             />
           </div>
         </Section>
