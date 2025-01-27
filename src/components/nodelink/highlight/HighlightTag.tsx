@@ -78,4 +78,6 @@ const HighlightTag: React.FC<PropsType> = React.memo(
   }
 );
 
+HighlightTag.displayName = "HighlightTag";
+
 export default HighlightTag;
