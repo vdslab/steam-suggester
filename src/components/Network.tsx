@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import NodeLink from "./nodelink/NodeLink";
 import SelectParameter from "./sidebar/selectParameter/SelectParameter";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
@@ -34,14 +34,13 @@ import { fetcher } from "./common/Fetcher";
 import useSWR from "swr";
 import SearchGames from "./sidebar/searchGames/SearchGames";
 
-type Props = {
-  steamListData: SteamListType[];
-};
+const Network = () => {
 
-const Network = (props: Props) => {
-  const { steamListData } = props;
-
-  const { data: steamAllData, error } = useSWR<SteamDetailsDataType[]>(
+  const { data: steamAllData, error: steamAllDataError } = useSWR<SteamDetailsDataType[]>(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
+    fetcher
+  );
+  const { data: steamListData, error: steamListDataError } = useSWR<SteamListType[]>(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     fetcher
   );
@@ -158,12 +157,12 @@ const Network = (props: Props) => {
     })();
   }, []);
 
-  if (isNetworkLoading || !steamAllData) {
+  if (isNetworkLoading || !steamAllData || !steamListData) {
     return <Loading />;
   }
 
-  if (error) {
-    return <Error error={error} reset={() => setIsNetworkLoading(true)} />;
+  if (steamAllDataError || steamListDataError) {
+    return <Error error={steamAllDataError || steamListDataError} reset={() => setIsNetworkLoading(true)} />;
   }
 
   return (
