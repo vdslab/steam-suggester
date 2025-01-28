@@ -25,7 +25,7 @@ export const DEFAULT_FILTER = {
   },
   Price: {
     startPrice: 0,
-    endPrice: 10000,
+    endPrice: 100000,
   },
   Mode: {
     isSinglePlayer: true,
