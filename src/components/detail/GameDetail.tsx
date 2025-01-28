@@ -182,7 +182,7 @@ const GameDetail = (props: Props) => {
                     />
                   </Tooltip>
                   <span className="text-gray-300">
-                    {nodes[selectedIndex].releaseDate}
+                    {nodes[selectedIndex].releaseDate.replace(/年/, "/").replace(/月/, "/").replace(/日/, "")}
                   </span>
                 </div>
 
