@@ -20,7 +20,7 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./common/Panel";
 import SteamList from "./sidebar/steamList/SteamList";
 import HelpTooltip from "./common/HelpTooltip";
-import Tour from "./sidebar/Tour";
+import Tour from "./tutorial/Tour";
 import ProgressBar from "./common/ProgressBar";
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./sidebar/leaderboard/Leaderboard";
@@ -33,6 +33,7 @@ import { fetcher } from "./common/Fetcher";
 import useSWR from "swr";
 import SearchGames from "./sidebar/searchGames/SearchGames";
 import GameDetail from "./detail/GameDetail";
+import Tutorial from "./tutorial/Tutorial";
 
 const Network = () => {
 
@@ -342,8 +343,9 @@ const Network = () => {
           />
         </div>
 
-        {/* Tourコンポーネント */}
-        <Tour run={tourRun} setRun={setTourRun} />
+        {/* チュートリアル */}
+        {/* <Tour run={tourRun} setRun={setTourRun} /> */}
+        <Tutorial run={tourRun} setRun={setTourRun} />
       </div>
     </div>
   );
