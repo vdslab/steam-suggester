@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import * as d3 from "d3";
 import Icon from "./Icon";
 import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
@@ -43,11 +43,15 @@ type TooltipType = {
   y: number;
 };
 
-const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
-  const { children, centerX, centerY } = props;
+type LinkWithLevel = LinkType & { level: number; from: NodeType; to: NodeType };
+
+const ZoomableSVG: React.FC<ZoomableSVGProps> = ({
+  children,
+  centerX,
+  centerY,
+}) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [transform, setTransform] = useState(d3.zoomIdentity);
-
   const zoom = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
   useEffect(() => {
@@ -59,7 +63,7 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
           d3.select(svgRef.current).style("cursor", "grabbing");
         }
       })
-      .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+      .on("zoom", (event) => {
         setTransform(event.transform);
       })
       .on("end", () => {
@@ -69,14 +73,14 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
       });
 
     if (svgRef.current) {
-      const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
-      svg.call(zoom.current);
+      d3.select(svgRef.current).call(zoom.current);
     }
   }, []);
 
+  // 初期位置へトランジション
   useEffect(() => {
     if (svgRef.current && zoom.current) {
-      const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
+      const svg = d3.select(svgRef.current);
 
       const initialTransform = d3.zoomIdentity
         .translate(
@@ -84,6 +88,7 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
           (window.innerHeight * 3) / 5 - centerY
         )
         .scale(1);
+
       svg
         .transition()
         .duration(1200)
@@ -105,6 +110,126 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
   );
 };
 
+function animatePath(
+  pathElement: SVGPathElement | null,
+  duration: number,
+  delay: number
+) {
+  if (!pathElement) return;
+  const totalLength = pathElement.getTotalLength();
+
+  d3.select(pathElement)
+    .attr("stroke-dasharray", totalLength)
+    .attr("stroke-dashoffset", totalLength)
+    .transition()
+    .duration(duration)
+    .delay(delay)
+    .ease(d3.easeLinear)
+    .attr("stroke-dashoffset", 0);
+}
+
+function buildAdjacencyList(
+  nodes: NodeType[],
+  links: LinkType[]
+): Map<number, LinkType[]> {
+  const adjacency = new Map<number, LinkType[]>();
+
+  links.forEach((link) => {
+    const sIdx = link.source.index ?? -1;
+    const tIdx = link.target.index ?? -1;
+
+    if (!adjacency.has(sIdx)) adjacency.set(sIdx, []);
+    if (!adjacency.has(tIdx)) adjacency.set(tIdx, []);
+
+    adjacency.get(sIdx)!.push(link);
+    adjacency.get(tIdx)!.push(link);
+  });
+
+  return adjacency;
+}
+
+function getBfsEdgesAllComponents(
+  nodes: NodeType[],
+  links: LinkType[]
+): { bfsEdges: LinkWithLevel[]; leftoverEdges: LinkType[] } {
+  if (nodes.length === 0) return { bfsEdges: [], leftoverEdges: links };
+
+  const adjacency = buildAdjacencyList(nodes, links);
+  const visited = new Set<number>();
+  const bfsEdges: LinkWithLevel[] = [];
+
+  // 全ノードを index 昇順にループし、未訪問ノードがあればその連結成分を BFS
+  for (let i = 0; i < nodes.length; i++) {
+    const nodeIndex = nodes[i].index ?? -1;
+    if (nodeIndex < 0) continue;
+
+    if (!visited.has(nodeIndex)) {
+      // 未訪問のノードがあれば BFS 開始
+      bfsFrom(nodeIndex, adjacency, visited, bfsEdges, nodes);
+    }
+  }
+
+  // BFS 辺に含まれなかったものは leftover
+  const leftoverEdges = links.filter(
+    (l) =>
+      !bfsEdges.some(
+        (bfsLink) =>
+          (bfsLink.source.index === l.source.index &&
+            bfsLink.to.index === l.target.index) ||
+          (bfsLink.source.index === l.target.index &&
+            bfsLink.to.index === l.source.index)
+      )
+  );
+
+  return { bfsEdges, leftoverEdges };
+}
+
+function bfsFrom(
+  startIndex: number,
+  adjacency: Map<number, LinkType[]>,
+  visited: Set<number>,
+  bfsEdges: LinkWithLevel[],
+  nodes: NodeType[]
+) {
+  visited.add(startIndex);
+  const queue: Array<{ node: number; level: number }> = [];
+  const nodeLevels = new Map<number, number>();
+
+  queue.push({ node: startIndex, level: 0 });
+  nodeLevels.set(startIndex, 0);
+
+  while (queue.length > 0) {
+    const { node, level } = queue.shift()!;
+    const neighborLinks = adjacency.get(node) || [];
+
+    for (const link of neighborLinks) {
+      const sIdx = link.source.index ?? -1;
+      const tIdx = link.target.index ?? -1;
+
+      const neighbor = sIdx === node ? tIdx : sIdx;
+
+      if (neighbor !== -1 && !visited.has(neighbor)) {
+        visited.add(neighbor);
+        queue.push({ node: neighbor, level: level + 1 });
+        nodeLevels.set(neighbor, level + 1);
+
+        // Find nodes by index
+        const fromNode = nodes.find((n) => n.index === node);
+        const toNode = nodes.find((n) => n.index === neighbor);
+
+        if (fromNode && toNode) {
+          bfsEdges.push({
+            ...link,
+            level: level + 1,
+            from: fromNode,
+            to: toNode,
+          });
+        }
+      }
+    }
+  }
+}
+
 const NodeLink = (props: NodeLinkProps) => {
   const {
     nodes,
@@ -123,12 +248,11 @@ const NodeLink = (props: NodeLinkProps) => {
   const [background, setBackground] = useState<string>("");
 
   const { data: session, status } = useSession();
-
   const steamId = session?.user?.email
     ? session.user.email.split("@")[0]
     : null;
 
-  // 自分の所有ゲームを取得
+  // Steam 所有ゲーム情報取得
   const { data: myOwnGames, error: myGamesError } = useSWR<
     GetSteamOwnedGamesResponse[]
   >(
@@ -138,8 +262,6 @@ const NodeLink = (props: NodeLinkProps) => {
     fetcher,
     { refreshInterval: ISR_FETCH_INTERVAL }
   );
-
-  // フレンドの所有ゲームを取得
   const { data: friendsOwnGames, error: friendsGamesError } = useSWR<
     GetFriendGamesResponse[]
   >(
@@ -150,41 +272,71 @@ const NodeLink = (props: NodeLinkProps) => {
     { refreshInterval: ISR_FETCH_INTERVAL }
   );
 
-  // 選択されたエッジのリスト
-  const selectedLinks = links.filter((link: LinkType) => {
-    return (
-      link.source.index === selectedIndex || link.target.index === selectedIndex
+  const { bfsEdges, leftoverEdges } = useMemo(() => {
+    return getBfsEdgesAllComponents(nodes, links);
+  }, [nodes, links]);
+
+  const selectedLinks = useMemo(() => {
+    return links.filter(
+      (link) =>
+        link.source.index === selectedIndex ||
+        link.target.index === selectedIndex
     );
-  });
+  }, [links, selectedIndex]);
 
-  // 非選択エッジのリスト
-  const nonSelectedLinks = links.filter((link: LinkType) => {
-    return (
-      link.source.index !== selectedIndex && link.target.index !== selectedIndex
-    );
-  });
-
-  const linkScale = d3.scaleLinear().domain([0, 50, 100]).range([0, 0.1, 2]);
-
-  // similarity スコアに基づく色スケールの定義
-  const colorScale = d3
-    .scaleLinear<string>()
-    .domain([0, 50, 100]) // スコアの範囲に応じて調整
-    .range(["red", "yellow", "green"]);
-
-  // 背景変更を適用
   useEffect(() => {
     if (selectedIndex !== -1) {
       const selectedNode = nodes.find((node) => node.index === selectedIndex);
-      if (selectedNode && selectedNode.background) {
-        setBackground(selectedNode.background);
-      } else {
-        setBackground(""); // デフォルト背景に戻す
-      }
+      setBackground(selectedNode?.background ?? "");
     } else {
-      setBackground(""); // デフォルト背景に戻す
+      setBackground("");
     }
   }, [selectedIndex, nodes]);
+
+  const bfsPathRefs = useRef<Array<SVGPathElement | null>>([]);
+  const [showLeftover, setShowLeftover] = useState(false);
+
+  useEffect(() => {
+    // 最大レベルを取得
+    const maxLevel = Math.max(...bfsEdges.map((link) => link.level), 0);
+
+    if (maxLevel === 0) {
+      // エッジがない場合はすぐに leftover を表示
+      setShowLeftover(true);
+      return;
+    }
+
+    // 全体のアニメーション時間を2秒に設定
+    const totalDuration = 3000; // ms
+    const perLevelDuration = maxLevel > 0 ? totalDuration / maxLevel : 0;
+
+    // エッジをレベル順にソート
+    const sortedBfsEdges = [...bfsEdges].sort((a, b) => a.level - b.level);
+
+    sortedBfsEdges.forEach((link, i) => {
+      const delay = link.level * perLevelDuration;
+      const pathIndex = bfsEdges.indexOf(link);
+      const pathEl = bfsPathRefs.current[pathIndex];
+      animatePath(pathEl, perLevelDuration, delay);
+    });
+
+    // アニメーション完了後に leftoverEdges を表示
+    const timer = setTimeout(() => {
+      setShowLeftover(true);
+    }, totalDuration + 100); // 余裕を持って100ms追加
+
+    return () => clearTimeout(timer);
+  }, [bfsEdges]);
+
+  const linkScale = useMemo(() => {
+    return d3.scaleLinear().domain([0, 50, 100]).range([0, 0.1, 2]);
+  }, []);
+  const colorScale = useMemo(() => {
+    return d3
+      .scaleLinear<string>()
+      .domain([0, 50, 100])
+      .range(["red", "yellow", "green"]);
+  }, []);
 
   return (
     <div
@@ -196,296 +348,140 @@ const NodeLink = (props: NodeLinkProps) => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        transition: "background-image 0.5s ease", // 背景切り替えのアニメーション
+        transition: "background-image 0.5s ease",
       }}
     >
       <ZoomableSVG centerX={centerX} centerY={centerY}>
         {(transform) => (
           <>
-            {/* 非選択エッジを最初に描画 */}
-            {nonSelectedLinks.length > 0 &&
-              nonSelectedLinks.map((link: LinkType, i: number) => {
-                const isHovered =
-                  (link.source.index === hoveredIndex &&
-                    link.target.index === selectedIndex) ||
-                  (link.source.index === selectedIndex &&
-                    link.target.index === hoveredIndex);
-                const isSelected =
-                  link.source.index === selectedIndex ||
-                  link.target.index === selectedIndex;
+            {bfsEdges.map((link, i) => {
+              const sIdx = link.from.index ?? -1;
+              const tIdx = link.to.index ?? -1;
+              const isHovered =
+                (sIdx === hoveredIndex && tIdx === selectedIndex) ||
+                (sIdx === selectedIndex && tIdx === hoveredIndex);
+              const isSelected =
+                sIdx === selectedIndex || tIdx === selectedIndex;
 
-                return (
-                  <line
-                    key={i}
-                    className="link"
-                    x1={link.source.x}
-                    y1={link.source.y}
-                    x2={link.target.x}
-                    y2={link.target.y}
-                    style={{
-                      stroke: isHovered
-                        ? "orange"
-                        : isSelected
-                        ? "cyan"
-                        : "white",
-                      strokeWidth:
-                        isHovered || isSelected
-                          ? Math.max(
-                              linkScale(link.similarity as number),
-                              0.1
-                            ) + 1
-                          : Math.max(linkScale(link.similarity as number), 0.1),
-                    }}
+              // path 座標 (from -> to)
+              const d = `M${link.from.x},${link.from.y} L${link.to.x},${link.to.y}`;
+              const strokeColor = isHovered
+                ? "orange"
+                : isSelected
+                ? "cyan"
+                : "white";
+              const strokeW =
+                isHovered || isSelected
+                  ? Math.max(linkScale(link.similarity ?? 0), 0.1) + 1
+                  : Math.max(linkScale(link.similarity ?? 0), 0.1);
+
+              return (
+                <path
+                  key={`bfsEdge-${i}`}
+                  d={d}
+                  fill="none"
+                  stroke={strokeColor}
+                  strokeWidth={strokeW}
+                  ref={(el) => {
+                    bfsPathRefs.current[i] = el;
+                  }}
+                />
+              );
+            })}
+
+            {leftoverEdges.map((link, i) => {
+              const sIdx = link.source.index ?? -1;
+              const tIdx = link.target.index ?? -1;
+              const isHovered =
+                (sIdx === hoveredIndex && tIdx === selectedIndex) ||
+                (sIdx === selectedIndex && tIdx === hoveredIndex);
+              const isSelected =
+                sIdx === selectedIndex || tIdx === selectedIndex;
+
+              const d = `M${link.source.x},${link.source.y} L${link.target.x},${link.target.y}`;
+              const strokeColor = isHovered
+                ? "orange"
+                : isSelected
+                ? "cyan"
+                : "white";
+              const strokeW =
+                isHovered || isSelected
+                  ? Math.max(linkScale(link.similarity ?? 0), 0.1) + 1
+                  : Math.max(linkScale(link.similarity ?? 0), 0.1);
+
+              return (
+                <path
+                  key={`leftoverEdge-${i}`}
+                  d={d}
+                  fill="none"
+                  stroke={strokeColor}
+                  strokeWidth={strokeW}
+                  style={{
+                    opacity: showLeftover ? 1 : 0,
+                    transition: "opacity 500ms ease-in",
+                  }}
+                />
+              );
+            })}
+
+            {nodes.map((node: NodeType, i: number) => {
+              const isHovered = node.index === hoveredIndex;
+              return (
+                <g
+                  key={`node-${i}`}
+                  transform={`translate(${node.x},${node.y})`}
+                  onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
+                  onMouseLeave={() => setHoveredIndex(-1)}
+                  onClick={() => {
+                    if (selectedIndex !== node.index) {
+                      setSelectedIndex(node.index ?? i);
+                      setHoveredIndex(-1);
+                    }
+                  }}
+                >
+                  <Icon
+                    title={node.title}
+                    imgURL={node.imgURL}
+                    index={node.index ?? i}
+                    steamGameId={node.steamGameId}
+                    twitchGameId={node.twitchGameId}
+                    circleScale={node.circleScale ?? 1}
+                    suggestValue={node.suggestValue}
+                    isHovered={isHovered}
+                    selectedIndex={selectedIndex}
+                    similarGamesLinkList={selectedLinks}
                   />
-                );
-              })}
 
-            {/* 選択されていないノードを描画 */}
-            {nodes.length !== 0 &&
-              nodes.map((node: NodeType, i: number) => {
-                if (
-                  selectedIndex === i ||
-                  selectedLinks.find(
-                    (link: LinkType) =>
-                      link.source === node || link.target === node
-                  )
-                )
-                  return;
-
-                const isHovered = node.index === hoveredIndex;
-                return (
-                  <g
-                    transform={`translate(${node.x},${node.y})`}
-                    onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
-                    onMouseLeave={() => setHoveredIndex(-1)}
-                    onClick={() => {
-                      if (selectedIndex !== node.index) {
-                        setSelectedIndex(node.index);
-                        setHoveredIndex(-1);
-                      }
-                    }}
-                    key={i}
-                  >
-                    <Icon
-                      title={node.title}
-                      imgURL={node.imgURL}
-                      index={node.index ?? i}
-                      steamGameId={node.steamGameId}
+                  {/* パネルによる強調 */}
+                  {openPanel === "streamer" && (
+                    <HighlightStreamer
+                      streamerIds={streamerIds}
                       twitchGameId={node.twitchGameId}
-                      circleScale={node.circleScale ?? 1}
-                      suggestValue={node.suggestValue}
-                      isHovered={isHovered}
-                      selectedIndex={selectedIndex}
-                      similarGamesLinkList={selectedLinks}
+                      circleScale={node.circleScale}
                     />
-                    {/* 色付きセグメントを描画 配信者による強調 */}
-                    {openPanel === "streamer" && (
-                      <HighlightStreamer
-                        streamerIds={streamerIds}
-                        twitchGameId={node.twitchGameId}
-                        circleScale={node.circleScale}
-                      />
-                    )}
-
-                    {openPanel === "highlight" && (
-                      <HighlightTag
-                        tags={node.tags || []}
-                        selectedTags={selectedTags}
-                        circleScale={node.circleScale}
-                        index={node.index}
-                      />
-                    )}
-
-                    {openPanel === "steamList" && (
-                      <HighlightSteamList
-                        myGamesError={myGamesError}
-                        friendsGamesError={friendsGamesError}
-                        myOwnGames={myOwnGames}
-                        friendsOwnGames={friendsOwnGames}
-                        circleScale={node.circleScale}
-                        index={node.index}
-                        title={node.title}
-                      />
-                    )}
-                  </g>
-                );
-              })}
-
-            {/* 選択エッジとスコアを描画 */}
-            <g className="selected-edges">
-              {selectedLinks.length > 0 &&
-                selectedLinks.map((link: LinkType, i: number) => {
-                  const isHovered =
-                    (link.source.index === hoveredIndex &&
-                      link.target.index === selectedIndex) ||
-                    (link.source.index === selectedIndex &&
-                      link.target.index === hoveredIndex);
-
-                  // エッジ中点計算にノードの半径を考慮
-                  const sourceX = link.source.x as number;
-                  const sourceY = link.source.y as number;
-                  const targetX = link.target.x as number;
-                  const targetY = link.target.y as number;
-
-                  const sourceRadius = 17 * (link.source.circleScale ?? 1);
-                  const targetRadius = 17 * (link.target.circleScale ?? 1);
-
-                  // ベクトル方向を計算
-                  const deltaX = targetX - sourceX;
-                  const deltaY = targetY - sourceY;
-                  const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-
-                  // 正規化
-                  const normalizedX = deltaX / distance;
-                  const normalizedY = deltaY / distance;
-
-                  // ノードの端から端までの位置を調整
-                  const adjustedSourceX = sourceX + normalizedX * sourceRadius;
-                  const adjustedSourceY = sourceY + normalizedY * sourceRadius;
-                  const adjustedTargetX = targetX - normalizedX * targetRadius;
-                  const adjustedTargetY = targetY - normalizedY * targetRadius;
-
-                  // ノードの端の中間地点
-                  const midX = (adjustedSourceX + adjustedTargetX) / 2;
-                  const midY = (adjustedSourceY + adjustedTargetY) / 2;
-
-                  return (
-                    <g key={`selected-${i}`}>
-                      {/* エッジ表示 */}
-                      <line
-                        x1={sourceX}
-                        y1={sourceY}
-                        x2={targetX}
-                        y2={targetY}
-                        style={{
-                          stroke: isHovered ? "orange" : "cyan",
-                          strokeWidth:
-                            Math.max(
-                              linkScale(link.similarity as number),
-                              0.1
-                            ) + 1,
-                        }}
-                      />
-
-                      {/* エッジスコアの表示 */}
-                      {link.similarity !== undefined && (
-                        <g
-                          className="edge-score-group"
-                          transform={`translate(${midX}, ${midY})`}
-                        >
-                          <g
-                            onMouseEnter={() =>
-                              setTooltip({
-                                index: i,
-                                x: midX,
-                                y: midY,
-                              })
-                            }
-                            onMouseLeave={() => setTooltip(DEFAULT_TOOLTIP)}
-                          >
-                            {/* 背景の円形 */}
-                            <circle
-                              cx={0}
-                              cy={0}
-                              r={15} // 半径
-                              stroke={isHovered ? "orange" : "cyan"} // エッジの色に合わせる
-                              strokeWidth={
-                                Math.max(
-                                  linkScale(link.similarity as number),
-                                  0.1
-                                ) + 1
-                              }
-                              fill={colorScale(link.similarity)} // スコアに
-                            />
-                            {/* similarity スコアの表示 */}
-                            <text
-                              x={0}
-                              y={4} // テキストの中央寄せ調整
-                              textAnchor="middle"
-                              fill="#fff" // 白色に変更
-                              fontSize="12px"
-                              className="edge-score"
-                            >
-                              {link.similarity}
-                            </text>
-                          </g>
-                        </g>
-                      )}
-                    </g>
-                  );
-                })}
-            </g>
-
-            {/* 選択されているノード及びそれとつながっているノードを描画 */}
-            {nodes.length !== 0 &&
-              nodes.map((node: NodeType, i: number) => {
-                if (
-                  selectedIndex !== i &&
-                  !selectedLinks.find(
-                    (link: LinkType) =>
-                      link.source === node || link.target === node
-                  )
-                )
-                  return;
-
-                const isHovered = node.index === hoveredIndex;
-                return (
-                  <g
-                    transform={`translate(${node.x},${node.y})`}
-                    onMouseEnter={() => setHoveredIndex(node.index ?? -1)}
-                    onMouseLeave={() => setHoveredIndex(-1)}
-                    onClick={() => {
-                      if (selectedIndex !== node.index) {
-                        setSelectedIndex(node.index);
-                        setHoveredIndex(-1);
-                      }
-                    }}
-                    key={i}
-                  >
-                    <Icon
+                  )}
+                  {openPanel === "highlight" && (
+                    <HighlightTag
+                      tags={node.tags || []}
+                      selectedTags={selectedTags}
+                      circleScale={node.circleScale}
+                      index={node.index}
+                    />
+                  )}
+                  {openPanel === "steamList" && (
+                    <HighlightSteamList
+                      myGamesError={myGamesError}
+                      friendsGamesError={friendsGamesError}
+                      myOwnGames={myOwnGames}
+                      friendsOwnGames={friendsOwnGames}
+                      circleScale={node.circleScale}
+                      index={node.index}
                       title={node.title}
-                      imgURL={node.imgURL}
-                      index={node.index ?? i}
-                      steamGameId={node.steamGameId}
-                      twitchGameId={node.twitchGameId}
-                      circleScale={node.circleScale ?? 1}
-                      suggestValue={node.suggestValue}
-                      isHovered={isHovered}
-                      selectedIndex={selectedIndex}
-                      similarGamesLinkList={selectedLinks}
                     />
-                    {/* 色付きセグメントを描画 配信者による強調 */}
-                    {openPanel === "streamer" && (
-                      <HighlightStreamer
-                        streamerIds={streamerIds}
-                        twitchGameId={node.twitchGameId}
-                        circleScale={node.circleScale}
-                      />
-                    )}
-
-                    {openPanel === "highlight" && (
-                      <HighlightTag
-                        tags={node.tags || []}
-                        selectedTags={selectedTags}
-                        circleScale={node.circleScale}
-                        index={node.index}
-                      />
-                    )}
-
-                    {openPanel === "steamList" && (
-                      <HighlightSteamList
-                        myGamesError={myGamesError}
-                        friendsGamesError={friendsGamesError}
-                        myOwnGames={myOwnGames}
-                        friendsOwnGames={friendsOwnGames}
-                        circleScale={node.circleScale}
-                        index={node.index}
-                        title={node.title}
-                      />
-                    )}
-                  </g>
-                );
-              })}
+                  )}
+                </g>
+              );
+            })}
 
             {tooltip.index !== -1 && (
               <g>
@@ -495,7 +491,10 @@ const NodeLink = (props: NodeLinkProps) => {
                     link.source.index === selectedIndex
                       ? link.target.index
                       : link.source.index;
-                  const node: NodeType = nodes[gameIndex];
+                  const node: NodeType | undefined = nodes.find(
+                    (n) => n.index === gameIndex
+                  );
+                  if (!node) return null;
                   return (
                     <g
                       transform={`translate(${tooltip.x},${tooltip.y})`}
@@ -508,33 +507,26 @@ const NodeLink = (props: NodeLinkProps) => {
               </g>
             )}
 
-            {/* ホバー時のツールチップを追加 */}
+            {/* ノードホバー時のゲームツールチップ */}
             {hoveredIndex !== -1 && (
               <GameTooltip
                 videoUrls={
-                  nodes.find((node) => node.index === hoveredIndex)
-                    ?.mp4Movies || []
+                  nodes.find((n) => n.index === hoveredIndex)?.mp4Movies || []
                 }
                 screenshots={
-                  nodes.find((node) => node.index === hoveredIndex)
-                    ?.screenshots || []
+                  nodes.find((n) => n.index === hoveredIndex)?.screenshots || []
                 }
                 imgURL={
-                  nodes.find((node) => node.index === hoveredIndex)?.imgURL ||
-                  ""
+                  nodes.find((n) => n.index === hoveredIndex)?.imgURL || ""
                 }
-                price={
-                  nodes.find((node) => node.index === hoveredIndex)?.price || 0
-                }
+                price={nodes.find((n) => n.index === hoveredIndex)?.price || 0}
                 title={
-                  nodes.find((node) => node.index === hoveredIndex)?.title ||
+                  nodes.find((n) => n.index === hoveredIndex)?.title ||
                   "Unknown"
                 }
-                tags={
-                  nodes.find((node) => node.index === hoveredIndex)?.tags || []
-                }
-                x={nodes.find((node) => node.index === hoveredIndex)?.x || 0}
-                y={nodes.find((node) => node.index === hoveredIndex)?.y || 0}
+                tags={nodes.find((n) => n.index === hoveredIndex)?.tags || []}
+                x={nodes.find((n) => n.index === hoveredIndex)?.x || 0}
+                y={nodes.find((n) => n.index === hoveredIndex)?.y || 0}
                 transform={transform}
                 setHoveredIndex={setHoveredIndex}
                 index={hoveredIndex}
