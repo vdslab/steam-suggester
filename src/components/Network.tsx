@@ -24,7 +24,6 @@ import Tour from "./sidebar/Tour";
 import ProgressBar from "./common/ProgressBar";
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./sidebar/leaderboard/Leaderboard";
-import GameDetailPanel from "./detail/gameDetail";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { HomeHeader } from "./common/Headers";
@@ -33,6 +32,7 @@ import SimilaritySettings from "./sidebar/similaritySettings/SimilaritySettings"
 import { fetcher } from "./common/Fetcher";
 import useSWR from "swr";
 import SearchGames from "./sidebar/searchGames/SearchGames";
+import GameDetail from "./detail/GameDetail";
 
 const Network = () => {
 
@@ -193,7 +193,7 @@ const Network = () => {
         {/* ゲーム詳細表示 */}
         {selectedIndex !== -1 && nodes[selectedIndex] && isGameSearchOpen && (
           <div className="absolute top-0 right-0 w-1/4 z-20 h-full">
-            <GameDetailPanel
+            <GameDetail
               nodes={nodes}
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}

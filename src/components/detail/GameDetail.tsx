@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 import { useEffect, useRef, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
@@ -12,16 +11,13 @@ import ReviewCloud, { getColorByScore } from "../charts/ReviewCloud";
 
 // Icons
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import WindowsIcon from "@/components/common/WindowsIcon";
-import AppleIcon from "@mui/icons-material/Apple";
-import PersonIcon from "@mui/icons-material/Person";
-import GroupIcon from "@mui/icons-material/Group";
 import BuildIcon from "@mui/icons-material/Build";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CurrencyYenIcon from "@mui/icons-material/CurrencyYen";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
+import DistributorVideos from "./Clips/DistributorVideos";
 
 type Props = {
   nodes: NodeType[];
@@ -32,7 +28,7 @@ type Props = {
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const GameSearchPanel = (props: Props) => {
+const GameDetail = (props: Props) => {
   const {
     nodes,
     selectedIndex,
@@ -66,6 +62,18 @@ const GameSearchPanel = (props: Props) => {
     nodes[selectedIndex].imgURL,
     nodes[selectedIndex].screenshots,
   ].flat();
+
+  const [minHeight, setMinHeight] = useState<number | null>(null);
+
+  // 画像の高さを取得して最小の高さを設定
+  useEffect(() => {
+    if (screenshots.length > 0) {
+      const imgElements = document.querySelectorAll(".screenshot-img");
+      const heights = Array.from(imgElements).map((img) => img.clientHeight);
+      setMinHeight(Math.min(...heights));
+    }
+  }, [screenshots]);
+
   // スライドショーの自動切り替え
   useEffect(() => {
     if (selectedIndex !== -1 && screenshots.length > 1) {
@@ -98,7 +106,7 @@ const GameSearchPanel = (props: Props) => {
                       index + 1
                     }`}
                     width={600}
-                    height={400}
+                    height={minHeight || 400} // 最小の高さに設定
                     style={{
                       borderRadius: "4px",
                       opacity: currentSlide === index ? 1 : 0,
@@ -108,7 +116,7 @@ const GameSearchPanel = (props: Props) => {
                       top: 0,
                       left: 0,
                     }}
-                    className="object-cover rounded mb-2"
+                    className="object-cover rounded mb-2 screenshot-img"
                   />
                 ))}
                 {/* 画像右上に閉じるボタン */}
@@ -262,8 +270,11 @@ const GameSearchPanel = (props: Props) => {
             <ReviewCloud reviewData={nodes[selectedIndex].review} />
           </div>
 
-          {/* Populatityコンポーネント */}
           <Popularity nodes={nodes} selectedIndex={selectedIndex} />
+
+          <DistributorVideos
+            twitchGameId={nodes[selectedIndex].twitchGameId}
+          />
         </div>
       ) : (
         <div className="text-white text-center pt-24">
@@ -274,4 +285,4 @@ const GameSearchPanel = (props: Props) => {
   );
 };
 
-export default GameSearchPanel;
+export default GameDetail;
