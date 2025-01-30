@@ -45,6 +45,52 @@ type TooltipType = {
 
 type LinkWithLevel = LinkType & { level: number; from: NodeType; to: NodeType };
 
+// ユーティリティ関数：エッジのラベル位置を計算
+const calculateLabelPosition = (
+  from: NodeType,
+  to: NodeType,
+  offset: number = 15 // ラベルをエッジから離すオフセット
+): { x: number; y: number } => {
+  // ノードの半径を計算（circleScale * 基準半径）
+  const radiusFrom = (from.circleScale ?? 1) * 30;
+  const radiusTo = (to.circleScale ?? 1) * 30;
+
+  // エッジのベクトル
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance === 0) {
+    return { x: from.x, y: from.y };
+  }
+
+  // 単位ベクトル
+  const ux = dx / distance;
+  const uy = dy / distance;
+
+  // ノードの端からの開始点
+  const startX = from.x + ux * radiusFrom;
+  const startY = from.y + uy * radiusFrom;
+
+  // ノードの端からの終了点
+  const endX = to.x - ux * radiusTo;
+  const endY = to.y - uy * radiusTo;
+
+  // 中央点
+  const midX = (startX + endX) / 2;
+  const midY = (startY + endY) / 2;
+
+  // エッジに対する垂直ベクトル
+  const perpUx = -uy;
+  const perpUy = ux;
+
+  // ラベルの位置をエッジからオフセット
+  const labelX = midX + perpUx * offset;
+  const labelY = midY + perpUy * offset;
+
+  return { x: labelX, y: labelY };
+};
+
 const ZoomableSVG: React.FC<ZoomableSVGProps> = ({
   children,
   centerX,
@@ -157,6 +203,7 @@ function getBfsEdgesAllComponents(
   const adjacency = buildAdjacencyList(nodes, links);
   const visited = new Set<number>();
   const bfsEdges: LinkWithLevel[] = [];
+  const includedLinkKeys = new Set<string>(); // 重複防止用
 
   // 全ノードを index 昇順にループし、未訪問ノードがあればその連結成分を BFS
   for (let i = 0; i < nodes.length; i++) {
@@ -165,19 +212,18 @@ function getBfsEdgesAllComponents(
 
     if (!visited.has(nodeIndex)) {
       // 未訪問のノードがあれば BFS 開始
-      bfsFrom(nodeIndex, adjacency, visited, bfsEdges, nodes);
+      bfsFrom(nodeIndex, adjacency, visited, bfsEdges, nodes, includedLinkKeys);
     }
   }
 
   // BFS 辺に含まれなかったものは leftover
   const leftoverEdges = links.filter(
     (l) =>
-      !bfsEdges.some(
-        (bfsLink) =>
-          (bfsLink.source.index === l.source.index &&
-            bfsLink.to.index === l.target.index) ||
-          (bfsLink.source.index === l.target.index &&
-            bfsLink.to.index === l.source.index)
+      !includedLinkKeys.has(
+        `${Math.min(l.source.index, l.target.index)}-${Math.max(
+          l.source.index,
+          l.target.index
+        )}`
       )
   );
 
@@ -189,7 +235,8 @@ function bfsFrom(
   adjacency: Map<number, LinkType[]>,
   visited: Set<number>,
   bfsEdges: LinkWithLevel[],
-  nodes: NodeType[]
+  nodes: NodeType[],
+  includedLinkKeys: Set<string>
 ) {
   visited.add(startIndex);
   const queue: Array<{ node: number; level: number }> = [];
@@ -209,11 +256,15 @@ function bfsFrom(
       const neighbor = sIdx === node ? tIdx : sIdx;
 
       if (neighbor !== -1 && !visited.has(neighbor)) {
+        // エッジキーを作成（小さい方から順に）
+        const linkKey = `${Math.min(sIdx, tIdx)}-${Math.max(sIdx, tIdx)}`;
+        if (includedLinkKeys.has(linkKey)) continue; // 重複チェック
+
         visited.add(neighbor);
         queue.push({ node: neighbor, level: level + 1 });
         nodeLevels.set(neighbor, level + 1);
 
-        // Find nodes by index
+        // ノードをインデックスで検索
         const fromNode = nodes.find((n) => n.index === node);
         const toNode = nodes.find((n) => n.index === neighbor);
 
@@ -224,6 +275,7 @@ function bfsFrom(
             from: fromNode,
             to: toNode,
           });
+          includedLinkKeys.add(linkKey); // エッジを記録
         }
       }
     }
@@ -306,7 +358,7 @@ const NodeLink = (props: NodeLinkProps) => {
       return;
     }
 
-    // 全体のアニメーション時間を2秒に設定
+    // 全体のアニメーション時間を3秒に設定
     const totalDuration = 3000; // ms
     const perLevelDuration = maxLevel > 0 ? totalDuration / maxLevel : 0;
 
@@ -338,6 +390,15 @@ const NodeLink = (props: NodeLinkProps) => {
       .range(["red", "yellow", "green"]);
   }, []);
 
+  // 類似度に基づいて色を設定するためのスケール
+  const similarityColorScale = useMemo(() => {
+    return d3
+      .scaleLinear<string>()
+      .domain([0, 50, 100])
+      .range(["red", "yellow", "green"])
+      .interpolate(d3.interpolateHcl); // グラデーションを滑らかにする
+  }, []);
+
   return (
     <div
       style={{
@@ -354,6 +415,9 @@ const NodeLink = (props: NodeLinkProps) => {
       <ZoomableSVG centerX={centerX} centerY={centerY}>
         {(transform) => (
           <>
+            {/* --------------------
+                1) BFS エッジをアニメーション付きで描画
+               -------------------- */}
             {bfsEdges.map((link, i) => {
               const sIdx = link.from.index ?? -1;
               const tIdx = link.to.index ?? -1;
@@ -372,23 +436,48 @@ const NodeLink = (props: NodeLinkProps) => {
                 : "white";
               const strokeW =
                 isHovered || isSelected
-                  ? Math.max(linkScale(link.similarity ?? 0), 0.1) + 1
-                  : Math.max(linkScale(link.similarity ?? 0), 0.1);
+                  ? Math.max(linkScale(Number(link.similarity)), 0.1) + 1
+                  : Math.max(linkScale(Number(link.similarity)), 0.1);
+
+              // ラベル位置を計算（エッジからオフセット）
+              const labelPos = calculateLabelPosition(link.from, link.to, 15); // オフセット値を調整可能
 
               return (
-                <path
-                  key={`bfsEdge-${i}`}
-                  d={d}
-                  fill="none"
-                  stroke={strokeColor}
-                  strokeWidth={strokeW}
-                  ref={(el) => {
-                    bfsPathRefs.current[i] = el;
-                  }}
-                />
+                <g key={`bfsEdgeGroup-${i}`}>
+                  <path
+                    d={d}
+                    fill="none"
+                    stroke={strokeColor}
+                    strokeWidth={strokeW}
+                    ref={(el) => {
+                      bfsPathRefs.current[i] = el;
+                    }}
+                  />
+                  {/* 選択されたノードと接続しているエッジのみラベルを表示 */}
+                  {(sIdx === selectedIndex || tIdx === selectedIndex) && (
+                    <text
+                      x={labelPos.x}
+                      y={labelPos.y}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fill={similarityColorScale(Number(link.similarity))}
+                      fontSize="20px"
+                      pointerEvents="none" // ラベルがマウスイベントを妨げないように
+                      style={{
+                        userSelect: "none",
+                      }}
+                    >
+                      {link.similarity}
+                    </text>
+                  )}
+                </g>
               );
             })}
 
+            {/* --------------------
+                2) leftoverEdges 
+                   => BFSアニメ完了後に表示（フェードイン）
+               -------------------- */}
             {leftoverEdges.map((link, i) => {
               const sIdx = link.source.index ?? -1;
               const tIdx = link.target.index ?? -1;
@@ -406,24 +495,53 @@ const NodeLink = (props: NodeLinkProps) => {
                 : "white";
               const strokeW =
                 isHovered || isSelected
-                  ? Math.max(linkScale(link.similarity ?? 0), 0.1) + 1
-                  : Math.max(linkScale(link.similarity ?? 0), 0.1);
+                  ? Math.max(linkScale(Number(link.similarity)), 0.1) + 1
+                  : Math.max(linkScale(Number(link.similarity)), 0.1);
+
+              // ラベル位置を計算（エッジからオフセット）
+              const labelPos = calculateLabelPosition(
+                link.source,
+                link.target,
+                15
+              );
 
               return (
-                <path
-                  key={`leftoverEdge-${i}`}
-                  d={d}
-                  fill="none"
-                  stroke={strokeColor}
-                  strokeWidth={strokeW}
-                  style={{
-                    opacity: showLeftover ? 1 : 0,
-                    transition: "opacity 500ms ease-in",
-                  }}
-                />
+                <g key={`leftoverEdgeGroup-${i}`}>
+                  <path
+                    d={d}
+                    fill="none"
+                    stroke={strokeColor}
+                    strokeWidth={strokeW}
+                    style={{
+                      opacity: showLeftover ? 1 : 0,
+                      transition: "opacity 500ms ease-in",
+                    }}
+                  />
+                  {/* 選択されたノードと接続しているエッジのみラベルを表示 */}
+                  {showLeftover &&
+                    (sIdx === selectedIndex || tIdx === selectedIndex) && (
+                      <text
+                        x={labelPos.x}
+                        y={labelPos.y}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill={similarityColorScale(Number(link.similarity))}
+                        fontSize="20px"
+                        pointerEvents="none" // ラベルがマウスイベントを妨げないように
+                        style={{
+                          userSelect: "none",
+                        }}
+                      >
+                        {link.similarity}
+                      </text>
+                    )}
+                </g>
               );
             })}
 
+            {/* --------------------
+                3) ノードの描画
+               -------------------- */}
             {nodes.map((node: NodeType, i: number) => {
               const isHovered = node.index === hoveredIndex;
               return (
@@ -483,6 +601,10 @@ const NodeLink = (props: NodeLinkProps) => {
               );
             })}
 
+            {/* --------------------
+                4) ツールチップ等
+               -------------------- */}
+            {/* 選択されたエッジに対するポップアップ例 */}
             {tooltip.index !== -1 && (
               <g>
                 {selectedLinks.map((link, index) => {
