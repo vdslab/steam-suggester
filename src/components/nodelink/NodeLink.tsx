@@ -374,7 +374,7 @@ const NodeLink = (props: NodeLinkProps) => {
                         }}
                       />
 
-                      {/* エッジスコアの表示（円を削除し、テキストのみを表示） */}
+                      {/* エッジスコアの表示（テキストのみ） */}
                       {link.similarity !== undefined && (
                         <g
                           className="edge-score-group"
@@ -389,6 +389,7 @@ const NodeLink = (props: NodeLinkProps) => {
                               })
                             }
                             onMouseLeave={() => setTooltip(DEFAULT_TOOLTIP)}
+                            style={{ cursor: "pointer" }} // ホバー時にカーソルをポインタに変更
                           >
                             {/* similarity スコアの表示 */}
                             <text
@@ -396,12 +397,11 @@ const NodeLink = (props: NodeLinkProps) => {
                               y={0} // テキストの中央寄せ調整
                               textAnchor="middle"
                               alignmentBaseline="middle"
-                              fill="#fff" // 必要に応じて色を変更
+                              fill={colorScale(link.similarity)} // グラデーション色をテキストに適用
                               fontSize="24px"
                               fontWeight="bold"
                               className="edge-score"
                               style={{
-                                pointerEvents: "none", // マウスイベントを無効化（必要に応じて）
                                 textShadow: "1px 1px 2px rgba(0,0,0,0.5)", // 読みやすさ向上のための影
                               }}
                             >
