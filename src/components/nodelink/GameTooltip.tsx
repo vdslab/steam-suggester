@@ -143,6 +143,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
                         src={screenshot}
                         alt="Game Screenshot"
                         fill
+                        sizes="250px"
                         style={{
                           objectFit: "cover",
                         }}
@@ -168,6 +169,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
               src={imgURL}
               alt="Game Thumbnail"
               fill
+              sizes="150px"
               style={{
                 objectFit: "cover",
               }}
