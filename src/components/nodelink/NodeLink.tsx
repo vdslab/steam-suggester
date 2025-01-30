@@ -347,6 +347,13 @@ const NodeLink = (props: NodeLinkProps) => {
                   const midX = (adjustedSourceX + adjustedTargetX) / 2;
                   const midY = (adjustedSourceY + adjustedTargetY) / 2;
 
+                  // エッジに対して垂直な方向にオフセットを追加
+                  const offset = 20; // オフセットの距離（必要に応じて調整）
+                  const perpendicularX = -normalizedY;
+                  const perpendicularY = normalizedX;
+                  const textX = midX + perpendicularX * offset;
+                  const textY = midY + perpendicularY * offset;
+
                   return (
                     <g key={`selected-${i}`}>
                       {/* エッジ表示 */}
@@ -365,44 +372,37 @@ const NodeLink = (props: NodeLinkProps) => {
                         }}
                       />
 
-                      {/* エッジスコアの表示 */}
+                      {/* エッジスコアの表示（テキストのみ） */}
                       {link.similarity !== undefined && (
                         <g
                           className="edge-score-group"
-                          transform={`translate(${midX}, ${midY})`}
+                          transform={`translate(${textX}, ${textY})`}
                         >
                           <g
                             onMouseEnter={() =>
                               setTooltip({
                                 index: i,
-                                x: midX,
-                                y: midY,
+                                x: textX,
+                                y: textY,
                               })
                             }
                             onMouseLeave={() => setTooltip(DEFAULT_TOOLTIP)}
+                            style={{ cursor: "pointer" }} // ホバー時にカーソルをポインタに変更
                           >
-                            {/* 背景の円形 */}
-                            <circle
-                              cx={0}
-                              cy={0}
-                              r={15} // 半径
-                              stroke={isHovered ? "orange" : "cyan"} // エッジの色に合わせる
-                              strokeWidth={
-                                Math.max(
-                                  linkScale(link.similarity as number),
-                                  0.1
-                                ) + 1
-                              }
-                              fill={colorScale(link.similarity)} // スコアに
-                            />
                             {/* similarity スコアの表示 */}
                             <text
                               x={0}
-                              y={4} // テキストの中央寄せ調整
+                              y={0} // テキストの中央寄せ調整
                               textAnchor="middle"
-                              fill="#fff" // 白色に変更
-                              fontSize="12px"
+                              alignmentBaseline="middle"
+                              fill={colorScale(link.similarity)} // グラデーション色をテキストに適用
+                              fontSize="24px"
+                              fontWeight="bold"
                               className="edge-score"
+                              textDecoration="underline"
+                              style={{
+                                textShadow: "1px 1px 2px rgba(0,0,0,0.5)", // 読みやすさ向上のための影
+                              }}
                             >
                               {link.similarity}%
                             </text>

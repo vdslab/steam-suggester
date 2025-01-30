@@ -1,3 +1,4 @@
+import { CIRCLE_SIZE } from "@/constants/NETWORK_DATA";
 import React, { useMemo } from "react";
 
 type PropsType = {
@@ -85,7 +86,7 @@ const HighlightSteamList: React.FC<PropsType> = ({
         <circle
           cx="0"
           cy="0"
-          r="17" // 半径
+          r={CIRCLE_SIZE} // 半径
           stroke={`url(#${gradientId})`}
           strokeWidth="3"
           fill="transparent"
@@ -98,7 +99,7 @@ const HighlightSteamList: React.FC<PropsType> = ({
         <circle
           cx="0"
           cy="0"
-          r="17"
+          r={CIRCLE_SIZE}
           stroke={
             isMyOwned && isFriendOwned
               ? "rgba(0, 255, 0, 0.5)"

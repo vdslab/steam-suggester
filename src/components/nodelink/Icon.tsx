@@ -1,3 +1,4 @@
+import { CIRCLE_SIZE } from "@/constants/NETWORK_DATA";
 import { IconType, LinkType } from "@/types/NetworkType";
 
 const Icon = (props: IconType) => {
@@ -29,7 +30,7 @@ const Icon = (props: IconType) => {
     >
       <defs>
         <clipPath id={`clip-${index}`}>
-          <circle r={17} />
+          <circle r={CIRCLE_SIZE} />
         </clipPath>
 
         {/* フィルターを条件に応じてレンダリング */}

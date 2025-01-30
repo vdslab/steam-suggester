@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { changeGameIdData } from "@/hooks/indexedDB";
 import { SteamListType, NodeType } from "@/types/NetworkType";
 import SearchItemManager from "./SearchItemManager";
@@ -50,38 +50,45 @@ const SearchGames = ({
     };
   }, []);
 
-  // 検索ロジック
-  useEffect(() => {
-    const lowerCaseQuery = searchQuery.toLowerCase();
+  // allSteamList を効率的に作成
+  const allSteamList = useMemo(() => {
+    const steamMap = new Map<string, SteamListType>();
 
-    const allSteamList: SteamListType[] = nodes.map(
-      (node: NodeType): SteamListType => {
-        return {
-          steamGameId: node.steamGameId,
-          title: node.title,
-          index: node.index,
-        };
+    // nodes を優先して追加
+    nodes.forEach((node: NodeType) => {
+      steamMap.set(node.steamGameId, {
+        steamGameId: node.steamGameId,
+        title: node.title,
+        index: node.index,
+      });
+    });
+
+    // steamListData を追加（重複は自動的に排除される）
+    steamListData.forEach((item: SteamListType) => {
+      if (!steamMap.has(item.steamGameId)) {
+        steamMap.set(item.steamGameId, item);
       }
-    );
+    });
 
-    allSteamList.push(
-      ...steamListData.filter(
-        (item1: SteamListType) =>
-          !allSteamList.find(
-            (item2: SteamListType) => item2.steamGameId === item1.steamGameId
-          )
-      )
-    );
+    return Array.from(steamMap.values());
+  }, [nodes, steamListData]);
 
-    const filteredSteam = allSteamList
+  // 検索ロジックを useMemo に移動
+  const filteredSteam = useMemo(() => {
+    if (!searchQuery) return [];
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return allSteamList
       .filter(
         (game) =>
           game.title.toLowerCase().includes(lowerCaseQuery) && game.steamGameId
       )
       .slice(0, 20);
+  }, [searchQuery, allSteamList]);
 
+  // filteredSteamList を setState する useEffect を単純化
+  useEffect(() => {
     setFilteredSteamList(filteredSteam);
-  }, [searchQuery, userAddedGames, nodes, steamListData]);
+  }, [filteredSteam]);
 
   // ゲームを追加する処理
   const handleGameAdd = (steamGameId: string) => {

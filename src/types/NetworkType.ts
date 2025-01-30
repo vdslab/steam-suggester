@@ -45,8 +45,8 @@ export type NodeType = {
   title: string;
   genres: string[];
   tags: string[];
-  x?: number;
-  y?: number;
+  x: number;
+  y: number;
   vx?: number;
   vy?: number;
   imgURL: string;

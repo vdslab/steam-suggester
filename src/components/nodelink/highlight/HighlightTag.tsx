@@ -1,3 +1,4 @@
+import { CIRCLE_SIZE } from "@/constants/NETWORK_DATA";
 import React from "react";
 
 type PropsType = {
@@ -38,7 +39,7 @@ const HighlightTag: React.FC<PropsType> = React.memo(
             <circle
               cx="0"
               cy="0"
-              r="17"
+              r={CIRCLE_SIZE}
               stroke={`url(#strong-gradient-${index})`}
               strokeWidth="3"
               fill="transparent"
@@ -51,7 +52,7 @@ const HighlightTag: React.FC<PropsType> = React.memo(
             <circle
               cx="0"
               cy="0"
-              r="17"
+              r={CIRCLE_SIZE}
               stroke="rgba(255, 77, 77, 0.5)"
               strokeWidth="2"
               fill="transparent"
