@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { NodeType, LinkType } from "@/types/NetworkType";
-import { GAME_COUNT } from "@/constants/NETWORK_DATA";
+import { CIRCLE_SIZE, GAME_COUNT } from "@/constants/NETWORK_DATA";
 import fetchWithCache from "./fetchWithCache";
 import { TAG_LIST } from "@/constants/TAG_LIST";
 
@@ -213,15 +213,20 @@ const createNetwork = async (
     node.circleScale = sizeScale(node.activeUsers ?? 0);
   });
 
+  // シミュレーションパラメータ
+  const baseDistance = 200; // リンクの基本距離
+  const similarityFactor = 600; // similarityに応じて距離を減少させる係数
+  const minDistance = 10; // リンク距離の最小値（必要に応じて設定）
+
   const simulation = d3
     .forceSimulation<NodeType>(nodes)
-    .force("charge", d3.forceManyBody<NodeType>().strength(-200))
-    .force("center", d3.forceCenter(0, 0).strength(0.05))
+    .force("charge", d3.forceManyBody<NodeType>().strength(-800))
+    .force("center", d3.forceCenter(0, 0).strength(0.01))
     .force(
       "collide",
       d3
         .forceCollide<NodeType>()
-        .radius((d) => (d.circleScale ?? 1) * 30)
+        .radius((d) => (d.circleScale ?? 1) * (CIRCLE_SIZE + 15))
         .iterations(3)
     )
     .force(
@@ -235,11 +240,18 @@ const createNetwork = async (
           const similarity =
             similarityMatrix[sourceNode.index][targetNode.index].similarity ||
             0;
-          return 130 - similarity * 100;
+
+          // similarityに基づいてリンク距離を計算
+          let distance = baseDistance - similarity * similarityFactor;
+
+          // 距離が最小値を下回らないように制約
+          distance = Math.max(distance, minDistance);
+
+          return distance;
         })
-        .strength(1)
+        .strength(1) // 強度は変更しない
     )
-    .force("radial", d3.forceRadial(800).strength(0.1))
+    .force("radial", d3.forceRadial(1200).strength(0.1))
     .force(
       "cluster",
       d3

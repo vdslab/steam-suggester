@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { StreamerListType } from "@/types/NetworkType";
+import { CIRCLE_SIZE } from "@/constants/NETWORK_DATA";
 
 type PropsType = {
   streamerIds: StreamerListType[];
@@ -35,7 +36,7 @@ const HighlightStreamer: React.FC<PropsType> = ({
               <circle
                 cx="0"
                 cy="0"
-                r="17" // 半径
+                r={CIRCLE_SIZE} // 半径
                 stroke={color}
                 strokeWidth="1.5"
                 fill="transparent"
