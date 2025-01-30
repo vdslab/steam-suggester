@@ -14,7 +14,7 @@ import { fetcher } from "@/components/common/Fetcher";
 import SearchIcon from "@mui/icons-material/Search";
 import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "../../common/HelpTooltip";
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 
 type Props = {
   nodes: NodeType[];
@@ -37,8 +37,7 @@ const SteamList = (props: Props) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
-    fetcher,
-    { refreshInterval: ISR_FETCH_INTERVAL }
+    fetcher, CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -46,8 +45,7 @@ const SteamList = (props: Props) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
-    fetcher,
-    { refreshInterval: ISR_FETCH_INTERVAL }
+    fetcher, CACHE_UPDATE_EVERY_24H
   );
 
   if (status === "loading" || !session) {

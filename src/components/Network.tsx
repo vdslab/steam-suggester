@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import NodeLink from "./nodelink/NodeLink";
 import SelectParameter from "./sidebar/selectParameter/SelectParameter";
 import { DEFAULT_FILTER, DEFAULT_SLIDER } from "@/constants/DEFAULT_FILTER";
@@ -20,11 +20,10 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./common/Panel";
 import SteamList from "./sidebar/steamList/SteamList";
 import HelpTooltip from "./common/HelpTooltip";
-import Tour from "./sidebar/Tour";
+import Tour from "./tutorial/Tour";
 import ProgressBar from "./common/ProgressBar";
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./sidebar/leaderboard/Leaderboard";
-import GameDetailPanel from "./detail/gameDetail";
 import useTour from "@/hooks/useTour";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { HomeHeader } from "./common/Headers";
@@ -33,15 +32,16 @@ import SimilaritySettings from "./sidebar/similaritySettings/SimilaritySettings"
 import { fetcher } from "./common/Fetcher";
 import useSWR from "swr";
 import SearchGames from "./sidebar/searchGames/SearchGames";
+import GameDetail from "./detail/GameDetail";
+import Tutorial from "./tutorial/Tutorial";
 
-type Props = {
-  steamListData: SteamListType[];
-};
+const Network = () => {
 
-const Network = (props: Props) => {
-  const { steamListData } = props;
-
-  const { data: steamAllData, error } = useSWR<SteamDetailsDataType[]>(
+  const { data: steamAllData, error: steamAllDataError } = useSWR<SteamDetailsDataType[]>(
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
+    fetcher
+  );
+  const { data: steamListData, error: steamListDataError } = useSWR<SteamListType[]>(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     fetcher
   );
@@ -158,12 +158,12 @@ const Network = (props: Props) => {
     })();
   }, []);
 
-  if (isNetworkLoading || !steamAllData) {
+  if (isNetworkLoading || !steamAllData || !steamListData) {
     return <Loading />;
   }
 
-  if (error) {
-    return <Error error={error} reset={() => setIsNetworkLoading(true)} />;
+  if (steamAllDataError || steamListDataError) {
+    return <Error error={steamAllDataError || steamListDataError} reset={() => setIsNetworkLoading(true)} />;
   }
 
   return (
@@ -194,7 +194,7 @@ const Network = (props: Props) => {
         {/* ゲーム詳細表示 */}
         {selectedIndex !== -1 && nodes[selectedIndex] && isGameSearchOpen && (
           <div className="absolute top-0 right-0 w-1/4 z-20 h-full">
-            <GameDetailPanel
+            <GameDetail
               nodes={nodes}
               selectedIndex={selectedIndex}
               setSelectedIndex={setSelectedIndex}
@@ -343,8 +343,9 @@ const Network = (props: Props) => {
           />
         </div>
 
-        {/* Tourコンポーネント */}
-        <Tour run={tourRun} setRun={setTourRun} />
+        {/* チュートリアル */}
+        {/* <Tour run={tourRun} setRun={setTourRun} /> */}
+        <Tutorial run={tourRun} setRun={setTourRun} />
       </div>
     </div>
   );

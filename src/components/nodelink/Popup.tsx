@@ -97,7 +97,7 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
       : link.source.title;
 
   return (
-    <g transform={`translate(${offsetX}, ${offsetY})`}>
+    <g transform={`translate(${offsetX}, ${offsetY})`} className="select-none">
       <g>
         {/* ポップアップの背景 */}
         <rect

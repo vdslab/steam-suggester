@@ -94,6 +94,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
             position: "relative",
             boxSizing: "border-box",
           }}
+          className="select-none"
         >
           {/* 動画またはスライドショーセクション */}
           <div
