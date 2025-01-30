@@ -401,11 +401,12 @@ const NodeLink = (props: NodeLinkProps) => {
                               fontSize="24px"
                               fontWeight="bold"
                               className="edge-score"
+                              textDecoration="underline"
                               style={{
                                 textShadow: "1px 1px 2px rgba(0,0,0,0.5)", // 読みやすさ向上のための影
                               }}
                             >
-                              {link.similarity}
+                              {link.similarity}%
                             </text>
                           </g>
                         </g>
