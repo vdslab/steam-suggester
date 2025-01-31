@@ -115,6 +115,7 @@ const ReviewCloud = (props: Props) => {
                 transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
                 fontSize={w.size}
                 fontFamily={w.font}
+                style={{ userSelect: "none" }}
               >
                 {w.text}
               </Text>
