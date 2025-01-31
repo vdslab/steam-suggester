@@ -141,4 +141,6 @@ const SelectedLinks: React.FC<SelectedLinksProps> = React.memo(
   }
 );
 
+SelectedLinks.displayName = "SelectedLinks";
+
 export default SelectedLinks;

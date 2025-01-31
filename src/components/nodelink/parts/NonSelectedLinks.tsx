@@ -54,4 +54,6 @@ const NonSelectedLinks: React.FC<NonSelectedLinksProps> = React.memo(
   }
 );
 
+NonSelectedLinks.displayName = "NonSelectedLinks";
+
 export default NonSelectedLinks;
