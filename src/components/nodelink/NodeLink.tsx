@@ -135,7 +135,8 @@ const NodeLink = (props: NodeLinkProps) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
-    fetcher, CACHE_UPDATE_EVERY_24H
+    fetcher,
+    CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -145,7 +146,8 @@ const NodeLink = (props: NodeLinkProps) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
-    fetcher, CACHE_UPDATE_EVERY_24H
+    fetcher,
+    CACHE_UPDATE_EVERY_24H
   );
 
   // 選択されたエッジのリスト
@@ -271,7 +273,6 @@ const NodeLink = (props: NodeLinkProps) => {
                       steamGameId={node.steamGameId}
                       twitchGameId={node.twitchGameId}
                       circleScale={node.circleScale ?? 1}
-                      suggestValue={node.suggestValue}
                       isHovered={isHovered}
                       selectedIndex={selectedIndex}
                       similarGamesLinkList={selectedLinks}
@@ -447,7 +448,6 @@ const NodeLink = (props: NodeLinkProps) => {
                       steamGameId={node.steamGameId}
                       twitchGameId={node.twitchGameId}
                       circleScale={node.circleScale ?? 1}
-                      suggestValue={node.suggestValue}
                       isHovered={isHovered}
                       selectedIndex={selectedIndex}
                       similarGamesLinkList={selectedLinks}

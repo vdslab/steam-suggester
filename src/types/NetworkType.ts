@@ -5,7 +5,6 @@ export type IconType = {
   steamGameId: string;
   twitchGameId: string;
   circleScale: number;
-  suggestValue: number;
   isHovered: boolean;
   selectedIndex: number;
   similarGamesLinkList: LinkType[];
@@ -31,7 +30,6 @@ export type StreamerListType = {
 
 export type NodeType = {
   index: number;
-  suggestValue: number;
   steamGameId: string;
   circleScale?: number;
   price: number;
