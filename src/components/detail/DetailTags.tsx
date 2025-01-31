@@ -31,12 +31,10 @@ const DetailTags = (props:Props) => {
               </span>
             ))}
             {tags.length > maxTagsToShow && (
-              <span
-                className="text-blue-400 cursor-pointer ml-1"
-                onClick={() => setIsExpanded(true)}
-              >
+              <div className="group text-sky-600 transition duration-300 cursor-pointer" onClick={() => setIsExpanded(true)}>
                 他{tags.length - maxTagsToShow}件
-              </span>
+                <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-sky-600"></span>
+              </div>
             )}
           </>
         ) : (
@@ -51,12 +49,10 @@ const DetailTags = (props:Props) => {
                 {tag}
               </span>
             ))}
-            <span
-              className="text-blue-400 cursor-pointer ml-1"
-              onClick={() => setIsExpanded(false)}
-            >
+            <div className="group text-sky-600 transition duration-300 cursor-pointer" onClick={() => setIsExpanded(false)}>
               閉じる
-            </span>
+              <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-sky-600"></span>
+            </div>
           </>
         )}
       </div>

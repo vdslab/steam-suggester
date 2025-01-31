@@ -226,22 +226,6 @@ const GameDetail = (props: Props) => {
               </div>
 
               {/* タグ */}
-              {/* <div className="text-white">
-                {nodes[selectedIndex].tags &&
-                  nodes[selectedIndex].tags.length > 0 && (
-                    <div className="">
-                      {nodes[selectedIndex].tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded inline-block whitespace-nowrap cursor-pointer select-none"
-                          onClick={() => addSelectedTags(tag)}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-              </div> */}
               {nodes[selectedIndex].tags && (
                 <DetailTags tags={nodes[selectedIndex].tags} addSelectedTags={addSelectedTags} />
               )}
