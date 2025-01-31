@@ -94,7 +94,7 @@ const GameDetail = (props: Props) => {
             {/* 画像とアイコンのコンテナ */}
             {/* スライドショー */}
             {screenshots && (
-              <div className="overflow-hidden">
+              <div className="overflow-hidden h-80 relative">
                 {screenshots.map((screenshot, index) => (
                   <Image
                     key={index}
@@ -128,7 +128,7 @@ const GameDetail = (props: Props) => {
               </div>
             )}
 
-            <div className="px-2">
+            <div className="p-2">
               <div className="flex items-center">
                 {/* ゲームタイトル */}
                 <h2 className="text-white text-xl font-semibold">
