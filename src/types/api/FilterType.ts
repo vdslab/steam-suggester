@@ -10,6 +10,7 @@ export type Filter = {
     mac: boolean;
   };
   Playtime: { [key: string]: boolean };
+  Tags: string[];
 };
 
 export type SliderSettings = {

@@ -86,15 +86,14 @@ const createNetwork = async (
 
   // フィルターに合致したノード群を抽出
   const rawNodes = slicedData.filter((item) => {
-    const isInGenresFilter = item.genres.find((genre) => {
-      return filter.Genres[genre];
-    });
 
     const isSinglePlayer =
       !item.isSinglePlayer && !item.isMultiPlayer ? true : item.isSinglePlayer;
 
+    const isInTagsFilter = item.tags?.some(tag => filter.Tags.includes(tag));
+
     return (
-      isInGenresFilter &&
+      isInTagsFilter &&
       filter.Price.startPrice <= item.price &&
       item.price <= filter.Price.endPrice &&
       ((isSinglePlayer && filter.Mode.isSinglePlayer) ||

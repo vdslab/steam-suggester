@@ -73,10 +73,7 @@ const GameDetail = (props: Props) => {
   };
 
   const [currentSlide, setCurrentSlide] = useState(0); // 現在のスライドインデックス
-  const screenshots = [
-    nodes[selectedIndex].imgURL,
-    nodes[selectedIndex].screenshots,
-  ].flat();
+  const screenshots =  nodes[selectedIndex].screenshots || [nodes[selectedIndex].imgURL];
 
   const [minHeight, setMinHeight] = useState<number | null>(null);
 
@@ -91,7 +88,7 @@ const GameDetail = (props: Props) => {
 
   // スライドショーの自動切り替え
   useEffect(() => {
-    if (selectedIndex !== -1 && screenshots.length > 1) {
+    if (selectedIndex !== -1 && screenshots.length > 2) {
       const interval = setInterval(() => {
         setCurrentSlide((prevSlide) => {
           const screenshots = nodes[selectedIndex].screenshots || [];

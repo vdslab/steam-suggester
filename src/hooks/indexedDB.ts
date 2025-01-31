@@ -21,6 +21,7 @@ if (typeof window !== "undefined") {
     networkFilterStore.createIndex("Mode", "Mode", { unique: false });
     networkFilterStore.createIndex("Device", "Device", { unique: false });
     networkFilterStore.createIndex("Playtime", "Playtime", { unique: false });
+    networkFilterStore.createIndex("Tags", "Tags", { unique: false });
 
     if (!db.objectStoreNames.contains("userAddedGames")) {
       const userAddedGamesStore: IDBObjectStore = db.createObjectStore(
@@ -84,6 +85,7 @@ export async function getFilterData(): Promise<Filter | null> {
           Mode: result.Mode,
           Device: result.Device,
           Playtime: result.Playtime,
+          Tags: result.Tags,
         };
         resolve(filterResult);
       } else {
