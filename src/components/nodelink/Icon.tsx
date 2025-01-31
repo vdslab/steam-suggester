@@ -1,12 +1,11 @@
-import { CIRCLE_SIZE } from "@/constants/NETWORK_DATA";
 import { IconType, LinkType } from "@/types/NetworkType";
+import React from "react";
 
-const Icon = (props: IconType) => {
+const Icon = React.memo((props: IconType) => {
   const {
     imgURL,
     index,
     circleScale,
-    suggestValue,
     isHovered,
     selectedIndex,
     similarGamesLinkList,
@@ -29,10 +28,6 @@ const Icon = (props: IconType) => {
       filter={filterType ? `url(#glow-${filterType}-${index})` : undefined}
     >
       <defs>
-        <clipPath id={`clip-${index}`}>
-          <circle r={CIRCLE_SIZE} />
-        </clipPath>
-
         {/* フィルターを条件に応じてレンダリング */}
         {filterType && (
           <filter
@@ -71,7 +66,6 @@ const Icon = (props: IconType) => {
         height={60}
         x={-37.5}
         y={-30}
-        clipPath={`url(#clip-${index})`}
         style={{
           filter:
             isHovered || isSelected
@@ -81,11 +75,12 @@ const Icon = (props: IconType) => {
               : selectedIndex === -1
               ? "brightness(1.0)"
               : "brightness(0.5)",
-          transition: "filter 0.3s ease",
         }}
       />
     </g>
   );
-};
+});
+
+Icon.displayName = "Icon";
 
 export default Icon;
