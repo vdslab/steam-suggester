@@ -19,6 +19,7 @@ import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 import DistributorVideos from "./Clips/DistributorVideos";
 import DetailTags from "./DetailTags";
+import { Box, Tab, Tabs } from "@mui/material";
 
 type Props = {
   nodes: NodeType[];
@@ -29,6 +30,13 @@ type Props = {
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
 const GameDetail = (props: Props) => {
   const {
     nodes,
@@ -38,6 +46,12 @@ const GameDetail = (props: Props) => {
     selectedTags,
     setSelectedTags,
   } = props;
+
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+  };
 
   // Ref for the selected game detail
   const selectedDetailRef = useRef<HTMLDivElement | null>(null);
@@ -261,11 +275,15 @@ const GameDetail = (props: Props) => {
             )}
           </div>
 
-          <Popularity nodes={nodes} selectedIndex={selectedIndex} />
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example">
+              <Tab label="流行度" {...a11yProps(0)} sx={{ color:"white"}}/>
+              <Tab label="Twitchクリップ" {...a11yProps(1)} sx={{ color:"white"}} />
+            </Tabs>
+          </Box>
 
-          <DistributorVideos
-            twitchGameId={nodes[selectedIndex].twitchGameId}
-          />
+          {tabIndex === 0 && (<Popularity nodes={nodes} selectedIndex={selectedIndex} />)}
+          {tabIndex === 1 && (<DistributorVideos twitchGameId={nodes[selectedIndex].twitchGameId} />)}
         </div>
       ) : (
         <div className="text-white text-center pt-24">

@@ -18,72 +18,53 @@ type Props = {
 type WordData = {
   text: string;
   value: number;
-  score: number; // スコアを追加
+  score: number;
 };
 
 export const getColorByScore = (score: number) => {
-  // スコアが1のときに青、-1のときに赤になるように補完
   const blue = "#4a90e2";
   const red = "#d14b56";
+  const ratio = (score + 1) / 2;
 
-  // スコアが-1から1の範囲で補完
-  const ratio = (score + 1) / 2; // -1 -> 0, 1 -> 1 の範囲に変換
+  const interpolate = (start: number, end: number) =>
+    Math.round(start + ratio * (end - start))
+      .toString(16)
+      .padStart(2, "0");
 
-  // RGBで補完するため、赤と青のRGB値を取得
-  const redRGB = parseInt(red.slice(1, 3), 16);
-  const greenRGB = parseInt(red.slice(3, 5), 16);
-  const blueRGB = parseInt(red.slice(5, 7), 16);
-
-  const blueRGBNew = parseInt(blue.slice(1, 3), 16);
-  const greenRGBNew = parseInt(blue.slice(3, 5), 16);
-  const blueRGBNew2 = parseInt(blue.slice(5, 7), 16);
-
-  // 赤と青の間で線形補完
-  const r = Math.round(redRGB + ratio * (blueRGBNew - redRGB))
-    .toString(16)
-    .padStart(2, "0");
-  const g = Math.round(greenRGB + ratio * (greenRGBNew - greenRGB))
-    .toString(16)
-    .padStart(2, "0");
-  const b = Math.round(blueRGB + ratio * (blueRGBNew2 - blueRGB))
-    .toString(16)
-    .padStart(2, "0");
-
-  // 変換したRGB値を使って色を作成
-  return `#${r}${g}${b}`;
+  return `#${interpolate(209, 74)}${interpolate(75, 144)}${interpolate(86, 226)}`;
 };
 
 // 固定値ジェネレータ
 const fixedValueGenerator = () => 0.5;
-const MAX_REVIEW_WORDS = 70;
+const MAX_REVIEW_WORDS = 40;
 
-const ReviewCloud = (props: Props) => {
-  const { reviewData } = props;
-
+const ReviewCloud = ({ reviewData }: Props) => {
   const [words, setWords] = useState<WordData[]>([]);
-
-  // 画面サイズ取得
+  const [isLoading, setIsLoading] = useState(true); // ローディング状態
   const { width, height } = useScreenSize({ debounceTime: 150 });
 
-  // レビューを処理してワードクラウド用データを準備
+  // 1秒のローディングを挟む
   useEffect(() => {
-    const filteredData = reviewData
-      .sort((a, b) => b.tfidf - a.tfidf) // TF-IDF の降順でソート
-      .slice(0, MAX_REVIEW_WORDS);
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      const filteredData = reviewData
+        .sort((a, b) => b.tfidf - a.tfidf)
+        .slice(0, MAX_REVIEW_WORDS)
+        .map((item) => ({
+          text: item.name,
+          value: item.tfidf,
+          score: item.score,
+        }));
 
-    const data = filteredData.map((item) => ({
-      text: item.name,
-      value: item.tfidf,
-      score: item.score,
-    }));
-    setWords(data);
+      setWords(filteredData);
+      setIsLoading(false);
+    }, 1300);
+
+    return () => clearTimeout(timer);
   }, [reviewData]);
 
   const fontScale = scaleLog({
-    domain: [
-      Math.min(...words.map((w) => w.value)),
-      Math.max(...words.map((w) => w.value)),
-    ],
+    domain: words.length ? [Math.min(...words.map((w) => w.value)), Math.max(...words.map((w) => w.value))] : [1, 100],
     range: [10, 100],
   });
 
@@ -93,36 +74,54 @@ const ReviewCloud = (props: Props) => {
     return <div className="text-white">レビューがありません</div>;
   }
 
+  const cloudWidth = width / 5;
+  const cloudHeight = height / 4;
+
   return (
-    <Suspense fallback={<CircularProgress />}>
-      <Wordcloud
-        words={words}
-        width={width / 5}
-        height={height / 4}
-        fontSize={fontSizeSetter}
-        padding={2}
-        rotate={0}
-        random={fixedValueGenerator}
-      >
-        {(cloudWords) =>
-          cloudWords.map((w: d3Cloud.Word) => {
-            const wordData = words.find((word) => word.text === w.text);
-            return (
-              <Text
-                key={w.text}
-                fill={wordData ? getColorByScore(wordData.score) : "gray"}
-                textAnchor={"middle"}
-                transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
-                fontSize={w.size}
-                fontFamily={w.font}
-              >
-                {w.text}
-              </Text>
-            );
-          })
-        }
-      </Wordcloud>
-    </Suspense>
+    <div className="relative w-full h-full flex items-center justify-center">
+      {isLoading ? (
+        <div
+          style={{
+            width: cloudWidth,
+            height: cloudHeight,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      ) : (
+        <Wordcloud
+          words={words}
+          width={cloudWidth}
+          height={cloudHeight}
+          fontSize={fontSizeSetter}
+          padding={2}
+          rotate={0}
+          random={fixedValueGenerator}
+        >
+          {(cloudWords) =>
+            cloudWords.map((w: d3Cloud.Word) => {
+              const wordData = words.find((word) => word.text === w.text);
+              return (
+                <Text
+                  key={w.text}
+                  fill={wordData ? getColorByScore(wordData.score) : "gray"}
+                  textAnchor="middle"
+                  transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
+                  fontSize={w.size}
+                  fontFamily={w.font}
+                  style={{ userSelect: "none" }}
+                >
+                  {w.text}
+                </Text>
+              );
+            })
+          }
+        </Wordcloud>
+      )}
+    </div>
   );
 };
 
