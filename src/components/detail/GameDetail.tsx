@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
 import HelpTooltip from "../common/HelpTooltip";
@@ -19,6 +19,7 @@ import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 import DistributorVideos from "./Clips/DistributorVideos";
 import DetailTags from "./DetailTags";
+import { Box, Tab, Tabs } from "@mui/material";
 
 type Props = {
   node: NodeType;
@@ -28,7 +29,14 @@ type Props = {
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const GameDetail = React.memo((props: Props) => {
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+const GameDetail = (props: Props) => {
   const {
     node,
     setSelectedIndex,
@@ -36,6 +44,12 @@ const GameDetail = React.memo((props: Props) => {
     selectedTags,
     setSelectedTags,
   } = props;
+
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+  };
 
   const addSelectedTags = (newTag: string) => {
     if (selectedTags.includes(newTag)) return;
@@ -228,9 +242,18 @@ const GameDetail = React.memo((props: Props) => {
             {node.review && <ReviewCloud reviewData={node.review} />}
           </div>
 
-          <Popularity node={node} />
+
 
           <DistributorVideos twitchGameId={node.twitchGameId} />
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example">
+              <Tab label="流行度" {...a11yProps(0)} sx={{ color:"white"}}/>
+              <Tab label="Twitchクリップ" {...a11yProps(1)} sx={{ color:"white"}} />
+            </Tabs>
+          </Box>
+
+          {tabIndex === 0 && (<Popularity node={node} />)}
+          {tabIndex === 1 && (<DistributorVideos twitchGameId={node.twitchGameId} />)}
         </div>
       ) : (
         <div className="text-white text-center pt-24">

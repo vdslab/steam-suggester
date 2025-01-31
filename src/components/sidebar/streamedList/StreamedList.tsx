@@ -375,11 +375,10 @@ const StreamedList = (props: Props) => {
             variant="contained"
             color="primary"
             onClick={handleSearch}
-            disabled={isSearching}
-            className="rounded-none"
+            sx={{ borderRadius: "0" }}
           >
             {isSearching ? (
-              <CircularProgress size={24} color="inherit" />
+              <CircularProgress size={24} sx={{ color: "white"}} />
             ) : (
               "検索"
             )}

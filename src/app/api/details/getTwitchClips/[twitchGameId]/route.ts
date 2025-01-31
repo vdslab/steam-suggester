@@ -13,7 +13,7 @@ type Params = {
 };
 
 export async function GET(req: Request, { params }: Params) {
-  const ClipCount = 3;
+  const ClipCount = 20;
 
   const gameId = params.twitchGameId;
 
@@ -37,7 +37,7 @@ export async function GET(req: Request, { params }: Params) {
 
     // 英語のクリップが多すぎるから５０件取得
     const res = await fetch(
-      `https://api.twitch.tv/helix/clips?game_id=${gameId}&started_at=${startedAtRFC3339}&is_featured=true&first=50`,
+      `https://api.twitch.tv/helix/clips?game_id=${gameId}&is_featured=true&first=50`,
       {
         headers: headers,
       }

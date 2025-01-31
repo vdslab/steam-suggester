@@ -34,19 +34,22 @@ import useSWR from "swr";
 import SearchGames from "./sidebar/searchGames/SearchGames";
 import GameDetail from "./detail/GameDetail";
 import Tutorial from "./tutorial/Tutorial";
+import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 
 const Network = () => {
   const { data: steamAllData, error: steamAllDataError } = useSWR<
     SteamDetailsDataType[]
   >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    fetcher
+    fetcher,
+    CACHE_UPDATE_EVERY_24H
   );
   const { data: steamListData, error: steamListDataError } = useSWR<
     SteamListType[]
   >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    fetcher
+    fetcher,
+    CACHE_UPDATE_EVERY_24H
   );
 
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);

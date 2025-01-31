@@ -47,7 +47,7 @@ const Leaderboard: React.FC<Props> = ({
       <div className="flex items-center mb-4">
         <LeaderboardOutlinedIcon className="text-white mr-2" />
         <h2 className="text-xl font-semibold">ランキング</h2>
-        <HelpTooltip title="人気のゲームランキングです。" />
+        <HelpTooltip title="Steamのアクティブユーザー数ランキングを表示します。新しく追加されたゲームタイトルは色付きで表示されます。" />
       </div>
       <ul>
         {sortedNodes.map((node, index) => {
