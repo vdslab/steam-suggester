@@ -11,12 +11,13 @@ import Button from "@mui/material/Button";
 type Props = {
   selectedTags: string[];
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+  defaultTags?: string[];
 };
 
 
 const TagsSelect = (props:Props) => {
 
-  const { selectedTags, setSelectedTags } = props;
+  const { selectedTags, setSelectedTags, defaultTags } = props;
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -48,7 +49,7 @@ const TagsSelect = (props:Props) => {
     <div>
       {/* 全解除 */}
       <Button
-        onClick={() => setSelectedTags([])}
+        onClick={() => setSelectedTags(defaultTags ? defaultTags : [])}
         variant="outlined"
         startIcon={<RefreshOutlinedIcon />}
         sx={{ mb: 2 }}

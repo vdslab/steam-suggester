@@ -19,8 +19,6 @@ const AreaRechart = (props:Props) => {
 
   const { data, dataKey, color, title } = props;
 
-  console.log(data);
-
   return (
     <div className="flex-1 flex flex-col items-center justify-center border border-gray-500 rounded-md">
       <ResponsiveContainer width="100%" height={100}>

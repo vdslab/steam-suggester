@@ -7,7 +7,7 @@ import {
 } from "@/constants/DEFAULT_FILTER";
 import { changeFilterData } from "@/hooks/indexedDB";
 import { Filter } from "@/types/api/FilterType";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import FilterButtonGroup from "./FilterButtonGroup";
 import Panel from "../../common/Panel";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -35,7 +35,7 @@ const SelectParameter: React.FC<Props> = ({
     startPrice: number;
     endPrice: number;
   } | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>(filter.Tags);
 
   useEffect(() => {
     if (filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {
@@ -123,7 +123,7 @@ const SelectParameter: React.FC<Props> = ({
         {/* タグフィルター */}
         <div className="pr-4">
           <Section title="価格" icon={<AttachMoneyIcon />}>
-            <TagsSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
+            <TagsSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} defaultTags={filter.Tags}/>
           </Section>
         </div>
 
