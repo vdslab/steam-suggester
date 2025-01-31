@@ -18,6 +18,7 @@ import RateReviewIcon from "@mui/icons-material/RateReview";
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 import DistributorVideos from "./Clips/DistributorVideos";
+import DetailTags from "./DetailTags";
 
 type Props = {
   nodes: NodeType[];
@@ -225,10 +226,10 @@ const GameDetail = (props: Props) => {
               </div>
 
               {/* タグ */}
-              <div className="text-white">
+              {/* <div className="text-white">
                 {nodes[selectedIndex].tags &&
                   nodes[selectedIndex].tags.length > 0 && (
-                    <div className="line-clamp-2 overflow-hidden">
+                    <div className="">
                       {nodes[selectedIndex].tags.map((tag, index) => (
                         <span
                           key={index}
@@ -240,7 +241,10 @@ const GameDetail = (props: Props) => {
                       ))}
                     </div>
                   )}
-              </div>
+              </div> */}
+              {nodes[selectedIndex].tags && (
+                <DetailTags tags={nodes[selectedIndex].tags} addSelectedTags={addSelectedTags} />
+              )}
             </div>
           </div>
 
