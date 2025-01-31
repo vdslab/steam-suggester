@@ -1,13 +1,4 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { NodeType } from "@/types/NetworkType";
-import Image from "next/image";
-import HelpTooltip from "../common/HelpTooltip";
-
-import Tooltip from "@mui/material/Tooltip";
-import Link from "next/link";
-import Popularity from "./Popularity2";
-import ReviewCloud, { getColorByScore } from "../charts/ReviewCloud";
 
 // Icons
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
@@ -17,9 +8,18 @@ import CurrencyYenIcon from "@mui/icons-material/CurrencyYen";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
+
+import { useEffect, useState } from "react";
+import { NodeType } from "@/types/NetworkType";
+import Image from "next/image";
+import HelpTooltip from "../common/HelpTooltip";
+import Tooltip from "@mui/material/Tooltip";
+import Link from "next/link";
+import ReviewCloud, { getColorByScore } from "../charts/ReviewCloud";
 import DistributorVideos from "./Clips/DistributorVideos";
 import DetailTags from "./DetailTags";
 import { Box, Tab, Tabs } from "@mui/material";
+import PopularityCharts from "./PopularityCharts";
 
 type Props = {
   node: NodeType;
@@ -250,7 +250,7 @@ const GameDetail = (props: Props) => {
             </Tabs>
           </Box>
 
-          {tabIndex === 0 && (<Popularity node={node} />)}
+          {tabIndex === 0 && (<PopularityCharts node={node} />)}
           {tabIndex === 1 && (<DistributorVideos twitchGameId={node.twitchGameId} />)}
         </div>
       ) : (
