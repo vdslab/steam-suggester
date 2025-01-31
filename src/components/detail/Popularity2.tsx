@@ -15,35 +15,32 @@ import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
 
 type Props = {
-  nodes: NodeType[];
-  selectedIndex: number;
+  node: NodeType;
 };
 
-const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
-  const selectedNode = nodes[selectedIndex] || null;
-
+const Popularity2: React.FC<Props> = ({ node }) => {
   const { data: steamData, error: steamError } = useSWR(
-    selectedNode
-      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countRecentSteamReviews/${selectedNode.steamGameId}`
+    node
+      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countRecentSteamReviews/${node.steamGameId}`
       : null,
     fetcher
   );
 
   const { data: twitchData, error: twitchError } = useSWR(
-    selectedNode
-      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchViews/${selectedNode.twitchGameId}`
+    node
+      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchViews/${node.twitchGameId}`
       : null,
     fetcher
   );
 
   const { data: activeUsersData, error: activeUsersError } = useSWR(
-    selectedNode
-      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${selectedNode.steamGameId}`
+    node
+      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${node.steamGameId}`
       : null,
     fetcher
   );
 
-  if (!selectedNode) {
+  if (!node) {
     return (
       <div className="text-white text-center">ゲームが選択されていません。</div>
     );
@@ -58,7 +55,11 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
   }
 
   if (steamError || twitchError || activeUsersError) {
-    return <div className="text-red-500 text-center">データの取得に失敗しました。</div>;
+    return (
+      <div className="text-red-500 text-center">
+        データの取得に失敗しました。
+      </div>
+    );
   }
 
   const formatDate = (timestamp: number) => {

@@ -203,8 +203,7 @@ const Network = () => {
         {selectedIndex !== -1 && nodes[selectedIndex] && isGameSearchOpen && (
           <div className="absolute top-0 right-0 w-1/4 z-20 h-full">
             <GameDetail
-              nodes={nodes}
-              selectedIndex={selectedIndex}
+              node={nodes[selectedIndex]}
               setSelectedIndex={setSelectedIndex}
               setOpenPanel={setOpenPanel}
               selectedTags={selectedTags}
