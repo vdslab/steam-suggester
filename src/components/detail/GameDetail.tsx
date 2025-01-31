@@ -267,7 +267,10 @@ const GameDetail = (props: Props) => {
                 </span>
               </div>
             </h3>
-            <ReviewCloud reviewData={nodes[selectedIndex].review} />
+
+            {nodes[selectedIndex].review && (
+              <ReviewCloud reviewData={nodes[selectedIndex].review} />
+            )}
           </div>
 
           <Popularity nodes={nodes} selectedIndex={selectedIndex} />
