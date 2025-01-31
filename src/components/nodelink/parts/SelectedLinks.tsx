@@ -33,6 +33,25 @@ const SelectedLinks: React.FC<SelectedLinksProps> = React.memo(
     colorScale,
     setTooltip,
   }) => {
+    // 長方形ノードの境界との交点を計算するヘルパー関数
+    const getRectIntersection = (
+      cx: number,
+      cy: number,
+      halfWidth: number,
+      halfHeight: number,
+      dx: number,
+      dy: number
+    ) => {
+      // dx,dyは既に正規化されている前提
+      const tX = halfWidth / Math.abs(dx);
+      const tY = halfHeight / Math.abs(dy);
+      const t = Math.min(tX, tY);
+      return {
+        x: cx + dx * t,
+        y: cy + dy * t,
+      };
+    };
+
     return (
       <g>
         {selectedLinks.map((link: LinkType, i: number) => {
@@ -42,35 +61,58 @@ const SelectedLinks: React.FC<SelectedLinksProps> = React.memo(
             (link.source.index === selectedIndex &&
               link.target.index === hoveredIndex);
 
-          // エッジの中点とオフセットを計算
+          // ノード中心座標
           const sourceX = link.source.x as number;
           const sourceY = link.source.y as number;
           const targetX = link.target.x as number;
           const targetY = link.target.y as number;
 
-          const sourceRadius = 17 * (link.source.circleScale ?? 1);
-          const targetRadius = 17 * (link.target.circleScale ?? 1);
+          // 仮のベースサイズ設定 (長方形の場合、幅と高さが異なる可能性があります)
+          const baseHalfWidth = 37; // 例: 幅34の半分
+          const baseHalfHeight = 20; // 例: 高さ24の半分
 
+          // ノードの大きさは circleScale で調整
+          const sourceHalfWidth =
+            baseHalfWidth * (link.source.circleScale ?? 1);
+          const sourceHalfHeight =
+            baseHalfHeight * (link.source.circleScale ?? 1);
+          const targetHalfWidth =
+            baseHalfWidth * (link.target.circleScale ?? 1);
+          const targetHalfHeight =
+            baseHalfHeight * (link.target.circleScale ?? 1);
+
+          // ソースからターゲットへの方向ベクトル
           const deltaX = targetX - sourceX;
           const deltaY = targetY - sourceY;
           const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
 
+          // ゼロ除算防止
+          if (distance === 0) return null;
           const normalizedX = deltaX / distance;
           const normalizedY = deltaY / distance;
 
-          const adjustedSourceX = sourceX + normalizedX * sourceRadius;
-          const adjustedSourceY = sourceY + normalizedY * sourceRadius;
-          const adjustedTargetX = targetX - normalizedX * targetRadius;
-          const adjustedTargetY = targetY - normalizedY * targetRadius;
+          // ノードの境界との交点を計算
+          const sourceIntersection = getRectIntersection(
+            sourceX,
+            sourceY,
+            sourceHalfWidth,
+            sourceHalfHeight,
+            normalizedX,
+            normalizedY
+          );
+          // ターゲット側は中心から逆方向
+          const targetIntersection = getRectIntersection(
+            targetX,
+            targetY,
+            targetHalfWidth,
+            targetHalfHeight,
+            -normalizedX,
+            -normalizedY
+          );
 
-          const midX = (adjustedSourceX + adjustedTargetX) / 2;
-          const midY = (adjustedSourceY + adjustedTargetY) / 2;
-
-          const offset = 20;
-          const perpendicularX = -normalizedY;
-          const perpendicularY = normalizedX;
-          const textX = midX + perpendicularX * offset;
-          const textY = midY + perpendicularY * offset;
+          // 両交点の中点を計算（この位置をエッジ上のテキスト表示位置とする）
+          const midX = (sourceIntersection.x + targetIntersection.x) / 2;
+          const midY = (sourceIntersection.y + targetIntersection.y) / 2;
 
           return (
             <g key={`selected-${i}`}>
@@ -91,14 +133,14 @@ const SelectedLinks: React.FC<SelectedLinksProps> = React.memo(
               {link.similarity !== undefined && (
                 <g
                   className="edge-score-group"
-                  transform={`translate(${textX}, ${textY})`}
+                  transform={`translate(${midX}, ${midY})`}
                 >
                   <g
                     onMouseEnter={() =>
                       setTooltip({
                         index: i,
-                        x: textX,
-                        y: textY,
+                        x: midX,
+                        y: midY,
                       })
                     }
                     onMouseLeave={() => setTooltip(DEFAULT_TOOLTIP)}
