@@ -172,7 +172,7 @@ const NodeLink = (props: NodeLinkProps) => {
   const colorScale = d3
     .scaleLinear<string>()
     .domain([0, 50, 100]) // スコアの範囲に応じて調整
-    .range(["red", "yellow", "green"]);
+    .range(["red", "yellow", "lime"]);
 
   // 背景変更を適用
   useEffect(() => {
