@@ -86,11 +86,10 @@ const createNetwork = async (
 
   // フィルターに合致したノード群を抽出
   const rawNodes = slicedData.filter((item) => {
-
     const isSinglePlayer =
       !item.isSinglePlayer && !item.isMultiPlayer ? true : item.isSinglePlayer;
 
-    const isInTagsFilter = item.tags?.some(tag => filter.Tags.includes(tag));
+    const isInTagsFilter = item.tags?.some((tag) => filter.Tags.includes(tag));
 
     return (
       isInTagsFilter &&
@@ -266,7 +265,7 @@ const createNetwork = async (
   const similarityScale = d3
     .scaleLinear()
     .domain(d3.extent(links, (link) => link.similarity) as [number, number])
-    .range([0, 100]);
+    .range([0, 99]);
 
   links.forEach((link) => {
     link.similarity = Math.round(similarityScale(link.similarity as number));
