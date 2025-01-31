@@ -1,6 +1,7 @@
 import { IconType, LinkType } from "@/types/NetworkType";
+import React from "react";
 
-const Icon = (props: IconType) => {
+const Icon = React.memo((props: IconType) => {
   const {
     imgURL,
     index,
@@ -78,6 +79,6 @@ const Icon = (props: IconType) => {
       />
     </g>
   );
-};
+});
 
 export default Icon;
