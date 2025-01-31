@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
 import HelpTooltip from "../common/HelpTooltip";
@@ -28,7 +28,7 @@ type Props = {
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const GameDetail = (props: Props) => {
+const GameDetail = React.memo((props: Props) => {
   const {
     node,
     setSelectedIndex,
@@ -230,7 +230,7 @@ const GameDetail = (props: Props) => {
 
           <Popularity node={node} />
 
-          <DistributorVideos twitchGameId={node.twitchGameId} />
+          {/* <DistributorVideos twitchGameId={node.twitchGameId} /> */}
         </div>
       ) : (
         <div className="text-white text-center pt-24">
@@ -239,6 +239,6 @@ const GameDetail = (props: Props) => {
       )}
     </div>
   );
-};
+});
 
 export default GameDetail;
