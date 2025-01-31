@@ -25,25 +25,26 @@ const ClipSlideshow = (props: Props) => {
     );
   };
 
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 10000);
-    return () => clearInterval(timer);
-  }, [data.length, nextSlide]);
-
   return (
     <div className="m-3">
       <div className="relative flex items-center justify-center">
         <button
           onClick={prevSlide}
-          className={`absolute -left-2 z-10 ${currentSlide === 0 ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}`}
+          className={`absolute left-2 z-10 ${currentSlide === 0 ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}`}
           disabled={currentSlide === 0}
         >
           <ArrowBackIosNewIcon sx={{ fill: "white" }} />
         </button>
-        <DisplayClip {...data[currentSlide]} />
+        <DisplayClip 
+          {...data[currentSlide]} 
+          nextSlide={nextSlide} 
+          prevSlide={prevSlide} 
+          isFirst={currentSlide === 0} 
+          isLast={currentSlide === data.length - 1} 
+        />
         <button
           onClick={nextSlide}
-          className={`absolute -right-2 z-10 ${currentSlide === data.length - 1 ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}`}
+          className={`absolute right-2 z-10 ${currentSlide === data.length - 1 ? 'opacity-20 cursor-not-allowed' : 'opacity-100'}`}
           disabled={currentSlide === data.length - 1}
         >
           <ArrowForwardIosIcon sx={{ fill: "white" }} />
