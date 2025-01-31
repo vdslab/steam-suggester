@@ -47,7 +47,7 @@ const Network = () => {
   const { data: steamListData, error: steamListDataError } = useSWR<
     SteamListType[]
   >(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
+    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`,
     fetcher,
     CACHE_UPDATE_EVERY_24H
   );
