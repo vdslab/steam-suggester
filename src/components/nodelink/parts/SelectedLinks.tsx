@@ -42,7 +42,6 @@ const SelectedLinks: React.FC<SelectedLinksProps> = React.memo(
       dx: number,
       dy: number
     ) => {
-      // dx,dyは既に正規化されている前提
       const tX = halfWidth / Math.abs(dx);
       const tY = halfHeight / Math.abs(dy);
       const t = Math.min(tX, tY);
@@ -53,89 +52,98 @@ const SelectedLinks: React.FC<SelectedLinksProps> = React.memo(
     };
 
     return (
-      <g>
-        {selectedLinks.map((link: LinkType, i: number) => {
-          const isHovered =
-            (link.source.index === hoveredIndex &&
-              link.target.index === selectedIndex) ||
-            (link.source.index === selectedIndex &&
-              link.target.index === hoveredIndex);
+      <>
+        <g>
+          {/* グロー効果の定義 */}
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
 
-          // ノード中心座標
-          const sourceX = link.source.x as number;
-          const sourceY = link.source.y as number;
-          const targetX = link.target.x as number;
-          const targetY = link.target.y as number;
+          {selectedLinks.map((link: LinkType, i: number) => {
+            const isHovered =
+              (link.source.index === hoveredIndex &&
+                link.target.index === selectedIndex) ||
+              (link.source.index === selectedIndex &&
+                link.target.index === hoveredIndex);
 
-          // 仮のベースサイズ設定 (長方形の場合、幅と高さが異なる可能性があります)
-          const baseHalfWidth = 37; // 例: 幅34の半分
-          const baseHalfHeight = 20; // 例: 高さ24の半分
+            // ノード中心座標
+            const sourceX = link.source.x as number;
+            const sourceY = link.source.y as number;
+            const targetX = link.target.x as number;
+            const targetY = link.target.y as number;
 
-          // ノードの大きさは circleScale で調整
-          const sourceHalfWidth =
-            baseHalfWidth * (link.source.circleScale ?? 1);
-          const sourceHalfHeight =
-            baseHalfHeight * (link.source.circleScale ?? 1);
-          const targetHalfWidth =
-            baseHalfWidth * (link.target.circleScale ?? 1);
-          const targetHalfHeight =
-            baseHalfHeight * (link.target.circleScale ?? 1);
+            // 仮のベースサイズ設定
+            const baseHalfWidth = 37;
+            const baseHalfHeight = 20;
 
-          // ソースからターゲットへの方向ベクトル
-          const deltaX = targetX - sourceX;
-          const deltaY = targetY - sourceY;
-          const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+            // ノードの大きさは circleScale で調整
+            const sourceHalfWidth =
+              baseHalfWidth * (link.source.circleScale ?? 1);
+            const sourceHalfHeight =
+              baseHalfHeight * (link.source.circleScale ?? 1);
+            const targetHalfWidth =
+              baseHalfWidth * (link.target.circleScale ?? 1);
+            const targetHalfHeight =
+              baseHalfHeight * (link.target.circleScale ?? 1);
 
-          // ゼロ除算防止
-          if (distance === 0) return null;
-          const normalizedX = deltaX / distance;
-          const normalizedY = deltaY / distance;
+            // ソースからターゲットへの方向ベクトル
+            const deltaX = targetX - sourceX;
+            const deltaY = targetY - sourceY;
+            const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
 
-          // ノードの境界との交点を計算
-          const sourceIntersection = getRectIntersection(
-            sourceX,
-            sourceY,
-            sourceHalfWidth,
-            sourceHalfHeight,
-            normalizedX,
-            normalizedY
-          );
-          // ターゲット側は中心から逆方向
-          const targetIntersection = getRectIntersection(
-            targetX,
-            targetY,
-            targetHalfWidth,
-            targetHalfHeight,
-            -normalizedX,
-            -normalizedY
-          );
+            if (distance === 0) return null;
+            const normalizedX = deltaX / distance;
+            const normalizedY = deltaY / distance;
 
-          // 両交点の中点を計算（この位置をエッジ上のテキスト表示位置とする）
-          const midX = (sourceIntersection.x + targetIntersection.x) / 2;
-          const midY = (sourceIntersection.y + targetIntersection.y) / 2;
+            // ノードの境界との交点を計算
+            const sourceIntersection = getRectIntersection(
+              sourceX,
+              sourceY,
+              sourceHalfWidth,
+              sourceHalfHeight,
+              normalizedX,
+              normalizedY
+            );
+            const targetIntersection = getRectIntersection(
+              targetX,
+              targetY,
+              targetHalfWidth,
+              targetHalfHeight,
+              -normalizedX,
+              -normalizedY
+            );
 
-          return (
-            <g key={`selected-${i}`}>
-              {/* エッジ表示 */}
-              <line
-                x1={sourceX}
-                y1={sourceY}
-                x2={targetX}
-                y2={targetY}
-                style={{
-                  stroke: isHovered ? "orange" : "cyan",
-                  strokeWidth:
-                    Math.max(linkScale(link.similarity as number), 0.1) + 1,
-                }}
-              />
+            // 両交点の中点を計算（この位置をエッジ上のテキスト表示位置とする）
+            const midX = (sourceIntersection.x + targetIntersection.x) / 2;
+            const midY = (sourceIntersection.y + targetIntersection.y) / 2;
 
-              {/* エッジスコアの表示 */}
-              {link.similarity !== undefined && (
-                <g
-                  className="edge-score-group"
-                  transform={`translate(${midX}, ${midY})`}
-                >
+            return (
+              <g key={`selected-${i}`}>
+                {/* エッジ表示（グロー効果を追加） */}
+                <line
+                  x1={sourceX}
+                  y1={sourceY}
+                  x2={targetX}
+                  y2={targetY}
+                  filter="url(#glow)"
+                  style={{
+                    stroke: isHovered ? "orange" : "cyan",
+                    strokeWidth:
+                      Math.max(linkScale(link.similarity as number), 0.1) + 1,
+                  }}
+                />
+
+                {/* エッジスコアの表示（ホバー時に drop-shadow を追加） */}
+                {link.similarity !== undefined && (
                   <g
+                    className="edge-score-container"
+                    transform={`translate(${midX}, ${midY})`}
                     onMouseEnter={() =>
                       setTooltip({
                         index: i,
@@ -156,19 +164,27 @@ const SelectedLinks: React.FC<SelectedLinksProps> = React.memo(
                       fontWeight="bold"
                       className="edge-score"
                       textDecoration="underline"
+                      filter="url(#glow)"
                       style={{
-                        textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+                        transition: "filter 0.2s ease, transform 0.2s ease",
                       }}
                     >
                       {link.similarity}%
                     </text>
                   </g>
-                </g>
-              )}
-            </g>
-          );
-        })}
-      </g>
+                )}
+              </g>
+            );
+          })}
+        </g>
+        {/* styled-jsx を利用してホバー時の drop-shadow 効果を定義 */}
+        <style jsx>{`
+          .edge-score-container:hover .edge-score {
+            filter: url(#glow) drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.7));
+            transform: translateY(2px);
+          }
+        `}</style>
+      </>
     );
   },
   (prevProps, nextProps) => {
