@@ -243,11 +243,9 @@ const GameDetail = (props: Props) => {
           </div>
 
 
-
-          <DistributorVideos twitchGameId={node.twitchGameId} />
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example">
-              <Tab label="流行度" {...a11yProps(0)} sx={{ color:"white"}}/>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
+            <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example" centered >
+              <Tab label="流行度グラフ" {...a11yProps(0)} sx={{ color:"white"}}/>
               <Tab label="Twitchクリップ" {...a11yProps(1)} sx={{ color:"white"}} />
             </Tabs>
           </Box>
@@ -262,6 +260,6 @@ const GameDetail = (props: Props) => {
       )}
     </div>
   );
-});
+};
 
 export default GameDetail;
