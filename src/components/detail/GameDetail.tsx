@@ -193,7 +193,7 @@ const GameDetail = (props: Props) => {
                     />
                   </Tooltip>
                   <span className="text-gray-300">
-                    {node.price ? `${node.price}` : "無料"}
+                    {node.price ? `${node.price.toLocaleString()}` : "無料"}
                   </span>
                 </div>
               </div>
