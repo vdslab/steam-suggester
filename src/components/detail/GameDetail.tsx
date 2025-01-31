@@ -275,17 +275,10 @@ const GameDetail = (props: Props) => {
             )}
           </div>
 
-          {/* <Popularity nodes={nodes} selectedIndex={selectedIndex} />
-
-          <DistributorVideos
-            twitchGameId={nodes[selectedIndex].twitchGameId}
-          /> */}
-
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example">
-              <Tab label="流行度" {...a11yProps(0)} />
-              <Tab label="Twitchクリップ" {...a11yProps(1)} />
-              <Tab label="Item Three" {...a11yProps(2)} />
+              <Tab label="流行度" {...a11yProps(0)} sx={{ color:"white"}}/>
+              <Tab label="Twitchクリップ" {...a11yProps(1)} sx={{ color:"white"}} />
             </Tabs>
           </Box>
 
