@@ -1,5 +1,5 @@
-'use client';
-import { useEffect, useRef, useState } from "react";
+"use client";
+import React, { useEffect, useRef, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
 import HelpTooltip from "../common/HelpTooltip";
@@ -22,8 +22,7 @@ import DetailTags from "./DetailTags";
 import { Box, Tab, Tabs } from "@mui/material";
 
 type Props = {
-  nodes: NodeType[];
-  selectedIndex: number;
+  node: NodeType;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   setOpenPanel: React.Dispatch<React.SetStateAction<string | null>>;
   selectedTags: string[];
@@ -39,8 +38,7 @@ function a11yProps(index: number) {
 
 const GameDetail = (props: Props) => {
   const {
-    nodes,
-    selectedIndex,
+    node,
     setSelectedIndex,
     setOpenPanel,
     selectedTags,
@@ -53,19 +51,6 @@ const GameDetail = (props: Props) => {
     setTabIndex(newValue);
   };
 
-  // Ref for the selected game detail
-  const selectedDetailRef = useRef<HTMLDivElement | null>(null);
-
-  // 自動スクロール機能の追加
-  useEffect(() => {
-    if (selectedIndex !== -1 && selectedDetailRef.current) {
-      selectedDetailRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  }, [selectedIndex]);
-
   const addSelectedTags = (newTag: string) => {
     if (selectedTags.includes(newTag)) return;
     setSelectedTags([...selectedTags, newTag]);
@@ -73,7 +58,7 @@ const GameDetail = (props: Props) => {
   };
 
   const [currentSlide, setCurrentSlide] = useState(0); // 現在のスライドインデックス
-  const screenshots =  nodes[selectedIndex].screenshots || [nodes[selectedIndex].imgURL];
+  const screenshots = node.screenshots || [node.imgURL];
 
   const [minHeight, setMinHeight] = useState<number | null>(null);
 
@@ -88,22 +73,22 @@ const GameDetail = (props: Props) => {
 
   // スライドショーの自動切り替え
   useEffect(() => {
-    if (selectedIndex !== -1 && screenshots.length > 2) {
+    if (node && screenshots.length > 1) {
       const interval = setInterval(() => {
         setCurrentSlide((prevSlide) => {
-          const screenshots = nodes[selectedIndex].screenshots || [];
+          const screenshots = node.screenshots || [];
           return (prevSlide + 1) % screenshots.length;
         });
       }, 2000); // 2秒ごとに切り替え
       return () => clearInterval(interval); // クリーンアップ
     }
-  }, [selectedIndex, nodes]);
+  }, [node]);
 
   return (
     <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 overflow-y-scroll h-full relative">
       {/* 選択されたゲームの詳細表示 */}
-      {selectedIndex !== -1 && nodes[selectedIndex] ? (
-        <div className="rounded-lg" ref={selectedDetailRef}>
+      {node ? (
+        <div className="rounded-lg">
           {/* ゲーム詳細内容 */}
           <div className="flex flex-col">
             {/* 画像とアイコンのコンテナ */}
@@ -114,9 +99,7 @@ const GameDetail = (props: Props) => {
                   <Image
                     key={index}
                     src={screenshot as string}
-                    alt={`${nodes[selectedIndex].title} screenshot ${
-                      index + 1
-                    }`}
+                    alt={`${node.title} screenshot ${index + 1}`}
                     width={600}
                     height={minHeight || 400} // 最小の高さに設定
                     style={{
@@ -148,19 +131,19 @@ const GameDetail = (props: Props) => {
                 {/* ゲームタイトル */}
                 <h2 className="text-white text-xl font-semibold">
                   <Link
-                    href={`https://store.steampowered.com/app/${nodes[selectedIndex].steamGameId}/`}
+                    href={`https://store.steampowered.com/app/${node.steamGameId}/`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="ml-2 text-white hover:underline"
                   >
-                    {nodes[selectedIndex].title}
+                    {node.title}
                   </Link>
                 </h2>
 
                 {/* Steamリンク */}
                 <Tooltip title="Steamで開く">
                   <Link
-                    href={`https://store.steampowered.com/app/${nodes[selectedIndex].steamGameId}/`}
+                    href={`https://store.steampowered.com/app/${node.steamGameId}/`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="ml-2 text-blue-400"
@@ -180,9 +163,7 @@ const GameDetail = (props: Props) => {
                       className="text-gray-400 mr-1"
                     />
                   </Tooltip>
-                  <span className="text-gray-300">
-                    {nodes[selectedIndex].developerName}
-                  </span>
+                  <span className="text-gray-300">{node.developerName}</span>
                 </div>
 
                 {/* 発売日 */}
@@ -194,7 +175,10 @@ const GameDetail = (props: Props) => {
                     />
                   </Tooltip>
                   <span className="text-gray-300">
-                    {nodes[selectedIndex].releaseDate.replace(/年/, "/").replace(/月/, "/").replace(/日/, "")}
+                    {node.releaseDate
+                      .replace(/年/, "/")
+                      .replace(/月/, "/")
+                      .replace(/日/, "")}
                   </span>
                 </div>
 
@@ -207,38 +191,26 @@ const GameDetail = (props: Props) => {
                     />
                   </Tooltip>
                   <span className="text-gray-300">
-                    {nodes[selectedIndex].salePrice &&
-                    parseInt(nodes[selectedIndex].salePrice, 10) <
-                      nodes[selectedIndex].price ? (
-                      <>
-                        <span className="line-through text-gray-400">
-                          {nodes[selectedIndex].price}
-                        </span>
-                        <span className="text-red-500 ml-1">
-                          {nodes[selectedIndex].salePrice}
-                        </span>
-                      </>
-                    ) : nodes[selectedIndex].price ? (
-                      `${nodes[selectedIndex].price}`
-                    ) : (
-                      "無料"
-                    )}
+                    {node.price ? `${node.price}` : "無料"}
                   </span>
                 </div>
               </div>
 
               {/* ゲーム説明文 */}
               <div>
-                {nodes[selectedIndex].shortDetails && (
+                {node.shortDetails && (
                   <div className="text-white text-sm mt-1 h-24 overflow-y-auto mb-2">
-                    {nodes[selectedIndex].shortDetails}
+                    {node.shortDetails}
                   </div>
                 )}
               </div>
 
               {/* タグ */}
-              {nodes[selectedIndex].tags && (
-                <DetailTags tags={nodes[selectedIndex].tags} addSelectedTags={addSelectedTags} />
+              {node.tags && (
+                <DetailTags
+                  tags={node.tags}
+                  addSelectedTags={addSelectedTags}
+                />
               )}
             </div>
           </div>
@@ -267,20 +239,19 @@ const GameDetail = (props: Props) => {
               </div>
             </h3>
 
-            {nodes[selectedIndex].review && (
-              <ReviewCloud reviewData={nodes[selectedIndex].review} />
-            )}
+            {node.review && <ReviewCloud reviewData={node.review} />}
           </div>
 
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example">
-              <Tab label="流行度" {...a11yProps(0)} sx={{ color:"white"}}/>
+
+          <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
+            <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example" centered >
+              <Tab label="流行度グラフ" {...a11yProps(0)} sx={{ color:"white"}}/>
               <Tab label="Twitchクリップ" {...a11yProps(1)} sx={{ color:"white"}} />
             </Tabs>
           </Box>
 
-          {tabIndex === 0 && (<Popularity nodes={nodes} selectedIndex={selectedIndex} />)}
-          {tabIndex === 1 && (<DistributorVideos twitchGameId={nodes[selectedIndex].twitchGameId} />)}
+          {tabIndex === 0 && (<Popularity node={node} />)}
+          {tabIndex === 1 && (<DistributorVideos twitchGameId={node.twitchGameId} />)}
         </div>
       ) : (
         <div className="text-white text-center pt-24">

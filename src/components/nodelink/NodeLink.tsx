@@ -12,6 +12,8 @@ import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 import HighlightStreamer from "./highlight/HighlightStreamer";
 import HighlightTag from "./highlight/HighlightTag";
 import HighlightSteamList from "./highlight/HighlightSteamList";
+import NonSelectedLinks from "./parts/NonSelectedLinks";
+import SelectedLinks from "./parts/SelectedLinks";
 
 const DEFAULT_TOOLTIP = {
   index: -1,
@@ -135,7 +137,8 @@ const NodeLink = (props: NodeLinkProps) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
-    fetcher, CACHE_UPDATE_EVERY_24H
+    fetcher,
+    CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -145,7 +148,8 @@ const NodeLink = (props: NodeLinkProps) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
-    fetcher, CACHE_UPDATE_EVERY_24H
+    fetcher,
+    CACHE_UPDATE_EVERY_24H
   );
 
   // 選択されたエッジのリスト
@@ -201,42 +205,12 @@ const NodeLink = (props: NodeLinkProps) => {
         {(transform) => (
           <>
             {/* 非選択エッジを最初に描画 */}
-            {nonSelectedLinks.length > 0 &&
-              nonSelectedLinks.map((link: LinkType, i: number) => {
-                const isHovered =
-                  (link.source.index === hoveredIndex &&
-                    link.target.index === selectedIndex) ||
-                  (link.source.index === selectedIndex &&
-                    link.target.index === hoveredIndex);
-                const isSelected =
-                  link.source.index === selectedIndex ||
-                  link.target.index === selectedIndex;
-
-                return (
-                  <line
-                    key={i}
-                    className="link"
-                    x1={link.source.x}
-                    y1={link.source.y}
-                    x2={link.target.x}
-                    y2={link.target.y}
-                    style={{
-                      stroke: isHovered
-                        ? "orange"
-                        : isSelected
-                        ? "cyan"
-                        : "white",
-                      strokeWidth:
-                        isHovered || isSelected
-                          ? Math.max(
-                              linkScale(link.similarity as number),
-                              0.1
-                            ) + 1
-                          : Math.max(linkScale(link.similarity as number), 0.1),
-                    }}
-                  />
-                );
-              })}
+            <NonSelectedLinks
+              nonSelectedLinks={nonSelectedLinks}
+              hoveredIndex={hoveredIndex}
+              selectedIndex={selectedIndex}
+              linkScale={linkScale}
+            />
 
             {/* 選択されていないノードを描画 */}
             {nodes.length !== 0 &&
@@ -271,7 +245,6 @@ const NodeLink = (props: NodeLinkProps) => {
                       steamGameId={node.steamGameId}
                       twitchGameId={node.twitchGameId}
                       circleScale={node.circleScale ?? 1}
-                      suggestValue={node.suggestValue}
                       isHovered={isHovered}
                       selectedIndex={selectedIndex}
                       similarGamesLinkList={selectedLinks}
@@ -310,109 +283,14 @@ const NodeLink = (props: NodeLinkProps) => {
               })}
 
             {/* 選択エッジとスコアを描画 */}
-            <g className="selected-edges">
-              {selectedLinks.length > 0 &&
-                selectedLinks.map((link: LinkType, i: number) => {
-                  const isHovered =
-                    (link.source.index === hoveredIndex &&
-                      link.target.index === selectedIndex) ||
-                    (link.source.index === selectedIndex &&
-                      link.target.index === hoveredIndex);
-
-                  // エッジ中点計算にノードの半径を考慮
-                  const sourceX = link.source.x as number;
-                  const sourceY = link.source.y as number;
-                  const targetX = link.target.x as number;
-                  const targetY = link.target.y as number;
-
-                  const sourceRadius = 17 * (link.source.circleScale ?? 1);
-                  const targetRadius = 17 * (link.target.circleScale ?? 1);
-
-                  // ベクトル方向を計算
-                  const deltaX = targetX - sourceX;
-                  const deltaY = targetY - sourceY;
-                  const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-
-                  // 正規化
-                  const normalizedX = deltaX / distance;
-                  const normalizedY = deltaY / distance;
-
-                  // ノードの端から端までの位置を調整
-                  const adjustedSourceX = sourceX + normalizedX * sourceRadius;
-                  const adjustedSourceY = sourceY + normalizedY * sourceRadius;
-                  const adjustedTargetX = targetX - normalizedX * targetRadius;
-                  const adjustedTargetY = targetY - normalizedY * targetRadius;
-
-                  // ノードの端の中間地点
-                  const midX = (adjustedSourceX + adjustedTargetX) / 2;
-                  const midY = (adjustedSourceY + adjustedTargetY) / 2;
-
-                  // エッジに対して垂直な方向にオフセットを追加
-                  const offset = 20; // オフセットの距離（必要に応じて調整）
-                  const perpendicularX = -normalizedY;
-                  const perpendicularY = normalizedX;
-                  const textX = midX + perpendicularX * offset;
-                  const textY = midY + perpendicularY * offset;
-
-                  return (
-                    <g key={`selected-${i}`}>
-                      {/* エッジ表示 */}
-                      <line
-                        x1={sourceX}
-                        y1={sourceY}
-                        x2={targetX}
-                        y2={targetY}
-                        style={{
-                          stroke: isHovered ? "orange" : "cyan",
-                          strokeWidth:
-                            Math.max(
-                              linkScale(link.similarity as number),
-                              0.1
-                            ) + 1,
-                        }}
-                      />
-
-                      {/* エッジスコアの表示（テキストのみ） */}
-                      {link.similarity !== undefined && (
-                        <g
-                          className="edge-score-group"
-                          transform={`translate(${textX}, ${textY})`}
-                        >
-                          <g
-                            onMouseEnter={() =>
-                              setTooltip({
-                                index: i,
-                                x: textX,
-                                y: textY,
-                              })
-                            }
-                            onMouseLeave={() => setTooltip(DEFAULT_TOOLTIP)}
-                            style={{ cursor: "pointer" }} // ホバー時にカーソルをポインタに変更
-                          >
-                            {/* similarity スコアの表示 */}
-                            <text
-                              x={0}
-                              y={0} // テキストの中央寄せ調整
-                              textAnchor="middle"
-                              alignmentBaseline="middle"
-                              fill={colorScale(link.similarity)} // グラデーション色をテキストに適用
-                              fontSize="24px"
-                              fontWeight="bold"
-                              className="edge-score"
-                              textDecoration="underline"
-                              style={{
-                                textShadow: "1px 1px 2px rgba(0,0,0,0.5)", // 読みやすさ向上のための影
-                              }}
-                            >
-                              {link.similarity}%
-                            </text>
-                          </g>
-                        </g>
-                      )}
-                    </g>
-                  );
-                })}
-            </g>
+            <SelectedLinks
+              selectedLinks={selectedLinks}
+              hoveredIndex={hoveredIndex}
+              selectedIndex={selectedIndex}
+              linkScale={linkScale}
+              colorScale={colorScale}
+              setTooltip={setTooltip}
+            />
 
             {/* 選択されているノード及びそれとつながっているノードを描画 */}
             {nodes.length !== 0 &&
@@ -447,7 +325,6 @@ const NodeLink = (props: NodeLinkProps) => {
                       steamGameId={node.steamGameId}
                       twitchGameId={node.twitchGameId}
                       circleScale={node.circleScale ?? 1}
-                      suggestValue={node.suggestValue}
                       isHovered={isHovered}
                       selectedIndex={selectedIndex}
                       similarGamesLinkList={selectedLinks}

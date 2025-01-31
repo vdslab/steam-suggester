@@ -37,13 +37,16 @@ import Tutorial from "./tutorial/Tutorial";
 import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 
 const Network = () => {
-
-  const { data: steamAllData, error: steamAllDataError } = useSWR<SteamDetailsDataType[]>(
+  const { data: steamAllData, error: steamAllDataError } = useSWR<
+    SteamDetailsDataType[]
+  >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     fetcher,
     CACHE_UPDATE_EVERY_24H
   );
-  const { data: steamListData, error: steamListDataError } = useSWR<SteamListType[]>(
+  const { data: steamListData, error: steamListDataError } = useSWR<
+    SteamListType[]
+  >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     fetcher,
     CACHE_UPDATE_EVERY_24H
@@ -166,7 +169,12 @@ const Network = () => {
   }
 
   if (steamAllDataError || steamListDataError) {
-    return <Error error={steamAllDataError || steamListDataError} reset={() => setIsNetworkLoading(true)} />;
+    return (
+      <Error
+        error={steamAllDataError || steamListDataError}
+        reset={() => setIsNetworkLoading(true)}
+      />
+    );
   }
 
   return (
@@ -198,8 +206,7 @@ const Network = () => {
         {selectedIndex !== -1 && nodes[selectedIndex] && isGameSearchOpen && (
           <div className="absolute top-0 right-0 w-1/4 z-20 h-full">
             <GameDetail
-              nodes={nodes}
-              selectedIndex={selectedIndex}
+              node={nodes[selectedIndex]}
               setSelectedIndex={setSelectedIndex}
               setOpenPanel={setOpenPanel}
               selectedTags={selectedTags}
