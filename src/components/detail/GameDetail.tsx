@@ -230,7 +230,7 @@ const GameDetail = React.memo((props: Props) => {
 
           <Popularity node={node} />
 
-          {/* <DistributorVideos twitchGameId={node.twitchGameId} /> */}
+          <DistributorVideos twitchGameId={node.twitchGameId} />
         </div>
       ) : (
         <div className="text-white text-center pt-24">
