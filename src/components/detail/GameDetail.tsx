@@ -18,6 +18,7 @@ import RateReviewIcon from "@mui/icons-material/RateReview";
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 import DistributorVideos from "./Clips/DistributorVideos";
+import DetailTags from "./DetailTags";
 
 type Props = {
   nodes: NodeType[];
@@ -225,22 +226,9 @@ const GameDetail = (props: Props) => {
               </div>
 
               {/* タグ */}
-              <div className="text-white">
-                {nodes[selectedIndex].tags &&
-                  nodes[selectedIndex].tags.length > 0 && (
-                    <div className="line-clamp-2 overflow-hidden">
-                      {nodes[selectedIndex].tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="bg-green-500 text-xs p-0.5 mr-1 mb-1 rounded inline-block whitespace-nowrap cursor-pointer select-none"
-                          onClick={() => addSelectedTags(tag)}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-              </div>
+              {nodes[selectedIndex].tags && (
+                <DetailTags tags={nodes[selectedIndex].tags} addSelectedTags={addSelectedTags} />
+              )}
             </div>
           </div>
 
@@ -267,7 +255,10 @@ const GameDetail = (props: Props) => {
                 </span>
               </div>
             </h3>
-            <ReviewCloud reviewData={nodes[selectedIndex].review} />
+
+            {nodes[selectedIndex].review && (
+              <ReviewCloud reviewData={nodes[selectedIndex].review} />
+            )}
           </div>
 
           <Popularity nodes={nodes} selectedIndex={selectedIndex} />
