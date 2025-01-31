@@ -36,12 +36,15 @@ import GameDetail from "./detail/GameDetail";
 import Tutorial from "./tutorial/Tutorial";
 
 const Network = () => {
-
-  const { data: steamAllData, error: steamAllDataError } = useSWR<SteamDetailsDataType[]>(
+  const { data: steamAllData, error: steamAllDataError } = useSWR<
+    SteamDetailsDataType[]
+  >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     fetcher
   );
-  const { data: steamListData, error: steamListDataError } = useSWR<SteamListType[]>(
+  const { data: steamListData, error: steamListDataError } = useSWR<
+    SteamListType[]
+  >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     fetcher
   );
@@ -163,7 +166,12 @@ const Network = () => {
   }
 
   if (steamAllDataError || steamListDataError) {
-    return <Error error={steamAllDataError || steamListDataError} reset={() => setIsNetworkLoading(true)} />;
+    return (
+      <Error
+        error={steamAllDataError || steamListDataError}
+        reset={() => setIsNetworkLoading(true)}
+      />
+    );
   }
 
   return (

@@ -29,10 +29,6 @@ const Icon = (props: IconType) => {
       filter={filterType ? `url(#glow-${filterType}-${index})` : undefined}
     >
       <defs>
-        <clipPath id={`clip-${index}`}>
-          <circle r={CIRCLE_SIZE} />
-        </clipPath>
-
         {/* フィルターを条件に応じてレンダリング */}
         {filterType && (
           <filter
@@ -71,7 +67,6 @@ const Icon = (props: IconType) => {
         height={60}
         x={-37.5}
         y={-30}
-        clipPath={`url(#clip-${index})`}
         style={{
           filter:
             isHovered || isSelected
