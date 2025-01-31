@@ -6,6 +6,7 @@ import { NodeType } from "@/types/NetworkType";
 import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
 import AreaRechart from "../charts/AreaRechart";
+import { GetActiveUserResponse } from "@/types/api/getActiveUserType";
 
 type Props = {
   node: NodeType;
@@ -26,7 +27,7 @@ const PopularityCharts = ({ node }:Props) => {
     fetcher
   );
 
-  const { data: activeUsersData, error: activeUsersError } = useSWR(
+  const { data: activeUsersData, error: activeUsersError } = useSWR<GetActiveUserResponse[]>(
     node
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${node.steamGameId}`
       : null,
@@ -56,15 +57,15 @@ const PopularityCharts = ({ node }:Props) => {
   }
 
   return (
-    <div className="flex flex-row overflow-x-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
       {/* Steamレビュー数 */}
-      <AreaRechart data={steamData} color={STEAM_COLOR_RANGE[0]} title="Steamレビュー数" />
+      <AreaRechart data={steamData} dataKey="date" color={STEAM_COLOR_RANGE[0]} title="Steamレビュー数" />
 
       {/* Twitch視聴数 */}
-      <AreaRechart data={twitchData} color={TWITCH_COLOR_RANGE[0]} title="Twitch視聴数" />
+      <AreaRechart data={twitchData} dataKey="date" color={TWITCH_COLOR_RANGE[0]} title="Twitch視聴数" />
 
       {/* アクティブユーザー数 */}
-      <AreaRechart data={activeUsersData} color={STEAM_COLOR_RANGE[0]} title="アクティブユーザー数" />
+      <AreaRechart data={activeUsersData} dataKey="date" color={STEAM_COLOR_RANGE[0]} title="アクティブユーザー数" />
     </div>
   );
 };
