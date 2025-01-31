@@ -15,7 +15,6 @@ export type SteamDetailsDataType = {
   shortDetails: string;
   releaseDate: string;
   developerName: string;
-  salePrice: string;
   playTime: string;
   review: {
     name: string;

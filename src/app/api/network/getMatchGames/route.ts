@@ -32,7 +32,6 @@ export async function GET() {
           sd.short_details,
           sd.release_date,
           sd.developer_name,
-          sd.sale_price,
           sd.play_time,
           sd.review_text,
           sd.difficulty,
@@ -60,7 +59,7 @@ export async function GET() {
           gv.steam_id, sd.game_title, sd.webpage_url, sd.img_url, sd.price,
           sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
           sd.genres, sd.tags, sd.short_details, sd.release_date, sd.developer_name,
-          sd.sale_price, sd.play_time, sd.review_text, sd.difficulty, sd.graphics,
+          sd.play_time, sd.review_text, sd.difficulty, sd.graphics,
           sd.story, sd.music, sd.similar_games, sd.feature_vector,
           sd.background, sd.screenshots, sd.mp4_movies
       ORDER BY
@@ -100,7 +99,6 @@ export async function GET() {
         shortDetails: item.short_details,
         releaseDate: item.release_date,
         developerName: item.developer_name,
-        salePrice: item.sale_price,
         playTime: item.play_time,
         review: item.review_text,
         difficulty: item.difficulty,

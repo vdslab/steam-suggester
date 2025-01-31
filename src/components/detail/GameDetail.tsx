@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useEffect, useRef, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
@@ -182,7 +182,10 @@ const GameDetail = (props: Props) => {
                     />
                   </Tooltip>
                   <span className="text-gray-300">
-                    {nodes[selectedIndex].releaseDate.replace(/年/, "/").replace(/月/, "/").replace(/日/, "")}
+                    {nodes[selectedIndex].releaseDate
+                      .replace(/年/, "/")
+                      .replace(/月/, "/")
+                      .replace(/日/, "")}
                   </span>
                 </div>
 
@@ -195,22 +198,9 @@ const GameDetail = (props: Props) => {
                     />
                   </Tooltip>
                   <span className="text-gray-300">
-                    {nodes[selectedIndex].salePrice &&
-                    parseInt(nodes[selectedIndex].salePrice, 10) <
-                      nodes[selectedIndex].price ? (
-                      <>
-                        <span className="line-through text-gray-400">
-                          {nodes[selectedIndex].price}
-                        </span>
-                        <span className="text-red-500 ml-1">
-                          {nodes[selectedIndex].salePrice}
-                        </span>
-                      </>
-                    ) : nodes[selectedIndex].price ? (
-                      `${nodes[selectedIndex].price}`
-                    ) : (
-                      "無料"
-                    )}
+                    {nodes[selectedIndex].price
+                      ? `${nodes[selectedIndex].price}`
+                      : "無料"}
                   </span>
                 </div>
               </div>
@@ -272,9 +262,7 @@ const GameDetail = (props: Props) => {
 
           <Popularity nodes={nodes} selectedIndex={selectedIndex} />
 
-          <DistributorVideos
-            twitchGameId={nodes[selectedIndex].twitchGameId}
-          />
+          <DistributorVideos twitchGameId={nodes[selectedIndex].twitchGameId} />
         </div>
       ) : (
         <div className="text-white text-center pt-24">
