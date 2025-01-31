@@ -14,9 +14,12 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DevicesIcon from "@mui/icons-material/Devices";
+import TagOutlinedIcon from '@mui/icons-material/TagOutlined';
 import Section from "../Section";
 import HelpTooltip from "../../common/HelpTooltip";
 import TagsSelect from "../highlight/TagsSelect";
+import { Button } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 type Props = {
   filter: Filter;
@@ -120,10 +123,11 @@ const SelectParameter: React.FC<Props> = ({
       icon={<FilterListIcon className="mr-2 text-white" />}
     >
       <div className="flex flex-col h-full">
+
         {/* タグフィルター */}
         <div className="pr-4">
-          <Section title="価格" icon={<AttachMoneyIcon />}>
-            <TagsSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} defaultTags={filter.Tags}/>
+          <Section title="タグ" icon={<TagOutlinedIcon />}>
+            <TagsSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
           </Section>
         </div>
 
@@ -204,6 +208,7 @@ const SelectParameter: React.FC<Props> = ({
             適用して再生成
           </button>
         </div>
+
       </div>
     </Panel>
   );

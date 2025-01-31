@@ -5,19 +5,16 @@ import { useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 import IconButton from "@mui/material/IconButton";
 import AutoCompleteBox from "@/components/sidebar/highlight/AutoCompleteBox";
-import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
-import Button from "@mui/material/Button";
+
 
 type Props = {
   selectedTags: string[];
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
-  defaultTags?: string[];
 };
-
 
 const TagsSelect = (props:Props) => {
 
-  const { selectedTags, setSelectedTags, defaultTags } = props;
+  const { selectedTags, setSelectedTags } = props;
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -47,15 +44,6 @@ const TagsSelect = (props:Props) => {
 
   return (
     <div>
-      {/* 全解除 */}
-      <Button
-        onClick={() => setSelectedTags(defaultTags ? defaultTags : [])}
-        variant="outlined"
-        startIcon={<RefreshOutlinedIcon />}
-        sx={{ mb: 2 }}
-      >
-        <span className="text-blue">リセット</span>
-      </Button>
 
       {/* タグ検索 */}
       <AutoCompleteBox
