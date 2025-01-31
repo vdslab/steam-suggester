@@ -94,14 +94,16 @@ const GameDetail = (props: Props) => {
             {/* 画像とアイコンのコンテナ */}
             {/* スライドショー */}
             {screenshots && (
-              <div className="relative">
+              <div className="overflow-hidden">
                 {screenshots.map((screenshot, index) => (
                   <Image
                     key={index}
                     src={screenshot as string}
                     alt={`${node.title} screenshot ${index + 1}`}
                     width={600}
-                    height={minHeight || 400} // 最小の高さに設定
+                    height={400}
+                    layout="intrinsic"
+                    objectFit="cover"
                     style={{
                       borderRadius: "4px",
                       opacity: currentSlide === index ? 1 : 0,
@@ -111,7 +113,7 @@ const GameDetail = (props: Props) => {
                       top: 0,
                       left: 0,
                     }}
-                    className="object-cover rounded mb-2 screenshot-img"
+                    className="rounded mb-2 screenshot-img"
                   />
                 ))}
                 {/* 画像右上に閉じるボタン */}
@@ -191,7 +193,7 @@ const GameDetail = (props: Props) => {
                     />
                   </Tooltip>
                   <span className="text-gray-300">
-                    {node.price ? `${node.price}` : "無料"}
+                    {node.price ? `${node.price.toLocaleString()}` : "無料"}
                   </span>
                 </div>
               </div>
@@ -243,7 +245,7 @@ const GameDetail = (props: Props) => {
           </div>
 
 
-          <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
             <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example" centered >
               <Tab label="流行度グラフ" {...a11yProps(0)} sx={{ color:"white"}}/>
               <Tab label="Twitchクリップ" {...a11yProps(1)} sx={{ color:"white"}} />

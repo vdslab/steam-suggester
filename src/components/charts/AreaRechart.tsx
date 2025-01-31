@@ -2,7 +2,8 @@ import { ResponsiveContainer, AreaChart, XAxis, YAxis, Tooltip, Area } from 'rec
 
 type Props = {
   data: any[];
-  dataKey: string;
+  xKey: string;
+  yKey: string;
   color: string;
   title: string;
 };
@@ -17,13 +18,14 @@ const formatDate = (timestamp: number) => {
 
 const AreaRechart = (props:Props) => {
 
-  const { data, dataKey, color, title } = props;
+  const { data, xKey, yKey, color, title } = props;
+
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center border border-gray-500 rounded-md">
       <ResponsiveContainer width="100%" height={100}>
         <AreaChart data={data}>
-          <XAxis dataKey={dataKey} hide />
+          <XAxis dataKey={xKey} hide />
           <YAxis hide />
           <Tooltip
             contentStyle={{
@@ -37,7 +39,7 @@ const AreaRechart = (props:Props) => {
           />
           <Area
             type="monotone"
-            dataKey="count"
+            dataKey={yKey}
             stroke={color}
             fill={color}
             fillOpacity={1}

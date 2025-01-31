@@ -149,6 +149,7 @@ const SteamList = (props: Props) => {
             <LogoutIcon sx={{ color: "white" }} />
           </IconButton>
         </div>
+
         {/* 自分の所有ゲーム */}
         <Section title="自分の所有ゲーム" icon={<PersonIcon />}>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
@@ -165,7 +166,6 @@ const SteamList = (props: Props) => {
                         const nodeIndex = nodes.findIndex(
                           (node) => node.steamGameId == game.id
                         );
-                        // const dataIndex = steamAllData.findIndex((data) => data.title == game.title);
                         if (nodeIndex !== -1) {
                           return (
                             <IconButton
@@ -176,14 +176,6 @@ const SteamList = (props: Props) => {
                             </IconButton>
                           );
                         }
-                        // TODO: 追加ボタン実装
-                        // } else if(dataIndex !== -1) {
-                        //   return(
-                        //     <IconButton sx={{ color:'white' }} onClick={() => console.log('add')}>
-                        //       <PlaylistAddIcon />
-                        //     </IconButton>
-                        //   );
-                        // }
                         return null;
                       })()}
                   </div>
