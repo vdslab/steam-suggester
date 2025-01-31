@@ -50,13 +50,15 @@ const ClipSlideshow = (props: Props) => {
         </button>
       </div>
 
-      <a
-        className="text-white w-64 mx-auto block text-center mt-2 truncate"
-        href={data[currentSlide].url} target="_blank"
-        rel="noopener noreferrer"
-      >
-        {data[currentSlide].title}
-      </a>
+      {data[currentSlide].url && (
+        <a
+          className="text-white w-64 mx-auto block text-center mt-2 truncate"
+          href={data[currentSlide].url} target="_blank"
+          rel="noopener noreferrer"
+        >
+          {data[currentSlide].title ? data[currentSlide].title : "no title"}
+        </a>
+      )}
     </div>
   );
 };
