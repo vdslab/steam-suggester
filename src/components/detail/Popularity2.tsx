@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
 import {
   AreaChart,
   Area,
@@ -11,6 +11,8 @@ import {
 import { STEAM_COLOR_RANGE, TWITCH_COLOR_RANGE } from "@/constants/STYLES";
 import CircularProgress from "@mui/material/CircularProgress";
 import { NodeType } from "@/types/NetworkType";
+import useSWR from "swr";
+import { fetcher } from "../common/Fetcher";
 
 type Props = {
   nodes: NodeType[];
@@ -18,61 +20,28 @@ type Props = {
 };
 
 const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
-  const [steamData, setSteamData] = useState<any[]>([]);
-  const [twitchData, setTwitchData] = useState<any[]>([]);
-  const [activeUsersData, setActiveUsersData] = useState<any[]>([]); // アクティブユーザーデータのステート
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const selectedNode = nodes[selectedIndex] || null;
 
-  useEffect(() => {
-    if (!selectedNode) {
-      setLoading(false);
-      return;
-    }
+  const { data: steamData, error: steamError } = useSWR(
+    selectedNode
+      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countRecentSteamReviews/${selectedNode.steamGameId}`
+      : null,
+    fetcher
+  );
 
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Steamデータの取得
-        const steamRes = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countRecentSteamReviews/${selectedNode.steamGameId}`,
-          { next: { revalidate: 60 } }
-        );
-        if (!steamRes.ok) throw new Error("Steamデータの取得に失敗しました。");
-        const steamJson = await steamRes.json();
-        setSteamData(steamJson);
+  const { data: twitchData, error: twitchError } = useSWR(
+    selectedNode
+      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchViews/${selectedNode.twitchGameId}`
+      : null,
+    fetcher
+  );
 
-        // Twitchデータの取得
-        const twitchRes = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchViews/${selectedNode.twitchGameId}`,
-          { next: { revalidate: 60 } }
-        );
-        if (!twitchRes.ok)
-          throw new Error("Twitchデータの取得に失敗しました。");
-        const twitchJson = await twitchRes.json();
-        setTwitchData(twitchJson);
-
-        // アクティブユーザーデータの取得
-        const activeUsersRes = await fetch(
-          `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${selectedNode.steamGameId}`,
-          { next: { revalidate: 60 } }
-        );
-        if (!activeUsersRes.ok)
-          throw new Error("アクティブユーザーデータの取得に失敗しました。");
-        const activeUsersJson = await activeUsersRes.json();
-        setActiveUsersData(activeUsersJson);
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message || "データの取得中にエラーが発生しました。");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedNode]);
+  const { data: activeUsersData, error: activeUsersError } = useSWR(
+    selectedNode
+      ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getActiveUser/${selectedNode.steamGameId}`
+      : null,
+    fetcher
+  );
 
   if (!selectedNode) {
     return (
@@ -80,7 +49,7 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
     );
   }
 
-  if (loading) {
+  if (!steamData || !twitchData || !activeUsersData) {
     return (
       <div className="flex justify-center items-center h-32">
         <CircularProgress />
@@ -88,8 +57,8 @@ const Popularity2: React.FC<Props> = ({ nodes, selectedIndex }) => {
     );
   }
 
-  if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
+  if (steamError || twitchError || activeUsersError) {
+    return <div className="text-red-500 text-center">データの取得に失敗しました。</div>;
   }
 
   const formatDate = (timestamp: number) => {
