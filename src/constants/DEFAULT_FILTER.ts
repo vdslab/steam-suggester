@@ -1,3 +1,5 @@
+import { TAG_LIST } from "./TAG_LIST";
+
 // フィルターの初期値
 export const DEFAULT_FILTER = {
   Genres: {
@@ -47,7 +49,7 @@ export const DEFAULT_FILTER = {
     "9": true,
     "10": true,
   },
-  Tags: []
+  Tags: Object.values(TAG_LIST).flat()
 };
 
 export const DEFAULT_SLIDER = {
