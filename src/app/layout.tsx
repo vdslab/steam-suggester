@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Steam Suggester",
   description:
-    "TwitchとSteamを組み合わせたゲーム提案を可視化するウェブサイト。最適なゲーム体験を見つけよう！",
+    "ネットワークグラフ上でゲームの類似度を可視化し、ユーザーが直感的に新しいゲームを探索できるシステムです。",
   keywords: [
     "Steam",
     "Twitch",
@@ -19,8 +19,7 @@ export const metadata: Metadata = {
     type: "website",
     title: "Steam Suggester",
     description:
-      "TwitchとSteamを組み合わせたゲーム提案を可視化するウェブサイト。最適なゲーム体験を見つけよう！",
-    url: process.env.NEXT_PUBLIC_CURRENT_URL,
+      "ネットワークグラフ上でゲームの類似度を可視化し、ユーザーが直感的に新しいゲームを探索できるシステムです。",
     siteName: "Steam Suggester",
     locale: "ja_JP",
     images: [
@@ -29,7 +28,7 @@ export const metadata: Metadata = {
         alt: "Steam Suggester OGP Image",
       },
     ],
-  },
+  }
 };
 
 export default function RootLayout({
