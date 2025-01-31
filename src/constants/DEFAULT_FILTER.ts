@@ -47,6 +47,7 @@ export const DEFAULT_FILTER = {
     "9": true,
     "10": true,
   },
+  Tags: []
 };
 
 export const DEFAULT_SLIDER = {

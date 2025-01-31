@@ -16,7 +16,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import DevicesIcon from "@mui/icons-material/Devices";
 import Section from "../Section";
 import HelpTooltip from "../../common/HelpTooltip";
-import GenreFilter from "./GenreFilter";
+import TagsSelect from "../highlight/TagsSelect";
 
 type Props = {
   filter: Filter;
@@ -31,12 +31,11 @@ const SelectParameter: React.FC<Props> = ({
 }) => {
   const [localFilter, setLocalFilter] = useState<Filter>(filter);
   const [isFreeChecked, setIsFreeChecked] = useState<boolean>(false);
-  const [areAllCategoriesSelected, setAreAllCategoriesSelected] =
-    useState<boolean>(false);
   const [previousPrice, setPreviousPrice] = useState<{
     startPrice: number;
     endPrice: number;
   } | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   useEffect(() => {
     if (filter.Price.startPrice === 0 && filter.Price.endPrice === 0) {
@@ -48,10 +47,6 @@ const SelectParameter: React.FC<Props> = ({
         endPrice: filter.Price.endPrice,
       });
     }
-
-    // カテゴリーの全選択状態を更新
-    const allSelected = Object.values(filter.Genres).every((value) => value);
-    setAreAllCategoriesSelected(allSelected);
   }, [filter]);
 
   const handlePriceChange = (
@@ -100,7 +95,7 @@ const SelectParameter: React.FC<Props> = ({
 
   const handleClickFilter = (filter: Filter) => {
     (async () => {
-      await changeFilterData(filter);
+      await changeFilterData({ ...filter, Tags: selectedTags });
       setIsNetworkLoading(true);
     })();
 
@@ -113,19 +108,6 @@ const SelectParameter: React.FC<Props> = ({
     }
   };
 
-  // カテゴリーの全選択/全解除
-  const handleMasterCheckboxChange = () => {
-    const newStatus = !areAllCategoriesSelected;
-    const newCategories: { [key: string]: boolean } = {};
-    for (const key in localFilter.Genres) {
-      newCategories[key] = newStatus;
-    }
-    setLocalFilter({
-      ...localFilter,
-      Genres: newCategories,
-    });
-    setAreAllCategoriesSelected(newStatus);
-  };
 
   return (
     <Panel
@@ -138,12 +120,12 @@ const SelectParameter: React.FC<Props> = ({
       icon={<FilterListIcon className="mr-2 text-white" />}
     >
       <div className="flex flex-col h-full">
-        {/* ジャンルフィルター */}
-        <GenreFilter
-          filter={filter}
-          localFilter={localFilter}
-          setLocalFilter={setLocalFilter}
-        />
+        {/* タグフィルター */}
+        <div className="pr-4">
+          <Section title="価格" icon={<AttachMoneyIcon />}>
+            <TagsSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
+          </Section>
+        </div>
 
         {/* 価格フィルター */}
         <Section title="価格" icon={<AttachMoneyIcon />}>
@@ -219,7 +201,7 @@ const SelectParameter: React.FC<Props> = ({
             className="w-full text-white rounded px-4 py-2 bg-blue-600 hover:bg-blue-500"
             onClick={() => handleClickFilter(localFilter)}
           >
-            フィルターを適用
+            適用して再生成
           </button>
         </div>
       </div>
