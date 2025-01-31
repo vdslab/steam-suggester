@@ -54,17 +54,11 @@ export type NodeType = {
   shortDetails: string;
   releaseDate: string;
   developerName: string;
-  salePrice: string;
-  playTime: string;
   review: {
     name: string;
     score: number;
     tfidf: number;
   }[];
-  difficulty: number;
-  graphics: number;
-  story: number;
-  music: number;
   primaryGenre?: string;
   totalViews?: number;
   activeUsers?: number;

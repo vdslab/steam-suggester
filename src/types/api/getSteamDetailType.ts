@@ -15,16 +15,11 @@ export type SteamDetailsDataType = {
   shortDetails: string;
   releaseDate: string;
   developerName: string;
-  playTime: string;
   review: {
     name: string;
     score: number;
     tfidf: number;
   }[];
-  difficulty: number;
-  graphics: number;
-  story: number;
-  music: number;
 
   similarGames: string[];
   featureVector: number[];
