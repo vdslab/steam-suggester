@@ -25,7 +25,7 @@ const HighlightPanel = (props: Props) => {
     >
       {/* 説明文を直接表示 */}
       <p className="text-sm text-white mb-4">
-        指定のタグを含むゲームを強調表示できます。
+        指定のタグをすべて含むゲームを強調表示できます。
       </p>
 
       {/* 全解除 */}
