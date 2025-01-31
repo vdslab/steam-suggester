@@ -59,13 +59,13 @@ const PopularityCharts = ({ node }:Props) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
       {/* Steamレビュー数 */}
-      <AreaRechart data={steamData} dataKey="date" color={STEAM_COLOR_RANGE[0]} title="Steamレビュー数" />
+      <AreaRechart data={steamData} xKey="date" yKey="count" color={STEAM_COLOR_RANGE[0]} title="Steamレビュー数" />
 
       {/* Twitch視聴数 */}
-      <AreaRechart data={twitchData} dataKey="date" color={TWITCH_COLOR_RANGE[0]} title="Twitch視聴数" />
+      <AreaRechart data={twitchData} xKey="date" yKey="count" color={TWITCH_COLOR_RANGE[0]} title="Twitch視聴数" />
 
       {/* アクティブユーザー数 */}
-      <AreaRechart data={activeUsersData} dataKey="date" color={STEAM_COLOR_RANGE[0]} title="アクティブユーザー数" />
+      <AreaRechart data={activeUsersData} xKey="get_date" yKey="active_user" color={STEAM_COLOR_RANGE[0]} title="アクティブユーザー数" />
     </div>
   );
 };

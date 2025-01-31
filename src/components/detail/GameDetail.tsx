@@ -243,7 +243,7 @@ const GameDetail = (props: Props) => {
           </div>
 
 
-          <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
             <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example" centered >
               <Tab label="流行度グラフ" {...a11yProps(0)} sx={{ color:"white"}}/>
               <Tab label="Twitchクリップ" {...a11yProps(1)} sx={{ color:"white"}} />
