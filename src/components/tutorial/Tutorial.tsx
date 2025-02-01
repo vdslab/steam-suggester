@@ -22,16 +22,18 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 450,
-  bgcolor: "background.paper",
-  borderRadius: "12px", // 角を丸める
-  boxShadow: 10, // シャドウを軽めに
+  bgcolor: "#121212",
+  color: "#ffffff",
+  borderRadius: "12px",
+  border: "1px solid #ffffff",
+  boxShadow: 10,
   p: 4,
   textAlign: "center",
 };
 
 const steps = [
   "Step 1: 気になるゲームを選択しよう",
-  "Step 2: さらに気になるゲームを見つけよう",
+  "Step 2: さらに気になるゲームを探そう",
   "Step 3: ゲーム詳細情報",
 ];
 
@@ -45,8 +47,8 @@ const stepImages = [
 
 const stepDescriptions = [
   "画像ホバーすると、ゲーム情報が表示される",
-  "数値をホバーすると選択されているゲームとの関連度が表示される",
-  "右のパネルでゲームの詳細情報が見れる",
+  "数値をホバーすると、選択されているゲームとの関連度が表示される",
+  "ゲームの詳細情報画面も駆使してゲームを探そう！",
 ];
 
 const Tutorial = ({ run, setRun }: Props) => {
@@ -72,7 +74,7 @@ const Tutorial = ({ run, setRun }: Props) => {
         </Typography>
 
         {/* ステップ説明 */}
-        <Typography sx={{ mb: 2, color: "gray" }}>
+        <Typography sx={{ mb: 2, color: "#bbbbbb" }}>
           {stepDescriptions[activeStep]}
         </Typography>
 
@@ -96,7 +98,16 @@ const Tutorial = ({ run, setRun }: Props) => {
         <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
           {stepLabels.map((label, index) => (
             <Step key={index}>
-              <StepLabel>{label}</StepLabel>
+              <StepLabel
+                sx={{
+                  color: "white",
+                  "& .MuiStepLabel-label": { color: "white" },
+                  "& .MuiStepLabel-label.Mui-active": { color: "white" },
+                  "& .MuiStepLabel-label.Mui-completed": { color: "white" },
+                }}
+              >
+                {label}
+              </StepLabel>
             </Step>
           ))}
         </Stepper>
