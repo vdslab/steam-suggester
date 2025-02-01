@@ -5,7 +5,7 @@ import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 export async function GET() {
   const COUNT = GAME_COUNT + 50;
   try {
-    const today = new Date();
+    const today = new Date(2025, 0, 21);
     // 過去一週間のデータを取得（昨日までの7日間）
     const endDate = new Date(today);
     endDate.setDate(endDate.getDate() - 1);

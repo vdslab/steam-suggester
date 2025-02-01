@@ -23,7 +23,7 @@ export async function GET(req: Request, params: Params) {
     const formatData = [];
 
     for (let i = 0; i < 9; i++) {
-      const date = new Date();
+      const date = new Date(2025, 0, 21);
       // 指定日の0時0分0秒
       date.setDate(date.getDate() - i - 1);
       const unixStart = Math.floor(date.setHours(0, 0, 0, 0) / 1000);

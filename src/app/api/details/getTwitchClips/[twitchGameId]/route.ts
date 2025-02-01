@@ -18,7 +18,7 @@ export async function GET(req: Request, { params }: Params) {
   const gameId = params.twitchGameId;
 
   // 一ヶ月前の日付を取得
-  const oneMonthAgo = new Date();
+  const oneMonthAgo = new Date(2025, 0, 21);
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
   const startedAtRFC3339 = oneMonthAgo.toISOString(); // RFC3339形式に変換
 
