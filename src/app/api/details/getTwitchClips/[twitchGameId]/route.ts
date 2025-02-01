@@ -13,12 +13,12 @@ type Params = {
 };
 
 export async function GET(req: Request, { params }: Params) {
-  const ClipCount = 3;
+  const ClipCount = 20;
 
   const gameId = params.twitchGameId;
 
   // 一ヶ月前の日付を取得
-  const oneMonthAgo = new Date();
+  const oneMonthAgo = new Date(2025, 0, 21);
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
   const startedAtRFC3339 = oneMonthAgo.toISOString(); // RFC3339形式に変換
 
@@ -37,7 +37,7 @@ export async function GET(req: Request, { params }: Params) {
 
     // 英語のクリップが多すぎるから５０件取得
     const res = await fetch(
-      `https://api.twitch.tv/helix/clips?game_id=${gameId}&started_at=${startedAtRFC3339}&is_featured=true&first=50`,
+      `https://api.twitch.tv/helix/clips?game_id=${gameId}&is_featured=true&first=50`,
       {
         headers: headers,
       }

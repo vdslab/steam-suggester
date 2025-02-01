@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { Filter, SliderSettings } from "@/types/api/FilterType";
 import { SteamDetailsDataType } from "@/types/api/getSteamDetailType";
 import { NodeType, LinkType } from "@/types/NetworkType";
-import { GAME_COUNT } from "@/constants/NETWORK_DATA";
+import { CIRCLE_SIZE, GAME_COUNT } from "@/constants/NETWORK_DATA";
 import fetchWithCache from "./fetchWithCache";
 import { TAG_LIST } from "@/constants/TAG_LIST";
 
@@ -32,27 +32,44 @@ const jaccardSimilarity = (setA: Set<string>, setB: Set<string>): number => {
 
 export function cosineSimilarityWithDetails(
   vecA: number[],
-  vecB: number[]
+  vecB: number[],
+  WEIGHT_TAG_LIST: number[]
 ): MatrixType {
   if (vecA.length === 0 || vecB.length === 0) {
     return { similarity: -2, elementScores: [] };
   }
 
-  const dotProduct = vecA.reduce((acc, val, idx) => acc + val * vecB[idx], 0);
-  const magnitudeA = Math.sqrt(vecA.reduce((acc, val) => acc + val * val, 0));
-  const magnitudeB = Math.sqrt(vecB.reduce((acc, val) => acc + val * val, 0));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    return { similarity: 0, elementScores: vecA.map(() => 0) }; // 大きさが0のベクトルの場合
+  if (vecA.length !== vecB.length || vecA.length !== WEIGHT_TAG_LIST.length) {
+    throw new Error("配列の長さが一致しません");
   }
 
-  const similarity = dotProduct / (magnitudeA * magnitudeB);
+  const weightedDotProduct = vecA.reduce(
+    (acc, val, idx) => acc + val * vecB[idx] * WEIGHT_TAG_LIST[idx],
+    0
+  );
+
+  const weightedMagnitudeA = Math.sqrt(
+    vecA.reduce((acc, val, idx) => acc + val * val * WEIGHT_TAG_LIST[idx], 0)
+  );
+
+  const weightedMagnitudeB = Math.sqrt(
+    vecB.reduce((acc, val, idx) => acc + val * val * WEIGHT_TAG_LIST[idx], 0)
+  );
+
+  if (weightedMagnitudeA === 0 || weightedMagnitudeB === 0) {
+    return { similarity: 0, elementScores: vecA.map(() => 0) };
+  }
+
+  const similarity =
+    weightedDotProduct / (weightedMagnitudeA * weightedMagnitudeB);
 
   // 各要素ごとの類似スコアを計算
   const elementScores = vecA.map((val, idx) => {
-    const normalizedA = val / magnitudeA;
-    const normalizedB = vecB[idx] / magnitudeB;
-    return normalizedA * normalizedB; // 正規化された値の積
+    const weightedNormalizedA =
+      (val / weightedMagnitudeA) * WEIGHT_TAG_LIST[idx];
+    const weightedNormalizedB =
+      (vecB[idx] / weightedMagnitudeB) * WEIGHT_TAG_LIST[idx];
+    return weightedNormalizedA * weightedNormalizedB; // 正規化後の値の積 × 重み
   });
 
   return { similarity, elementScores };
@@ -68,6 +85,25 @@ const createNetwork = async (
     return { nodes: [], links: [] };
   }
   const slicedData = data.slice(0, GAME_COUNT);
+
+  const WEIGHT_TAG_LIST = Object.keys(TAG_LIST)
+    .map((key: string, index) => {
+      const size = TAG_LIST[key as keyof typeof TAG_LIST].length;
+      let defaultValue = 0;
+
+      if (index === 0 || index === 1 || index === 2) {
+        defaultValue = slider.genreWeight / 100;
+      } else if (index === 3 || index === 4 || index === 10) {
+        defaultValue = slider.graphicWeight / 100;
+      } else if (index === 6 || index === 8 || index === 11) {
+        defaultValue = slider.playstyleWeight / 100;
+      } else if (index === 5 || index === 7 || index === 9 || index === 12) {
+        defaultValue = slider.reviewWeight / 100;
+      }
+      const arr = Array.from({ length: size }, () => defaultValue);
+      return arr;
+    })
+    .flat();
 
   // 追加で取得が必要なゲーム詳細情報を取得
   const promises = gameIds
@@ -86,15 +122,13 @@ const createNetwork = async (
 
   // フィルターに合致したノード群を抽出
   const rawNodes = slicedData.filter((item) => {
-    const isInGenresFilter = item.genres.find((genre) => {
-      return filter.Genres[genre];
-    });
-
     const isSinglePlayer =
       !item.isSinglePlayer && !item.isMultiPlayer ? true : item.isSinglePlayer;
 
+    const isInTagsFilter = item.tags?.some((tag) => filter.Tags.includes(tag));
+
     return (
-      isInGenresFilter &&
+      !isInTagsFilter &&
       filter.Price.startPrice <= item.price &&
       item.price <= filter.Price.endPrice &&
       ((isSinglePlayer && filter.Mode.isSinglePlayer) ||
@@ -139,7 +173,8 @@ const createNetwork = async (
       }
       const similarityObject = cosineSimilarityWithDetails(
         nodes[i].featureVector as number[],
-        nodes[j].featureVector as number[]
+        nodes[j].featureVector as number[],
+        WEIGHT_TAG_LIST
       );
       if (similarityObject.similarity === -2) {
         const setA = new Set(nodes[i].tags ?? []);
@@ -213,15 +248,20 @@ const createNetwork = async (
     node.circleScale = sizeScale(node.activeUsers ?? 0);
   });
 
+  // シミュレーションパラメータ
+  const baseDistance = 200; // リンクの基本距離
+  const similarityFactor = 600; // similarityに応じて距離を減少させる係数
+  const minDistance = 10; // リンク距離の最小値（必要に応じて設定）
+
   const simulation = d3
     .forceSimulation<NodeType>(nodes)
-    .force("charge", d3.forceManyBody<NodeType>().strength(-200))
-    .force("center", d3.forceCenter(0, 0).strength(0.05))
+    .force("charge", d3.forceManyBody<NodeType>().strength(-800))
+    .force("center", d3.forceCenter(0, 0).strength(0.01))
     .force(
       "collide",
       d3
         .forceCollide<NodeType>()
-        .radius((d) => (d.circleScale ?? 1) * 30)
+        .radius((d) => (d.circleScale ?? 1) * (CIRCLE_SIZE + 15))
         .iterations(3)
     )
     .force(
@@ -235,11 +275,18 @@ const createNetwork = async (
           const similarity =
             similarityMatrix[sourceNode.index][targetNode.index].similarity ||
             0;
-          return 130 - similarity * 100;
+
+          // similarityに基づいてリンク距離を計算
+          let distance = baseDistance - similarity * similarityFactor;
+
+          // 距離が最小値を下回らないように制約
+          distance = Math.max(distance, minDistance);
+
+          return distance;
         })
-        .strength(1)
+        .strength(1) // 強度は変更しない
     )
-    .force("radial", d3.forceRadial(800).strength(0.1))
+    .force("radial", d3.forceRadial(1200).strength(0.1))
     .force(
       "cluster",
       d3
@@ -255,7 +302,7 @@ const createNetwork = async (
   const similarityScale = d3
     .scaleLinear()
     .domain(d3.extent(links, (link) => link.similarity) as [number, number])
-    .range([0, 100]);
+    .range([0, 99]);
 
   links.forEach((link) => {
     link.similarity = Math.round(similarityScale(link.similarity as number));

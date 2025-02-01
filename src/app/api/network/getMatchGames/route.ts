@@ -5,7 +5,7 @@ import { GAME_COUNT } from "@/constants/NETWORK_DATA";
 export async function GET() {
   const COUNT = GAME_COUNT + 50;
   try {
-    const today = new Date();
+    const today = new Date(2025, 0, 21);
     // 過去一週間のデータを取得（昨日までの7日間）
     const endDate = new Date(today);
     endDate.setDate(endDate.getDate() - 1);
@@ -32,13 +32,7 @@ export async function GET() {
           sd.short_details,
           sd.release_date,
           sd.developer_name,
-          sd.sale_price,
-          sd.play_time,
           sd.review_text,
-          sd.difficulty,
-          sd.graphics,
-          sd.story,
-          sd.music,
           sd.similar_games,
           sd.feature_vector,
           sd.background,
@@ -60,8 +54,7 @@ export async function GET() {
           gv.steam_id, sd.game_title, sd.webpage_url, sd.img_url, sd.price,
           sd.is_single_player, sd.is_multi_player, sd.is_device_windows, sd.is_device_mac,
           sd.genres, sd.tags, sd.short_details, sd.release_date, sd.developer_name,
-          sd.sale_price, sd.play_time, sd.review_text, sd.difficulty, sd.graphics,
-          sd.story, sd.music, sd.similar_games, sd.feature_vector,
+          sd.review_text, sd.similar_games, sd.feature_vector,
           sd.background, sd.screenshots, sd.mp4_movies
       ORDER BY
           SUM(sa.active_user) DESC
@@ -100,13 +93,7 @@ export async function GET() {
         shortDetails: item.short_details,
         releaseDate: item.release_date,
         developerName: item.developer_name,
-        salePrice: item.sale_price,
-        playTime: item.play_time,
         review: item.review_text,
-        difficulty: item.difficulty,
-        graphics: item.graphics,
-        story: item.story,
-        music: item.music,
         similarGames: similarGames,
         featureVector: item.feature_vector || [],
         background: item.background || "",

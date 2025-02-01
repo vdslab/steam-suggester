@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 5s ease infinite;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
 }
@@ -122,19 +139,4 @@ body {
     opacity: 0;
     stroke-width: 1;
   }
-}
-
-/* エッジスコアのグループ全体 */
-.edge-score-group {
-  cursor: pointer;
-}
-
-/* スコアテキストのスタイル */
-.edge-score {
-  fill: white;
-  font-size: 12px;
-  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black,
-    1px 1px 0 black;
-  pointer-events: none; /* マウスイベントを受け取らない */
-  user-select: none; /* テキストの選択を防ぐ */
 }

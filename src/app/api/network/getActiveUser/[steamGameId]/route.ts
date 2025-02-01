@@ -39,7 +39,28 @@ export async function GET(req: Request, { params }: Params) {
       };
     });
 
-    return NextResponse.json(activeUsers);
+    const rowsByDate = new Map<number, number>();
+    activeUsers.forEach((row) => {
+      const dayTs = new Date(row.get_date).setHours(0, 0, 0, 0);
+      rowsByDate.set(dayTs, (rowsByDate.get(dayTs) || 0) + row.active_user);
+    });
+    if (!rowsByDate.size) return NextResponse.json([]);
+
+    // 日付範囲計算
+    const timestamps = [...rowsByDate.keys()];
+    const minTs = Math.min(...timestamps);
+    const maxTs = Math.max(...timestamps);
+
+    const dailyData: GetActiveUserResponse[] = [];
+    for (let d = new Date(minTs); d.getTime() <= maxTs; d.setDate(d.getDate() + 1)) {
+      const current = d.getTime();
+      dailyData.push({
+        get_date: Math.floor(current / 1000),
+        active_user: rowsByDate.get(current) || 0,
+      });
+    }
+
+    return NextResponse.json(dailyData);
   } catch (error) {
     console.error("Error fetching game details:", error);
     return NextResponse.json(

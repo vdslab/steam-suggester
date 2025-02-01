@@ -28,8 +28,8 @@ const useBrushScales = ({
       scaleTime<number>({
         range: [0, xMax],
         domain: (extent(filteredStock, getDate) as [Date, Date]) || [
-          new Date(),
-          new Date(),
+          new Date(2025, 0, 21),
+          new Date(2025, 0, 21),
         ],
       }),
     [xMax, filteredStock]
@@ -50,8 +50,8 @@ const useBrushScales = ({
       scaleTime<number>({
         range: [0, xBrushMax],
         domain: (extent(data || [], getDate) as [Date, Date]) || [
-          new Date(),
-          new Date(),
+          new Date(2025, 1, 20),
+          new Date(2025, 1, 20),
         ],
       }),
     [xBrushMax, data]

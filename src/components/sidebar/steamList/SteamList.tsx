@@ -9,20 +9,23 @@ import Panel from "../../common/Panel";
 import Section from "../Section";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Image from "next/image";
-import { Alert, Avatar, AvatarGroup, Button, IconButton } from "@mui/material";
+import { Alert, Avatar, AvatarGroup, Button, IconButton, Tooltip } from "@mui/material";
 import { fetcher } from "@/components/common/Fetcher";
 import SearchIcon from "@mui/icons-material/Search";
 import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "../../common/HelpTooltip";
-import { ISR_FETCH_INTERVAL } from "@/constants/DetailsConstants";
+import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
+import { changeGameIdData } from "@/hooks/indexedDB";
 
 type Props = {
   nodes: NodeType[];
   setSelectedIndex: (value: number) => void;
+  setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  userAddedGames: string[];
 };
 
 const SteamList = (props: Props) => {
-  const { nodes, setSelectedIndex } = props;
+  const { nodes, setSelectedIndex, setIsNetworkLoading, userAddedGames } = props;
 
   const { data: session, status } = useSession();
 
@@ -37,17 +40,17 @@ const SteamList = (props: Props) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
-    fetcher,
-    { refreshInterval: ISR_FETCH_INTERVAL }
+    fetcher, CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
-  const { data: friendsOwnGames, error: friendsGamesError } = useSWR(
+  const { data: friendsOwnGames, error: friendsGamesError } = useSWR<
+    GetFriendGamesResponse[]
+  >(
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
-    fetcher,
-    { refreshInterval: ISR_FETCH_INTERVAL }
+    fetcher, CACHE_UPDATE_EVERY_24H
   );
 
   if (status === "loading" || !session) {
@@ -121,12 +124,34 @@ const SteamList = (props: Props) => {
       next.friends.length - prev.friends.length
   );
 
+  const addAllGames = async () => {
+    const newGames = myOwnGames.filter(
+      (game) => !nodes.some((node) => node.steamGameId === game.id)
+    );
+
+    const newFriendGames = friendsOwnGames
+      .map((game) => {
+        const matchedNode = nodes.find((node) => node.title === game.gameName);
+        return matchedNode ? matchedNode.steamGameId : null;
+      })
+      .filter((id): id is string => id !== null);
+
+
+    const allNewGames = [
+      ...newGames.map((game) => game.id.toString()),
+      // ...newFriendGames,
+    ];
+
+    await changeGameIdData([...userAddedGames, ...allNewGames]);
+    setIsNetworkLoading(true);
+  }
+
   return (
     <Panel
       title={
         <div className="flex items-center">
           <span>Steam所有ゲーム一覧</span>
-          <HelpTooltip title="自分の所有してるゲームは緑、フレンドの所有してるゲームは青の枠線で囲まれます。" />
+          <HelpTooltip title="自分の所有してるゲームは黄色、フレンドの所有してるゲームは青の枠線で囲まれます。もし、どちらも所有してる場合は緑の枠で囲まれます。" />
         </div>
       }
       icon={<SportsEsportsIcon className="mr-2 text-white" />}
@@ -147,12 +172,16 @@ const SteamList = (props: Props) => {
             )}
             <div className="ml-3">{session.user?.name}</div>
           </div>
-          <IconButton onClick={() => signOut()} sx={{ color: "white" }}>
-            <LogoutIcon sx={{ color: "white" }} />
-          </IconButton>
+          <Tooltip title="ログアウト">
+            <IconButton onClick={() => signOut()} sx={{ color: "white" }}>
+              <LogoutIcon sx={{ color: "white" }} />
+            </IconButton>
+          </Tooltip>
         </div>
+
         {/* 自分の所有ゲーム */}
         <Section title="自分の所有ゲーム" icon={<PersonIcon />}>
+          <Button onClick={addAllGames}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
             {myOwnGames.length > 0 ? (
               myOwnGames.map((game: GetSteamOwnedGamesResponse) => (
@@ -167,7 +196,6 @@ const SteamList = (props: Props) => {
                         const nodeIndex = nodes.findIndex(
                           (node) => node.steamGameId == game.id
                         );
-                        // const dataIndex = steamAllData.findIndex((data) => data.title == game.title);
                         if (nodeIndex !== -1) {
                           return (
                             <IconButton
@@ -178,14 +206,6 @@ const SteamList = (props: Props) => {
                             </IconButton>
                           );
                         }
-                        // TODO: 追加ボタン実装
-                        // } else if(dataIndex !== -1) {
-                        //   return(
-                        //     <IconButton sx={{ color:'white' }} onClick={() => console.log('add')}>
-                        //       <PlaylistAddIcon />
-                        //     </IconButton>
-                        //   );
-                        // }
                         return null;
                       })()}
                   </div>

@@ -94,6 +94,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
             position: "relative",
             boxSizing: "border-box",
           }}
+          className="select-none"
         >
           {/* 動画またはスライドショーセクション */}
           <div
@@ -143,6 +144,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
                         src={screenshot}
                         alt="Game Screenshot"
                         fill
+                        sizes="250px"
                         style={{
                           objectFit: "cover",
                         }}
@@ -168,6 +170,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
               src={imgURL}
               alt="Game Thumbnail"
               fill
+              sizes="150px"
               style={{
                 objectFit: "cover",
               }}
