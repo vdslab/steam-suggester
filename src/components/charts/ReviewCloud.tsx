@@ -31,7 +31,10 @@ export const getColorByScore = (score: number) => {
       .toString(16)
       .padStart(2, "0");
 
-  return `#${interpolate(209, 74)}${interpolate(75, 144)}${interpolate(86, 226)}`;
+  return `#${interpolate(209, 74)}${interpolate(75, 144)}${interpolate(
+    86,
+    226
+  )}`;
 };
 
 // 固定値ジェネレータ
@@ -47,30 +50,43 @@ const ReviewCloud = ({ reviewData }: Props) => {
   useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => {
-      const filteredData = reviewData
-        .sort((a, b) => b.tfidf - a.tfidf)
-        .slice(0, MAX_REVIEW_WORDS)
-        .map((item) => ({
-          text: item.name,
-          value: item.tfidf,
-          score: item.score,
-        }));
+      if (reviewData && reviewData.length !== 0) {
+        if (reviewData[0]?.tfidf) {
+          const filteredData = reviewData
+            .sort((a, b) => b.tfidf - a.tfidf)
+            .slice(0, MAX_REVIEW_WORDS)
+            .map((item) => ({
+              text: item.name,
+              value: item.tfidf,
+              score: item.score,
+            }));
 
-      setWords(filteredData);
-      setIsLoading(false);
+          setWords(filteredData);
+          setIsLoading(false);
+        }
+      }
     }, 1300);
 
     return () => clearTimeout(timer);
   }, [reviewData]);
 
   const fontScale = scaleLog({
-    domain: words.length ? [Math.min(...words.map((w) => w.value)), Math.max(...words.map((w) => w.value))] : [1, 100],
+    domain: words.length
+      ? [
+          Math.min(...words.map((w) => w.value)),
+          Math.max(...words.map((w) => w.value)),
+        ]
+      : [1, 100],
     range: [10, 100],
   });
 
   const fontSizeSetter = (datum: WordData) => fontScale(datum.value);
 
   if (!reviewData || reviewData.length === 0) {
+    return <div className="text-white">レビューがありません</div>;
+  }
+
+  if (!reviewData[0]?.tfidf) {
     return <div className="text-white">レビューがありません</div>;
   }
 
