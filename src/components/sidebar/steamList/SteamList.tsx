@@ -9,7 +9,14 @@ import Panel from "../../common/Panel";
 import Section from "../Section";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Image from "next/image";
-import { Alert, Avatar, AvatarGroup, Button, IconButton, Tooltip } from "@mui/material";
+import {
+  Alert,
+  Avatar,
+  AvatarGroup,
+  Button,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { fetcher } from "@/components/common/Fetcher";
 import SearchIcon from "@mui/icons-material/Search";
 import { NodeType } from "@/types/NetworkType";
@@ -25,7 +32,8 @@ type Props = {
 };
 
 const SteamList = (props: Props) => {
-  const { nodes, setSelectedIndex, setIsNetworkLoading, userAddedGames } = props;
+  const { nodes, setSelectedIndex, setIsNetworkLoading, userAddedGames } =
+    props;
 
   const { data: session, status } = useSession();
 
@@ -40,7 +48,8 @@ const SteamList = (props: Props) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
-    fetcher, CACHE_UPDATE_EVERY_24H
+    fetcher,
+    CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -50,7 +59,8 @@ const SteamList = (props: Props) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
-    fetcher, CACHE_UPDATE_EVERY_24H
+    fetcher,
+    CACHE_UPDATE_EVERY_24H
   );
 
   if (status === "loading" || !session) {
@@ -136,15 +146,14 @@ const SteamList = (props: Props) => {
       })
       .filter((id): id is string => id !== null);
 
-
     const allNewGames = [
       ...newGames.map((game) => game.id.toString()),
       // ...newFriendGames,
     ];
 
-    await changeGameIdData([...userAddedGames, ...allNewGames]);
+    await changeGameIdData([...new Set([...userAddedGames, ...allNewGames])]);
     setIsNetworkLoading(true);
-  }
+  };
 
   return (
     <Panel
