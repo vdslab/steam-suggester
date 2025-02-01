@@ -6,45 +6,41 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import IconButton from "@mui/material/IconButton";
 import AutoCompleteBox from "@/components/sidebar/highlight/AutoCompleteBox";
 
-
 type Props = {
   selectedTags: string[];
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const TagsSelect = (props:Props) => {
-
+const TagsSelect = (props: Props) => {
   const { selectedTags, setSelectedTags } = props;
-
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const searchList: string[] = [
     ...new Set(
       Object.values(TAG_LIST)
         .flat()
-        .filter(
-          (key) =>
-            !selectedTags.includes(key) &&
-            key.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        .filter((key) => key.toLowerCase().includes(searchQuery.toLowerCase()))
     ),
-  ];
+  ].filter((tag) => !selectedTags.includes(tag));
 
   const AddSelectedTags = (event: any, value: string | null) => {
-    if (value) {
+    if (value && !selectedTags.includes(value)) {
       setSelectedTags([...selectedTags, value]);
-      setSearchQuery("");
     }
+    setSearchQuery("");
   };
 
   const deleteSelectedTags = (value: string) => {
-    setSelectedTags([...selectedTags.filter((tag: string) => tag !== value)]);
+    const index = selectedTags.indexOf(value);
+    if (index > -1) {
+      const newTags = [...selectedTags];
+      newTags.splice(index, 1);
+      setSelectedTags(newTags);
+    }
   };
-
 
   return (
     <div>
-
       {/* タグ検索 */}
       <AutoCompleteBox
         searchQuery={searchQuery}
@@ -76,7 +72,7 @@ const TagsSelect = (props:Props) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TagsSelect
+export default TagsSelect;

@@ -92,7 +92,7 @@ const createNetwork = async (
     const isInTagsFilter = item.tags?.some((tag) => filter.Tags.includes(tag));
 
     return (
-      isInTagsFilter &&
+      !isInTagsFilter &&
       filter.Price.startPrice <= item.price &&
       item.price <= filter.Price.endPrice &&
       ((isSinglePlayer && filter.Mode.isSinglePlayer) ||

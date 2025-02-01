@@ -126,7 +126,7 @@ const SelectParameter: React.FC<Props> = ({
 
         {/* タグフィルター */}
         <div className="pr-4">
-          <Section title="タグ" icon={<TagOutlinedIcon />}>
+          <Section title="除外するタグ" icon={<TagOutlinedIcon />}>
             <TagsSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
           </Section>
         </div>
