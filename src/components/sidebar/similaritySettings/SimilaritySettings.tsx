@@ -190,7 +190,7 @@ const SimilaritySettings = ({
         </div>
 
         <div className="mb-4">
-          <label className="text-white block mb-2">レビュー（評判）</label>
+          <label className="text-white block mb-2">ストーリー性</label>
           <Slider
             domain={[0, 100]}
             values={[reviewWeight]}
