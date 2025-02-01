@@ -60,16 +60,7 @@ const GameDetail = (props: Props) => {
   const [currentSlide, setCurrentSlide] = useState(0); // 現在のスライドインデックス
   const screenshots = node.screenshots || [node.imgURL];
 
-  const [minHeight, setMinHeight] = useState<number | null>(null);
 
-  // 画像の高さを取得して最小の高さを設定
-  useEffect(() => {
-    if (screenshots.length > 0) {
-      const imgElements = document.querySelectorAll(".screenshot-img");
-      const heights = Array.from(imgElements).map((img) => img.clientHeight);
-      setMinHeight(Math.min(...heights));
-    }
-  }, [screenshots]);
 
   // スライドショーの自動切り替え
   useEffect(() => {

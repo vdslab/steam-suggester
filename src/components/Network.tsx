@@ -330,7 +330,12 @@ const Network = () => {
               : "hidden"
           }`}
         >
-          <SteamList nodes={nodes} setSelectedIndex={setSelectedIndex} />
+          <SteamList
+            nodes={nodes}
+            setSelectedIndex={setSelectedIndex}
+            setIsNetworkLoading={setIsNetworkLoading}
+            userAddedGames={userAddedGames}
+            />
         </div>
 
         {/* ランキングパネル */}

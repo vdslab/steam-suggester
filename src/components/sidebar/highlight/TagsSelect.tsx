@@ -58,10 +58,10 @@ const TagsSelect = (props:Props) => {
       {/* 選択中のジャンル */}
       <div className="flex flex-wrap mt-2">
         {selectedTags.map(
-          (value: string) =>
+          (value: string, index: number) =>
             value && (
               <span
-                key={value}
+                key={`${value}-${index}`}
                 className="bg-blue-500 text-xs text-white px-3 py-1 rounded-full mr-2 mb-2 flex items-center shadow-lg transition-all duration-200"
               >
                 {value}
