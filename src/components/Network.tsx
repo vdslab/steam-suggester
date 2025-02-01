@@ -21,7 +21,7 @@ import Panel from "./common/Panel";
 import SteamList from "./sidebar/steamList/SteamList";
 import HelpTooltip from "./common/HelpTooltip";
 import Tour from "./tutorial/Tour";
-import ProgressBar from "./common/ProgressBar";
+// import ProgressBar from "./common/ProgressBar"; // ProgressBar は不要なら削除
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./sidebar/leaderboard/Leaderboard";
 import useTour from "@/hooks/useTour";
@@ -35,6 +35,7 @@ import SearchGames from "./sidebar/searchGames/SearchGames";
 import GameDetail from "./detail/GameDetail";
 import Tutorial from "./tutorial/Tutorial";
 import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
+import changeNetwork from "@/hooks/changeNetwork";
 
 const Network = () => {
   const { data: steamAllData, error: steamAllDataError } = useSWR<
@@ -60,16 +61,14 @@ const Network = () => {
   const [centerX, setCenterX] = useState<number>(0);
   const [centerY, setCenterY] = useState<number>(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-
   const [isNetworkLoading, setIsNetworkLoading] = useState(true);
 
   const [streamerIds, setStreamerIds] = useState<StreamerListType[]>([]);
 
-  // openPanelを他のパネルのみに使用
+  // openPanel を他のパネルのみに使用
   const [openPanel, setOpenPanel] = useState<string | null>(null);
-  // GameSearchPanel専用の状態
+  // GameSearchPanel 専用の状態
   const [isGameSearchOpen, setIsGameSearchOpen] = useState<boolean>(false);
 
   const { tourRun, setTourRun } = useTour();
@@ -83,29 +82,57 @@ const Network = () => {
     gameIds: string[],
     slider: SliderSettings
   ) => {
-    const result = await createNetwork(steamAllData, filter, gameIds, slider);
-    const nodes = result?.nodes ?? [];
-    const links = result?.links ?? [];
-    const buffNodes = nodes.concat();
-    buffNodes.sort(
-      (node1: NodeType, node2: NodeType) =>
-        (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
-    );
-    const index = buffNodes.findIndex(
-      (node: NodeType) => node.steamGameId === prevAddedGameId
-    );
-    if (buffNodes.length > 0 && index === -1) {
-      setCenterX((buffNodes[0]?.x ?? 0) - 150);
-      setCenterY((buffNodes[0]?.y ?? 0) + 100);
-      setSelectedIndex(-1);
-    } else if (index !== -1) {
-      setCenterX((buffNodes[index]?.x ?? 0) - 150);
-      setCenterY((buffNodes[index]?.y ?? 0) + 100);
-      setSelectedIndex(index);
+    if (!steamAllData) return;
+
+    if (nodes.length === 0) {
+      // 新規作成
+      const result = await createNetwork(steamAllData, filter, gameIds, slider);
+      const rawNodes = result?.nodes ?? [];
+      const rawLinks = result?.links ?? [];
+      const buffNodes = [...rawNodes].sort(
+        (node1, node2) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
+      );
+      const index = buffNodes.findIndex(
+        (node: NodeType) => node.steamGameId === prevAddedGameId
+      );
+      if (buffNodes.length > 0 && index === -1) {
+        setCenterX((buffNodes[0]?.x ?? 0) - 150);
+        setCenterY((buffNodes[0]?.y ?? 0) + 100);
+        setSelectedIndex(-1);
+      } else if (index !== -1) {
+        setCenterX((buffNodes[index]?.x ?? 0) - 150);
+        setCenterY((buffNodes[index]?.y ?? 0) + 100);
+        setSelectedIndex(index);
+      }
+      setPrevAddedGameId("");
+      setNodes(rawNodes);
+      setLinks(rawLinks);
+    } else {
+      // 既存ネットワークをアップデート
+      const result = await changeNetwork(
+        steamAllData,
+        filter,
+        gameIds,
+        slider,
+        nodes
+      );
+      const rawNodes = result?.nodes ?? [];
+      const rawLinks = result?.links ?? [];
+      const buffNodes = [...rawNodes].sort(
+        (node1, node2) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
+      );
+      const index = buffNodes.findIndex(
+        (node: NodeType) => node.steamGameId === prevAddedGameId
+      );
+      if (buffNodes.length > 0 && index === -1) {
+        setSelectedIndex(-1);
+      } else if (index !== -1) {
+        setSelectedIndex(index);
+      }
+      setPrevAddedGameId("");
+      setNodes(rawNodes);
+      setLinks(rawLinks);
     }
-    setPrevAddedGameId("");
-    setNodes(nodes);
-    setLinks(links);
   };
 
   useEffect(() => {
@@ -135,7 +162,7 @@ const Network = () => {
       setCenterY((nodes[selectedIndex].y ?? 0) + 100);
       setIsGameSearchOpen(true);
     }
-  }, [selectedIndex]);
+  }, [selectedIndex, nodes]);
 
   const togglePanel = (panelName: string) => {
     setOpenPanel((prevPanel) => {
@@ -164,10 +191,10 @@ const Network = () => {
     })();
   }, []);
 
-  if (isNetworkLoading || !steamAllData || !steamListData) {
+  // データ取得失敗
+  if (!steamAllData || !steamListData) {
     return <Loading />;
   }
-
   if (steamAllDataError || steamListDataError) {
     return (
       <Error
@@ -179,7 +206,7 @@ const Network = () => {
 
   return (
     <div className="flex flex-1 overflow-hidden text-white relative">
-      {/* Sidebar */}
+      {/* サイドバー */}
       <Sidebar
         openPanel={openPanel}
         togglePanel={togglePanel}
@@ -215,22 +242,26 @@ const Network = () => {
           </div>
         )}
 
-        {!isNetworkLoading ? (
-          <div className="absolute inset-0">
-            <NodeLink
-              nodes={nodes}
-              links={links}
-              centerX={centerX}
-              centerY={centerY}
-              selectedIndex={selectedIndex}
-              setSelectedIndex={setSelectedIndex}
-              streamerIds={streamerIds}
-              openPanel={openPanel}
-              selectedTags={selectedTags}
-            />
+        {/* ネットワークグラフ */}
+        <div className="absolute inset-0">
+          <NodeLink
+            nodes={nodes}
+            links={links}
+            centerX={centerX}
+            centerY={centerY}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            streamerIds={streamerIds}
+            openPanel={openPanel}
+            selectedTags={selectedTags}
+          />
+        </div>
+
+        {/* ▼ ローディング時に表示する: 背景を暗くしてスピナーを中央に */}
+        {isNetworkLoading && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div className="w-16 h-16 border-4 border-dashed border-white rounded-full animate-spin" />
           </div>
-        ) : (
-          <ProgressBar progress={0} />
         )}
 
         {/* フィルターパネル */}
@@ -266,7 +297,7 @@ const Network = () => {
           />
         </div>
 
-        {/* StreamerListパネル */}
+        {/* StreamerList パネル */}
         <div
           className={`absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
             openPanel === "streamer"
@@ -335,7 +366,7 @@ const Network = () => {
             setSelectedIndex={setSelectedIndex}
             setIsNetworkLoading={setIsNetworkLoading}
             userAddedGames={userAddedGames}
-            />
+          />
         </div>
 
         {/* ランキングパネル */}
