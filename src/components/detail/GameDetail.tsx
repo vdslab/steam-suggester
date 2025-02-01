@@ -32,7 +32,7 @@ type Props = {
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
@@ -60,8 +60,6 @@ const GameDetail = (props: Props) => {
   const [currentSlide, setCurrentSlide] = useState(0); // 現在のスライドインデックス
   const screenshots = node.screenshots || [node.imgURL];
 
-
-
   // スライドショーの自動切り替え
   useEffect(() => {
     if (node && screenshots.length > 1) {
@@ -85,7 +83,7 @@ const GameDetail = (props: Props) => {
             {/* 画像とアイコンのコンテナ */}
             {/* スライドショー */}
             {screenshots && (
-              <div className="overflow-hidden h-80 relative">
+              <div className="overflow-hidden h-60 relative">
                 {screenshots.map((screenshot, index) => (
                   <Image
                     key={index}
@@ -235,16 +233,32 @@ const GameDetail = (props: Props) => {
             {node.review && <ReviewCloud reviewData={node.review} />}
           </div>
 
-
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
-            <Tabs value={tabIndex} onChange={handleChange} aria-label="basic tabs example" centered >
-              <Tab label="流行度グラフ" {...a11yProps(0)} sx={{ color:"white"}}/>
-              <Tab label="Twitchクリップ" {...a11yProps(1)} sx={{ color:"white"}} />
+          <Box
+            sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}
+          >
+            <Tabs
+              value={tabIndex}
+              onChange={handleChange}
+              aria-label="basic tabs example"
+              centered
+            >
+              <Tab
+                label="流行度グラフ"
+                {...a11yProps(0)}
+                sx={{ color: "white" }}
+              />
+              <Tab
+                label="Twitchクリップ"
+                {...a11yProps(1)}
+                sx={{ color: "white" }}
+              />
             </Tabs>
           </Box>
 
-          {tabIndex === 0 && (<PopularityCharts node={node} />)}
-          {tabIndex === 1 && (<DistributorVideos twitchGameId={node.twitchGameId} />)}
+          {tabIndex === 0 && <PopularityCharts node={node} />}
+          {tabIndex === 1 && (
+            <DistributorVideos twitchGameId={node.twitchGameId} />
+          )}
         </div>
       ) : (
         <div className="text-white text-center pt-24">
