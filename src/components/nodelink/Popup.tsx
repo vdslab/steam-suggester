@@ -20,20 +20,27 @@ const PopupComponent: React.FC<Props> = ({ node, link }) => {
   // FLAT_TAG_LIST は定数なので useMemo を使用してメモ化
   const FLAT_TAG_LIST = useMemo(() => Object.values(TAG_LIST).flat(), []);
 
-  // 共通タグリストの生成をメモ化
+  // OR 条件: source または target に含まれるタグ
   const commonTagList = useMemo(() => {
-    return [...new Set([...link.source.tags, ...link.target.tags])];
+    return [...new Set([...link.source.tags, ...link.target.tags])]; // OR 条件
+  }, [link.source.tags, link.target.tags]);
+
+  // AND 条件: 両方に含まれるタグ
+  const andTagList = useMemo(() => {
+    return link.source.tags.filter((tag) => link.target.tags.includes(tag)); // AND 条件
   }, [link.source.tags, link.target.tags]);
 
   // rawData の生成をメモ化
   const rawData = useMemo(() => {
     return FLAT_TAG_LIST.map((tag: string, index: number) => ({
       text: tag,
-      value: (link.elementScores as number[])[index],
+      value:
+        (link.elementScores as number[])[index] +
+        (andTagList.includes(tag) ? 0 : -0.1), // AND 条件なら value を +1
     }));
-  }, [FLAT_TAG_LIST, link.elementScores]);
+  }, [FLAT_TAG_LIST, link.elementScores, andTagList]);
 
-  // tagData の生成をメモ化
+  // tagData の生成をメモ化（OR 条件でフィルタリング）
   const tagData = useMemo(() => {
     const seenTags = new Set<string>();
     return rawData.filter((item) => {
