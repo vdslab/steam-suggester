@@ -179,14 +179,6 @@ const Network = () => {
     });
   };
 
-  // ユーザーが追加したゲームを取得
-  useEffect(() => {
-    (async () => {
-      const res = await getGameIdData();
-      setUserAddedGames(res ?? []);
-    })();
-  }, []);
-
   // データ取得失敗
   if (!steamAllData || !steamListData) {
     return <Loading />;
@@ -216,8 +208,6 @@ const Network = () => {
 
         <SearchGames
           setSelectedIndex={setSelectedIndex}
-          userAddedGames={userAddedGames}
-          setUserAddedGames={setUserAddedGames}
           nodes={nodes}
           setIsNetworkLoading={setIsNetworkLoading}
           steamListData={steamListData}
@@ -378,8 +368,6 @@ const Network = () => {
             nodes={nodes}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
-            userAddedGames={userAddedGames}
-            setUserAddedGames={setUserAddedGames}
             setIsNetworkLoading={setIsNetworkLoading}
           />
         </div>

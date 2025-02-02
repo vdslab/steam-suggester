@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { changeGameIdData } from "@/hooks/indexedDB";
+import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { SteamListType, NodeType } from "@/types/NetworkType";
 import SearchItemManager from "./SearchItemManager";
 
@@ -10,8 +10,6 @@ import { IconButton } from "@mui/material";
 
 type SearchGamesProps = {
   setSelectedIndex: (value: number) => void;
-  userAddedGames: string[];
-  setUserAddedGames: (value: string[]) => void;
   nodes: NodeType[];
   setIsNetworkLoading: (value: boolean) => void;
   steamListData: SteamListType[];
@@ -21,8 +19,6 @@ type SearchGamesProps = {
 
 const SearchGames = ({
   setSelectedIndex,
-  userAddedGames,
-  setUserAddedGames,
   nodes,
   setIsNetworkLoading,
   steamListData,
@@ -30,10 +26,10 @@ const SearchGames = ({
   setPrevAddedGameId,
 }: SearchGamesProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>(
-    []
-  );
+  const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
   const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [addedGameIds, setAddedGameIds] = useState<string[]>([]);
+
 
   // 外部クリックを検出してフォーカスを解除
   useEffect(() => {
@@ -49,6 +45,14 @@ const SearchGames = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchGameIds = async () => {
+      const addedGameIds = await getGameIdData();
+      setAddedGameIds(addedGameIds ?? []);
+    };
+    fetchGameIds();
+  }, [nodes]);
 
   // allSteamList を効率的に作成
   const allSteamList = useMemo(() => {
@@ -93,11 +97,10 @@ const SearchGames = ({
   // ゲームを追加する処理
   const handleGameAdd = (steamGameId: string) => {
     if (
-      !userAddedGames.includes(steamGameId) &&
+      !addedGameIds.includes(steamGameId) &&
       !nodes.some((node: NodeType) => node.steamGameId === steamGameId)
     ) {
-      const newUserAddedGames = [...userAddedGames, steamGameId];
-      setUserAddedGames(newUserAddedGames);
+      const newUserAddedGames = [...addedGameIds, steamGameId];
       setSearchQuery("");
       (async () => {
         await changeGameIdData(newUserAddedGames);
@@ -108,10 +111,9 @@ const SearchGames = ({
 
   // ゲームを削除する処理
   const handleGameDelete = (steamGameId: string) => {
-    const newUserAddedGames = userAddedGames.filter(
+    const newUserAddedGames = addedGameIds.filter(
       (gameId: string) => gameId !== steamGameId
     );
-    setUserAddedGames(newUserAddedGames);
     (async () => {
       await changeGameIdData(newUserAddedGames);
       setSearchQuery("");
@@ -182,7 +184,7 @@ const SearchGames = ({
                     setIsFocused={setIsFocused}
                     startIcon={`${game.index + 1}位`}
                     endIcon={
-                      userAddedGames.includes(game.steamGameId) ? (
+                      addedGameIds.includes(game.steamGameId) ? (
                         <IconButton>
                           <DeleteForeverOutlinedIcon />
                         </IconButton>
