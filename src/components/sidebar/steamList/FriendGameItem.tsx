@@ -5,17 +5,20 @@ import SearchIcon from "@mui/icons-material/Search";
 type FriendGameItemProps = {
   game: GetFriendGamesResponse;
   onSelect: () => void;
+  nodeIndex: number;
 }
 
-const FriendGameItem = ({ game, onSelect }: FriendGameItemProps) => {
+const FriendGameItem = ({ game, onSelect, nodeIndex }: FriendGameItemProps) => {
   return (
     <div className="p-2 mb-2 bg-gray-900 rounded-lg relative group">
       <div className="flex items-center justify-between">
         <div className="p-2" onClick={onSelect}>
           {game.gameName}
-          <IconButton size="small" sx={{ color: "white" }} onClick={onSelect}>
-            <SearchIcon />
-          </IconButton>
+          {nodeIndex !== -1 &&
+            <IconButton size="small" sx={{ color: "white" }} onClick={onSelect}>
+              <SearchIcon />
+            </IconButton>
+          }
         </div>
         <AvatarGroup max={3} spacing={"small"}>
           {game.friends.map((friend, friendIndex) => (

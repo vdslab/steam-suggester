@@ -17,8 +17,7 @@ import {
 } from "@mui/material";
 import { fetcher } from "@/components/common/Fetcher";
 import { NodeType } from "@/types/NetworkType";
-import HelpTooltip from "../../common/HelpTooltip";
-import { changeGameIdData } from "@/hooks/indexedDB";
+import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import OwnedGameItem from "./OwnedGameItem";
 import FriendGameItem from "./FriendGameItem";
 
@@ -127,7 +126,8 @@ const SteamList = (props: Props) => {
     const newGames = myOwnGames.filter((game) =>
       !nodes.some((node) => node.steamGameId === game.id)
     );
-    await changeGameIdData([...new Set([...userAddedGames, ...newGames.map((game) => game.id.toString())])]);
+    const gameIdData = await getGameIdData();
+    await changeGameIdData([...(gameIdData || []), ...newGames.map((game) => game.id.toString())]);
     setIsNetworkLoading(true);
   };
 
@@ -136,7 +136,8 @@ const SteamList = (props: Props) => {
       .map((game) => game.gameId)
       .filter((gameId) => !nodes.some((node) => node.steamGameId === gameId));
 
-    await changeGameIdData([...new Set([...userAddedGames, ...newFriendGameIds])]);
+    const gameIdData = await getGameIdData();
+    await changeGameIdData([...(gameIdData || []), ...newFriendGameIds]);
     setIsNetworkLoading(true);
   }
 
@@ -191,6 +192,7 @@ const SteamList = (props: Props) => {
                     onSelect={() => {
                       if (nodeIndex !== -1) setSelectedIndex(nodeIndex);
                     }}
+                    nodeIndex={nodeIndex}
                   />
                 );
               })
@@ -207,13 +209,17 @@ const SteamList = (props: Props) => {
         <Button onClick={addFriendGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
             {friendsOwnGames.length > 0 ? (
-              descFriendsData.map((game, index) => (
+              descFriendsData.map((game, index) => {
+                const nodeIndex = nodes.findIndex((node) => node.steamGameId == game.gameId);
+                return (
                 <FriendGameItem
                   key={index}
                   game={game}
                   onSelect={() => handleGameInNode(game)}
-                />
-              ))
+                  nodeIndex={nodeIndex}
+                  />
+                );
+              })
             ) : (
               <p className="text-center text-white">
                 フレンドのゲームが見つかりませんでした。
