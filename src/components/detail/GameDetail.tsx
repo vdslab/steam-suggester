@@ -91,7 +91,6 @@ const GameDetail = (props: Props) => {
                     alt={`${node.title} screenshot ${index + 1}`}
                     width={600}
                     height={400}
-                    objectFit="cover"
                     style={{
                       borderRadius: "4px",
                       opacity: currentSlide === index ? 1 : 0,
