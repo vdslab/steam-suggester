@@ -124,10 +124,7 @@ const SelectParameter: React.FC<Props> = ({
       <div className="flex flex-col h-full">
 
         {/* タグフィルター */}
-        <Section title="タグ" icon={<TagOutlinedIcon />}>
-          <p className="text-sm text-white mb-4">
-            指定のタグを含むゲームを表示します。
-          </p>
+        <Section title="取り除くタグ" icon={<TagOutlinedIcon />}>
           <Button
             onClick={() => setSelectedTags([])}
             variant="outlined"
