@@ -68,8 +68,6 @@ const Network = () => {
 
   const { tourRun, setTourRun } = useTour();
 
-  const [userAddedGames, setUserAddedGames] = useState<string[]>([]);
-
   const [prevAddedGameId, setPrevAddedGameId] = useState<string>("");
 
   const initialNodes = async (
@@ -87,18 +85,10 @@ const Network = () => {
       const buffNodes = [...rawNodes].sort(
         (node1, node2) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
       );
-      const index = buffNodes.findIndex(
-        (node: NodeType) => node.steamGameId === prevAddedGameId
-      );
-      if (buffNodes.length > 0 && index === -1) {
-        setCenterX((buffNodes[0]?.x ?? 0) - 150);
-        setCenterY((buffNodes[0]?.y ?? 0) + 100);
-        setSelectedIndex(-1);
-      } else if (index !== -1) {
-        setCenterX((buffNodes[index]?.x ?? 0) - 150);
-        setCenterY((buffNodes[index]?.y ?? 0) + 100);
-        setSelectedIndex(index);
-      }
+      setCenterX((buffNodes[0]?.x ?? 0) - 150);
+      setCenterY((buffNodes[0]?.y ?? 0) + 100);
+      setSelectedIndex(-1);
+      
       setPrevAddedGameId("");
       setNodes(rawNodes);
       setLinks(rawLinks);
