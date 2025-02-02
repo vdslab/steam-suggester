@@ -126,7 +126,7 @@ const SimilaritySettings = ({
   };
 
   return (
-    <>
+    <div className="select-none">
       <Section title="メイン指標" icon={<TuneIcon />}>
         {!isDetailMode ? (
           <div className="mb-4">
@@ -271,7 +271,7 @@ const SimilaritySettings = ({
           類似度設定を適用
         </button>
       </div>
-    </>
+    </div>
   );
 };
 
