@@ -23,6 +23,8 @@ import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "../../common/HelpTooltip";
 import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 import { changeGameIdData } from "@/hooks/indexedDB";
+import OwnedGameItem from "./OwnedGameItem";
+import FriendGameItem from "./FriendGameItem";
 
 type Props = {
   nodes: NodeType[];
@@ -190,33 +192,18 @@ const SteamList = (props: Props) => {
           <Button onClick={addOwnedGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
             {myOwnGames.length > 0 ? (
-              myOwnGames.map((game: GetSteamOwnedGamesResponse) => (
-                <div
-                  key={game.title}
-                  className="p-2 mb-2 bg-gray-900 rounded-lg text-white"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="p-2">{game.title}</div>
-                    {nodes &&
-                      (() => {
-                        const nodeIndex = nodes.findIndex(
-                          (node) => node.steamGameId == game.id
-                        );
-                        if (nodeIndex !== -1) {
-                          return (
-                            <IconButton
-                              sx={{ color: "white" }}
-                              onClick={() => setSelectedIndex(nodeIndex)}
-                            >
-                              <SearchIcon />
-                            </IconButton>
-                          );
-                        }
-                        return null;
-                      })()}
-                  </div>
-                </div>
-              ))
+              myOwnGames.map((game) => {
+                const nodeIndex = nodes.findIndex((node) => node.steamGameId == game.id);
+                return (
+                  <OwnedGameItem
+                    key={game.title}
+                    game={game}
+                    onSelect={() => {
+                      if (nodeIndex !== -1) setSelectedIndex(nodeIndex);
+                    }}
+                  />
+                );
+              })
             ) : (
               <p className="text-center text-white">
                 ゲームが見つかりませんでした。
@@ -230,62 +217,13 @@ const SteamList = (props: Props) => {
         <Button onClick={addFriendGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
             {friendsOwnGames.length > 0 ? (
-              descFriendsData.map(
-                (game: GetFriendGamesResponse, index: number) => (
-                  <div
-                    key={index}
-                    className="p-2 mb-2 bg-gray-900 rounded-lg relative group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div
-                          className={`p-2`}
-                          onClick={() => handleGameInNode(game)}
-                        >
-                          {game.gameName}
-                          {isGameInNode(game) ? (
-                            <IconButton
-                              size="small"
-                              sx={{ color: "white" }}
-                              onClick={() =>
-                                setSelectedIndex(
-                                  nodes.findIndex(
-                                    (node) => node.title == game.gameName
-                                  )
-                                )
-                              }
-                            >
-                              <SearchIcon />
-                            </IconButton>
-                          ) : null}
-                        </div>
-                      </div>
-                      <AvatarGroup max={3} spacing={"small"}>
-                        {game.friends.map((friend, friendIndex) => (
-                          <Avatar
-                            key={friendIndex}
-                            alt={friend.name}
-                            src={friend.avatar}
-                          />
-                        ))}
-                      </AvatarGroup>
-                    </div>
-                    {/* ホバー時に表示されるリスト */}
-                    <div className="absolute left-1/2 w-64 top-full mt-2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg border border-gray-600 shadow-xl z-50 hidden group-hover:block opacity-0 group-hover:opacity-100">
-                      <h4 className="text-lg font-bold mb-2">
-                        所持しているフレンドリスト
-                      </h4>
-                      <ul>
-                        {game.friends.map((friend, friendIndex) => (
-                          <li key={friendIndex} className="text-sm">
-                            {friend.name}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )
-              )
+              descFriendsData.map((game, index) => (
+                <FriendGameItem
+                  key={index}
+                  game={game}
+                  onSelect={() => handleGameInNode(game)}
+                />
+              ))
             ) : (
               <p className="text-center text-white">
                 フレンドのゲームが見つかりませんでした。
