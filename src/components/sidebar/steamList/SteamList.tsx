@@ -11,14 +11,11 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import Image from "next/image";
 import {
   Alert,
-  Avatar,
-  AvatarGroup,
   Button,
   IconButton,
   Tooltip,
 } from "@mui/material";
 import { fetcher } from "@/components/common/Fetcher";
-import SearchIcon from "@mui/icons-material/Search";
 import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "../../common/HelpTooltip";
 import { changeGameIdData } from "@/hooks/indexedDB";
@@ -121,14 +118,6 @@ const SteamList = (props: Props) => {
     }
   };
 
-  const isGameInNode = (game: GetFriendGamesResponse) => {
-    const nodeIndex = nodes.findIndex((node) => node.title == game.gameName);
-    if (nodeIndex !== -1) {
-      return true;
-    }
-    return false;
-  };
-
   const descFriendsData = friendsOwnGames.sort(
     (prev: GetFriendGamesResponse, next: GetFriendGamesResponse) =>
       next.friends.length - prev.friends.length
@@ -156,11 +145,15 @@ const SteamList = (props: Props) => {
       title={
         <div className="flex items-center">
           <span>Steam所有ゲーム一覧</span>
-          <HelpTooltip title="自分の所有してるゲームは黄色、フレンドの所有してるゲームは青の枠線で囲まれます。もし、どちらも所有してる場合は緑の枠で囲まれます。" />
         </div>
       }
       icon={<SportsEsportsIcon className="mr-2 text-white" />}
     >
+      <div className="text-white text-sm mb-4">
+        自分の所有してるゲームは青色、フレンドの所有してるゲームは黄色の円枠で囲まれます。<br />
+        どちらも所有してる場合は緑の円枠で囲まれます。
+      </div>
+
       <div>
         <div className="flex items-center justify-between m-3">
           <div className="flex items-center">
