@@ -83,22 +83,19 @@ const GameDetail = (props: Props) => {
             {/* 画像とアイコンのコンテナ */}
             {/* スライドショー */}
             {screenshots && (
-              <div className="overflow-hidden h-60 relative">
+              <div className="overflow-hidden relative h-[20vh]">
                 {screenshots.map((screenshot, index) => (
                   <Image
                     key={index}
                     src={screenshot as string}
                     alt={`${node.title} screenshot ${index + 1}`}
-                    width={600}
-                    height={400}
+                    fill
+                    sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     style={{
                       borderRadius: "4px",
                       opacity: currentSlide === index ? 1 : 0,
-                      transition: "opacity 0.5s ease-in-out",
-                      position:
-                        currentSlide === index ? "relative" : "absolute",
-                      top: 0,
-                      left: 0,
+                      transition: "opacity 0.35s ease-in-out",
+                      objectFit: "cover",
                     }}
                     className="rounded mb-2 screenshot-img"
                   />
