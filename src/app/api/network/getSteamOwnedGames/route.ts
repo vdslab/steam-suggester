@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
 
       if (queryResult.rows.length > 0 && queryResult.rows[0].game_title) {
         result.push({
-          id: appId,
+          id: String(appId),
           title: queryResult.rows[0].game_title,
         });
       }

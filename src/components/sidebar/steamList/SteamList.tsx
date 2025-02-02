@@ -88,6 +88,7 @@ const SteamList = (props: Props) => {
     );
   }
 
+
   if (myGamesError || friendsGamesError) {
     return (
       <Panel
@@ -134,26 +135,22 @@ const SteamList = (props: Props) => {
       next.friends.length - prev.friends.length
   );
 
-  const addAllGames = async () => {
-    const newGames = myOwnGames.filter(
-      (game) => !nodes.some((node) => node.steamGameId === game.id)
+  const addOwnedGamesToNode = async () => {
+    const newGames = myOwnGames.filter((game) =>
+      !nodes.some((node) => node.steamGameId === game.id)
     );
-
-    const newFriendGames = friendsOwnGames
-      .map((game) => {
-        const matchedNode = nodes.find((node) => node.title === game.gameName);
-        return matchedNode ? matchedNode.steamGameId : null;
-      })
-      .filter((id): id is string => id !== null);
-
-    const allNewGames = [
-      ...newGames.map((game) => game.id.toString()),
-      // ...newFriendGames,
-    ];
-
-    await changeGameIdData([...new Set([...userAddedGames, ...allNewGames])]);
+    await changeGameIdData([...new Set([...userAddedGames, ...newGames.map((game) => game.id.toString())])]);
     setIsNetworkLoading(true);
   };
+
+  const addFriendGamesToNode = async () => {
+    const newFriendGameIds = friendsOwnGames
+      .map((game) => game.gameId)
+      .filter((gameId) => !nodes.some((node) => node.steamGameId === gameId));
+
+    await changeGameIdData([...new Set([...userAddedGames, ...newFriendGameIds])]);
+    setIsNetworkLoading(true);
+  }
 
   return (
     <Panel
@@ -190,7 +187,7 @@ const SteamList = (props: Props) => {
 
         {/* 自分の所有ゲーム */}
         <Section title="自分の所有ゲーム" icon={<PersonIcon />}>
-          <Button onClick={addAllGames}>追加してないゲームをすべて追加</Button>
+          <Button onClick={addOwnedGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
             {myOwnGames.length > 0 ? (
               myOwnGames.map((game: GetSteamOwnedGamesResponse) => (
@@ -230,6 +227,7 @@ const SteamList = (props: Props) => {
 
         {/* フレンドの所有ゲーム */}
         <Section title="フレンドの所有ゲーム" icon={<GroupIcon />}>
+        <Button onClick={addFriendGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
             {friendsOwnGames.length > 0 ? (
               descFriendsData.map(
