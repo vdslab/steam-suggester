@@ -21,7 +21,6 @@ import { fetcher } from "@/components/common/Fetcher";
 import SearchIcon from "@mui/icons-material/Search";
 import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "../../common/HelpTooltip";
-import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 import { changeGameIdData } from "@/hooks/indexedDB";
 import OwnedGameItem from "./OwnedGameItem";
 import FriendGameItem from "./FriendGameItem";
@@ -51,7 +50,6 @@ const SteamList = (props: Props) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -62,7 +60,6 @@ const SteamList = (props: Props) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   if (status === "loading" || !session) {
