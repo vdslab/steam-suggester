@@ -515,7 +515,6 @@ const StreamedList = (props: Props) => {
                       <Image
                         src={streamer.thumbnail}
                         alt={`${streamer.name} Thumbnail`}
-                        layout="responsive"
                         width={16}
                         height={9}
                         className="w-full h-full object-cover"
@@ -531,7 +530,6 @@ const StreamedList = (props: Props) => {
                       <Image
                         src={streamer.thumbnail}
                         alt={`${streamer.name} Thumbnail`}
-                        layout="responsive"
                         width={16}
                         height={9}
                         className="w-full h-full object-cover"
