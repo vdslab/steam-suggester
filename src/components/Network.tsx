@@ -173,6 +173,7 @@ const Network = () => {
       if (newState) {
         setOpenPanel(null);
         setIsGameSearchOpen(false); // ツアー開始時に GameSearchPanel も閉じる
+        setSelectedIndex(-1);
       }
       return newState;
     });
