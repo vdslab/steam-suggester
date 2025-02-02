@@ -178,7 +178,7 @@ const SteamList = (props: Props) => {
         </div>
 
         {/* 自分の所有ゲーム */}
-        <Section title="自分の所有ゲーム" icon={<PersonIcon />}>
+        <Section title={`自分の所有ゲーム(${myOwnGames.length})`} icon={<PersonIcon />}>
           <Button onClick={addOwnedGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
             {myOwnGames.length > 0 ? (
@@ -204,7 +204,7 @@ const SteamList = (props: Props) => {
         </Section>
 
         {/* フレンドの所有ゲーム */}
-        <Section title="フレンドの所有ゲーム" icon={<GroupIcon />}>
+        <Section title={`フレンドの所有ゲーム(${friendsOwnGames.length})`} icon={<GroupIcon />}>
         <Button onClick={addFriendGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
             {friendsOwnGames.length > 0 ? (

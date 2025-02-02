@@ -116,7 +116,7 @@ const SelectParameter: React.FC<Props> = ({
       title={
         <div className="flex items-center">
           <span>フィルター</span>
-          <HelpTooltip title="フィルターを適用することでゲームの絞り込みができます。" />
+          <HelpTooltip title="フィルターを適用することで独自のグラフを生成できます。" />
         </div>
       }
       icon={<FilterListIcon className="mr-2 text-white" />}

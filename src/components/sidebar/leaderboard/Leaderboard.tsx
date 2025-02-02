@@ -59,10 +59,8 @@ const Leaderboard: React.FC<Props> = ({
       </div>
       <ul>
         {sortedNodes.map((node, index) => {
-          const isUserAdded = addedGameIds.find(
-            (gameId: string) => gameId === node.steamGameId
-          );
-          const titleColor = isUserAdded ? "green-300" : "white";
+          const isUserAdded = addedGameIds.find((gameId: string) => gameId === node.steamGameId);
+          const titleColor = isUserAdded ? "text-green-300" : "text-white";
 
           const isSelected = selectedIndex === node.index; // 選択状態を判定
 
@@ -79,7 +77,7 @@ const Leaderboard: React.FC<Props> = ({
                 <span className={`${selectColor(index + 1).rankColor} mr-2`}>
                   {index + 1}位
                 </span>
-                <span className={`text-${titleColor}`}>{node.title}</span>
+                <span className={`${titleColor}`}>{node.title}</span>
               </div>
 
               {/* ゴミ箱アイコン */}
