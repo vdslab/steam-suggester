@@ -8,7 +8,6 @@ import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
 import Popup from "./Popup";
 import GameTooltip from "./GameTooltip";
-import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 import HighlightStreamer from "./highlight/HighlightStreamer";
 import HighlightTag from "./highlight/HighlightTag";
 import HighlightSteamList from "./highlight/HighlightSteamList";
@@ -138,7 +137,6 @@ const NodeLink = (props: NodeLinkProps) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -149,7 +147,6 @@ const NodeLink = (props: NodeLinkProps) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   // 選択されたエッジのリスト

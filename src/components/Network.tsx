@@ -20,8 +20,6 @@ import LiveTvIcon from "@mui/icons-material/LiveTv";
 import Panel from "./common/Panel";
 import SteamList from "./sidebar/steamList/SteamList";
 import HelpTooltip from "./common/HelpTooltip";
-import Tour from "./tutorial/Tour";
-// import ProgressBar from "./common/ProgressBar"; // ProgressBar は不要なら削除
 import TuneIcon from "@mui/icons-material/Tune";
 import Leaderboard from "./sidebar/leaderboard/Leaderboard";
 import useTour from "@/hooks/useTour";
@@ -34,7 +32,6 @@ import useSWR from "swr";
 import SearchGames from "./sidebar/searchGames/SearchGames";
 import GameDetail from "./detail/GameDetail";
 import Tutorial from "./tutorial/Tutorial";
-import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 import changeNetwork from "@/hooks/changeNetwork";
 
 const Network = () => {
@@ -43,14 +40,12 @@ const Network = () => {
   >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
   const { data: steamListData, error: steamListDataError } = useSWR<
     SteamListType[]
   >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
@@ -178,6 +173,7 @@ const Network = () => {
       if (newState) {
         setOpenPanel(null);
         setIsGameSearchOpen(false); // ツアー開始時に GameSearchPanel も閉じる
+        setSelectedIndex(-1);
       }
       return newState;
     });
@@ -365,7 +361,6 @@ const Network = () => {
             nodes={nodes}
             setSelectedIndex={setSelectedIndex}
             setIsNetworkLoading={setIsNetworkLoading}
-            userAddedGames={userAddedGames}
           />
         </div>
 
@@ -390,7 +385,6 @@ const Network = () => {
         </div>
 
         {/* チュートリアル */}
-        {/* <Tour run={tourRun} setRun={setTourRun} /> */}
         <Tutorial run={tourRun} setRun={setTourRun} />
       </div>
     </div>

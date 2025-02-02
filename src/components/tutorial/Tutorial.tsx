@@ -21,7 +21,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 450,
+  width: "50%",
   bgcolor: "#121212",
   color: "#ffffff",
   borderRadius: "12px",
@@ -86,7 +86,6 @@ const Tutorial = ({ run, setRun }: Props) => {
             style={{
               width: "100%",
               height: "auto",
-              maxHeight: "200px",
               borderRadius: "8px",
               border: "1px solid #ddd",
               boxShadow: "2px 2px 10px rgba(0, 0, 0, 0.1)",

@@ -88,7 +88,7 @@ const Sidebar: React.FC<Props> = ({
       {/* ツアーボタン */}
       <button onClick={toggleTourRun} className={`${buttonClasses(tourRun)}`}>
         <TourOutlinedIcon />
-        <span className="text-xs mt-1">ツアー開始</span>
+        <span className="text-xs mt-1">チュートリアル</span>
       </button>
     </div>
   );
