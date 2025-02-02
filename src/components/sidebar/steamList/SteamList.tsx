@@ -25,11 +25,10 @@ type Props = {
   nodes: NodeType[];
   setSelectedIndex: (value: number) => void;
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  userAddedGames: string[];
 };
 
 const SteamList = (props: Props) => {
-  const { nodes, setSelectedIndex, setIsNetworkLoading, userAddedGames } =
+  const { nodes, setSelectedIndex, setIsNetworkLoading } =
     props;
 
   const { data: session, status } = useSession();

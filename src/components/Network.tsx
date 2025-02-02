@@ -360,7 +360,6 @@ const Network = () => {
             nodes={nodes}
             setSelectedIndex={setSelectedIndex}
             setIsNetworkLoading={setIsNetworkLoading}
-            userAddedGames={userAddedGames}
           />
         </div>
 
