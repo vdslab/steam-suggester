@@ -122,6 +122,27 @@ const SelectParameter: React.FC<Props> = ({
       icon={<FilterListIcon className="mr-2 text-white" />}
     >
       <div className="flex flex-col h-full">
+
+        {/* タグフィルター */}
+        <Section title="タグ" icon={<TagOutlinedIcon />}>
+          <p className="text-sm text-white mb-4">
+            指定のタグを含むゲームを表示します。
+          </p>
+          <Button
+            onClick={() => setSelectedTags([])}
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            sx={{ mb: 2 }}
+          >
+            <span className="text-blue-300">リセット</span>
+          </Button>
+          <TagsSelect
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+          />
+        </Section>
+
+
         {/* 価格フィルター */}
         <Section title="価格" icon={<AttachMoneyIcon />}>
           <div className="flex items-center mb-4">

@@ -146,15 +146,18 @@ export default async function changeNetwork(
   const promises = gameIds
     .filter((gameId) => !slicedData.find((d) => d.steamGameId === gameId))
     .map(async (gameId) => {
-      const url = `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`;
+      const url = `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getSteamGameDetail/${gameId}`;
       try {
         const d: SteamDetailsDataType = await fetchWithCache(url);
+        console.log(gameId, d)
         slicedData.push(d);
       } catch (error) {
         console.error(error);
       }
     });
   await Promise.all(promises);
+
+  console.log("slicedData", slicedData);
 
   // フィルターに合致するデータだけ取り出す
   const rawNodes = slicedData.filter((item) => {
