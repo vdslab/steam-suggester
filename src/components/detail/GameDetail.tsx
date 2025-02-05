@@ -74,7 +74,7 @@ const GameDetail = (props: Props) => {
   }, [node]);
 
   return (
-    <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 overflow-y-scroll h-full relative">
+    <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 relative">
       {/* 選択されたゲームの詳細表示 */}
       {node ? (
         <div className="rounded-lg">

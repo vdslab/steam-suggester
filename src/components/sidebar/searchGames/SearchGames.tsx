@@ -7,6 +7,7 @@ import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { IconButton } from "@mui/material";
+import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 
 type SearchGamesProps = {
   setSelectedIndex: (value: number) => void;
@@ -29,6 +30,8 @@ const SearchGames = ({
   const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [addedGameIds, setAddedGameIds] = useState<string[]>([]);
+
+  const { width, height } = useScreenSize({ debounceTime: 150 });
 
 
   // 外部クリックを検出してフォーカスを解除
@@ -129,12 +132,16 @@ const SearchGames = ({
     }
   };
 
+  if (width < 768 && openPanel && ["streamer", "highlight", "steamList", "ranking", "similarity", "filter"].includes(openPanel)) {
+    return null;
+  }
+
   return (
     <div
       id="search-container"
       className={`absolute top-4 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ease-in-out`}
       style={{
-        marginLeft: openPanel ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
+        marginLeft: openPanel&&["streamer", "highlight", "steamList", "ranking", "similarity", "filter"].includes(openPanel) ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
       }}
     >
       {/* 検索フォーム */}
