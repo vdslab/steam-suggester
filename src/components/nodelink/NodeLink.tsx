@@ -186,8 +186,6 @@ const NodeLink = (props: NodeLinkProps) => {
     }
   }, [selectedIndex, nodes]);
 
-  console.log(openPanel);
-
   return (
     <div
       style={{

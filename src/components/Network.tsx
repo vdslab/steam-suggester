@@ -83,19 +83,16 @@ const Network = () => {
 
     if (nodes.length === 0) {
       // 新規作成
-      const result = await createNetwork(steamAllData, filter, gameIds, slider);
-      const rawNodes = result?.nodes ?? [];
-      const rawLinks = result?.links ?? [];
-      const buffNodes = [...rawNodes].sort(
+      const { nodes, links} = await createNetwork(steamAllData, filter, gameIds, slider);
+      const buffNodes = [...nodes].sort(
         (node1, node2) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
       );
       setCenterX((buffNodes[0]?.x ?? 0) - width / 10);
       setCenterY((buffNodes[0]?.y ?? 0) + (width >= 768 ? height / 10 : height / 4));
       setSelectedIndex(-1);
-      
-      setPrevAddedGameId("");
-      setNodes(rawNodes);
-      setLinks(rawLinks);
+
+      setNodes(nodes);
+      setLinks(links);
     } else {
       // 既存ネットワークをアップデート
       const result = await changeNetwork(
