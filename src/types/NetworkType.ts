@@ -76,6 +76,11 @@ export type LinkType = {
   elementScores?: number[];
 };
 
+export type CenterType = {
+  x: number;
+  y: number;
+};
+
 export type SimilarGameType = {
   [key: string]: {
     steamGameId: string;

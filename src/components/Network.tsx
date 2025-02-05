@@ -9,6 +9,7 @@ import createNetwork from "@/hooks/createNetwork";
 import Loading from "@/app/loading";
 import Error from "@/app/error";
 import {
+  CenterType,
   LinkType,
   NodeType,
   SteamListType,
@@ -36,22 +37,16 @@ import changeNetwork from "@/hooks/changeNetwork";
 import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 import { startsWithPanelList } from "./common/Utils";
 
-
-
-
 const Network = () => {
   const { data: steamAllData, error: steamAllDataError } = useSWR<
     SteamDetailsDataType[]
   >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    fetcher,
+    fetcher
   );
   const { data: steamListData, error: steamListDataError } = useSWR<
     SteamListType[]
-  >(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`,
-    fetcher,
-  );
+  >(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`, fetcher);
 
   const { width, height } = useScreenSize({ debounceTime: 150 });
 
@@ -60,8 +55,7 @@ const Network = () => {
 
   const [nodes, setNodes] = useState<NodeType[]>([]);
   const [links, setLinks] = useState<LinkType[]>([]);
-  const [centerX, setCenterX] = useState<number>(0);
-  const [centerY, setCenterY] = useState<number>(0);
+  const [center, setCenter] = useState<CenterType>({ x: 0, y: 0 });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isNetworkLoading, setIsNetworkLoading] = useState(true);
@@ -84,12 +78,20 @@ const Network = () => {
 
     if (nodes.length === 0) {
       // 新規作成
-      const { nodes, links} = await createNetwork(steamAllData, filter, gameIds, slider);
+      const { nodes, links } = await createNetwork(
+        steamAllData,
+        filter,
+        gameIds,
+        slider
+      );
       const buffNodes = [...nodes].sort(
         (node1, node2) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
       );
-      setCenterX((buffNodes[0]?.x ?? 0) - width / 10);
-      setCenterY((buffNodes[0]?.y ?? 0) + (width >= 768 ? height / 10 : height / 4));
+      setCenter({
+        x: (buffNodes[0]?.x ?? 0) - width / 10,
+        y: (buffNodes[0]?.y ?? 0) + (width >= 768 ? height / 10 : height / 4),
+      });
+
       setSelectedIndex(-1);
 
       setNodes(nodes);
@@ -145,13 +147,17 @@ const Network = () => {
   // 選択されたノードが変更されたときに中心座標を更新
   useEffect(() => {
     if (selectedIndex !== -1 && nodes[selectedIndex]) {
-      setCenterX((nodes[selectedIndex].x ?? 0) - width / 10);
-      setCenterY((nodes[selectedIndex].y ?? 0) + (width >= 768 ? height / 10 : height / 4));
+      setCenter({
+        x: (nodes[selectedIndex].x ?? 0) - width / 10,
+        y:
+          (nodes[selectedIndex].y ?? 0) +
+          (width >= 768 ? height / 10 : height / 4),
+      });
     }
   }, [selectedIndex, nodes]);
 
   const togglePanel = (panelName: string) => {
-    if(openPanel === panelName) {
+    if (openPanel === panelName) {
       setOpenPanel(`${panelName}-close`);
       setTourRun(false);
     } else {
@@ -191,10 +197,10 @@ const Network = () => {
   const panelClassNames = (openPanelName: string) =>
     `absolute top-0 left-0 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
       openPanel === openPanelName
-      ? "translate-x-0"
-      : openPanel === null || openPanel === `${openPanelName}-close`
-      ? "-translate-x-full"
-      : "hidden"
+        ? "translate-x-0"
+        : openPanel === null || openPanel === `${openPanelName}-close`
+        ? "-translate-x-full"
+        : "hidden"
     }
     w-2/3 lg:w-1/5`;
 
@@ -222,25 +228,26 @@ const Network = () => {
         />
 
         {/* ゲーム詳細表示 */}
-        {selectedIndex !== -1 && nodes[selectedIndex] && !startsWithPanelList(openPanel) &&(
-          <div className="absolute right-0 z-20 overflow-y-scroll h-1/3 bottom-0 md:w-1/4 md:h-auto md:bottom-auto md:top-0 lg:h-full">
-            <GameDetail
-              node={nodes[selectedIndex]}
-              setSelectedIndex={setSelectedIndex}
-              setOpenPanel={setOpenPanel}
-              selectedTags={selectedTags}
-              setSelectedTags={setSelectedTags}
-            />
-          </div>
-        )}
+        {selectedIndex !== -1 &&
+          nodes[selectedIndex] &&
+          !startsWithPanelList(openPanel) && (
+            <div className="absolute right-0 z-20 overflow-y-scroll h-1/3 bottom-0 md:w-1/4 md:h-auto md:bottom-auto md:top-0 lg:h-full">
+              <GameDetail
+                node={nodes[selectedIndex]}
+                setSelectedIndex={setSelectedIndex}
+                setOpenPanel={setOpenPanel}
+                selectedTags={selectedTags}
+                setSelectedTags={setSelectedTags}
+              />
+            </div>
+          )}
 
         {/* ネットワークグラフ */}
         <div className="absolute inset-0">
           <NodeLink
             nodes={nodes}
             links={links}
-            centerX={centerX}
-            centerY={centerY}
+            center={center}
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
             streamerIds={streamerIds}

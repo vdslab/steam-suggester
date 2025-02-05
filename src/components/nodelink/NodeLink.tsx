@@ -2,7 +2,12 @@
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import Icon from "./Icon";
-import { LinkType, NodeType, StreamerListType } from "@/types/NetworkType";
+import {
+  CenterType,
+  LinkType,
+  NodeType,
+  StreamerListType,
+} from "@/types/NetworkType";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
@@ -24,8 +29,7 @@ const DEFAULT_TOOLTIP = {
 type NodeLinkProps = {
   nodes: NodeType[];
   links: LinkType[];
-  centerX: number;
-  centerY: number;
+  center: CenterType;
   selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   streamerIds: StreamerListType[];
@@ -35,8 +39,7 @@ type NodeLinkProps = {
 
 type ZoomableSVGProps = {
   children: (transform: d3.ZoomTransform) => React.ReactNode;
-  centerX: number;
-  centerY: number;
+  center: CenterType;
 };
 
 type TooltipType = {
@@ -46,7 +49,7 @@ type TooltipType = {
 };
 
 const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
-  const { children, centerX, centerY } = props;
+  const { children, center } = props;
   const svgRef = useRef<SVGSVGElement>(null);
   const [transform, setTransform] = useState(d3.zoomIdentity);
 
@@ -82,8 +85,8 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
 
       const initialTransform = d3.zoomIdentity
         .translate(
-          window.innerWidth / 2 - window.innerWidth / 7 - centerX,
-          (window.innerHeight * 3) / 5 - centerY
+          window.innerWidth / 2 - window.innerWidth / 7 - center.x,
+          (window.innerHeight * 3) / 5 - center.y
         )
         .scale(1);
       svg
@@ -94,7 +97,7 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
           setTransform(initialTransform);
         });
     }
-  }, [centerX, centerY]);
+  }, [center]);
 
   return (
     <svg ref={svgRef} width="100%" height="100%">
@@ -111,8 +114,7 @@ const NodeLink = (props: NodeLinkProps) => {
   const {
     nodes,
     links,
-    centerX,
-    centerY,
+    center,
     selectedIndex,
     setSelectedIndex,
     streamerIds = [],
@@ -137,7 +139,7 @@ const NodeLink = (props: NodeLinkProps) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
-    fetcher,
+    fetcher
   );
 
   // フレンドの所有ゲームを取得
@@ -147,7 +149,7 @@ const NodeLink = (props: NodeLinkProps) => {
     status === "authenticated" && steamId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
-    fetcher,
+    fetcher
   );
 
   // 選択されたエッジのリスト
@@ -199,7 +201,7 @@ const NodeLink = (props: NodeLinkProps) => {
         transition: "background-image 0.5s ease", // 背景切り替えのアニメーション
       }}
     >
-      <ZoomableSVG centerX={centerX} centerY={centerY}>
+      <ZoomableSVG center={center}>
         {(transform) => (
           <>
             {/* 非選択エッジを最初に描画 */}
