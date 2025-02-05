@@ -69,8 +69,6 @@ const Network = () => {
 
   // openPanel を他のパネルのみに使用
   const [openPanel, setOpenPanel] = useState<string | null>(null);
-  // GameSearchPanel 専用の状態
-  const [isGameSearchOpen, setIsGameSearchOpen] = useState<boolean>(false);
 
   const { tourRun, setTourRun } = useTour();
 
@@ -151,7 +149,6 @@ const Network = () => {
     if (selectedIndex !== -1 && nodes[selectedIndex]) {
       setCenterX((nodes[selectedIndex].x ?? 0) - width / 10);
       setCenterY((nodes[selectedIndex].y ?? 0) + (width >= 768 ? height / 10 : height / 4));
-      setIsGameSearchOpen(true);
     }
   }, [selectedIndex, nodes]);
 
@@ -173,7 +170,6 @@ const Network = () => {
       const newState = !prev;
       if (newState) {
         setOpenPanel(null);
-        setIsGameSearchOpen(false); // ツアー開始時に GameSearchPanel も閉じる
         setSelectedIndex(-1);
       }
       return newState;
@@ -228,7 +224,7 @@ const Network = () => {
         />
 
         {/* ゲーム詳細表示 */}
-        {selectedIndex !== -1 && nodes[selectedIndex] && isGameSearchOpen  && (
+        {selectedIndex !== -1 && nodes[selectedIndex] && (
           <div className="absolute right-0 z-20 overflow-y-scroll h-1/3 bottom-0 md:w-1/4 md:h-auto md:bottom-auto md:top-0 lg:h-full">
             <GameDetail
               node={nodes[selectedIndex]}
