@@ -74,7 +74,7 @@ const GameDetail = (props: Props) => {
   }, [node]);
 
   return (
-    <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 overflow-y-scroll h-full relative">
+    <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 relative">
       {/* 選択されたゲームの詳細表示 */}
       {node ? (
         <div className="rounded-lg">
@@ -83,24 +83,19 @@ const GameDetail = (props: Props) => {
             {/* 画像とアイコンのコンテナ */}
             {/* スライドショー */}
             {screenshots && (
-              <div className="overflow-hidden h-60 relative">
+              <div className="overflow-hidden relative h-[20vh]">
                 {screenshots.map((screenshot, index) => (
                   <Image
                     key={index}
                     src={screenshot as string}
                     alt={`${node.title} screenshot ${index + 1}`}
-                    width={600}
-                    height={400}
-                    layout="intrinsic"
-                    objectFit="cover"
+                    fill
+                    sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     style={{
                       borderRadius: "4px",
                       opacity: currentSlide === index ? 1 : 0,
-                      transition: "opacity 0.5s ease-in-out",
-                      position:
-                        currentSlide === index ? "relative" : "absolute",
-                      top: 0,
-                      left: 0,
+                      transition: "opacity 0.35s ease-in-out",
+                      objectFit: "cover",
                     }}
                     className="rounded mb-2 screenshot-img"
                   />
@@ -233,27 +228,30 @@ const GameDetail = (props: Props) => {
             {node.review && <ReviewCloud reviewData={node.review} />}
           </div>
 
-          <Box
-            sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}
-          >
-            <Tabs
-              value={tabIndex}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-              centered
+          {node.twitchGameId !== "" && (
+
+            <Box
+              sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}
             >
-              <Tab
-                label="流行度グラフ"
-                {...a11yProps(0)}
-                sx={{ color: "white" }}
-              />
-              <Tab
-                label="Twitchクリップ"
-                {...a11yProps(1)}
-                sx={{ color: "white" }}
-              />
-            </Tabs>
-          </Box>
+              <Tabs
+                value={tabIndex}
+                onChange={handleChange}
+                aria-label="basic tabs example"
+                centered
+              >
+                <Tab
+                  label="流行度グラフ"
+                  {...a11yProps(0)}
+                  sx={{ color: "white" }}
+                />
+                <Tab
+                  label="Twitchクリップ"
+                  {...a11yProps(1)}
+                  sx={{ color: "white" }}
+                />
+              </Tabs>
+            </Box>
+          )}
 
           {tabIndex === 0 && <PopularityCharts node={node} />}
           {tabIndex === 1 && (

@@ -17,7 +17,7 @@ const Section: React.FC<Props> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-gray-200 text-md font-medium flex items-center">
+      <h3 className="text-gray-200 text-md font-medium flex items-center select-none">
         {icon}
         <span className="ml-2">{title}</span>
       </h3>

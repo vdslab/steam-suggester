@@ -11,28 +11,24 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import Image from "next/image";
 import {
   Alert,
-  Avatar,
-  AvatarGroup,
   Button,
   IconButton,
   Tooltip,
 } from "@mui/material";
 import { fetcher } from "@/components/common/Fetcher";
-import SearchIcon from "@mui/icons-material/Search";
 import { NodeType } from "@/types/NetworkType";
-import HelpTooltip from "../../common/HelpTooltip";
-import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
-import { changeGameIdData } from "@/hooks/indexedDB";
+import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
+import OwnedGameItem from "./OwnedGameItem";
+import FriendGameItem from "./FriendGameItem";
 
 type Props = {
   nodes: NodeType[];
   setSelectedIndex: (value: number) => void;
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  userAddedGames: string[];
 };
 
 const SteamList = (props: Props) => {
-  const { nodes, setSelectedIndex, setIsNetworkLoading, userAddedGames } =
+  const { nodes, setSelectedIndex, setIsNetworkLoading } =
     props;
 
   const { data: session, status } = useSession();
@@ -49,7 +45,6 @@ const SteamList = (props: Props) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -60,7 +55,6 @@ const SteamList = (props: Props) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   if (status === "loading" || !session) {
@@ -87,6 +81,7 @@ const SteamList = (props: Props) => {
       </Panel>
     );
   }
+
 
   if (myGamesError || friendsGamesError) {
     return (
@@ -121,50 +116,44 @@ const SteamList = (props: Props) => {
     }
   };
 
-  const isGameInNode = (game: GetFriendGamesResponse) => {
-    const nodeIndex = nodes.findIndex((node) => node.title == game.gameName);
-    if (nodeIndex !== -1) {
-      return true;
-    }
-    return false;
-  };
-
   const descFriendsData = friendsOwnGames.sort(
     (prev: GetFriendGamesResponse, next: GetFriendGamesResponse) =>
       next.friends.length - prev.friends.length
   );
 
-  const addAllGames = async () => {
-    const newGames = myOwnGames.filter(
-      (game) => !nodes.some((node) => node.steamGameId === game.id)
+  const addOwnedGamesToNode = async () => {
+    const newGames = myOwnGames.filter((game) =>
+      !nodes.some((node) => node.steamGameId === game.id)
     );
-
-    const newFriendGames = friendsOwnGames
-      .map((game) => {
-        const matchedNode = nodes.find((node) => node.title === game.gameName);
-        return matchedNode ? matchedNode.steamGameId : null;
-      })
-      .filter((id): id is string => id !== null);
-
-    const allNewGames = [
-      ...newGames.map((game) => game.id.toString()),
-      // ...newFriendGames,
-    ];
-
-    await changeGameIdData([...new Set([...userAddedGames, ...allNewGames])]);
+    const gameIdData = await getGameIdData();
+    await changeGameIdData([...(gameIdData || []), ...newGames.map((game) => game.id.toString())]);
     setIsNetworkLoading(true);
   };
+
+  const addFriendGamesToNode = async () => {
+    const newFriendGameIds = friendsOwnGames
+      .map((game) => game.gameId)
+      .filter((gameId) => !nodes.some((node) => node.steamGameId === gameId));
+
+    const gameIdData = await getGameIdData();
+    await changeGameIdData([...(gameIdData || []), ...newFriendGameIds]);
+    setIsNetworkLoading(true);
+  }
 
   return (
     <Panel
       title={
         <div className="flex items-center">
           <span>Steam所有ゲーム一覧</span>
-          <HelpTooltip title="自分の所有してるゲームは黄色、フレンドの所有してるゲームは青の枠線で囲まれます。もし、どちらも所有してる場合は緑の枠で囲まれます。" />
         </div>
       }
       icon={<SportsEsportsIcon className="mr-2 text-white" />}
     >
+      <div className="text-white text-sm mb-4">
+        自分の所有してるゲームは青色、フレンドの所有してるゲームは黄色の円枠で囲まれます。<br />
+        どちらも所有してる場合は緑の円枠で囲まれます。
+      </div>
+
       <div>
         <div className="flex items-center justify-between m-3">
           <div className="flex items-center">
@@ -189,37 +178,23 @@ const SteamList = (props: Props) => {
         </div>
 
         {/* 自分の所有ゲーム */}
-        <Section title="自分の所有ゲーム" icon={<PersonIcon />}>
-          <Button onClick={addAllGames}>追加してないゲームをすべて追加</Button>
+        <Section title={`自分の所有ゲーム(${myOwnGames.length})`} icon={<PersonIcon />}>
+          <Button onClick={addOwnedGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
             {myOwnGames.length > 0 ? (
-              myOwnGames.map((game: GetSteamOwnedGamesResponse) => (
-                <div
-                  key={game.title}
-                  className="p-2 mb-2 bg-gray-900 rounded-lg text-white"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="p-2">{game.title}</div>
-                    {nodes &&
-                      (() => {
-                        const nodeIndex = nodes.findIndex(
-                          (node) => node.steamGameId == game.id
-                        );
-                        if (nodeIndex !== -1) {
-                          return (
-                            <IconButton
-                              sx={{ color: "white" }}
-                              onClick={() => setSelectedIndex(nodeIndex)}
-                            >
-                              <SearchIcon />
-                            </IconButton>
-                          );
-                        }
-                        return null;
-                      })()}
-                  </div>
-                </div>
-              ))
+              myOwnGames.map((game) => {
+                const nodeIndex = nodes.findIndex((node) => node.steamGameId == game.id);
+                return (
+                  <OwnedGameItem
+                    key={game.title}
+                    game={game}
+                    onSelect={() => {
+                      if (nodeIndex !== -1) setSelectedIndex(nodeIndex);
+                    }}
+                    nodeIndex={nodeIndex}
+                  />
+                );
+              })
             ) : (
               <p className="text-center text-white">
                 ゲームが見つかりませんでした。
@@ -229,65 +204,21 @@ const SteamList = (props: Props) => {
         </Section>
 
         {/* フレンドの所有ゲーム */}
-        <Section title="フレンドの所有ゲーム" icon={<GroupIcon />}>
+        <Section title={`フレンドの所有ゲーム(${friendsOwnGames.length})`} icon={<GroupIcon />}>
+        <Button onClick={addFriendGamesToNode}>追加してないゲームをすべて追加</Button>
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
             {friendsOwnGames.length > 0 ? (
-              descFriendsData.map(
-                (game: GetFriendGamesResponse, index: number) => (
-                  <div
-                    key={index}
-                    className="p-2 mb-2 bg-gray-900 rounded-lg relative group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div
-                          className={`p-2`}
-                          onClick={() => handleGameInNode(game)}
-                        >
-                          {game.gameName}
-                          {isGameInNode(game) ? (
-                            <IconButton
-                              size="small"
-                              sx={{ color: "white" }}
-                              onClick={() =>
-                                setSelectedIndex(
-                                  nodes.findIndex(
-                                    (node) => node.title == game.gameName
-                                  )
-                                )
-                              }
-                            >
-                              <SearchIcon />
-                            </IconButton>
-                          ) : null}
-                        </div>
-                      </div>
-                      <AvatarGroup max={3} spacing={"small"}>
-                        {game.friends.map((friend, friendIndex) => (
-                          <Avatar
-                            key={friendIndex}
-                            alt={friend.name}
-                            src={friend.avatar}
-                          />
-                        ))}
-                      </AvatarGroup>
-                    </div>
-                    {/* ホバー時に表示されるリスト */}
-                    <div className="absolute left-1/2 w-64 top-full mt-2 -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg border border-gray-600 shadow-xl z-50 hidden group-hover:block opacity-0 group-hover:opacity-100">
-                      <h4 className="text-lg font-bold mb-2">
-                        所持しているフレンドリスト
-                      </h4>
-                      <ul>
-                        {game.friends.map((friend, friendIndex) => (
-                          <li key={friendIndex} className="text-sm">
-                            {friend.name}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )
-              )
+              descFriendsData.map((game, index) => {
+                const nodeIndex = nodes.findIndex((node) => node.steamGameId == game.gameId);
+                return (
+                <FriendGameItem
+                  key={index}
+                  game={game}
+                  onSelect={() => handleGameInNode(game)}
+                  nodeIndex={nodeIndex}
+                  />
+                );
+              })
             ) : (
               <p className="text-center text-white">
                 フレンドのゲームが見つかりませんでした。

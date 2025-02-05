@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
     const gameFriendMap = new Map<
       string,
-      { friends: { name: string; avatar: string }[]; gameName: string }
+      { friends: { name: string; avatar: string }[]; gameName: string; gameId: string }
     >();
 
     const client = await PG_POOL.connect();
@@ -85,6 +85,7 @@ export async function GET(req: NextRequest) {
           gameFriendMap.set(appId, {
             friends: [friendData],
             gameName,
+            gameId: String(appId),
           });
         }
       }

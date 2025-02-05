@@ -28,6 +28,7 @@ type GetFriendGamesResponse = {
     avatar: string;
   }[];
   gameName: string;
+  gameId: string;
 };
 
 type GetPlayerSummariesResponse = {

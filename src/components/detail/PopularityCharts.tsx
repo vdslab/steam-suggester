@@ -12,7 +12,7 @@ type Props = {
   node: NodeType;
 };
 
-const PopularityCharts = ({ node }:Props) => {
+const PopularityCharts = ({ node }: Props) => {
   const { data: steamData, error: steamError } = useSWR(
     node
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/countRecentSteamReviews/${node.steamGameId}`
@@ -21,7 +21,7 @@ const PopularityCharts = ({ node }:Props) => {
   );
 
   const { data: twitchData, error: twitchError } = useSWR(
-    node
+    node && node.twitchGameId
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getTwitchViews/${node.twitchGameId}`
       : null,
     fetcher
@@ -40,18 +40,18 @@ const PopularityCharts = ({ node }:Props) => {
     );
   }
 
-  if (!steamData || !twitchData || !activeUsersData) {
-    return (
-      <div className="flex justify-center items-center h-32">
-        <CircularProgress />
-      </div>
-    );
-  }
-
   if (steamError || twitchError || activeUsersError) {
     return (
       <div className="text-red-500 text-center">
         データの取得に失敗しました。
+      </div>
+    );
+  }
+
+  if (!steamData || !activeUsersData || (node.twitchGameId && !twitchData)) {
+    return (
+      <div className="flex justify-center items-center h-32">
+        <CircularProgress />
       </div>
     );
   }
@@ -62,7 +62,9 @@ const PopularityCharts = ({ node }:Props) => {
       <AreaRechart data={steamData} xKey="date" yKey="count" color={STEAM_COLOR_RANGE[0]} title="Steamレビュー数" />
 
       {/* Twitch視聴数 */}
-      <AreaRechart data={twitchData} xKey="date" yKey="count" color={TWITCH_COLOR_RANGE[0]} title="Twitch視聴数" />
+      {node.twitchGameId && (
+        <AreaRechart data={twitchData} xKey="date" yKey="count" color={TWITCH_COLOR_RANGE[0]} title="Twitch視聴数" />
+      )}
 
       {/* アクティブユーザー数 */}
       <AreaRechart data={activeUsersData} xKey="get_date" yKey="active_user" color={STEAM_COLOR_RANGE[0]} title="アクティブユーザー数" />

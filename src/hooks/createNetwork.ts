@@ -109,7 +109,7 @@ const createNetwork = async (
   const promises = gameIds
     .filter((gameId) => !slicedData.find((d) => d.steamGameId === gameId))
     .map(async (gameId, index, array) => {
-      const url = `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/details/getSteamGameDetail/${gameId}`;
+      const url = `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getSteamGameDetail/${gameId}`;
       try {
         const d: SteamDetailsDataType = await fetchWithCache(url);
         slicedData.push(d);

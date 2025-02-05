@@ -8,12 +8,12 @@ import useSWR from "swr";
 import { fetcher } from "../common/Fetcher";
 import Popup from "./Popup";
 import GameTooltip from "./GameTooltip";
-import { CACHE_UPDATE_EVERY_24H } from "@/constants/USE_SWR_OPTION";
 import HighlightStreamer from "./highlight/HighlightStreamer";
 import HighlightTag from "./highlight/HighlightTag";
 import HighlightSteamList from "./highlight/HighlightSteamList";
 import NonSelectedLinks from "./parts/NonSelectedLinks";
 import SelectedLinks from "./parts/SelectedLinks";
+import { startsWith } from "../common/Utils";
 
 const DEFAULT_TOOLTIP = {
   index: -1,
@@ -138,7 +138,6 @@ const NodeLink = (props: NodeLinkProps) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamOwnedGames?steamId=${steamId}`
       : null,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   // フレンドの所有ゲームを取得
@@ -149,7 +148,6 @@ const NodeLink = (props: NodeLinkProps) => {
       ? `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getFriendGames?steamId=${steamId}`
       : null,
     fetcher,
-    CACHE_UPDATE_EVERY_24H
   );
 
   // 選択されたエッジのリスト
@@ -250,7 +248,7 @@ const NodeLink = (props: NodeLinkProps) => {
                       similarGamesLinkList={selectedLinks}
                     />
                     {/* 色付きセグメントを描画 配信者による強調 */}
-                    {openPanel === "streamer" && (
+                    {startsWith(openPanel, "streamer") && (
                       <HighlightStreamer
                         streamerIds={streamerIds}
                         twitchGameId={node.twitchGameId}
@@ -258,7 +256,7 @@ const NodeLink = (props: NodeLinkProps) => {
                       />
                     )}
 
-                    {openPanel === "highlight" && (
+                    {startsWith(openPanel, "highlight") && (
                       <HighlightTag
                         tags={node.tags || []}
                         selectedTags={selectedTags}
@@ -267,7 +265,7 @@ const NodeLink = (props: NodeLinkProps) => {
                       />
                     )}
 
-                    {openPanel === "steamList" && (
+                    {startsWith(openPanel, "steamList") && (
                       <HighlightSteamList
                         myGamesError={myGamesError}
                         friendsGamesError={friendsGamesError}
