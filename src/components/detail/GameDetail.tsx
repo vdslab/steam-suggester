@@ -74,7 +74,7 @@ const GameDetail = (props: Props) => {
   }, [node]);
 
   return (
-    <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 overflow-y-scroll h-full relative">
+    <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 relative">
       {/* 選択されたゲームの詳細表示 */}
       {node ? (
         <div className="rounded-lg">
@@ -228,27 +228,30 @@ const GameDetail = (props: Props) => {
             {node.review && <ReviewCloud reviewData={node.review} />}
           </div>
 
-          <Box
-            sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}
-          >
-            <Tabs
-              value={tabIndex}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-              centered
+          {node.twitchGameId !== "" && (
+
+            <Box
+              sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}
             >
-              <Tab
-                label="流行度グラフ"
-                {...a11yProps(0)}
-                sx={{ color: "white" }}
-              />
-              <Tab
-                label="Twitchクリップ"
-                {...a11yProps(1)}
-                sx={{ color: "white" }}
-              />
-            </Tabs>
-          </Box>
+              <Tabs
+                value={tabIndex}
+                onChange={handleChange}
+                aria-label="basic tabs example"
+                centered
+              >
+                <Tab
+                  label="流行度グラフ"
+                  {...a11yProps(0)}
+                  sx={{ color: "white" }}
+                />
+                <Tab
+                  label="Twitchクリップ"
+                  {...a11yProps(1)}
+                  sx={{ color: "white" }}
+                />
+              </Tabs>
+            </Box>
+          )}
 
           {tabIndex === 0 && <PopularityCharts node={node} />}
           {tabIndex === 1 && (

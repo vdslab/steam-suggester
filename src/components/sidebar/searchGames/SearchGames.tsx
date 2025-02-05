@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { changeGameIdData } from "@/hooks/indexedDB";
+import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 import { SteamListType, NodeType } from "@/types/NetworkType";
 import SearchItemManager from "./SearchItemManager";
 
@@ -7,11 +7,11 @@ import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined
 import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { IconButton } from "@mui/material";
+import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
+import { startsWithPanelList } from "@/components/common/Utils";
 
 type SearchGamesProps = {
   setSelectedIndex: (value: number) => void;
-  userAddedGames: string[];
-  setUserAddedGames: (value: string[]) => void;
   nodes: NodeType[];
   setIsNetworkLoading: (value: boolean) => void;
   steamListData: SteamListType[];
@@ -21,8 +21,6 @@ type SearchGamesProps = {
 
 const SearchGames = ({
   setSelectedIndex,
-  userAddedGames,
-  setUserAddedGames,
   nodes,
   setIsNetworkLoading,
   steamListData,
@@ -30,10 +28,12 @@ const SearchGames = ({
   setPrevAddedGameId,
 }: SearchGamesProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>(
-    []
-  );
+  const [filteredSteamList, setFilteredSteamList] = useState<SteamListType[]>([]);
   const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [addedGameIds, setAddedGameIds] = useState<string[]>([]);
+
+  const { width, height } = useScreenSize({ debounceTime: 150 });
+
 
   // 外部クリックを検出してフォーカスを解除
   useEffect(() => {
@@ -49,6 +49,14 @@ const SearchGames = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchGameIds = async () => {
+      const addedGameIds = await getGameIdData();
+      setAddedGameIds(addedGameIds ?? []);
+    };
+    fetchGameIds();
+  }, [nodes]);
 
   // allSteamList を効率的に作成
   const allSteamList = useMemo(() => {
@@ -93,11 +101,10 @@ const SearchGames = ({
   // ゲームを追加する処理
   const handleGameAdd = (steamGameId: string) => {
     if (
-      !userAddedGames.includes(steamGameId) &&
+      !addedGameIds.includes(steamGameId) &&
       !nodes.some((node: NodeType) => node.steamGameId === steamGameId)
     ) {
-      const newUserAddedGames = [...userAddedGames, steamGameId];
-      setUserAddedGames(newUserAddedGames);
+      const newUserAddedGames = [...addedGameIds, steamGameId];
       setSearchQuery("");
       (async () => {
         await changeGameIdData(newUserAddedGames);
@@ -108,10 +115,9 @@ const SearchGames = ({
 
   // ゲームを削除する処理
   const handleGameDelete = (steamGameId: string) => {
-    const newUserAddedGames = userAddedGames.filter(
+    const newUserAddedGames = addedGameIds.filter(
       (gameId: string) => gameId !== steamGameId
     );
-    setUserAddedGames(newUserAddedGames);
     (async () => {
       await changeGameIdData(newUserAddedGames);
       setSearchQuery("");
@@ -127,12 +133,16 @@ const SearchGames = ({
     }
   };
 
+  if (width < 1024 && startsWithPanelList(openPanel)) {
+    return null;
+  }
+
   return (
     <div
       id="search-container"
-      className={`absolute top-4 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ease-in-out`}
+      className={`absolute z-30 py-2 rounded-lg transition-all duration-300 ease-in-out top-12 lg:top-4`}
       style={{
-        marginLeft: openPanel ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
+        marginLeft: startsWithPanelList(openPanel) ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
       }}
     >
       {/* 検索フォーム */}
@@ -182,7 +192,7 @@ const SearchGames = ({
                     setIsFocused={setIsFocused}
                     startIcon={`${game.index + 1}位`}
                     endIcon={
-                      userAddedGames.includes(game.steamGameId) ? (
+                      addedGameIds.includes(game.steamGameId) ? (
                         <IconButton>
                           <DeleteForeverOutlinedIcon />
                         </IconButton>

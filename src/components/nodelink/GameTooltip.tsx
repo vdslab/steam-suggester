@@ -36,6 +36,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
 
   const hasVideos = videoUrls.length > 0;
   const videoUrl = hasVideos ? videoUrls[0] : "";
+  const secureUrl = videoUrl.replace("http://", "https://");
 
   // スライドショーのタイマー
   useEffect(() => {
@@ -107,7 +108,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
           >
             {hasVideos ? (
               <video
-                src={videoUrl}
+                src={secureUrl}
                 autoPlay
                 muted
                 loop

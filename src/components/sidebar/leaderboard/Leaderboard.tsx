@@ -1,18 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import HelpTooltip from "../../common/HelpTooltip";
 import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import { changeGameIdData } from "@/hooks/indexedDB";
+import { changeGameIdData, getGameIdData } from "@/hooks/indexedDB";
 
 type Props = {
   nodes: NodeType[];
   selectedIndex: number;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-  userAddedGames: string[];
-  setUserAddedGames: React.Dispatch<React.SetStateAction<string[]>>;
   setIsNetworkLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -20,10 +18,20 @@ const Leaderboard: React.FC<Props> = ({
   nodes,
   selectedIndex,
   setSelectedIndex,
-  userAddedGames,
-  setUserAddedGames,
   setIsNetworkLoading,
 }) => {
+
+  const [addedGameIds, setAddedGameIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchGameIds = async () => {
+      const addedGameIds = await getGameIdData();
+      setAddedGameIds(addedGameIds ?? []);
+    };
+    fetchGameIds();
+  }, [nodes]);
+
+
   // ランキング順にソート
   const sortedNodes = [...nodes].sort(
     (a, b) => (b.circleScale ?? 0) - (a.circleScale ?? 0)
@@ -51,10 +59,8 @@ const Leaderboard: React.FC<Props> = ({
       </div>
       <ul>
         {sortedNodes.map((node, index) => {
-          const isUserAdded = userAddedGames.find(
-            (gameId: string) => gameId === node.steamGameId
-          );
-          const titleColor = isUserAdded ? "green-300" : "white";
+          const isUserAdded = addedGameIds.find((gameId: string) => gameId === node.steamGameId);
+          const titleColor = isUserAdded ? "text-green-300" : "text-white";
 
           const isSelected = selectedIndex === node.index; // 選択状態を判定
 
@@ -71,7 +77,7 @@ const Leaderboard: React.FC<Props> = ({
                 <span className={`${selectColor(index + 1).rankColor} mr-2`}>
                   {index + 1}位
                 </span>
-                <span className={`text-${titleColor}`}>{node.title}</span>
+                <span className={`${titleColor}`}>{node.title}</span>
               </div>
 
               {/* ゴミ箱アイコン */}
@@ -80,10 +86,9 @@ const Leaderboard: React.FC<Props> = ({
                   className="flex items-center justify-center p-1 hover:bg-red-500 rounded cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    const newUserAddedGames = userAddedGames.filter(
+                    const newUserAddedGames = addedGameIds.filter(
                       (gameId: string) => gameId !== node.steamGameId
                     );
-                    setUserAddedGames(newUserAddedGames);
                     (async () => {
                       await changeGameIdData(newUserAddedGames);
                       setIsNetworkLoading(true);
