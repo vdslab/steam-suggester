@@ -112,7 +112,6 @@ const createNetwork = async (
       const url = `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/getSteamGameDetail/${gameId}`;
       try {
         const d: SteamDetailsDataType = await fetchWithCache(url);
-        console.log(d)
         slicedData.push(d);
       } catch (error) {
         console.error(error);

@@ -65,8 +65,6 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
     }
   }, []);
 
-  console.log(secureUrl);
-
   return (
     <g
       transform={`translate(${x},${y}) scale(${1 / transform.k})`}

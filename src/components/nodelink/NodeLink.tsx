@@ -13,6 +13,7 @@ import HighlightTag from "./highlight/HighlightTag";
 import HighlightSteamList from "./highlight/HighlightSteamList";
 import NonSelectedLinks from "./parts/NonSelectedLinks";
 import SelectedLinks from "./parts/SelectedLinks";
+import { startsWith } from "../common/Utils";
 
 const DEFAULT_TOOLTIP = {
   index: -1,
@@ -247,7 +248,7 @@ const NodeLink = (props: NodeLinkProps) => {
                       similarGamesLinkList={selectedLinks}
                     />
                     {/* 色付きセグメントを描画 配信者による強調 */}
-                    {openPanel === "streamer" && (
+                    {startsWith(openPanel, "streamer") && (
                       <HighlightStreamer
                         streamerIds={streamerIds}
                         twitchGameId={node.twitchGameId}
@@ -255,7 +256,7 @@ const NodeLink = (props: NodeLinkProps) => {
                       />
                     )}
 
-                    {openPanel === "highlight" && (
+                    {startsWith(openPanel, "highlight") && (
                       <HighlightTag
                         tags={node.tags || []}
                         selectedTags={selectedTags}
@@ -264,7 +265,7 @@ const NodeLink = (props: NodeLinkProps) => {
                       />
                     )}
 
-                    {openPanel === "steamList" && (
+                    {startsWith(openPanel, "steamList") && (
                       <HighlightSteamList
                         myGamesError={myGamesError}
                         friendsGamesError={friendsGamesError}

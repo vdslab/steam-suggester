@@ -33,6 +33,11 @@ import SearchGames from "./sidebar/searchGames/SearchGames";
 import GameDetail from "./detail/GameDetail";
 import Tutorial from "./tutorial/Tutorial";
 import changeNetwork from "@/hooks/changeNetwork";
+import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
+import { startsWithPanelList } from "./common/Utils";
+
+
+
 
 const Network = () => {
   const { data: steamAllData, error: steamAllDataError } = useSWR<
@@ -47,6 +52,8 @@ const Network = () => {
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`,
     fetcher,
   );
+
+  const { width, height } = useScreenSize({ debounceTime: 150 });
 
   const [filter, setFilter] = useState<Filter>(DEFAULT_FILTER);
   const [slider, setSlider] = useState<SliderSettings>(DEFAULT_SLIDER);
@@ -63,8 +70,6 @@ const Network = () => {
 
   // openPanel を他のパネルのみに使用
   const [openPanel, setOpenPanel] = useState<string | null>(null);
-  // GameSearchPanel 専用の状態
-  const [isGameSearchOpen, setIsGameSearchOpen] = useState<boolean>(false);
 
   const { tourRun, setTourRun } = useTour();
 
@@ -79,19 +84,16 @@ const Network = () => {
 
     if (nodes.length === 0) {
       // 新規作成
-      const result = await createNetwork(steamAllData, filter, gameIds, slider);
-      const rawNodes = result?.nodes ?? [];
-      const rawLinks = result?.links ?? [];
-      const buffNodes = [...rawNodes].sort(
+      const { nodes, links} = await createNetwork(steamAllData, filter, gameIds, slider);
+      const buffNodes = [...nodes].sort(
         (node1, node2) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
       );
-      setCenterX((buffNodes[0]?.x ?? 0) - 150);
-      setCenterY((buffNodes[0]?.y ?? 0) + 100);
+      setCenterX((buffNodes[0]?.x ?? 0) - width / 10);
+      setCenterY((buffNodes[0]?.y ?? 0) + (width >= 768 ? height / 10 : height / 4));
       setSelectedIndex(-1);
-      
-      setPrevAddedGameId("");
-      setNodes(rawNodes);
-      setLinks(rawLinks);
+
+      setNodes(nodes);
+      setLinks(links);
     } else {
       // 既存ネットワークをアップデート
       const result = await changeNetwork(
@@ -143,18 +145,22 @@ const Network = () => {
   // 選択されたノードが変更されたときに中心座標を更新
   useEffect(() => {
     if (selectedIndex !== -1 && nodes[selectedIndex]) {
-      setCenterX((nodes[selectedIndex].x ?? 0) - 150);
-      setCenterY((nodes[selectedIndex].y ?? 0) + 100);
-      setIsGameSearchOpen(true);
+      setCenterX((nodes[selectedIndex].x ?? 0) - width / 10);
+      setCenterY((nodes[selectedIndex].y ?? 0) + (width >= 768 ? height / 10 : height / 4));
     }
   }, [selectedIndex, nodes]);
 
   const togglePanel = (panelName: string) => {
-    setOpenPanel((prevPanel) => {
-      const newPanel = prevPanel === panelName ? null : panelName;
-      return newPanel;
-    });
-    setTourRun(false);
+    if(openPanel === panelName) {
+      setOpenPanel(`${panelName}-close`);
+      setTourRun(false);
+    } else {
+      setOpenPanel((prevPanel) => {
+        const newPanel = prevPanel === panelName ? null : panelName;
+        return newPanel;
+      });
+      setTourRun(false);
+    }
   };
 
   const toggleTourRun = () => {
@@ -162,7 +168,6 @@ const Network = () => {
       const newState = !prev;
       if (newState) {
         setOpenPanel(null);
-        setIsGameSearchOpen(false); // ツアー開始時に GameSearchPanel も閉じる
         setSelectedIndex(-1);
       }
       return newState;
@@ -181,6 +186,17 @@ const Network = () => {
       />
     );
   }
+
+  // パネルの共通クラス
+  const panelClassNames = (openPanelName: string) =>
+    `absolute top-0 left-0 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
+      openPanel === openPanelName
+      ? "translate-x-0"
+      : openPanel === null || openPanel === `${openPanelName}-close`
+      ? "-translate-x-full"
+      : "hidden"
+    }
+    w-2/3 lg:w-1/5`;
 
   return (
     <div className="flex flex-1 overflow-hidden text-white relative">
@@ -206,8 +222,8 @@ const Network = () => {
         />
 
         {/* ゲーム詳細表示 */}
-        {selectedIndex !== -1 && nodes[selectedIndex] && isGameSearchOpen && (
-          <div className="absolute top-0 right-0 w-1/4 z-20 h-full">
+        {selectedIndex !== -1 && nodes[selectedIndex] && !startsWithPanelList(openPanel) &&(
+          <div className="absolute right-0 z-20 overflow-y-scroll h-1/3 bottom-0 md:w-1/4 md:h-auto md:bottom-auto md:top-0 lg:h-full">
             <GameDetail
               node={nodes[selectedIndex]}
               setSelectedIndex={setSelectedIndex}
@@ -241,15 +257,7 @@ const Network = () => {
         )}
 
         {/* フィルターパネル */}
-        <div
-          className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "filter"
-              ? "translate-x-0"
-              : openPanel === null
-              ? "-translate-x-full"
-              : "hidden"
-          }`}
-        >
+        <div className={`${panelClassNames("filter")}`}>
           <SelectParameter
             filter={filter}
             setFilter={setFilter}
@@ -258,15 +266,7 @@ const Network = () => {
         </div>
 
         {/* 強調表示パネル */}
-        <div
-          className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "highlight"
-              ? "translate-x-0"
-              : openPanel === null
-              ? "-translate-x-full"
-              : "hidden"
-          }`}
-        >
+        <div className={`${panelClassNames("highlight")}`}>
           <HighlightPanel
             selectedTags={selectedTags}
             setSelectedTags={setSelectedTags}
@@ -274,15 +274,7 @@ const Network = () => {
         </div>
 
         {/* StreamerList パネル */}
-        <div
-          className={`absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "streamer"
-              ? "translate-x-0"
-              : openPanel === null
-              ? "-translate-x-full"
-              : "hidden"
-          }`}
-        >
+        <div className={`${panelClassNames("streamer")}`}>
           <Panel
             title={
               <div className="flex items-center">
@@ -301,15 +293,7 @@ const Network = () => {
         </div>
 
         {/* 類似度パネル */}
-        <div
-          className={`absolute top-0 left-0 w-1/5 h-full bg-transparent overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "similarity"
-              ? "translate-x-0"
-              : openPanel === null
-              ? "-translate-x-full"
-              : "hidden"
-          }`}
-        >
+        <div className={`${panelClassNames("similarity")}`}>
           <Panel
             title={
               <div className="flex items-center">
@@ -328,15 +312,7 @@ const Network = () => {
         </div>
 
         {/* Steam連携パネル */}
-        <div
-          className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "steamList"
-              ? "translate-x-0"
-              : openPanel === null
-              ? "-translate-x-full"
-              : "hidden"
-          }`}
-        >
+        <div className={`${panelClassNames("steamList")}`}>
           <SteamList
             nodes={nodes}
             setSelectedIndex={setSelectedIndex}
@@ -345,15 +321,7 @@ const Network = () => {
         </div>
 
         {/* ランキングパネル */}
-        <div
-          className={`absolute top-0 left-0 w-1/5 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
-            openPanel === "ranking"
-              ? "translate-x-0"
-              : openPanel === null
-              ? "-translate-x-full"
-              : "hidden"
-          }`}
-        >
+        <div className={`${panelClassNames("ranking")}`}>
           <Leaderboard
             nodes={nodes}
             selectedIndex={selectedIndex}
