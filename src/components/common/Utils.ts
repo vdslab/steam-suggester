@@ -5,9 +5,9 @@ export const startsWith = (str: string | null, prefix: string) => {
   return str?.startsWith(prefix);
 };
 
-export const startsWithArray = (str: string | null, prefixArray: string[]) => {
+export const startsWithPanelList = (str: string | null) => {
   if (str === null || str === undefined) {
     return false;
   }
-  return prefixArray.some((prefix) => str.startsWith(prefix));
+  return str && ["streamer", "highlight", "steamList", "ranking", "similarity", "filter"].includes(str);
 }

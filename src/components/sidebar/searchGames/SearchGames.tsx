@@ -8,6 +8,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { IconButton } from "@mui/material";
 import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
+import { startsWithPanelList } from "@/components/common/Utils";
 
 type SearchGamesProps = {
   setSelectedIndex: (value: number) => void;
@@ -132,16 +133,16 @@ const SearchGames = ({
     }
   };
 
-  if (width < 768 && openPanel && ["streamer", "highlight", "steamList", "ranking", "similarity", "filter"].includes(openPanel)) {
+  if (width < 1024 && startsWithPanelList(openPanel)) {
     return null;
   }
 
   return (
     <div
       id="search-container"
-      className={`absolute top-4 z-30 py-2 rounded-lg backdrop-filter backdrop-blur-sm transition-all duration-300 ease-in-out`}
+      className={`absolute z-30 py-2 rounded-lg transition-all duration-300 ease-in-out top-12 lg:top-4`}
       style={{
-        marginLeft: openPanel&&["streamer", "highlight", "steamList", "ranking", "similarity", "filter"].includes(openPanel) ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
+        marginLeft: startsWithPanelList(openPanel) ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
       }}
     >
       {/* 検索フォーム */}
