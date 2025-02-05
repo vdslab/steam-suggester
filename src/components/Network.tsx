@@ -209,7 +209,7 @@ const Network = () => {
       />
 
       {/* メインコンテンツ */}
-      <div className="flex-1 relative bg-gray-900 overflow-hidden z-10">
+      <div className="flex-1 relative overflow-hidden z-10">
         <HomeHeader />
 
         <SearchGames
