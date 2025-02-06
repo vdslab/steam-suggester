@@ -128,7 +128,9 @@ const NodeLink = (props: NodeLinkProps) => {
         width: "100%",
         height: "100%",
         position: "relative",
-        backgroundImage: background ? `url(${background})` : "none",
+        backgroundImage: background
+          ? `url(${background})`
+          : `url(/default_background.png)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
