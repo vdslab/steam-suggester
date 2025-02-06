@@ -11,12 +11,11 @@ import { startsWith } from "../common/Utils";
 
 // 共通のボタンクラス
 const buttonClasses = (isActive: boolean) =>
-`w-full py-2 text-center flex flex-col items-center ${
-  isActive ? "bg-gray-700" : "hover:bg-gray-700"
-} rounded transition-colors duration-200`;
+  `w-full py-2 text-center flex flex-col items-center ${
+    isActive ? "bg-gray-700" : "hover:bg-gray-700"
+  } rounded transition-colors duration-200`;
 
-const titleClasses = () =>
-"text-xs mt-1 hidden lg:inline-block";
+const titleClasses = () => "text-xs mt-1 hidden lg:inline-block";
 
 type Props = {
   openPanel: string | null;
@@ -48,10 +47,23 @@ const Sidebar: React.FC<Props> = ({
         {/* Steamリストボタン */}
         <button
           onClick={() => togglePanel("steamList")}
-          className={`${buttonClasses(startsWith(openPanel, "steamList"))} step4`}
+          className={`${buttonClasses(
+            startsWith(openPanel, "steamList")
+          )} step4`}
         >
           <SportsEsportsOutlinedIcon />
           <span className={titleClasses()}>Steam連携</span>
+        </button>
+
+        {/* Streamerボタン */}
+        <button
+          onClick={() => togglePanel("streamer")}
+          className={`${buttonClasses(
+            startsWith(openPanel, "streamer")
+          )} step2`}
+        >
+          <LiveTvOutlinedIcon />
+          <span className={titleClasses()}>配信者</span>
         </button>
         {/* 強調表示ボタン */}
         <button
@@ -61,20 +73,14 @@ const Sidebar: React.FC<Props> = ({
           <HighlightOutlinedIcon />
           <span className={titleClasses()}>強調表示</span>
         </button>
-        {/* Streamerボタン */}
-        <button
-          onClick={() => togglePanel("streamer")}
-          className={`${buttonClasses(startsWith(openPanel, "streamer"))} step2`}
-        >
-          <LiveTvOutlinedIcon />
-          <span className={titleClasses()}>配信者</span>
-        </button>
         {/* 区切り線 */}
         <div className="w-full border-t border-gray-700 my-2"></div>
         {/* 類似度ボタン */}
         <button
           onClick={() => togglePanel("similarity")}
-          className={`${buttonClasses(startsWith(openPanel, "similarity"))} step3`}
+          className={`${buttonClasses(
+            startsWith(openPanel, "similarity")
+          )} step3`}
         >
           <TuneOutlinedIcon />
           <span className={titleClasses()}>類似度設定</span>
