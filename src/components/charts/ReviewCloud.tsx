@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { scaleLog } from "@visx/scale";
 import Wordcloud from "@visx/wordcloud/lib/Wordcloud";
 import { Text } from "@visx/text";
@@ -8,6 +8,8 @@ import { CircularProgress } from "@mui/material";
 import d3Cloud from "d3-cloud";
 
 type Props = {
+  parentW: number;
+  parentH: number;
   reviewData: {
     name: string;
     score: number;
@@ -22,8 +24,6 @@ type WordData = {
 };
 
 export const getColorByScore = (score: number) => {
-  const blue = "#4a90e2";
-  const red = "#d14b56";
   const ratio = (score + 1) / 2;
 
   const interpolate = (start: number, end: number) =>
@@ -41,9 +41,10 @@ export const getColorByScore = (score: number) => {
 const fixedValueGenerator = () => 0.5;
 const MAX_REVIEW_WORDS = 40;
 
-const ReviewCloud = ({ reviewData }: Props) => {
+const ReviewCloud = ({ reviewData, parentW, parentH }: Props) => {
   const [words, setWords] = useState<WordData[]>([]);
   const [isLoading, setIsLoading] = useState(true); // ローディング状態
+
   const { width, height } = useScreenSize({ debounceTime: 150 });
 
   // 1秒のローディングを挟む
@@ -90,16 +91,14 @@ const ReviewCloud = ({ reviewData }: Props) => {
     return <div className="text-white">レビューがありません</div>;
   }
 
-  const cloudWidth = width / 5;
-  const cloudHeight = height / 4;
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       {isLoading ? (
         <div
           style={{
-            width: cloudWidth,
-            height: cloudHeight,
+            width: parentW,
+            height: height / 4,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -110,8 +109,8 @@ const ReviewCloud = ({ reviewData }: Props) => {
       ) : (
         <Wordcloud
           words={words}
-          width={cloudWidth}
-          height={cloudHeight}
+          width={parentW}
+          height={height/4}
           fontSize={fontSizeSetter}
           padding={2}
           rotate={0}

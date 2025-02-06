@@ -15,8 +15,8 @@ import DistributorVideos from "./Clips/DistributorVideos";
 import DetailTags from "./DetailTags";
 import { Box, Tab, Tabs } from "@mui/material";
 import PopularityCharts from "./PopularityCharts";
-import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 import ReviewCloudPanel from "./ReviewCloudPanel";
+import useParentSize from "@visx/responsive/lib/hooks/useParentSize";
 
 type Props = {
   node: NodeType;
@@ -44,7 +44,7 @@ const GameDetail = (props: Props) => {
 
   const [tabIndex, setTabIndex] = useState(0);
 
-  const { width, height } = useScreenSize({ debounceTime: 150 });
+  const { parentRef, width:parentW, height:parentH } = useParentSize({ debounceTime: 150 });
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
@@ -73,7 +73,7 @@ const GameDetail = (props: Props) => {
   }, [node]);
 
   return (
-    <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 relative">
+    <div ref={parentRef} className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 relative">
       {/* 選択されたゲームの詳細表示 */}
       {node ? (
         <div className="rounded-lg">
@@ -200,7 +200,7 @@ const GameDetail = (props: Props) => {
             </div>
           </div>
 
-          <ReviewCloudPanel node={node} />
+          <ReviewCloudPanel parentW={parentW} parentH={parentH} node={node} />
 
           {node.twitchGameId !== "" && (
             <Box

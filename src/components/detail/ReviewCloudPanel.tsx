@@ -6,10 +6,13 @@ import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 
 type Props = {
+  parentW: number;
+  parentH: number;
   node: NodeType;
 };
 
-const ReviewCloudPanel = ({ node }: Props) => {
+const ReviewCloudPanel = ({ node, parentW, parentH }: Props) => {
+
   return (
     <div className="px-2 mt-2">
       <h3 className="text-white text-lg font-semibold mb-2 flex items-center">
@@ -34,7 +37,7 @@ const ReviewCloudPanel = ({ node }: Props) => {
         </div>
       </h3>
 
-      {node.review && <ReviewCloud reviewData={node.review} />}
+      {node.review && <ReviewCloud parentW={parentW} parentH={parentH} reviewData={node.review} />}
     </div>
   );
 };
