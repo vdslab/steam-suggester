@@ -4,7 +4,7 @@ import Network from "@/components/Network";
 
 export default async function Page() {
   return (
-    <div className="flex flex-col h-screen bg-gray-900 safe-area">
+    <div className="flex flex-col h-[100dvh] bg-gray-900 safe-area">
       <Providers>
         <SWRProvider>
           <Network />
