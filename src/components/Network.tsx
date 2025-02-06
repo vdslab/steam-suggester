@@ -55,7 +55,7 @@ const Network = () => {
 
   const [nodes, setNodes] = useState<NodeType[]>([]);
   const [links, setLinks] = useState<LinkType[]>([]);
-  const [center, setCenter] = useState<CenterType>({ x: 0, y: 0 });
+  const [center, setCenter] = useState<CenterType>({ x: 0, y: 0, k: 1 });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isNetworkLoading, setIsNetworkLoading] = useState(true);
@@ -90,6 +90,7 @@ const Network = () => {
       setCenter({
         x: (buffNodes[0]?.x ?? 0) - width / 10,
         y: (buffNodes[0]?.y ?? 0) + (width >= 768 ? height / 10 : height / 4),
+        k: buffNodes[0]?.circleScale ?? 1,
       });
 
       setSelectedIndex(-1);
@@ -152,6 +153,7 @@ const Network = () => {
         y:
           (nodes[selectedIndex].y ?? 0) +
           (width >= 768 ? height / 10 : height / 4),
+        k: nodes[selectedIndex].circleScale ?? 1,
       });
     }
   }, [selectedIndex, nodes]);

@@ -79,6 +79,7 @@ export type LinkType = {
 export type CenterType = {
   x: number;
   y: number;
+  k: number;
 };
 
 export type SimilarGameType = {
