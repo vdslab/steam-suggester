@@ -97,7 +97,7 @@ const ReviewCloud = ({ reviewData, parentW, parentH }: Props) => {
       {isLoading ? (
         <div
           style={{
-            width: parentW,
+            width: parentW -10 ,
             height: height / 4,
             display: "flex",
             justifyContent: "center",
@@ -109,7 +109,7 @@ const ReviewCloud = ({ reviewData, parentW, parentH }: Props) => {
       ) : (
         <Wordcloud
           words={words}
-          width={parentW}
+          width={parentW -10}
           height={height/4}
           fontSize={fontSizeSetter}
           padding={2}
