@@ -35,23 +35,18 @@ import Tutorial from "./tutorial/Tutorial";
 import changeNetwork from "@/hooks/changeNetwork";
 import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 import { startsWithPanelList } from "./common/Utils";
-
-
-
+import SwipeContainer from "./common/SwipeContainer";
 
 const Network = () => {
   const { data: steamAllData, error: steamAllDataError } = useSWR<
     SteamDetailsDataType[]
   >(
     `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getMatchGames`,
-    fetcher,
+    fetcher
   );
   const { data: steamListData, error: steamListDataError } = useSWR<
     SteamListType[]
-  >(
-    `${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`,
-    fetcher,
-  );
+  >(`${process.env.NEXT_PUBLIC_CURRENT_URL}/api/network/getSteamList`, fetcher);
 
   const { width, height } = useScreenSize({ debounceTime: 150 });
 
@@ -75,6 +70,8 @@ const Network = () => {
 
   const [prevAddedGameId, setPrevAddedGameId] = useState<string>("");
 
+  const [open, setOpen] = useState(false);
+
   const initialNodes = async (
     filter: Filter,
     gameIds: string[],
@@ -84,12 +81,19 @@ const Network = () => {
 
     if (nodes.length === 0) {
       // 新規作成
-      const { nodes, links} = await createNetwork(steamAllData, filter, gameIds, slider);
+      const { nodes, links } = await createNetwork(
+        steamAllData,
+        filter,
+        gameIds,
+        slider
+      );
       const buffNodes = [...nodes].sort(
         (node1, node2) => (node2.circleScale ?? 0) - (node1.circleScale ?? 0)
       );
       setCenterX((buffNodes[0]?.x ?? 0) - width / 10);
-      setCenterY((buffNodes[0]?.y ?? 0) + (width >= 768 ? height / 10 : height / 4));
+      setCenterY(
+        (buffNodes[0]?.y ?? 0) + (width >= 768 ? height / 10 : height / 4)
+      );
       setSelectedIndex(-1);
 
       setNodes(nodes);
@@ -146,12 +150,15 @@ const Network = () => {
   useEffect(() => {
     if (selectedIndex !== -1 && nodes[selectedIndex]) {
       setCenterX((nodes[selectedIndex].x ?? 0) - width / 10);
-      setCenterY((nodes[selectedIndex].y ?? 0) + (width >= 768 ? height / 10 : height / 4));
+      setCenterY(
+        (nodes[selectedIndex].y ?? 0) +
+          (width >= 768 ? height / 10 : height / 4)
+      );
     }
   }, [selectedIndex, nodes]);
 
   const togglePanel = (panelName: string) => {
-    if(openPanel === panelName) {
+    if (openPanel === panelName) {
       setOpenPanel(`${panelName}-close`);
       setTourRun(false);
     } else {
@@ -191,12 +198,13 @@ const Network = () => {
   const panelClassNames = (openPanelName: string) =>
     `absolute top-0 left-0 h-full bg-gray-900 overflow-y-auto overflow-x-hidden shadow-lg z-10 transition-transform duration-300 transform ${
       openPanel === openPanelName
-      ? "translate-x-0"
-      : openPanel === null || openPanel === `${openPanelName}-close`
-      ? "-translate-x-full"
-      : "hidden"
+        ? "translate-x-0"
+        : openPanel === null || openPanel === `${openPanelName}-close`
+        ? "-translate-x-full"
+        : "hidden"
     }
     w-2/3 lg:w-1/5`;
+
 
   return (
     <div className="flex flex-1 overflow-hidden text-white relative">
@@ -222,17 +230,33 @@ const Network = () => {
         />
 
         {/* ゲーム詳細表示 */}
-        {selectedIndex !== -1 && nodes[selectedIndex] && !startsWithPanelList(openPanel) &&(
-          <div className="absolute right-0 z-20 overflow-y-scroll h-1/3 bottom-0 md:w-1/4 md:h-auto md:bottom-auto md:top-0 lg:h-full">
-            <GameDetail
-              node={nodes[selectedIndex]}
-              setSelectedIndex={setSelectedIndex}
-              setOpenPanel={setOpenPanel}
-              selectedTags={selectedTags}
-              setSelectedTags={setSelectedTags}
-            />
-          </div>
-        )}
+        {selectedIndex !== -1 &&
+          nodes[selectedIndex] &&
+          !startsWithPanelList(openPanel) &&
+          (width < 1024 ? (
+            <SwipeContainer setSelectedIndex={setSelectedIndex} open={open} setOpen={setOpen}>
+              <div className="overflow-y-scroll top-0 h-full">
+                <GameDetail
+                  node={nodes[selectedIndex]}
+                  setSelectedIndex={setSelectedIndex}
+                  setOpenPanel={setOpenPanel}
+                  selectedTags={selectedTags}
+                  setSelectedTags={setSelectedTags}
+                  swipeOpen={open}
+                />
+              </div>
+            </SwipeContainer>
+          ) : (
+            <div className="absolute right-0 z-20 overflow-y-scroll w-4/12 bottom-0 top-0 h-full bg-gray-800">
+              <GameDetail
+                node={nodes[selectedIndex]}
+                setSelectedIndex={setSelectedIndex}
+                setOpenPanel={setOpenPanel}
+                selectedTags={selectedTags}
+                setSelectedTags={setSelectedTags}
+              />
+            </div>
+          ))}
 
         {/* ネットワークグラフ */}
         <div className="absolute inset-0">

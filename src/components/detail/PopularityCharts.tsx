@@ -57,7 +57,7 @@ const PopularityCharts = ({ node }: Props) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+    <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-2">
       {/* Steamレビュー数 */}
       <AreaRechart data={steamData} xKey="date" yKey="count" color={STEAM_COLOR_RANGE[0]} title="Steamレビュー数" />
 
