@@ -1,6 +1,4 @@
 import { useScreenSize } from "@visx/responsive";
-import { useState } from "react";
-
 import { Global } from "@emotion/react";
 import { grey } from "@mui/material/colors";
 import { styled } from "@mui/material/styles";
@@ -8,6 +6,9 @@ import SwipeableDrawer from "@mui/material/SwipeableDrawer/SwipeableDrawer";
 
 type Props = {
   children: React.ReactNode;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Puller = styled("div")(({ theme }) => ({
@@ -32,11 +33,10 @@ const StyledBox = styled("div")(({ theme }) => ({
 }));
 
 const SwipeContainer = (props: Props) => {
-  const { children } = props;
+  const { children, setSelectedIndex, open, setOpen } = props;
 
   const { width, height } = useScreenSize({ debounceTime: 150 });
 
-  const [open, setOpen] = useState(false);
 
   const drawerBleeding = height / 3;
 
@@ -46,6 +46,15 @@ const SwipeContainer = (props: Props) => {
 
   return (
     <>
+      <button
+        className={"absolute right-2 px-2 rounded z-50 flex items-center justify-center w-8 h-8 bg-black bg-opacity-50 rounded-full cursor-pointer z-90 transition-transform duration-200"}
+        onClick={() => setSelectedIndex(-1)}
+        style={{ top: `calc(100% - ${drawerBleeding +40}px)`}}
+      >
+        <span className="text-white text-xl font-bold transition-colors duration-200 hover:text-red-400">
+          ×
+        </span>
+      </button>
       <Global
         styles={{
           ".MuiDrawer-root > .MuiPaper-root": {
@@ -61,7 +70,6 @@ const SwipeContainer = (props: Props) => {
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
         swipeAreaWidth={drawerBleeding}
-        disableDiscovery={false} 
       >
         <StyledBox
           sx={{

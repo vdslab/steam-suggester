@@ -17,6 +17,7 @@ import { Box, Tab, Tabs } from "@mui/material";
 import PopularityCharts from "./PopularityCharts";
 import ReviewCloudPanel from "./ReviewCloudPanel";
 import useParentSize from "@visx/responsive/lib/hooks/useParentSize";
+import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 
 type Props = {
   node: NodeType;
@@ -24,6 +25,7 @@ type Props = {
   setOpenPanel: React.Dispatch<React.SetStateAction<string | null>>;
   selectedTags: string[];
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+  swipeOpen?: boolean;
 };
 
 function a11yProps(index: number) {
@@ -40,11 +42,13 @@ const GameDetail = (props: Props) => {
     setOpenPanel,
     selectedTags,
     setSelectedTags,
+    swipeOpen
   } = props;
 
   const [tabIndex, setTabIndex] = useState(0);
 
   const { parentRef, width:parentW, height:parentH } = useParentSize({ debounceTime: 150 });
+  const { width, height } = useScreenSize({ debounceTime: 150 });
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
@@ -100,14 +104,16 @@ const GameDetail = (props: Props) => {
                   />
                 ))}
                 {/* 画像右上に閉じるボタン */}
-                <div
-                  className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 bg-black bg-opacity-50 rounded-full cursor-pointer z-20 transition-transform duration-200 hover:bg-opacity-75 hover:scale-110"
-                  onClick={() => setSelectedIndex(-1)}
-                >
-                  <span className="text-white text-xl font-bold transition-colors duration-200 hover:text-red-400">
-                    ×
-                  </span>
-                </div>
+                {(width >= 1024 || (width < 1024 && swipeOpen)) &&
+                  <div
+                    className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 bg-black bg-opacity-50 rounded-full cursor-pointer z-90 transition-transform duration-200 hover:bg-opacity-75 hover:scale-110"
+                    onClick={() => setSelectedIndex(-1)}
+                  >
+                    <span className="text-white text-xl font-bold transition-colors duration-200 hover:text-red-400">
+                      ×
+                    </span>
+                  </div>
+                }
               </div>
             )}
 

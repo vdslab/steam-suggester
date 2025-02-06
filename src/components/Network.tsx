@@ -70,6 +70,7 @@ const Network = () => {
 
   const [prevAddedGameId, setPrevAddedGameId] = useState<string>("");
 
+  const [open, setOpen] = useState(false);
 
   const initialNodes = async (
     filter: Filter,
@@ -233,7 +234,7 @@ const Network = () => {
           nodes[selectedIndex] &&
           !startsWithPanelList(openPanel) &&
           (width < 1024 ? (
-            <SwipeContainer>
+            <SwipeContainer setSelectedIndex={setSelectedIndex} open={open} setOpen={setOpen}>
               <div className="overflow-y-scroll top-0 h-full">
                 <GameDetail
                   node={nodes[selectedIndex]}
@@ -241,6 +242,7 @@ const Network = () => {
                   setOpenPanel={setOpenPanel}
                   selectedTags={selectedTags}
                   setSelectedTags={setSelectedTags}
+                  swipeOpen={open}
                 />
               </div>
             </SwipeContainer>
