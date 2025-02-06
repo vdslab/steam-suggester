@@ -19,23 +19,21 @@ const ReviewCloudPanel = ({ node, parentW, parentH }: Props) => {
         <RateReviewIcon className="mr-1" />
         レビュー分析
         <HelpTooltip title="ゲームレビュー文に多く含まれた単語ほど、大きく表示されます。単語の色はその単語が含まれているレビューの評判によって変化します。" />
-        <div className="flex items-center ml-8 relative">
-          <span className="absolute left-0 -translate-x-4">
-            <ThumbDownAltOutlinedIcon />
-          </span>
+
+        <div className="flex items-center space-x-2 ml-2">
+          <ThumbDownAltOutlinedIcon />
           <div
-            className="h-2 w-32 mx-4 rounded"
+            className="h-2 w-24 mx-4 rounded"
             style={{
               background: `linear-gradient(to right,  ${getColorByScore(
                 -1
               )}, ${getColorByScore(0)}, ${getColorByScore(1)})`,
             }}
           />
-          <span className="absolute right-0 translate-x-4">
-            <ThumbUpAltOutlinedIcon />
-          </span>
+          <ThumbUpAltOutlinedIcon />
         </div>
       </h3>
+
 
       {node.review && <ReviewCloud parentW={parentW} parentH={parentH} reviewData={node.review} />}
     </div>

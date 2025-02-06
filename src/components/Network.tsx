@@ -277,7 +277,7 @@ const Network = () => {
               </div>
             </SwipeContainer>
           ) : (
-            <div className="absolute right-0 z-20 overflow-y-scroll w-1/4 bottom-0 top-0 h-full">
+            <div className="absolute right-0 z-20 overflow-y-scroll w-4/12 bottom-0 top-0 h-full bg-gray-800">
               <GameDetail
                 node={nodes[selectedIndex]}
                 setSelectedIndex={setSelectedIndex}
