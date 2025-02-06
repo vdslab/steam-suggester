@@ -14,6 +14,7 @@ import HighlightSteamList from "./highlight/HighlightSteamList";
 import NonSelectedLinks from "./parts/NonSelectedLinks";
 import SelectedLinks from "./parts/SelectedLinks";
 import { startsWith } from "../common/Utils";
+import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 
 const DEFAULT_TOOLTIP = {
   index: -1,
@@ -52,10 +53,14 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
 
   const zoom = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
+  const { width, height } = useScreenSize({ debounceTime: 150 });
+
+  const minScaleSize = width < 1024 ? 0.1 : 0.25;
+
   useEffect(() => {
     zoom.current = d3
       .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.25, 4])
+      .scaleExtent([minScaleSize, 4])
       .on("start", () => {
         if (svgRef.current) {
           d3.select(svgRef.current).style("cursor", "grabbing");
@@ -74,7 +79,7 @@ const ZoomableSVG: React.FC<ZoomableSVGProps> = (props) => {
       const svg = d3.select<SVGSVGElement, unknown>(svgRef.current);
       svg.call(zoom.current);
     }
-  }, []);
+  }, [width, height]);
 
   useEffect(() => {
     if (svgRef.current && zoom.current) {

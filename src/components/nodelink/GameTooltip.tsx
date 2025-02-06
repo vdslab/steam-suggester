@@ -70,6 +70,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
       transform={`translate(${x},${y}) scale(${1 / transform.k})`}
       onMouseEnter={() => setHoveredIndex(index)}
       onMouseLeave={() => setHoveredIndex(-1)}
+      className="hidden lg:inline-block"
     >
       <foreignObject
         x={-halfSize}

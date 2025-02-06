@@ -140,7 +140,7 @@ const SearchGames = ({
   return (
     <div
       id="search-container"
-      className={`absolute z-30 py-2 rounded-lg transition-all duration-300 ease-in-out top-12 lg:top-4`}
+      className={`absolute z-30 py-2 rounded-lg text-sm transition-all duration-300 ease-in-out top-12 lg:top-4 md:text-md lg:text-lg`}
       style={{
         marginLeft: startsWithPanelList(openPanel) ? "calc(20% + 1rem)" : "1rem", // Sidebarの幅に応じてマージンを変更
       }}
@@ -160,11 +160,11 @@ const SearchGames = ({
                 : "rounded-lg"
             }`}
           />
-          <SearchIcon className="absolute left-2 text-gray-500" />
+          <SearchIcon fontSize={width < 1024 ?"small": "medium" } className="absolute left-2 text-gray-500 text-sm md:text-md lg:text-lg" />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              className="absolute right-2 text-gray-500 hover:text-gray-700 focus:outline-none text-sm md:text-md lg:text-lg"
               aria-label="クリア検索"
             >
               ×
@@ -174,8 +174,8 @@ const SearchGames = ({
 
         {/* メッセージ表示エリア */}
         {searchQuery !== "" && filteredSteamList.length === 0 && (
-          <p className="text-gray-300 mt-1">
-            該当するゲームが見つかりません。別のゲームをお探しください。
+          <p className="text-gray-300 mt-1 text-sm">
+            該当するゲームが見つかりませんでした
           </p>
         )}
 
@@ -194,7 +194,7 @@ const SearchGames = ({
                     endIcon={
                       addedGameIds.includes(game.steamGameId) ? (
                         <IconButton>
-                          <DeleteForeverOutlinedIcon />
+                          <DeleteForeverOutlinedIcon fontSize={width < 1024 ?"small": "medium" } />
                         </IconButton>
                       ) : null
                     }

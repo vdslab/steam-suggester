@@ -5,21 +5,19 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import BuildIcon from "@mui/icons-material/Build";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CurrencyYenIcon from "@mui/icons-material/CurrencyYen";
-import RateReviewIcon from "@mui/icons-material/RateReview";
-import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
-import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 
 import { useEffect, useState } from "react";
 import { NodeType } from "@/types/NetworkType";
 import Image from "next/image";
-import HelpTooltip from "../common/HelpTooltip";
 import Tooltip from "@mui/material/Tooltip";
 import Link from "next/link";
-import ReviewCloud, { getColorByScore } from "../charts/ReviewCloud";
 import DistributorVideos from "./Clips/DistributorVideos";
 import DetailTags from "./DetailTags";
 import { Box, Tab, Tabs } from "@mui/material";
 import PopularityCharts from "./PopularityCharts";
+import ReviewCloudPanel from "./ReviewCloudPanel";
+import useParentSize from "@visx/responsive/lib/hooks/useParentSize";
+import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 
 type Props = {
   node: NodeType;
@@ -27,6 +25,7 @@ type Props = {
   setOpenPanel: React.Dispatch<React.SetStateAction<string | null>>;
   selectedTags: string[];
   setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
+  swipeOpen?: boolean;
 };
 
 function a11yProps(index: number) {
@@ -43,9 +42,13 @@ const GameDetail = (props: Props) => {
     setOpenPanel,
     selectedTags,
     setSelectedTags,
+    swipeOpen
   } = props;
 
   const [tabIndex, setTabIndex] = useState(0);
+
+  const { parentRef, width:parentW, height:parentH } = useParentSize({ debounceTime: 150 });
+  const { width, height } = useScreenSize({ debounceTime: 150 });
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
@@ -74,7 +77,7 @@ const GameDetail = (props: Props) => {
   }, [node]);
 
   return (
-    <div className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 relative">
+    <div ref={parentRef} className="flex-1 bg-gray-800 rounded-l-lg shadow-md flex flex-col space-y-4 relative">
       {/* 選択されたゲームの詳細表示 */}
       {node ? (
         <div className="rounded-lg">
@@ -101,14 +104,16 @@ const GameDetail = (props: Props) => {
                   />
                 ))}
                 {/* 画像右上に閉じるボタン */}
-                <div
-                  className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 bg-black bg-opacity-50 rounded-full cursor-pointer z-20 transition-transform duration-200 hover:bg-opacity-75 hover:scale-110"
-                  onClick={() => setSelectedIndex(-1)}
-                >
-                  <span className="text-white text-xl font-bold transition-colors duration-200 hover:text-red-400">
-                    ×
-                  </span>
-                </div>
+                {(width >= 1024 || (width < 1024 && swipeOpen)) &&
+                  <div
+                    className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 bg-black bg-opacity-50 rounded-full cursor-pointer z-90 transition-transform duration-200 hover:bg-opacity-75 hover:scale-110"
+                    onClick={() => setSelectedIndex(-1)}
+                  >
+                    <span className="text-white text-xl font-bold transition-colors duration-200 hover:text-red-400">
+                      ×
+                    </span>
+                  </div>
+                }
               </div>
             )}
 
@@ -201,35 +206,9 @@ const GameDetail = (props: Props) => {
             </div>
           </div>
 
-          {/* レビュー分析タイトルの追加 */}
-          <div className="px-2 mt-2">
-            <h3 className="text-white text-lg font-semibold mb-2 flex items-center">
-              <RateReviewIcon className="mr-1" />
-              レビュー分析
-              <HelpTooltip title="ゲームレビュー文に多く含まれた単語ほど、大きく表示されます。単語の色はその単語が含まれているレビューの評判によって変化します。" />
-              <div className="flex items-center ml-8 relative">
-                <span className="absolute left-0 -translate-x-4">
-                  <ThumbDownAltOutlinedIcon />
-                </span>
-                <div
-                  className="h-2 w-32 mx-4 rounded"
-                  style={{
-                    background: `linear-gradient(to right,  ${getColorByScore(
-                      -1
-                    )}, ${getColorByScore(0)}, ${getColorByScore(1)})`,
-                  }}
-                />
-                <span className="absolute right-0 translate-x-4">
-                  <ThumbUpAltOutlinedIcon />
-                </span>
-              </div>
-            </h3>
-
-            {node.review && <ReviewCloud reviewData={node.review} />}
-          </div>
+          <ReviewCloudPanel parentW={parentW} parentH={parentH} node={node} />
 
           {node.twitchGameId !== "" && (
-
             <Box
               sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}
             >

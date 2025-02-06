@@ -140,6 +140,19 @@ const SteamList = (props: Props) => {
     setIsNetworkLoading(true);
   }
 
+  const areAllMyOwnGamesInNodes = () => {
+    return myOwnGames.every((game) =>
+      nodes.some((node) => node.steamGameId === game.id)
+    );
+  };
+
+  // フレンドの所有ゲームが nodes にすべて含まれているかを判別する関数
+  const areAllFriendGamesInNodes = () => {
+    return friendsOwnGames.every((game) =>
+      nodes.some((node) => node.steamGameId === game.gameId)
+    );
+  };
+
   return (
     <Panel
       title={
@@ -179,7 +192,7 @@ const SteamList = (props: Props) => {
 
         {/* 自分の所有ゲーム */}
         <Section title={`自分の所有ゲーム(${myOwnGames.length})`} icon={<PersonIcon />}>
-          <Button onClick={addOwnedGamesToNode}>追加してないゲームをすべて追加</Button>
+          {!areAllMyOwnGamesInNodes && <Button onClick={addOwnedGamesToNode} variant="outlined">追加してないゲームをすべて追加</Button>}
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
             {myOwnGames.length > 0 ? (
               myOwnGames.map((game) => {
@@ -205,7 +218,7 @@ const SteamList = (props: Props) => {
 
         {/* フレンドの所有ゲーム */}
         <Section title={`フレンドの所有ゲーム(${friendsOwnGames.length})`} icon={<GroupIcon />}>
-        <Button onClick={addFriendGamesToNode}>追加してないゲームをすべて追加</Button>
+        {!areAllFriendGamesInNodes && <Button onClick={addFriendGamesToNode} variant="outlined">追加してないゲームをすべて追加</Button>}
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
             {friendsOwnGames.length > 0 ? (
               descFriendsData.map((game, index) => {
