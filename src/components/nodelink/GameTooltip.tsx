@@ -194,7 +194,7 @@ const GameTooltip: React.FC<GameTooltipProps> = ({
               boxSizing: "border-box",
             }}
           >
-            ￥{price}
+            {price ? `￥${price.toLocaleString()}` : "無料"}
           </div>
 
           {/* タイトルセクション */}
