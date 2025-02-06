@@ -91,7 +91,7 @@ const createNetwork = async (
       const size = TAG_LIST[key as keyof typeof TAG_LIST].length;
       let defaultValue = 0;
 
-      if (index === 0 || index === 1 || index === 2) {
+      if (index === 1 || index === 2) {
         defaultValue = slider.genreWeight / 100;
       } else if (index === 3 || index === 4 || index === 10) {
         defaultValue = slider.graphicWeight / 100;

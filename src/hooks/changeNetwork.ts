@@ -128,7 +128,7 @@ export default async function changeNetwork(
 
       // ここは TAG_LIST の構造/用途にあわせて自由に変更
       // index と slider の各 Weight を使って重みづけする例
-      if (index === 0 || index === 1 || index === 2) {
+      if (index === 1 || index === 2) {
         defaultValue = slider.genreWeight / 100;
       } else if (index === 3 || index === 4 || index === 10) {
         defaultValue = slider.graphicWeight / 100;
@@ -155,7 +155,6 @@ export default async function changeNetwork(
       }
     });
   await Promise.all(promises);
-
 
   // フィルターに合致するデータだけ取り出す
   const rawNodes = slicedData.filter((item) => {
