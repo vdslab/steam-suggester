@@ -274,14 +274,6 @@ const Network = () => {
           />
         </div>
 
-        {/* 強調表示パネル */}
-        <div className={`${panelClassNames("highlight")}`}>
-          <HighlightPanel
-            selectedTags={selectedTags}
-            setSelectedTags={setSelectedTags}
-          />
-        </div>
-
         {/* StreamerList パネル */}
         <div className={`${panelClassNames("streamer")}`}>
           <Panel
@@ -299,6 +291,14 @@ const Network = () => {
               setStreamerIds={setStreamerIds}
             />
           </Panel>
+        </div>
+
+        {/* 強調表示パネル */}
+        <div className={`${panelClassNames("highlight")}`}>
+          <HighlightPanel
+            selectedTags={selectedTags}
+            setSelectedTags={setSelectedTags}
+          />
         </div>
 
         {/* 類似度パネル */}
