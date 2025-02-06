@@ -15,7 +15,7 @@ const Panel: React.FC<PanelProps> = ({ title, icon, children }) => {
         {icon}
         <h2 className="text-white text-lg font-semibold">{title}</h2>
       </div>
-      <div className="border-t border-gray-700 pt-2 flex-1 overflow-y-auto">
+      <div className="border-t border-gray-700 pt-2 flex-1 overflow-y-auto overflow-x-hidden">
         {children}
       </div>
     </div>
