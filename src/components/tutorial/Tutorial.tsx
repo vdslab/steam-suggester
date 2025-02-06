@@ -9,6 +9,7 @@ import {
   Step,
   StepLabel,
   Button,
+  useMediaQuery,
 } from "@mui/material";
 
 type Props = {
@@ -21,7 +22,8 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "50%",
+  width: "90%",
+  maxWidth: "50%",
   bgcolor: "#121212",
   color: "#ffffff",
   borderRadius: "12px",
@@ -39,10 +41,18 @@ const steps = [
 
 const stepLabels = ["Step 1", "Step 2", "Step 3"];
 
-const stepImages = [
+// Desktop images
+const stepImagesDesktop = [
   `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/1.gif`,
   `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/2.gif`,
   `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/3.jpg`,
+];
+
+// Mobile images
+const stepImagesMobile = [
+  `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/sp1.gif`,
+  `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/sp2.gif`,
+  `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/sp3.jpg`,
 ];
 
 const stepDescriptions = [
@@ -54,6 +64,12 @@ const stepDescriptions = [
 const Tutorial = ({ run, setRun }: Props) => {
   const [activeStep, setActiveStep] = useState(0);
 
+  // Check if screen is mobile size
+  const isMobile = useMediaQuery("(max-width:600px)");
+
+  // Select correct images based on screen size
+  const stepImages = isMobile ? stepImagesMobile : stepImagesDesktop;
+
   const handleNext = () => setActiveStep((prev) => prev + 1);
   const handleBack = () => setActiveStep((prev) => prev - 1);
   const handleClose = () => {
@@ -63,7 +79,7 @@ const Tutorial = ({ run, setRun }: Props) => {
 
   return (
     <Modal open={run} onClose={handleClose}>
-      <Box sx={style}>
+      <Box sx={{ ...style, maxWidth: isMobile ? "90%" : "50%" }}>
         {/* ステップタイトル */}
         <Typography
           variant="h6"
