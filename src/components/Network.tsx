@@ -232,7 +232,7 @@ const Network = () => {
         {/* ゲーム詳細表示 */}
         {selectedIndex !== -1 &&
           nodes[selectedIndex] &&
-          !startsWithPanelList(openPanel) && (
+          (width >= 1024 || !startsWithPanelList(openPanel)) && (
             <div className="absolute right-0 z-20 overflow-y-scroll h-1/3 bottom-0 md:w-1/4 md:h-auto md:bottom-auto md:top-0 lg:h-full">
               <GameDetail
                 node={nodes[selectedIndex]}
