@@ -47,20 +47,23 @@ const DisplayClip = (props: DisplayClipProps) => {
             onClick={(e) => e.stopPropagation()}
           >
             <CloseIcon
-              className="absolute"
+              className="absolute hidden sm:block"
               sx={{ fontSize: 48, color: 'white', cursor: 'pointer', top: -50, right: -10 }}
               onClick={onHandleClose}
             />
-            <iframe
-              src={`${embedUrl}&parent=${process.env.NEXT_PUBLIC_DOMAIN}`}
-              width='800'
-              height='600'
-              allowFullScreen
-            />
-            {/* Next & Prev ボタンをモーダル内に追加 */}
+            {/* ラッパ要素に aspect-video クラスを適用 */}
+            <div className="relative w-[90vw] max-w-[800px] aspect-video">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={`${embedUrl}&parent=${process.env.NEXT_PUBLIC_DOMAIN}`}
+                allowFullScreen
+              />
+            </div>
+
+            {/* Next & Prev ボタン（モバイル版では非表示） */}
             <button
               onClick={prevSlide}
-              className={`absolute -left-20 top-1/2 transform -translate-y-1/2 z-10 p-2 ${
+              className={`absolute -left-20 top-1/2 transform -translate-y-1/2 z-10 p-2 hidden lg:block ${
                 isFirst ? 'opacity-20 cursor-not-allowed' : 'opacity-100'
               }`}
               disabled={isFirst}
@@ -70,7 +73,7 @@ const DisplayClip = (props: DisplayClipProps) => {
 
             <button
               onClick={nextSlide}
-              className={`absolute -right-20 top-1/2 transform -translate-y-1/2 z-10 p-2 ${
+              className={`absolute -right-20 top-1/2 transform -translate-y-1/2 z-10 p-2 hidden lg:block ${
                 isLast ? 'opacity-20 cursor-not-allowed' : 'opacity-100'
               }`}
               disabled={isLast}
