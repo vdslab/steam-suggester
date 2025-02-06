@@ -9,6 +9,7 @@ import {
   Step,
   StepLabel,
   Button,
+  useMediaQuery,
 } from "@mui/material";
 import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 
@@ -26,15 +27,18 @@ const steps = [
 
 const stepLabels = ["Step 1", "Step 2", "Step 3"];
 
-const stepImages = [
+// Desktop images
+const stepImagesDesktop = [
   `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/1.gif`,
   `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/2.gif`,
   `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/3.jpg`,
 ];
 
+// Mobile images
 const stepImagesMobile = [
   `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/sp1.gif`,
   `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/sp2.gif`,
+  `${process.env.NEXT_PUBLIC_CURRENT_URL}/tutorialImg/sp3.jpg`,
 ];
 
 const stepDescriptions = [
@@ -73,7 +77,7 @@ const Tutorial = ({ run, setRun }: Props) => {
 
   return (
     <Modal open={run} onClose={handleClose}>
-      <Box sx={style}>
+      <Box sx={{ ...style}}>
         {/* ステップタイトル */}
         <Typography
           variant="h6"
@@ -93,7 +97,7 @@ const Tutorial = ({ run, setRun }: Props) => {
         {/* ステップ画像 */}
         <Box sx={{ mb: 3, display: "flex", justifyContent: "center" }}>
           <img
-            src={width < 1024 ?  stepImagesMobile[activeStep] :stepImages[activeStep]}
+            src={width < 1024 ?  stepImagesMobile[activeStep] :stepImagesDesktop[activeStep]}
             alt={`Step ${activeStep + 1}`}
             style={{
               width: "100%",
