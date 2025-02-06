@@ -35,33 +35,7 @@ import Tutorial from "./tutorial/Tutorial";
 import changeNetwork from "@/hooks/changeNetwork";
 import useScreenSize from "@visx/responsive/lib/hooks/useScreenSize";
 import { startsWithPanelList } from "./common/Utils";
-
-import { Global } from "@emotion/react";
-import { grey } from "@mui/material/colors";
-import { styled } from "@mui/material/styles";
-import SwipeableDrawer from "@mui/material/SwipeableDrawer/SwipeableDrawer";
 import SwipeContainer from "./common/SwipeContainer";
-
-const Puller = styled("div")(({ theme }) => ({
-  width: 30,
-  height: 6,
-  backgroundColor: grey[300],
-  borderRadius: 3,
-  position: "absolute",
-  top: 8,
-  left: "calc(50% - 15px)",
-  ...theme.applyStyles("dark", {
-    backgroundColor: grey[900],
-  }),
-  zIndex: 100,
-}));
-
-const StyledBox = styled("div")(({ theme }) => ({
-  backgroundColor: "#fff",
-  ...theme.applyStyles("dark", {
-    backgroundColor: grey[800],
-  }),
-}));
 
 const Network = () => {
   const { data: steamAllData, error: steamAllDataError } = useSWR<
@@ -96,9 +70,6 @@ const Network = () => {
 
   const [prevAddedGameId, setPrevAddedGameId] = useState<string>("");
 
-  const [open, setOpen] = useState(false);
-
-  const drawerBleeding = height / 3;
 
   const initialNodes = async (
     filter: Filter,
@@ -233,9 +204,6 @@ const Network = () => {
     }
     w-2/3 lg:w-1/5`;
 
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
-  };
 
   return (
     <div className="flex flex-1 overflow-hidden text-white relative">
