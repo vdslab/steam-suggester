@@ -192,7 +192,7 @@ const SteamList = (props: Props) => {
 
         {/* 自分の所有ゲーム */}
         <Section title={`自分の所有ゲーム(${myOwnGames.length})`} icon={<PersonIcon />}>
-          {!areAllMyOwnGamesInNodes && <Button onClick={addOwnedGamesToNode} variant="outlined">追加してないゲームをすべて追加</Button>}
+          {!areAllMyOwnGamesInNodes() && <Button onClick={addOwnedGamesToNode} variant="outlined">追加してないゲームをすべて追加</Button>}
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto ">
             {myOwnGames.length > 0 ? (
               myOwnGames.map((game) => {
@@ -218,7 +218,7 @@ const SteamList = (props: Props) => {
 
         {/* フレンドの所有ゲーム */}
         <Section title={`フレンドの所有ゲーム(${friendsOwnGames.length})`} icon={<GroupIcon />}>
-        {!areAllFriendGamesInNodes && <Button onClick={addFriendGamesToNode} variant="outlined">追加してないゲームをすべて追加</Button>}
+        {!areAllFriendGamesInNodes() && <Button onClick={addFriendGamesToNode} variant="outlined">追加してないゲームをすべて追加</Button>}
           <div className="bg-gray-700 p-2 rounded-lg overflow-y-auto">
             {friendsOwnGames.length > 0 ? (
               descFriendsData.map((game, index) => {
